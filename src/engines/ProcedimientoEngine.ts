@@ -4,14 +4,16 @@
  * ProcedimientoEngine
  * ============================================================
  *
- * Motor encargado de determinar el procedimiento
- * de adjudicación utilizando el motor de inferencia.
+ * Motor encargado de determinar el procedimiento de
+ * adjudicación.
+ *
+ * Hereda de BaseEngine para reutilizar el acceso al
+ * conocimiento y al motor de inferencia.
  *
  * ============================================================
  */
 
-import { KnowledgeEngine } from "./KnowledgeEngine";
-import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+import { BaseEngine } from "./BaseEngine";
 import { ReglaJuridica } from "../domain/conocimiento/ReglaJuridica";
 
 export enum TipoContrato {
@@ -32,15 +34,7 @@ export interface DatosProcedimiento {
 
 }
 
-export class ProcedimientoEngine {
-
-    constructor(
-
-        private readonly knowledge: KnowledgeEngine,
-
-        private readonly inference: InferenceEngine
-
-    ) {}
+export class ProcedimientoEngine extends BaseEngine {
 
     /**
      * Determina el procedimiento aplicable.
@@ -52,17 +46,20 @@ export class ProcedimientoEngine {
     ): Promise<string> {
 
         const reglas =
-            await this.knowledge.obtenerReglasProcedimiento();
+            await this.obtenerReglas(
+                "PROCEDIMIENTO"
+            );
 
-        const regla = this.inference.evaluarPrimera(
+        const regla =
+            this.inference.evaluarPrimera(
 
-            reglas,
+                reglas,
 
-            datos,
+                datos,
 
-            (r, d) => this.cumple(r, d)
+                (r, d) => this.cumple(r, d)
 
-        );
+            );
 
         if (!regla) {
 
@@ -85,12 +82,12 @@ export class ProcedimientoEngine {
 
     ): boolean {
 
-        const condicion: any = regla as any;
+        const r: any = regla;
 
         if (
 
-            condicion.tipoContrato &&
-            condicion.tipoContrato !== datos.tipoContrato
+            r.tipoContrato &&
+            r.tipoContrato !== datos.tipoContrato
 
         ) {
 
@@ -100,8 +97,8 @@ export class ProcedimientoEngine {
 
         if (
 
-            condicion.valorMinimo !== undefined &&
-            datos.valorEstimado < condicion.valorMinimo
+            r.valorMinimo !== undefined &&
+            datos.valorEstimado < r.valorMinimo
 
         ) {
 
@@ -111,8 +108,8 @@ export class ProcedimientoEngine {
 
         if (
 
-            condicion.valorMaximo !== undefined &&
-            datos.valorEstimado > condicion.valorMaximo
+            r.valorMaximo !== undefined &&
+            datos.valorEstimado > r.valorMaximo
 
         ) {
 
