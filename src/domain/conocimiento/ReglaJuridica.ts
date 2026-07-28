@@ -1,111 +1,121 @@
 /**
  * ============================================================
  * CONTRATA IA
- * ReglaJuridica
+ * RuleEngine
  * ============================================================
  *
- * Unidad básica de razonamiento jurídico.
+ * Gestor central de reglas jurídicas.
  *
- * Una regla indica:
+ * NO interpreta normativa.
  *
- * SI ocurre una condición
+ * NO toma decisiones.
  *
- * ENTONCES debe aplicarse una consecuencia.
- *
- * Los motores nunca contendrán reglas.
- * Las reglas vivirán únicamente en esta capa.
+ * Únicamente administra las reglas que posteriormente
+ * utilizarán los distintos motores.
  *
  * ============================================================
  */
 
-import { ReferenciaNormativa } from "./ReferenciaNormativa";
+import { ReglaJuridica } from "./ReglaJuridica";
 
-export class ReglaJuridica {
+export class RuleEngine {
 
-    constructor(
-
-        /**
-         * Identificador único.
-         */
-        public readonly id: string,
-
-        /**
-         * Nombre corto.
-         */
-        public readonly nombre: string,
-
-        /**
-         * Descripción funcional.
-         */
-        public readonly descripcion: string,
-
-        /**
-         * Motor responsable.
-         *
-         * Ej:
-         * CPV
-         * PROCEDIMIENTO
-         * SOLVENCIA
-         * PUBLICIDAD
-         */
-        public readonly motor: string,
-
-        /**
-         * Condición.
-         */
-        public readonly condicion: string,
-
-        /**
-         * Consecuencia.
-         */
-        public readonly consecuencia: string,
-
-        /**
-         * Referencias jurídicas.
-         */
-        public readonly referencias: ReferenciaNormativa[] = [],
-
-        /**
-         * Prioridad.
-         */
-        public readonly prioridad: number = 0,
-
-        /**
-         * Activa.
-         */
-        public readonly activa: boolean = true
-
-    ) {}
+    private readonly reglas: ReglaJuridica[] = [];
 
     /**
-     * Indica si la regla puede utilizarse.
+     * Registra una regla.
      */
-    public disponible(): boolean {
+    public registrar(
+        regla: ReglaJuridica
+    ): void {
 
-        return this.activa;
+        this.reglas.push(regla);
 
     }
 
     /**
-     * Devuelve la referencia principal.
+     * Elimina una regla.
      */
-    public referenciaPrincipal(): ReferenciaNormativa | undefined {
+    public eliminar(
+        id: string
+    ): void {
 
-        return this.referencias[0];
-
-    }
-
-    /**
-     * Comprueba si afecta a un motor.
-     */
-    public afectaMotor(
-        nombreMotor: string
-    ): boolean {
-
-        return (
-            this.motor.toUpperCase() ===
-            nombreMotor.toUpperCase()
+        const indice = this.reglas.findIndex(
+            r => r.id === id
         );
+
+        if (indice >= 0) {
+
+            this.reglas.splice(indice, 1);
+
+        }
+
+    }
+
+    /**
+     * Devuelve todas las reglas.
+     */
+    public obtenerTodas(): ReglaJuridica[] {
+
+        return [...this.reglas];
+
+    }
+
+    /**
+     * Devuelve únicamente reglas activas.
+     */
+    public obtenerActivas(): ReglaJuridica[] {
+
+        return this.reglas.filter(
+            r => r.disponible()
+        );
+
+    }
+
+    /**
+     * Obtiene reglas de un motor.
+     */
+    public obtenerPorMotor(
+        motor: string
+    ): ReglaJuridica[] {
+
+        return this.obtenerActivas()
+            .filter(r => r.afectaMotor(motor))
+            .sort(
+                (a, b) =>
+                    b.prioridad - a.prioridad
+            );
+
+    }
+
+    /**
+     * Busca una regla.
+     */
+    public obtenerPorId(
+        id: string
+    ): ReglaJuridica | undefined {
+
+        return this.reglas.find(
+            r => r.id === id
+        );
+
+    }
+
+    /**
+     * Número total de reglas.
+     */
+    public total(): number {
+
+        return this.reglas.length;
+
+    }
+
+    /**
+     * Elimina todas las reglas.
+     */
+    public limpiar(): void {
+
+        this.reglas.length = 0;
 
     }
 
