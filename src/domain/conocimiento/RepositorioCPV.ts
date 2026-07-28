@@ -1,61 +1,44 @@
 /**
- * =========================================================
+ * ============================================================
  * CONTRATA IA
- * Repositorio de códigos CPV
- * =========================================================
+ * RepositorioCPV
+ * ============================================================
  *
- * Contrato de acceso al catálogo CPV.
+ * Contrato del repositorio de códigos CPV.
  *
- * Su implementación podrá utilizar:
+ * Todas las implementaciones deberán ajustarse
+ * a esta interfaz.
  *
- * • JSON
- * • Base de datos
- * • API
- * • IA
- *
- * sin modificar el resto del sistema.
- * =========================================================
+ * ============================================================
  */
 
-export interface ResultadoBusquedaCPV {
-
-    codigo: string;
-
-    descripcion: string;
-
-    principal: boolean;
-
-    confianza: number;
-
-    palabrasClave: string[];
-
-}
+import { ResultadoBusquedaCPV } from "./ResultadoBusquedaCPV";
 
 export interface RepositorioCPV {
 
     /**
-     * Busca CPV por descripción libre.
+     * Busca CPV a partir de una descripción.
      */
     buscarPorDescripcion(
         descripcion: string
     ): Promise<ResultadoBusquedaCPV[]>;
 
     /**
-     * Busca un CPV por su código.
+     * Busca un CPV por código.
      */
     buscarPorCodigo(
         codigo: string
     ): Promise<ResultadoBusquedaCPV | null>;
 
     /**
-     * Busca por palabra clave.
+     * Busca CPV por palabra clave.
      */
     buscarPorPalabraClave(
         palabra: string
     ): Promise<ResultadoBusquedaCPV[]>;
 
     /**
-     * Devuelve CPV relacionados.
+     * Obtiene códigos relacionados.
      */
     obtenerRelacionados(
         codigo: string
@@ -69,8 +52,7 @@ export interface RepositorioCPV {
     ): Promise<boolean>;
 
     /**
-     * Comprueba si un código pertenece
-     * a una familia determinada.
+     * Comprueba si pertenece a una familia.
      */
     perteneceAFamilia(
         codigo: string,
@@ -78,17 +60,32 @@ export interface RepositorioCPV {
     ): Promise<boolean>;
 
     /**
-     * Obtiene el CPV principal.
+     * Devuelve el CPV principal.
      */
     obtenerPrincipal(
         resultados: ResultadoBusquedaCPV[]
     ): ResultadoBusquedaCPV | null;
 
     /**
-     * Obtiene CPV secundarios.
+     * Devuelve CPV secundarios.
      */
     obtenerSecundarios(
         resultados: ResultadoBusquedaCPV[]
     ): ResultadoBusquedaCPV[];
+
+    /**
+     * Obtiene todas las palabras clave
+     * asociadas a un código.
+     */
+    obtenerPalabrasClave(
+        codigo: string
+    ): Promise<string[]>;
+
+    /**
+     * Obtiene la descripción oficial.
+     */
+    obtenerDescripcion(
+        codigo: string
+    ): Promise<string | null>;
 
 }
