@@ -4,136 +4,113 @@
  * DocumentEngine
  * ============================================================
  *
- * Motor responsable de coordinar la generación de toda la
- * documentación del expediente de contratación.
- *
- * No redacta documentos directamente; coordina los distintos
- * generadores especializados.
- *
- * Documentos previstos:
- *
- * • Memoria justificativa
- * • Memoria de insuficiencia de medios
- * • Informe del procedimiento
- * • Informe de solvencia
- * • Propuesta de criterios
- * • Propuesta de división en lotes
- * • PCAP
- * • PPT
- * • Resoluciones
+ * Motor responsable de determinar los documentos
+ * que deben incorporarse al expediente.
  *
  * ============================================================
  */
-
-import { Expediente } from "../domain/expediente/Expediente";
 
 export interface DocumentoGenerado {
 
     nombre: string;
 
-    contenido: string;
+    obligatorio: boolean;
+
+    generado: boolean;
 
 }
 
 export class DocumentEngine {
 
     /**
-     * Genera toda la documentación asociada
-     * a un expediente.
+     * Obtiene la documentación mínima.
      */
-    public generarExpediente(
-        expediente: Expediente
-    ): DocumentoGenerado[] {
+    public obtenerDocumentos(): DocumentoGenerado[] {
 
-        this.validar(expediente);
+        return [
 
-        const documentos: DocumentoGenerado[] = [];
+            {
 
-        documentos.push(
-            this.generarMemoria(expediente)
-        );
+                nombre: "Memoria Justificativa",
 
-        documentos.push(
-            this.generarInformeProcedimiento(expediente)
-        );
+                obligatorio: true,
 
-        documentos.push(
-            this.generarInformeSolvencia(expediente)
-        );
+                generado: false
 
-        return documentos;
+            },
+
+            {
+
+                nombre: "Informe de Insuficiencia de Medios",
+
+                obligatorio: true,
+
+                generado: false
+
+            },
+
+            {
+
+                nombre: "PCAP",
+
+                obligatorio: true,
+
+                generado: false
+
+            },
+
+            {
+
+                nombre: "PPT",
+
+                obligatorio: true,
+
+                generado: false
+
+            }
+
+        ];
 
     }
 
-    // =====================================================
-    // VALIDACIÓN
-    // =====================================================
+    /**
+     * Marca un documento como generado.
+     */
+    public marcarGenerado(
 
-    private validar(
-        expediente: Expediente
-    ): void {
+        documento: DocumentoGenerado
 
-        if (!expediente) {
+    ): DocumentoGenerado {
 
-            throw new Error(
-                "Debe existir un expediente."
+        documento.generado = true;
+
+        return documento;
+
+    }
+
+    /**
+     * Comprueba si todos los documentos
+     * obligatorios han sido generados.
+     */
+    public expedienteCompleto(
+
+        documentos: DocumentoGenerado[]
+
+    ): boolean {
+
+        return documentos
+
+            .filter(
+
+                documento => documento.obligatorio
+
+            )
+
+            .every(
+
+                documento => documento.generado
+
             );
-
-        }
-
-    }
-
-    // =====================================================
-    // MEMORIA
-    // =====================================================
-
-    private generarMemoria(
-        expediente: Expediente
-    ): DocumentoGenerado {
-
-        return {
-
-            nombre: "Memoria Justificativa",
-
-            contenido: ""
-
-        };
-
-    }
-
-    // =====================================================
-    // PROCEDIMIENTO
-    // =====================================================
-
-    private generarInformeProcedimiento(
-        expediente: Expediente
-    ): DocumentoGenerado {
-
-        return {
-
-            nombre: "Informe del Procedimiento",
-
-            contenido: ""
-
-        };
-
-    }
-
-    // =====================================================
-    // SOLVENCIA
-    // =====================================================
-
-    private generarInformeSolvencia(
-        expediente: Expediente
-    ): DocumentoGenerado {
-
-        return {
-
-            nombre: "Informe de Solvencia",
-
-            contenido: ""
-
-        };
 
     }
 
