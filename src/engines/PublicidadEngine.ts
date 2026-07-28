@@ -4,171 +4,137 @@
  * PublicidadEngine
  * ============================================================
  *
- * Motor encargado de determinar la publicidad
- * obligatoria del expediente.
+ * Motor experto encargado de determinar
+ * el régimen de publicidad de la licitación.
  *
- * Implementado sobre BaseEngine para reutilizar
- * KnowledgeEngine e InferenceEngine.
+ * Toda la lógica jurídica se encuentra
+ * externalizada en:
+ *
+ * knowledge/rules/publicidad.rules.json
  *
  * ============================================================
  */
 
+import * as path from "path";
+
 import { BaseEngine } from "./BaseEngine";
-import { ReglaJuridica } from "../domain/conocimiento/ReglaJuridica";
 
-export interface DatosPublicidad {
+import { RuleEngine } from "../domain/conocimiento/RuleEngine";
+import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
 
-    procedimiento: string;
+import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
 
-    tipoContrato: string;
-
-    valorEstimado: number;
-
-}
-
-export interface ResultadoPublicidad {
-
-    publicarPLCSP: boolean;
-
-    publicarDOUE: boolean;
-
-    publicarPerfilContratante: boolean;
-
-    justificacion: string[];
-
-}
+import { TipoPublicidad } from "../domain/publicidad/TipoPublicidad";
 
 export class PublicidadEngine extends BaseEngine {
 
-    /**
-     * Determina la publicidad exigible.
-     */
-    public async determinarPublicidad(
+    private readonly ruleEngine = new RuleEngine();
 
-        datos: DatosPublicidad
+    private readonly inference: InferenceEngine;
 
-    ): Promise<ResultadoPublicidad> {
+    constructor() {
 
-        const reglas =
-            await this.obtenerReglas(
-                "PUBLICIDAD"
-            );
+        super();
 
-        const reglasAplicables =
-            this.inference.evaluarTodas(
+        this.ruleEngine.cargarReglas(
 
-                reglas,
+            path.join(
 
-                datos,
+                process.cwd(),
 
-                (r, d) => this.cumple(r, d)
+                "knowledge",
 
-            );
+                "rules",
 
-        const resultado: ResultadoPublicidad = {
+                "publicidad.rules.json"
 
-            publicarPLCSP: false,
+            )
 
-            publicarDOUE: false,
+        );
 
-            publicarPerfilContratante: false,
+        this.inference =
 
-            justificacion: []
+            new InferenceEngine(
 
-        };
-
-        for (const regla of reglasAplicables) {
-
-            const r: any = regla;
-
-            if (r.publicarPLCSP) {
-
-                resultado.publicarPLCSP = true;
-
-            }
-
-            if (r.publicarDOUE) {
-
-                resultado.publicarDOUE = true;
-
-            }
-
-            if (r.publicarPerfilContratante) {
-
-                resultado.publicarPerfilContratante = true;
-
-            }
-
-            resultado.justificacion.push(
-
-                regla.descripcion
+                this.ruleEngine
 
             );
-
-        }
-
-        return resultado;
 
     }
 
     /**
-     * Comprueba si una regla resulta aplicable.
+     * Ejecuta el motor de publicidad.
      */
-    private cumple(
+    public ejecutar(
 
-        regla: ReglaJuridica,
+        contexto: ExpedienteContext
 
-        datos: DatosPublicidad
+    ): DecisionJuridica<TipoPublicidad> {
 
-    ): boolean {
+        const decision =
 
-        const r: any = regla;
+            new DecisionJuridica<TipoPublicidad>();
 
-        if (
+        const evaluaciones =
 
-            r.procedimiento &&
-            r.procedimiento !== datos.procedimiento
+            this.inference.evaluar(
 
-        ) {
+                contexto as Record<string, unknown>
 
-            return false;
+            );
 
-        }
+        const regla =
 
-        if (
+            evaluaciones.find(
 
-            r.tipoContrato &&
-            r.tipoContrato !== datos.tipoContrato
+                r => r.cumplida
 
-        ) {
+            );
 
-            return false;
+        if (!regla) {
 
-        }
+            decision.confianza = 0;
 
-        if (
+            decision.explicacion =
 
-            r.valorMinimo !== undefined &&
-            datos.valorEstimado < r.valorMinimo
+                "No existe ninguna regla de publicidad aplicable.";
 
-        ) {
-
-            return false;
+            return decision;
 
         }
 
-        if (
+        const publicidad =
 
-            r.valorMaximo !== undefined &&
-            datos.valorEstimado > r.valorMaximo
+            regla.regla.resultado as TipoPublicidad;
 
-        ) {
+        contexto.publicidad = publicidad;
 
-            return false;
+        decision.resultado = publicidad;
+
+        decision.confianza = 100;
+
+        if (regla.regla.articulo) {
+
+            decision.articulos.push(
+
+                regla.regla.articulo
+
+            );
 
         }
 
-        return true;
+        decision.reglasAplicadas.push(
+
+            regla.regla.id
+
+        );
+
+        decision.explicacion =
+
+            regla.regla.nombre;
+
+        return decision;
 
     }
 
