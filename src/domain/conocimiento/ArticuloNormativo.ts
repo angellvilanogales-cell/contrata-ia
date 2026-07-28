@@ -6,140 +6,71 @@
  *
  * Representa un artículo de una norma jurídica.
  *
- * No almacena únicamente el texto legal.
+ * Esta entidad será utilizada por:
  *
- * Almacena conocimiento estructurado que podrá ser utilizado
- * por todos los motores del sistema.
+ * - Reglas jurídicas
+ * - Decisiones jurídicas
+ * - Memorias
+ * - Informes
+ * - PCAP
+ * - PPT
  *
  * ============================================================
  */
 
+import { FuenteJuridica } from "./FuenteJuridica";
+
 export class ArticuloNormativo {
 
-    constructor(
-
-        /**
-         * Identificador interno.
-         */
-        public readonly id: string,
-
-        /**
-         * Norma.
-         * Ej.: LCSP
-         */
-        public readonly norma: string,
-
-        /**
-         * Número del artículo.
-         * Ej.: 99
-         */
-        public readonly articulo: string,
-
-        /**
-         * Título.
-         */
-        public readonly titulo: string,
-
-        /**
-         * Texto resumido.
-         */
-        public readonly resumen: string,
-
-        /**
-         * Texto oficial.
-         */
-        public readonly texto: string,
-
-        /**
-         * Palabras clave.
-         */
-        public readonly palabrasClave: string[] = [],
-
-        /**
-         * Artículos relacionados.
-         */
-        public readonly relacionados: string[] = [],
-
-        /**
-         * Documentos afectados.
-         */
-        public readonly documentos: string[] = [],
-
-        /**
-         * Motores afectados.
-         */
-        public readonly motores: string[] = [],
-
-        /**
-         * Fecha de vigencia.
-         */
-        public readonly vigenteDesde?: Date,
-
-        /**
-         * Fecha de fin de vigencia.
-         */
-        public readonly vigenteHasta?: Date
-
-    ) {}
+    /**
+     * Identificador interno.
+     */
+    public id = "";
 
     /**
-     * Comprueba si el artículo está vigente.
+     * Número del artículo.
+     *
+     * Ejemplo:
+     * 99
+     * 145
+     * 159
      */
-    public estaVigente(
-        fecha: Date = new Date()
-    ): boolean {
-
-        if (
-            this.vigenteDesde &&
-            fecha < this.vigenteDesde
-        ) {
-            return false;
-        }
-
-        if (
-            this.vigenteHasta &&
-            fecha > this.vigenteHasta
-        ) {
-            return false;
-        }
-
-        return true;
-
-    }
+    public numero = "";
 
     /**
-     * Comprueba si afecta a un documento.
+     * Título del artículo.
      */
-    public afectaDocumento(
-        documento: string
-    ): boolean {
-
-        return this.documentos.includes(documento);
-
-    }
+    public titulo = "";
 
     /**
-     * Comprueba si afecta a un motor.
+     * Texto consolidado.
      */
-    public afectaMotor(
-        motor: string
-    ): boolean {
-
-        return this.motores.includes(motor);
-
-    }
+    public texto = "";
 
     /**
-     * Comprueba si contiene una palabra clave.
+     * Resumen funcional utilizado por
+     * el sistema experto.
      */
-    public contienePalabraClave(
-        palabra: string
-    ): boolean {
+    public resumen = "";
 
-        return this.palabrasClave
-            .map(p => p.toLowerCase())
-            .includes(palabra.toLowerCase());
+    /**
+     * Palabras clave.
+     */
+    public etiquetas: string[] = [];
 
-    }
+    /**
+     * Fuente normativa.
+     */
+    public fuente!: FuenteJuridica;
+
+    /**
+     * Artículos relacionados.
+     */
+    public relacionados: string[] = [];
+
+    /**
+     * Indica si el artículo continúa vigente.
+     */
+    public vigente = true;
 
 }
