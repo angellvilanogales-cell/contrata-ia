@@ -1,0 +1,49 @@
+{
+  "modulo": "PROCEDIMIENTO",
+  "version": "1.0.0",
+  "descripcion": "Reglas para la determinación del procedimiento de adjudicación conforme a la LCSP.",
+  "articulos": [
+    "118",
+    "131",
+    "159",
+    "159.6"
+  ],
+  "reglas": [
+    {
+      "id": "PROC-001",
+      "nombre": "Contrato menor",
+      "tipo": "DECISION",
+      "prioridad": 1,
+      "condicion": "valorEstimado < 15000",
+      "resultado": "CONTRATO_MENOR",
+      "articulo": "118"
+    },
+    {
+      "id": "PROC-002",
+      "nombre": "Abierto simplificado abreviado",
+      "tipo": "DECISION",
+      "prioridad": 2,
+      "condicion": "valorEstimado <= 60000",
+      "resultado": "ABIERTO_SIMPLIFICADO_ABREVIADO",
+      "articulo": "159.6"
+    },
+    {
+      "id": "PROC-003",
+      "nombre": "Abierto simplificado",
+      "tipo": "DECISION",
+      "prioridad": 3,
+      "condicion": "valorEstimado <= 100000",
+      "resultado": "ABIERTO_SIMPLIFICADO",
+      "articulo": "159"
+    },
+    {
+      "id": "PROC-004",
+      "nombre": "Procedimiento abierto",
+      "tipo": "DECISION",
+      "condicion": "true",
+      "prioridad": 99,
+      "resultado": "ABIERTO",
+      "articulo": "131"
+    }
+  ]
+}
