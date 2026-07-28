@@ -4,13 +4,13 @@
  * ProcedimientoEngine
  * ============================================================
  *
- * Motor encargado de determinar el procedimiento
- * de adjudicación utilizando exclusivamente el
- * banco de reglas jurídicas.
+ * Motor experto para la determinación del
+ * procedimiento de adjudicación.
  *
- * Toda la lógica se encuentra externalizada en:
+ * Trabaja directamente sobre ExpedienteContext.
  *
- * knowledge/rules/procedimiento.rules.json
+ * Toda la lógica jurídica está externalizada
+ * en el banco de reglas.
  *
  * ============================================================
  */
@@ -21,16 +21,12 @@ import { BaseEngine } from "./BaseEngine";
 
 import { RuleEngine } from "../domain/conocimiento/RuleEngine";
 import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+
 import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
+
+import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
+
 import { TipoProcedimiento } from "../domain/procedimiento/TipoProcedimiento";
-
-export interface DatosProcedimiento {
-
-    tipoContrato: string;
-
-    valorEstimado: number;
-
-}
 
 export class ProcedimientoEngine extends BaseEngine {
 
@@ -69,11 +65,11 @@ export class ProcedimientoEngine extends BaseEngine {
     }
 
     /**
-     * Determina el procedimiento.
+     * Ejecuta el motor.
      */
-    public determinar(
+    public ejecutar(
 
-        datos: DatosProcedimiento
+        contexto: ExpedienteContext
 
     ): DecisionJuridica<TipoProcedimiento> {
 
@@ -85,11 +81,11 @@ export class ProcedimientoEngine extends BaseEngine {
 
             this.inference.evaluar(
 
-                datos as Record<string, unknown>
+                contexto as Record<string, unknown>
 
             );
 
-        const reglaAplicada =
+        const regla =
 
             evaluaciones.find(
 
@@ -97,39 +93,47 @@ export class ProcedimientoEngine extends BaseEngine {
 
             );
 
-        if (!reglaAplicada) {
+        if (!regla) {
 
             decision.confianza = 0;
 
             decision.explicacion =
 
-                "No existe ninguna regla aplicable.";
+                "No existe ninguna regla de procedimiento aplicable.";
 
             return decision;
 
         }
 
-        decision.resultado =
+        const procedimiento =
 
-            reglaAplicada.regla.resultado as TipoProcedimiento;
+            regla.regla.resultado as TipoProcedimiento;
+
+        contexto.procedimiento = procedimiento;
+
+        decision.resultado = procedimiento;
 
         decision.confianza = 100;
 
-        decision.articulos.push(
+        if (regla.regla.articulo) {
 
-            reglaAplicada.regla.articulo
+            decision.articulos.push(
 
-        );
+                regla.regla.articulo
+
+            );
+
+        }
 
         decision.reglasAplicadas.push(
 
-            reglaAplicada.regla.id
+            regla.regla.id
 
         );
 
         decision.explicacion =
 
-            reglaAplicada.regla.nombre;
+            regla.regla.nombre;
 
         return decision;
 
