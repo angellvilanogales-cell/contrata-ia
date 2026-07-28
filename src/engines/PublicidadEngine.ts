@@ -4,17 +4,16 @@
  * PublicidadEngine
  * ============================================================
  *
- * Determina la publicidad obligatoria utilizando
- * el motor de inferencia.
+ * Motor encargado de determinar la publicidad
+ * obligatoria del expediente.
  *
- * Toda la lógica jurídica se obtiene desde
- * KnowledgeEngine + RuleEngine.
+ * Implementado sobre BaseEngine para reutilizar
+ * KnowledgeEngine e InferenceEngine.
  *
  * ============================================================
  */
 
-import { KnowledgeEngine } from "./KnowledgeEngine";
-import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+import { BaseEngine } from "./BaseEngine";
 import { ReglaJuridica } from "../domain/conocimiento/ReglaJuridica";
 
 export interface DatosPublicidad {
@@ -39,18 +38,10 @@ export interface ResultadoPublicidad {
 
 }
 
-export class PublicidadEngine {
-
-    constructor(
-
-        private readonly knowledge: KnowledgeEngine,
-
-        private readonly inference: InferenceEngine
-
-    ) {}
+export class PublicidadEngine extends BaseEngine {
 
     /**
-     * Determina la publicidad obligatoria.
+     * Determina la publicidad exigible.
      */
     public async determinarPublicidad(
 
@@ -59,7 +50,9 @@ export class PublicidadEngine {
     ): Promise<ResultadoPublicidad> {
 
         const reglas =
-            await this.knowledge.obtenerReglasPublicidad();
+            await this.obtenerReglas(
+                "PUBLICIDAD"
+            );
 
         const reglasAplicables =
             this.inference.evaluarTodas(
@@ -119,7 +112,7 @@ export class PublicidadEngine {
     }
 
     /**
-     * Evalúa una regla.
+     * Comprueba si una regla resulta aplicable.
      */
     private cumple(
 
