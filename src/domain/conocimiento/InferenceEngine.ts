@@ -4,98 +4,161 @@
  * InferenceEngine
  * ============================================================
  *
- * Motor genérico de inferencia.
+ * Motor de inferencia.
  *
- * Todos los motores jurídicos deberán utilizar esta clase
- * para evaluar reglas.
+ * Responsable de evaluar las reglas jurídicas
+ * previamente cargadas por RuleEngine.
  *
- * No conoce la LCSP.
- * No conoce CPV.
- * No conoce procedimientos.
- *
- * Únicamente evalúa reglas.
+ * En esta primera versión implementa la estructura
+ * necesaria para evolucionar hacia un sistema
+ * experto completo basado en reglas.
  *
  * ============================================================
  */
 
-import { ReglaJuridica } from "./ReglaJuridica";
+import { RuleDefinition } from "./RuleLoader";
+import { RuleEngine } from "./RuleEngine";
+
+export interface RuleEvaluation {
+
+    regla: RuleDefinition;
+
+    cumplida: boolean;
+
+    mensaje: string;
+
+}
 
 export class InferenceEngine {
 
+    constructor(
+
+        private readonly ruleEngine: RuleEngine
+
+    ) { }
+
     /**
-     * Devuelve la primera regla válida.
+     * Evalúa todas las reglas.
      */
-    public evaluarPrimera<T>(
+    public evaluar(
 
-        reglas: ReglaJuridica[],
+        contexto: Record<string, unknown>
 
-        contexto: T,
+    ): RuleEvaluation[] {
 
-        evaluador: (
-            regla: ReglaJuridica,
-            contexto: T
-        ) => boolean
+        const resultado: RuleEvaluation[] = [];
 
-    ): ReglaJuridica | undefined {
+        const reglas =
+            this.ruleEngine.obtenerReglasOrdenadas();
 
         for (const regla of reglas) {
 
-            if (!regla.disponible()) {
-                continue;
-            }
+            const cumplida =
+                this.evaluarCondicion(
 
-            if (evaluador(regla, contexto)) {
-                return regla;
-            }
+                    regla,
+
+                    contexto
+
+                );
+
+            resultado.push({
+
+                regla,
+
+                cumplida,
+
+                mensaje: regla.mensaje
+
+            });
 
         }
 
-        return undefined;
+        return resultado;
 
     }
 
     /**
-     * Devuelve todas las reglas válidas.
+     * Devuelve únicamente las reglas incumplidas.
      */
-    public evaluarTodas<T>(
+    public obtenerIncumplimientos(
 
-        reglas: ReglaJuridica[],
+        contexto: Record<string, unknown>
 
-        contexto: T,
+    ): RuleEvaluation[] {
 
-        evaluador: (
-            regla: ReglaJuridica,
-            contexto: T
-        ) => boolean
+        return this.evaluar(contexto)
 
-    ): ReglaJuridica[] {
+            .filter(
 
-        return reglas.filter(regla =>
+                r => !r.cumplida
 
-            regla.disponible() &&
-
-            evaluador(regla, contexto)
-
-        );
+            );
 
     }
 
     /**
-     * Ordena reglas por prioridad.
+     * Comprueba si todas las reglas se cumplen.
      */
-    public ordenar(
+    public esValido(
 
-        reglas: ReglaJuridica[]
+        contexto: Record<string, unknown>
 
-    ): ReglaJuridica[] {
+    ): boolean {
 
-        return [...reglas].sort(
+        return this.obtenerIncumplimientos(
 
-            (a, b) =>
+            contexto
 
-                b.prioridad - a.prioridad
+        ).length === 0;
 
-        );
+    }
+
+    /**
+     * =====================================================
+     * Evaluación de condiciones.
+     *
+     * En esta primera versión únicamente implementamos
+     * la infraestructura.
+     *
+     * En el siguiente sprint se sustituirá por un
+     * evaluador completo de expresiones.
+     * =====================================================
+     */
+    private evaluarCondicion(
+
+        regla: RuleDefinition,
+
+        contexto: Record<string, unknown>
+
+    ): boolean {
+
+        switch (regla.condicion.trim()) {
+
+            case "true":
+
+                return true;
+
+            case "false":
+
+                return false;
+
+            default:
+
+                /**
+                 * TODO
+                 *
+                 * Aquí irá el evaluador de expresiones:
+                 *
+                 * titulo != ''
+                 * descripcion.length >= 20
+                 * valorEstimado > 0
+                 * etc.
+                 */
+
+                return true;
+
+        }
 
     }
 
