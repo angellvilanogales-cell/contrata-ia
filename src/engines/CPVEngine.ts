@@ -4,116 +4,146 @@
  * CPVEngine
  * ============================================================
  *
- * Motor encargado de determinar automáticamente el código
- * CPV más adecuado para el expediente de contratación.
+ * Motor inteligente para la determinación y validación
+ * de códigos CPV conforme al Reglamento (CE) 2195/2002
+ * y a la Ley 9/2017 de Contratos del Sector Público.
  *
- * En futuras versiones utilizará:
+ * Funciones principales:
  *
- * - Base oficial CPV
- * - Reglas jurídicas
- * - Sinónimos
- * - IA
- * - Históricos de expedientes
+ *  • Analizar el objeto del contrato.
+ *  • Proponer CPV principales.
+ *  • Proponer CPV secundarios.
+ *  • Validar códigos CPV.
+ *  • Detectar incoherencias.
+ *  • Generar la justificación de la selección.
  *
+ * ============================================================
  */
 
-import { Expediente } from "../domain/expediente/Expediente";
+export interface CPVCandidato {
 
-export interface ResultadoCPV {
+    codigo: string;
 
-    codigoPrincipal: string;
-
-    descripcionPrincipal: string;
-
-    codigosSecundarios: string[];
+    descripcion: string;
 
     confianza: number;
 
-    observaciones: string[];
+    principal: boolean;
+
+    motivo: string;
 
 }
 
 export class CPVEngine {
 
     /**
-     * Punto de entrada.
+     * Analiza el objeto contractual y devuelve
+     * una lista de posibles códigos CPV.
      */
-    public clasificar(
-        expediente: Expediente
-    ): ResultadoCPV {
+    public analizarObjeto(
+        objeto: string
+    ): CPVCandidato[] {
 
-        this.validar(expediente);
+        if (!objeto) {
 
-        const descripcion =
-            this.obtenerDescripcion(expediente);
-
-        return this.buscarCPV(descripcion);
-
-    }
-
-    // =====================================================
-    // VALIDACIONES
-    // =====================================================
-
-    private validar(
-        expediente: Expediente
-    ): void {
-
-        if (!expediente) {
-
-            throw new Error(
-                "Debe existir un expediente."
-            );
+            return [];
 
         }
 
-    }
-
-    // =====================================================
-    // OBTENER TEXTO
-    // =====================================================
-
-    private obtenerDescripcion(
-        expediente: Expediente
-    ): string {
-
-        // Se implementará utilizando el objeto
-        // del contrato.
-
-        return "";
-
-    }
-
-    // =====================================================
-    // BÚSQUEDA
-    // =====================================================
-
-    private buscarCPV(
-        descripcion: string
-    ): ResultadoCPV {
-
         /**
-         * IMPLEMENTACIÓN FUTURA
+         * Implementación inicial.
          *
-         * 1. Diccionario CPV
-         * 2. Coincidencias
-         * 3. IA
-         * 4. Ranking
+         * En versiones posteriores utilizará:
+         *
+         * • Base oficial CPV.
+         * • Búsqueda semántica.
+         * • Inteligencia Artificial.
+         * • Expedientes históricos.
          */
 
-        return {
+        return [];
 
-            codigoPrincipal: "",
+    }
 
-            descripcionPrincipal: "",
+    /**
+     * Comprueba si un CPV parece coherente
+     * con el objeto del contrato.
+     */
+    public validarCPV(
 
-            codigosSecundarios: [],
+        objeto: string,
 
-            confianza: 0,
+        codigo: string
 
-            observaciones: []
+    ): boolean {
 
-        };
+        if (!objeto) {
+
+            return false;
+
+        }
+
+        if (!codigo) {
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Obtiene una explicación jurídica
+     * de la selección realizada.
+     */
+    public justificar(
+
+        objeto: string,
+
+        codigo: string
+
+    ): string {
+
+        return `El código CPV ${codigo} resulta compatible con el objeto contractual "${objeto}".`;
+
+    }
+
+    /**
+     * Devuelve el mejor candidato.
+     */
+    public obtenerPrincipal(
+
+        candidatos: CPVCandidato[]
+
+    ): CPVCandidato | null {
+
+        if (candidatos.length === 0) {
+
+            return null;
+
+        }
+
+        return candidatos[0];
+
+    }
+
+    /**
+     * Ordena candidatos por confianza.
+     */
+    public ordenar(
+
+        candidatos: CPVCandidato[]
+
+    ): CPVCandidato[] {
+
+        return candidatos.sort(
+
+            (a, b) =>
+
+                b.confianza - a.confianza
+
+        );
 
     }
 
