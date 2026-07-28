@@ -4,10 +4,13 @@
  * ExpedienteEngine
  * ============================================================
  *
- * Motor principal del sistema experto.
+ * Orquestador principal del sistema experto.
  *
- * Coordina la ejecución de todos los motores
- * especializados sobre un mismo ExpedienteContext.
+ * Ejecuta secuencialmente todos los motores sobre
+ * un mismo ExpedienteContext.
+ *
+ * Cada motor enriquece el contexto con nueva
+ * información jurídica.
  *
  * ============================================================
  */
@@ -19,6 +22,7 @@ import { KnowledgeManager } from "../domain/conocimiento/KnowledgeManager";
 import { CPVEngine } from "./CPVEngine";
 import { ProcedimientoEngine } from "./ProcedimientoEngine";
 import { SolvenciaEngine } from "./SolvenciaEngine";
+import { PublicidadEngine } from "./PublicidadEngine";
 
 export class ExpedienteEngine {
 
@@ -27,6 +31,8 @@ export class ExpedienteEngine {
     private readonly procedimientoEngine: ProcedimientoEngine;
 
     private readonly solvenciaEngine: SolvenciaEngine;
+
+    private readonly publicidadEngine: PublicidadEngine;
 
     constructor(
 
@@ -50,6 +56,10 @@ export class ExpedienteEngine {
 
             new SolvenciaEngine();
 
+        this.publicidadEngine =
+
+            new PublicidadEngine();
+
     }
 
     /**
@@ -63,7 +73,7 @@ export class ExpedienteEngine {
 
         //
         // 1
-        // Código CPV
+        // Identificación CPV
         //
         this.cpvEngine.ejecutar(
 
@@ -92,16 +102,29 @@ export class ExpedienteEngine {
         );
 
         //
-        // Próximamente
+        // 4
+        // Publicidad
         //
-        // PublicidadEngine
+        this.publicidadEngine.ejecutar(
+
+            contexto
+
+        );
+
+        //
+        // Próximos motores
+        //
         // PlazosEngine
         // LotesEngine
-        // CriteriosEngine
         // GarantiasEngine
+        // CriteriosEngine
         // RecursosEngine
         // PenalidadesEngine
+        // RevisionPreciosEngine
         // ModificacionesEngine
+        // EjecucionEngine
+        // RecepcionEngine
+        // LiquidacionEngine
         //
 
         return contexto;
