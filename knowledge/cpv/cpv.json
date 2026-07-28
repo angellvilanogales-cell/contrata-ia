@@ -1,0 +1,245 @@
+[
+  {
+    "codigo": "45000000-7",
+    "descripcion": "Trabajos de construcción",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "obra",
+      "obras",
+      "construcción",
+      "edificación",
+      "rehabilitación"
+    ],
+    "sinonimos": [
+      "construir",
+      "edificar"
+    ]
+  },
+  {
+    "codigo": "45110000-1",
+    "descripcion": "Trabajos de demolición y explanación",
+    "nivel": "GRUPO",
+    "padre": "45000000-7",
+    "activo": true,
+    "palabrasClave": [
+      "demolición",
+      "derribo",
+      "movimiento de tierras",
+      "explanación"
+    ],
+    "sinonimos": [
+      "derribar"
+    ]
+  },
+  {
+    "codigo": "45200000-9",
+    "descripcion": "Trabajos generales de construcción de inmuebles y obras de ingeniería civil",
+    "nivel": "GRUPO",
+    "padre": "45000000-7",
+    "activo": true,
+    "palabrasClave": [
+      "edificio",
+      "infraestructura",
+      "obra civil"
+    ],
+    "sinonimos": [
+      "ingeniería"
+    ]
+  },
+  {
+    "codigo": "50000000-5",
+    "descripcion": "Servicios de reparación y mantenimiento",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "mantenimiento",
+      "reparación",
+      "conservación"
+    ],
+    "sinonimos": [
+      "reparar",
+      "mantener"
+    ]
+  },
+  {
+    "codigo": "50700000-2",
+    "descripcion": "Servicios de reparación y mantenimiento de equipos de edificios",
+    "nivel": "GRUPO",
+    "padre": "50000000-5",
+    "activo": true,
+    "palabrasClave": [
+      "climatización",
+      "electricidad",
+      "fontanería",
+      "ascensores"
+    ],
+    "sinonimos": [
+      "instalaciones"
+    ]
+  },
+  {
+    "codigo": "55100000-1",
+    "descripcion": "Servicios de hostelería",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "hotel",
+      "alojamiento",
+      "hospedaje"
+    ],
+    "sinonimos": [
+      "hospedaje"
+    ]
+  },
+  {
+    "codigo": "55300000-3",
+    "descripcion": "Servicios de restaurante y suministro de comidas",
+    "nivel": "GRUPO",
+    "padre": "55100000-1",
+    "activo": true,
+    "palabrasClave": [
+      "catering",
+      "restaurante",
+      "comidas",
+      "almuerzo",
+      "cena",
+      "coffee break"
+    ],
+    "sinonimos": [
+      "restauración"
+    ]
+  },
+  {
+    "codigo": "70000000-1",
+    "descripcion": "Servicios inmobiliarios",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "inmueble",
+      "local",
+      "edificio"
+    ],
+    "sinonimos": [
+      "patrimonio"
+    ]
+  },
+  {
+    "codigo": "79000000-4",
+    "descripcion": "Servicios a empresas: legislación, mercadotecnia, asesoría, selección de personal, imprenta y seguridad",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "consultoría",
+      "asesoría",
+      "auditoría"
+    ],
+    "sinonimos": [
+      "consultoría técnica"
+    ]
+  },
+  {
+    "codigo": "79952000-2",
+    "descripcion": "Servicios de organización de eventos",
+    "nivel": "CLASE",
+    "padre": "79000000-4",
+    "activo": true,
+    "palabrasClave": [
+      "evento",
+      "jornada",
+      "congreso",
+      "seminario",
+      "feria",
+      "acto",
+      "encuentro"
+    ],
+    "sinonimos": [
+      "organización de jornadas",
+      "organización de congresos",
+      "eventos"
+    ]
+  },
+  {
+    "codigo": "79993000-1",
+    "descripcion": "Servicios de gestión de edificios e instalaciones",
+    "nivel": "CLASE",
+    "padre": "79000000-4",
+    "activo": true,
+    "palabrasClave": [
+      "gestión",
+      "instalaciones",
+      "edificios"
+    ],
+    "sinonimos": [
+      "facility management"
+    ]
+  },
+  {
+    "codigo": "80500000-9",
+    "descripcion": "Servicios de formación",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "formación",
+      "curso",
+      "docencia",
+      "capacitación",
+      "aprendizaje"
+    ],
+    "sinonimos": [
+      "enseñanza"
+    ]
+  },
+  {
+    "codigo": "80510000-2",
+    "descripcion": "Servicios de formación especializada",
+    "nivel": "GRUPO",
+    "padre": "80500000-9",
+    "activo": true,
+    "palabrasClave": [
+      "curso especializado",
+      "especialización",
+      "itinerario formativo"
+    ],
+    "sinonimos": [
+      "capacitación especializada"
+    ]
+  },
+  {
+    "codigo": "90910000-9",
+    "descripcion": "Servicios de limpieza",
+    "nivel": "DIVISION",
+    "padre": null,
+    "activo": true,
+    "palabrasClave": [
+      "limpieza",
+      "aseo",
+      "higiene"
+    ],
+    "sinonimos": [
+      "limpiar"
+    ]
+  },
+  {
+    "codigo": "90911200-8",
+    "descripcion": "Servicios de limpieza de edificios",
+    "nivel": "CLASE",
+    "padre": "90910000-9",
+    "activo": true,
+    "palabrasClave": [
+      "limpieza de edificios",
+      "oficinas",
+      "centros",
+      "dependencias"
+    ],
+    "sinonimos": [
+      "limpieza de oficinas"
+    ]
+  }
+]
