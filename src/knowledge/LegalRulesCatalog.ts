@@ -3,6 +3,7 @@ import { LegalRule } from "./LegalRule";
 import { NecesidadRules } from "./rules/NecesidadRules";
 import { ObjetoRules } from "./rules/ObjetoRules";
 import { ProcedimientoRules } from "./rules/ProcedimientoRules";
+import { SolvenciaRules } from "./rules/SolvenciaRules";
 
 export class LegalRulesCatalog {
 
@@ -14,7 +15,9 @@ export class LegalRulesCatalog {
 
             ...ObjetoRules,
 
-            ...ProcedimientoRules
+            ...ProcedimientoRules,
+
+            ...SolvenciaRules
 
         ];
 
