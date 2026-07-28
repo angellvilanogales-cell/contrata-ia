@@ -6,12 +6,10 @@
  *
  * Base de conocimiento jurídica.
  *
- * Esta clase constituye el punto único de acceso al
- * conocimiento derivado de la Ley 9/2017.
+ * Punto único de acceso al conocimiento derivado de la
+ * Ley 9/2017 de Contratos del Sector Público.
  *
- * Los motores nunca accederán directamente a la normativa.
- * Siempre consultarán este componente.
- *
+ * Todos los motores del sistema consultarán esta clase.
  * ============================================================
  */
 
@@ -94,12 +92,99 @@ export class LCSPKnowledge {
     }
 
     /**
+     * Devuelve todas las preguntas que puede
+     * formular CONTRATA IA.
+     */
+    public obtenerPreguntas(): string[] {
+
+        const preguntas = new Set<string>();
+
+        this.articulos.forEach(articulo => {
+
+            articulo.preguntas.forEach(pregunta => {
+
+                preguntas.add(pregunta);
+
+            });
+
+        });
+
+        return Array.from(preguntas);
+
+    }
+
+    /**
+     * Devuelve todas las reglas registradas.
+     */
+    public obtenerReglas(): string[] {
+
+        const reglas = new Set<string>();
+
+        this.articulos.forEach(articulo => {
+
+            articulo.reglas.forEach(regla => {
+
+                reglas.add(regla);
+
+            });
+
+        });
+
+        return Array.from(reglas);
+
+    }
+
+    /**
+     * Devuelve todos los motores que utilizan
+     * la base de conocimiento.
+     */
+    public obtenerMotores(): string[] {
+
+        const motores = new Set<string>();
+
+        this.articulos.forEach(articulo => {
+
+            articulo.motores.forEach(motor => {
+
+                motores.add(motor);
+
+            });
+
+        });
+
+        return Array.from(motores);
+
+    }
+
+    /**
+     * Devuelve todos los documentos afectados
+     * por la normativa.
+     */
+    public obtenerDocumentos(): string[] {
+
+        const documentos = new Set<string>();
+
+        this.articulos.forEach(articulo => {
+
+            articulo.documentos.forEach(documento => {
+
+                documentos.add(documento);
+
+            });
+
+        });
+
+        return Array.from(documentos);
+
+    }
+
+    /**
      * Base inicial de conocimiento.
      *
-     * Crecerá hasta convertirse en la representación
-     * estructurada de la LCSP.
+     * Esta colección irá creciendo progresivamente hasta
+     * representar el conocimiento jurídico necesario para
+     * la toma automática de decisiones.
      */
-
     private readonly articulos: ArticuloLCSP[] = [
 
         {
@@ -109,7 +194,7 @@ export class LCSPKnowledge {
             titulo: "Necesidad e idoneidad",
 
             resumen:
-                "Todo contrato debe responder a una necesidad pública.",
+                "Todo contrato debe responder a una necesidad pública debidamente justificada.",
 
             finalidad:
                 "Justificar la contratación.",
@@ -140,7 +225,7 @@ export class LCSPKnowledge {
 
                 "¿Qué necesidad pública se pretende satisfacer?",
 
-                "¿Por qué no puede atenderse con medios propios?"
+                "¿Por qué no puede atenderse mediante medios propios?"
 
             ]
 
@@ -153,10 +238,10 @@ export class LCSPKnowledge {
             titulo: "Objeto del contrato",
 
             resumen:
-                "El objeto debe definirse con precisión.",
+                "El objeto del contrato deberá definirse de forma precisa y adecuada.",
 
             finalidad:
-                "Delimitar el alcance del contrato.",
+                "Determinar correctamente el objeto contractual.",
 
             motores: [
 
@@ -186,9 +271,53 @@ export class LCSPKnowledge {
 
             preguntas: [
 
-                "¿Cuál es el objeto del contrato?",
+                "¿Cuál es el objeto exacto del contrato?",
 
-                "¿Puede dividirse en lotes?"
+                "¿Procede dividir el contrato en lotes?"
+
+            ]
+
+        },
+
+        {
+
+            articulo: "116",
+
+            titulo: "Expediente de contratación",
+
+            resumen:
+                "El expediente deberá incorporar la documentación justificativa exigida por la LCSP.",
+
+            finalidad:
+                "Garantizar que el expediente contiene toda la documentación necesaria.",
+
+            motores: [
+
+                "DocumentEngine"
+
+            ],
+
+            documentos: [
+
+                "Expediente",
+
+                "MemoriaJustificativa",
+
+                "InformeProcedimiento"
+
+            ],
+
+            reglas: [
+
+                "Documentación",
+
+                "Preparación"
+
+            ],
+
+            preguntas: [
+
+                "¿Está completa la documentación del expediente?"
 
             ]
 
