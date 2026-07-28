@@ -4,6 +4,7 @@ import { NecesidadRules } from "./rules/NecesidadRules";
 import { ObjetoRules } from "./rules/ObjetoRules";
 import { ProcedimientoRules } from "./rules/ProcedimientoRules";
 import { SolvenciaRules } from "./rules/SolvenciaRules";
+import { CriteriosAdjudicacionRules } from "./rules/CriteriosAdjudicacionRules";
 
 export class LegalRulesCatalog {
 
@@ -17,7 +18,9 @@ export class LegalRulesCatalog {
 
             ...ProcedimientoRules,
 
-            ...SolvenciaRules
+            ...SolvenciaRules,
+
+            ...CriteriosAdjudicacionRules
 
         ];
 
@@ -25,13 +28,11 @@ export class LegalRulesCatalog {
 
     public obtenerActivas(): LegalRule[] {
 
-        return this.obtenerTodas()
+        return this.obtenerTodas().filter(
 
-            .filter(
+            regla => regla.activa
 
-                regla => regla.activa
-
-            );
+        );
 
     }
 
@@ -39,15 +40,11 @@ export class LegalRulesCatalog {
         articulo: string
     ): LegalRule[] {
 
-        return this.obtenerTodas()
+        return this.obtenerTodas().filter(
 
-            .filter(
+            regla => regla.articulo === articulo
 
-                regla =>
-
-                    regla.articulo === articulo
-
-            );
+        );
 
     }
 
@@ -55,17 +52,13 @@ export class LegalRulesCatalog {
         motor: string
     ): LegalRule[] {
 
-        return this.obtenerTodas()
+        return this.obtenerTodas().filter(
 
-            .filter(
+            regla =>
 
-                regla =>
+                regla.motores.includes(motor)
 
-                    regla.motores.includes(
-                        motor
-                    )
-
-            );
+        );
 
     }
 
