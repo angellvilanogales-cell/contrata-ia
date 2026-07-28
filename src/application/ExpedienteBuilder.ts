@@ -6,9 +6,8 @@
  *
  * Orquestador principal del expediente.
  *
- * No contiene lógica jurídica.
- *
- * Coordina todos los motores especializados.
+ * Centraliza la construcción del expediente y coordina
+ * los distintos motores especializados.
  *
  * ============================================================
  */
@@ -45,7 +44,7 @@ export class ExpedienteBuilder {
     ) {}
 
     /**
-     * Construye el expediente inicial.
+     * Punto de entrada principal.
      */
     public async construir(
 
@@ -53,27 +52,89 @@ export class ExpedienteBuilder {
 
     ): Promise<ResultadoExpediente> {
 
-        const candidatosCPV =
-            await this.cpvEngine.analizarObjeto(
-                solicitud.objetoContrato
+        return this.construirExpediente(
+            solicitud
+        );
+
+    }
+
+    /**
+     * Orquesta la construcción completa
+     * del expediente.
+     */
+    private async construirExpediente(
+
+        solicitud: SolicitudExpediente
+
+    ): Promise<ResultadoExpediente> {
+
+        const cpv =
+            await this.calcularCPV(
+                solicitud
             );
 
         const procedimiento =
-            await this.procedimientoEngine.determinarProcedimiento({
+            await this.calcularProcedimiento(
+                solicitud
+            );
 
-                tipoContrato: solicitud.tipoContrato as any,
-
-                valorEstimado: solicitud.valorEstimado
-
-            });
+        /*
+         * Próximos módulos
+         *
+         * await this.calcularPublicidad(...)
+         * await this.calcularSolvencia(...)
+         * await this.calcularDivisionLotes(...)
+         * await this.generarMemoria(...)
+         * await this.generarPCAP(...)
+         * await this.generarPPT(...)
+         */
 
         return {
 
-            cpv: candidatosCPV,
+            cpv,
 
             procedimiento
 
         };
+
+    }
+
+    /**
+     * Determina el CPV.
+     */
+    private async calcularCPV(
+
+        solicitud: SolicitudExpediente
+
+    ) {
+
+        return this.cpvEngine.analizarObjeto(
+
+            solicitud.objetoContrato
+
+        );
+
+    }
+
+    /**
+     * Determina el procedimiento.
+     */
+    private async calcularProcedimiento(
+
+        solicitud: SolicitudExpediente
+
+    ): Promise<string> {
+
+        return this.procedimientoEngine
+            .determinarProcedimiento({
+
+                tipoContrato:
+                    solicitud.tipoContrato as any,
+
+                valorEstimado:
+                    solicitud.valorEstimado
+
+            });
 
     }
 
