@@ -4,21 +4,20 @@
  * ProcedimientoEngine
  * ============================================================
  *
- * Determina el procedimiento de adjudicación conforme
- * a la información disponible del expediente.
+ * Motor encargado de determinar el procedimiento
+ * de adjudicación.
  *
- * En esta primera versión únicamente clasifica
- * el procedimiento. En las siguientes incorporaremos:
+ * IMPORTANTE
  *
- * - publicidad
- * - plazos
- * - tramitación
- * - regulación armonizada
- * - urgencia
- * - emergencia
+ * Este motor NO contiene normativa.
+ *
+ * Toda la normativa deberá consultarse a través
+ * del KnowledgeEngine y del RuleEngine.
  *
  * ============================================================
  */
+
+import { KnowledgeEngine } from "./KnowledgeEngine";
 
 export enum TipoContrato {
 
@@ -27,18 +26,6 @@ export enum TipoContrato {
     SERVICIOS = "SERVICIOS",
 
     SUMINISTROS = "SUMINISTROS"
-
-}
-
-export enum ProcedimientoContratacion {
-
-    MENOR = "MENOR",
-
-    ABIERTO = "ABIERTO",
-
-    ABIERTO_SIMPLIFICADO = "ABIERTO_SIMPLIFICADO",
-
-    ABIERTO_SUPERSIMPLIFICADO = "ABIERTO_SUPERSIMPLIFICADO"
 
 }
 
@@ -52,64 +39,89 @@ export interface DatosProcedimiento {
 
 export class ProcedimientoEngine {
 
+    constructor(
+
+        private readonly knowledge: KnowledgeEngine
+
+    ) {}
+
     /**
      * Determina el procedimiento.
+     *
+     * En esta versión el motor consulta
+     * el conocimiento disponible.
      */
-    public determinarProcedimiento(
+    public async determinarProcedimiento(
 
         datos: DatosProcedimiento
 
-    ): ProcedimientoContratacion {
+    ): Promise<string> {
 
-        switch (datos.tipoContrato) {
+        const reglas =
+            await this.knowledge.obtenerReglasProcedimiento();
 
-            case TipoContrato.OBRAS:
+        for (const regla of reglas) {
 
-                if (datos.valorEstimado < 40000) {
+            if (this.cumple(regla, datos)) {
 
-                    return ProcedimientoContratacion.MENOR;
+                return regla.consecuencia;
 
-                }
-
-                if (datos.valorEstimado <= 80000) {
-
-                    return ProcedimientoContratacion.ABIERTO_SUPERSIMPLIFICADO;
-
-                }
-
-                if (datos.valorEstimado <= 2000000) {
-
-                    return ProcedimientoContratacion.ABIERTO_SIMPLIFICADO;
-
-                }
-
-                return ProcedimientoContratacion.ABIERTO;
-
-            case TipoContrato.SERVICIOS:
-
-            case TipoContrato.SUMINISTROS:
-
-                if (datos.valorEstimado < 15000) {
-
-                    return ProcedimientoContratacion.MENOR;
-
-                }
-
-                if (datos.valorEstimado <= 60000) {
-
-                    return ProcedimientoContratacion.ABIERTO_SUPERSIMPLIFICADO;
-
-                }
-
-                if (datos.valorEstimado <= 100000) {
-
-                    return ProcedimientoContratacion.ABIERTO_SIMPLIFICADO;
-
-                }
-
-                return ProcedimientoContratacion.ABIERTO;
+            }
 
         }
+
+        return "PROCEDIMIENTO_NO_DETERMINADO";
+
+    }
+
+    /**
+     * Evalúa una regla.
+     *
+     * En siguientes versiones será sustituido
+     * por el verdadero motor de inferencia.
+     */
+    private cumple(
+
+        regla: any,
+
+        datos: DatosProcedimiento
+
+    ): boolean {
+
+        if (
+
+            regla.tipoContrato &&
+            regla.tipoContrato !== datos.tipoContrato
+
+        ) {
+
+            return false;
+
+        }
+
+        if (
+
+            regla.valorMinimo !== undefined &&
+            datos.valorEstimado < regla.valorMinimo
+
+        ) {
+
+            return false;
+
+        }
+
+        if (
+
+            regla.valorMaximo !== undefined &&
+            datos.valorEstimado > regla.valorMaximo
+
+        ) {
+
+            return false;
+
+        }
+
+        return true;
 
     }
 
