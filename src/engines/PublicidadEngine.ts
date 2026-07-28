@@ -4,17 +4,18 @@
  * PublicidadEngine
  * ============================================================
  *
- * Motor encargado de determinar la publicidad mínima
- * exigible conforme a la normativa aplicable.
+ * Determina la publicidad obligatoria utilizando
+ * el motor de inferencia.
  *
- * En esta primera versión se prepara la estructura
- * del motor. La lógica jurídica se incorporará desde
- * RuleEngine y KnowledgeEngine.
+ * Toda la lógica jurídica se obtiene desde
+ * KnowledgeEngine + RuleEngine.
  *
  * ============================================================
  */
 
 import { KnowledgeEngine } from "./KnowledgeEngine";
+import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+import { ReglaJuridica } from "../domain/conocimiento/ReglaJuridica";
 
 export interface DatosPublicidad {
 
@@ -42,7 +43,9 @@ export class PublicidadEngine {
 
     constructor(
 
-        private readonly knowledge: KnowledgeEngine
+        private readonly knowledge: KnowledgeEngine,
+
+        private readonly inference: InferenceEngine
 
     ) {}
 
@@ -58,6 +61,17 @@ export class PublicidadEngine {
         const reglas =
             await this.knowledge.obtenerReglasPublicidad();
 
+        const reglasAplicables =
+            this.inference.evaluarTodas(
+
+                reglas,
+
+                datos,
+
+                (r, d) => this.cumple(r, d)
+
+            );
+
         const resultado: ResultadoPublicidad = {
 
             publicarPLCSP: false,
@@ -70,27 +84,23 @@ export class PublicidadEngine {
 
         };
 
-        for (const regla of reglas) {
+        for (const regla of reglasAplicables) {
 
-            if (!this.cumple(regla, datos)) {
+            const r: any = regla;
 
-                continue;
-
-            }
-
-            if (regla.publicarPLCSP) {
+            if (r.publicarPLCSP) {
 
                 resultado.publicarPLCSP = true;
 
             }
 
-            if (regla.publicarDOUE) {
+            if (r.publicarDOUE) {
 
                 resultado.publicarDOUE = true;
 
             }
 
-            if (regla.publicarPerfilContratante) {
+            if (r.publicarPerfilContratante) {
 
                 resultado.publicarPerfilContratante = true;
 
@@ -110,21 +120,21 @@ export class PublicidadEngine {
 
     /**
      * Evalúa una regla.
-     *
-     * Será sustituido por el motor de inferencia.
      */
     private cumple(
 
-        regla: any,
+        regla: ReglaJuridica,
 
         datos: DatosPublicidad
 
     ): boolean {
 
+        const r: any = regla;
+
         if (
 
-            regla.procedimiento &&
-            regla.procedimiento !== datos.procedimiento
+            r.procedimiento &&
+            r.procedimiento !== datos.procedimiento
 
         ) {
 
@@ -134,8 +144,30 @@ export class PublicidadEngine {
 
         if (
 
-            regla.tipoContrato &&
-            regla.tipoContrato !== datos.tipoContrato
+            r.tipoContrato &&
+            r.tipoContrato !== datos.tipoContrato
+
+        ) {
+
+            return false;
+
+        }
+
+        if (
+
+            r.valorMinimo !== undefined &&
+            datos.valorEstimado < r.valorMinimo
+
+        ) {
+
+            return false;
+
+        }
+
+        if (
+
+            r.valorMaximo !== undefined &&
+            datos.valorEstimado > r.valorMaximo
 
         ) {
 
