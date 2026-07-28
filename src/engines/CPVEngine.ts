@@ -4,145 +4,131 @@
  * CPVEngine
  * ============================================================
  *
- * Motor inteligente para la determinación y validación
- * de códigos CPV conforme al Reglamento (CE) 2195/2002
- * y a la Ley 9/2017 de Contratos del Sector Público.
+ * Primer nivel del motor de selección CPV.
  *
- * Funciones principales:
+ * Responsabilidades:
  *
- *  • Analizar el objeto del contrato.
- *  • Proponer CPV principales.
- *  • Proponer CPV secundarios.
- *  • Validar códigos CPV.
- *  • Detectar incoherencias.
- *  • Generar la justificación de la selección.
+ * - Normalizar texto
+ * - Extraer palabras clave
+ * - Consultar RepositorioCPV
+ * - Ordenar candidatos
  *
  * ============================================================
  */
 
-export interface CPVCandidato {
-
-    codigo: string;
-
-    descripcion: string;
-
-    confianza: number;
-
-    principal: boolean;
-
-    motivo: string;
-
-}
+import { RepositorioCPV } from "../domain/conocimiento/RepositorioCPV";
+import { ResultadoBusquedaCPV } from "../domain/conocimiento/ResultadoBusquedaCPV";
 
 export class CPVEngine {
 
+    constructor(
+        private readonly repositorio: RepositorioCPV
+    ) {}
+
     /**
-     * Analiza el objeto contractual y devuelve
-     * una lista de posibles códigos CPV.
+     * Punto de entrada principal.
      */
-    public analizarObjeto(
-        objeto: string
-    ): CPVCandidato[] {
+    public async analizarObjeto(
+        descripcion: string
+    ): Promise<ResultadoBusquedaCPV[]> {
 
-        if (!objeto) {
+        const texto = this.normalizar(descripcion);
 
-            return [];
+        const palabras = this.extraerPalabrasClave(texto);
 
-        }
+        const candidatos =
+            await this.buscarCandidatos(palabras);
 
-        /**
-         * Implementación inicial.
-         *
-         * En versiones posteriores utilizará:
-         *
-         * • Base oficial CPV.
-         * • Búsqueda semántica.
-         * • Inteligencia Artificial.
-         * • Expedientes históricos.
-         */
-
-        return [];
+        return this.ordenarPorConfianza(candidatos);
 
     }
 
     /**
-     * Comprueba si un CPV parece coherente
-     * con el objeto del contrato.
+     * Normaliza un texto.
      */
-    public validarCPV(
+    private normalizar(texto: string): string {
 
-        objeto: string,
-
-        codigo: string
-
-    ): boolean {
-
-        if (!objeto) {
-
-            return false;
-
-        }
-
-        if (!codigo) {
-
-            return false;
-
-        }
-
-        return true;
+        return texto
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^\w\s]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
 
     }
 
     /**
-     * Obtiene una explicación jurídica
-     * de la selección realizada.
+     * Extrae palabras útiles.
      */
-    public justificar(
+    private extraerPalabrasClave(
+        texto: string
+    ): string[] {
 
-        objeto: string,
+        const palabrasVacias = new Set([
 
-        codigo: string
+            "de",
+            "del",
+            "la",
+            "las",
+            "el",
+            "los",
+            "para",
+            "por",
+            "con",
+            "sin",
+            "y",
+            "e",
+            "o",
+            "u",
+            "en",
+            "un",
+            "una",
+            "unos",
+            "unas"
 
-    ): string {
+        ]);
 
-        return `El código CPV ${codigo} resulta compatible con el objeto contractual "${objeto}".`;
+        return texto
+            .split(" ")
+            .filter(p => p.length > 2)
+            .filter(p => !palabrasVacias.has(p));
 
     }
 
     /**
-     * Devuelve el mejor candidato.
+     * Busca candidatos.
      */
-    public obtenerPrincipal(
+    private async buscarCandidatos(
+        palabras: string[]
+    ): Promise<ResultadoBusquedaCPV[]> {
 
-        candidatos: CPVCandidato[]
+        const resultados: ResultadoBusquedaCPV[] = [];
 
-    ): CPVCandidato | null {
+        for (const palabra of palabras) {
 
-        if (candidatos.length === 0) {
+            const encontrados =
+                await this.repositorio.buscarPorPalabraClave(
+                    palabra
+                );
 
-            return null;
+            resultados.push(...encontrados);
 
         }
 
-        return candidatos[0];
+        return resultados;
 
     }
 
     /**
-     * Ordena candidatos por confianza.
+     * Ordena resultados.
      */
-    public ordenar(
+    private ordenarPorConfianza(
+        resultados: ResultadoBusquedaCPV[]
+    ): ResultadoBusquedaCPV[] {
 
-        candidatos: CPVCandidato[]
-
-    ): CPVCandidato[] {
-
-        return candidatos.sort(
-
-            (a, b) =>
-
-                b.confianza - a.confianza
-
+        return resultados.sort(
+            (a, b) => b.confianza - a.confianza
         );
 
     }
