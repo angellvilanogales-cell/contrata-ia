@@ -4,21 +4,24 @@
  * ProcedimientoEngine
  * ============================================================
  *
- * Determina el procedimiento de adjudicación
- * conforme a la Ley 9/2017 de Contratos del
- * Sector Público.
+ * Motor encargado de determinar el procedimiento
+ * de adjudicación utilizando exclusivamente el
+ * banco de reglas jurídicas.
  *
- * Esta primera versión implementa la lógica base
- * que posteriormente será sustituida por reglas
- * cargadas desde el banco de conocimiento.
+ * Toda la lógica se encuentra externalizada en:
+ *
+ * knowledge/rules/procedimiento.rules.json
  *
  * ============================================================
  */
 
+import * as path from "path";
+
 import { BaseEngine } from "./BaseEngine";
 
+import { RuleEngine } from "../domain/conocimiento/RuleEngine";
+import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
 import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
-
 import { TipoProcedimiento } from "../domain/procedimiento/TipoProcedimiento";
 
 export interface DatosProcedimiento {
@@ -31,8 +34,42 @@ export interface DatosProcedimiento {
 
 export class ProcedimientoEngine extends BaseEngine {
 
+    private readonly ruleEngine = new RuleEngine();
+
+    private readonly inference: InferenceEngine;
+
+    constructor() {
+
+        super();
+
+        this.ruleEngine.cargarReglas(
+
+            path.join(
+
+                process.cwd(),
+
+                "knowledge",
+
+                "rules",
+
+                "procedimiento.rules.json"
+
+            )
+
+        );
+
+        this.inference =
+
+            new InferenceEngine(
+
+                this.ruleEngine
+
+            );
+
+    }
+
     /**
-     * Determina el procedimiento aplicable.
+     * Determina el procedimiento.
      */
     public determinar(
 
@@ -44,190 +81,57 @@ export class ProcedimientoEngine extends BaseEngine {
 
             new DecisionJuridica<TipoProcedimiento>();
 
-        // ==========================================
-        // CONTRATO MENOR
-        // ==========================================
+        const evaluaciones =
 
-        if (
+            this.inference.evaluar(
 
-            this.esContratoMenor(datos)
-
-        ) {
-
-            decision.resultado =
-
-                TipoProcedimiento.CONTRATO_MENOR;
-
-            decision.confianza = 100;
-
-            decision.articulos.push(
-
-                "Artículo 118 LCSP"
+                datos as Record<string, unknown>
 
             );
 
-            decision.reglasAplicadas.push(
+        const reglaAplicada =
 
-                "PROC-001"
+            evaluaciones.find(
+
+                r => r.cumplida
 
             );
+
+        if (!reglaAplicada) {
+
+            decision.confianza = 0;
 
             decision.explicacion =
 
-                "El valor estimado permite la utilización del contrato menor conforme al artículo 118 de la LCSP.";
+                "No existe ninguna regla aplicable.";
 
             return decision;
 
         }
-
-        // ==========================================
-        // ABIERTO SIMPLIFICADO ABREVIADO
-        // ==========================================
-
-        if (
-
-            this.esAbiertoSimplificadoAbreviado(datos)
-
-        ) {
-
-            decision.resultado =
-
-                TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO;
-
-            decision.confianza = 95;
-
-            decision.articulos.push(
-
-                "Artículo 159.6 LCSP"
-
-            );
-
-            decision.reglasAplicadas.push(
-
-                "PROC-002"
-
-            );
-
-            decision.explicacion =
-
-                "Procede el procedimiento abierto simplificado abreviado.";
-
-            return decision;
-
-        }
-
-        // ==========================================
-        // ABIERTO SIMPLIFICADO
-        // ==========================================
-
-        if (
-
-            this.esAbiertoSimplificado(datos)
-
-        ) {
-
-            decision.resultado =
-
-                TipoProcedimiento.ABIERTO_SIMPLIFICADO;
-
-            decision.confianza = 90;
-
-            decision.articulos.push(
-
-                "Artículo 159 LCSP"
-
-            );
-
-            decision.reglasAplicadas.push(
-
-                "PROC-003"
-
-            );
-
-            decision.explicacion =
-
-                "Procede el procedimiento abierto simplificado.";
-
-            return decision;
-
-        }
-
-        // ==========================================
-        // ABIERTO
-        // ==========================================
 
         decision.resultado =
 
-            TipoProcedimiento.ABIERTO;
+            reglaAplicada.regla.resultado as TipoProcedimiento;
 
-        decision.confianza = 80;
+        decision.confianza = 100;
 
         decision.articulos.push(
 
-            "Artículo 131 LCSP"
+            reglaAplicada.regla.articulo
 
         );
 
         decision.reglasAplicadas.push(
 
-            "PROC-004"
+            reglaAplicada.regla.id
 
         );
 
         decision.explicacion =
 
-            "Con carácter general procede el procedimiento abierto.";
+            reglaAplicada.regla.nombre;
 
         return decision;
-
-    }
-
-    /**
-     * ------------------------------------------
-     * Contrato menor.
-     * ------------------------------------------
-     *
-     * NOTA:
-     * Los umbrales se sustituirán posteriormente
-     * por reglas externas.
-     */
-    private esContratoMenor(
-
-        datos: DatosProcedimiento
-
-    ): boolean {
-
-        return datos.valorEstimado < 15000;
-
-    }
-
-    /**
-     * ------------------------------------------
-     * Artículo 159.6
-     * ------------------------------------------
-     */
-    private esAbiertoSimplificadoAbreviado(
-
-        datos: DatosProcedimiento
-
-    ): boolean {
-
-        return datos.valorEstimado <= 60000;
-
-    }
-
-    /**
-     * ------------------------------------------
-     * Artículo 159
-     * ------------------------------------------
-     */
-    private esAbiertoSimplificado(
-
-        datos: DatosProcedimiento
-
-    ): boolean {
-
-        return datos.valorEstimado <= 100000;
 
     }
 
