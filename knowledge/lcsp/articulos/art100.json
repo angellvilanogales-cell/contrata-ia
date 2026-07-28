@@ -1,0 +1,48 @@
+{
+  "id": "LCSP-100",
+  "numero": "100",
+  "titulo": "Presupuesto base de licitación",
+  "libro": "II",
+  "vigente": true,
+  "fuente": {
+    "tipo": "LEY",
+    "organismo": "Jefatura del Estado",
+    "norma": "Ley 9/2017, de Contratos del Sector Público"
+  },
+  "palabrasClave": [
+    "presupuesto",
+    "licitación",
+    "costes",
+    "precio",
+    "valor"
+  ],
+  "reglas": [
+    {
+      "id": "PBL-001",
+      "descripcion": "El presupuesto base de licitación deberá adecuarse a los precios de mercado.",
+      "tipo": "OBLIGACION"
+    },
+    {
+      "id": "PBL-002",
+      "descripcion": "Se identificarán los costes directos e indirectos cuando proceda.",
+      "tipo": "OBLIGACION"
+    },
+    {
+      "id": "PBL-003",
+      "descripcion": "El presupuesto servirá de base para la preparación del expediente.",
+      "tipo": "DECISION"
+    }
+  ],
+  "relacionados": [
+    "LCSP-099",
+    "LCSP-101",
+    "LCSP-102"
+  ],
+  "afectaA": [
+    "VALOR_ESTIMADO",
+    "MEMORIA",
+    "PCAP",
+    "PPT",
+    "EXPEDIENTE"
+  ]
+}
