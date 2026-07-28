@@ -2,6 +2,7 @@ import { LegalRule } from "./LegalRule";
 
 import { NecesidadRules } from "./rules/NecesidadRules";
 import { ObjetoRules } from "./rules/ObjetoRules";
+import { ProcedimientoRules } from "./rules/ProcedimientoRules";
 
 export class LegalRulesCatalog {
 
@@ -11,7 +12,9 @@ export class LegalRulesCatalog {
 
             ...NecesidadRules,
 
-            ...ObjetoRules
+            ...ObjetoRules,
+
+            ...ProcedimientoRules
 
         ];
 
@@ -37,7 +40,9 @@ export class LegalRulesCatalog {
 
             .filter(
 
-                regla => regla.articulo === articulo
+                regla =>
+
+                    regla.articulo === articulo
 
             );
 
