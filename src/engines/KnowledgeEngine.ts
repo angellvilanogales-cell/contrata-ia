@@ -4,57 +4,75 @@
  * KnowledgeEngine
  * ============================================================
  *
- * Motor encargado de consultar la base de conocimiento
- * jurídica y proporcionar las reglas aplicables a cada
- * expediente.
+ * Motor central de acceso al conocimiento.
+ *
+ * Este motor NO toma decisiones.
+ *
+ * Su única responsabilidad es localizar el conocimiento
+ * necesario para que los distintos motores jurídicos
+ * puedan razonar.
  *
  * ============================================================
  */
 
-import { LegalRule } from "../knowledge/LegalRule";
-import { LegalRulesCatalog } from "../knowledge/LegalRulesCatalog";
+import { RepositorioCPV } from "../domain/conocimiento/RepositorioCPV";
+import { ResultadoBusquedaCPV } from "../domain/conocimiento/ResultadoBusquedaCPV";
 
 export class KnowledgeEngine {
 
-    private catalogo: LegalRulesCatalog;
-
-    constructor() {
-
-        this.catalogo = new LegalRulesCatalog();
-
-    }
+    constructor(
+        private readonly repositorioCPV: RepositorioCPV
+    ) {}
 
     /**
-     * Obtiene todas las reglas activas.
+     * Obtiene candidatos CPV a partir
+     * de una descripción.
      */
-    public obtenerReglas(): LegalRule[] {
+    public async obtenerCandidatosCPV(
+        descripcion: string
+    ): Promise<ResultadoBusquedaCPV[]> {
 
-        return this.catalogo.obtenerActivas();
-
-    }
-
-    /**
-     * Busca reglas por artículo.
-     */
-    public buscarPorArticulo(
-        articulo: string
-    ): LegalRule[] {
-
-        return this.catalogo.buscarPorArticulo(
-            articulo
+        return this.repositorioCPV.buscarPorDescripcion(
+            descripcion
         );
 
     }
 
     /**
-     * Busca reglas por motor.
+     * Comprueba si un código existe.
      */
-    public buscarPorMotor(
-        motor: string
-    ): LegalRule[] {
+    public async existeCPV(
+        codigo: string
+    ): Promise<boolean> {
 
-        return this.catalogo.buscarPorMotor(
-            motor
+        return this.repositorioCPV.existe(codigo);
+
+    }
+
+    /**
+     * Obtiene la descripción oficial
+     * de un CPV.
+     */
+    public async obtenerDescripcionCPV(
+        codigo: string
+    ): Promise<string | null> {
+
+        return this.repositorioCPV.obtenerDescripcion(
+            codigo
+        );
+
+    }
+
+    /**
+     * Obtiene las palabras clave
+     * asociadas a un CPV.
+     */
+    public async obtenerPalabrasClaveCPV(
+        codigo: string
+    ): Promise<string[]> {
+
+        return this.repositorioCPV.obtenerPalabrasClave(
+            codigo
         );
 
     }
