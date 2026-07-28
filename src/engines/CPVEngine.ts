@@ -4,132 +4,142 @@
  * CPVEngine
  * ============================================================
  *
- * Primer nivel del motor de selección CPV.
+ * Motor encargado de proponer los códigos CPV más
+ * adecuados para el objeto del contrato.
  *
- * Responsabilidades:
+ * Combina:
  *
- * - Normalizar texto
- * - Extraer palabras clave
- * - Consultar RepositorioCPV
- * - Ordenar candidatos
+ *  • KnowledgeManager
+ *  • CPVMatcher
+ *  • DecisionJuridica
  *
  * ============================================================
  */
 
-import { RepositorioCPV } from "../domain/conocimiento/RepositorioCPV";
-import { ResultadoBusquedaCPV } from "../domain/conocimiento/ResultadoBusquedaCPV";
+import { BaseEngine } from "./BaseEngine";
 
-export class CPVEngine {
+import { KnowledgeManager } from "../domain/conocimiento/KnowledgeManager";
+
+import { CPVMatcher, CPVMatch } from "../domain/cpv/CPVMatcher";
+
+import { CPVEntry } from "../domain/cpv/CPVEntry";
+
+import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
+
+export class CPVEngine extends BaseEngine {
+
+    private readonly matcher = new CPVMatcher();
 
     constructor(
-        private readonly repositorio: RepositorioCPV
-    ) {}
+
+        private readonly knowledge: KnowledgeManager
+
+    ) {
+
+        super();
+
+    }
 
     /**
-     * Punto de entrada principal.
+     * Propone los CPV más adecuados.
      */
-    public async analizarObjeto(
+    public proponer(
+
         descripcion: string
-    ): Promise<ResultadoBusquedaCPV[]> {
 
-        const texto = this.normalizar(descripcion);
+    ): DecisionJuridica<CPVEntry[]> {
 
-        const palabras = this.extraerPalabrasClave(texto);
+        const cpv =
+
+            this.knowledge.obtenerTodosCPV() as CPVEntry[];
 
         const candidatos =
-            await this.buscarCandidatos(palabras);
 
-        return this.ordenarPorConfianza(candidatos);
+            this.matcher.buscar(
 
-    }
+                descripcion,
 
-    /**
-     * Normaliza un texto.
-     */
-    private normalizar(texto: string): string {
+                cpv,
 
-        return texto
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^\w\s]/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
+                10
 
-    }
+            );
 
-    /**
-     * Extrae palabras útiles.
-     */
-    private extraerPalabrasClave(
-        texto: string
-    ): string[] {
+        return this.crearDecision(
 
-        const palabrasVacias = new Set([
+            candidatos
 
-            "de",
-            "del",
-            "la",
-            "las",
-            "el",
-            "los",
-            "para",
-            "por",
-            "con",
-            "sin",
-            "y",
-            "e",
-            "o",
-            "u",
-            "en",
-            "un",
-            "una",
-            "unos",
-            "unas"
-
-        ]);
-
-        return texto
-            .split(" ")
-            .filter(p => p.length > 2)
-            .filter(p => !palabrasVacias.has(p));
-
-    }
-
-    /**
-     * Busca candidatos.
-     */
-    private async buscarCandidatos(
-        palabras: string[]
-    ): Promise<ResultadoBusquedaCPV[]> {
-
-        const resultados: ResultadoBusquedaCPV[] = [];
-
-        for (const palabra of palabras) {
-
-            const encontrados =
-                await this.repositorio.buscarPorPalabraClave(
-                    palabra
-                );
-
-            resultados.push(...encontrados);
-
-        }
-
-        return resultados;
-
-    }
-
-    /**
-     * Ordena resultados.
-     */
-    private ordenarPorConfianza(
-        resultados: ResultadoBusquedaCPV[]
-    ): ResultadoBusquedaCPV[] {
-
-        return resultados.sort(
-            (a, b) => b.confianza - a.confianza
         );
+
+    }
+
+    /**
+     * Devuelve únicamente el mejor CPV.
+     */
+    public mejorCPV(
+
+        descripcion: string
+
+    ): CPVEntry | undefined {
+
+        const resultado =
+
+            this.proponer(descripcion);
+
+        return resultado.resultado[0];
+
+    }
+
+    /**
+     * Construye la decisión jurídica.
+     */
+    private crearDecision(
+
+        candidatos: CPVMatch[]
+
+    ): DecisionJuridica<CPVEntry[]> {
+
+        const decision =
+
+            new DecisionJuridica<CPVEntry[]>();
+
+        decision.resultado =
+
+            candidatos.map(
+
+                c => c.cpv
+
+            );
+
+        decision.confianza =
+
+            candidatos.length === 0
+
+                ? 0
+
+                : candidatos[0].puntuacion;
+
+        decision.explicacion =
+
+            candidatos.length === 0
+
+                ? "No se ha encontrado ningún CPV compatible con la descripción indicada."
+
+                : "Se propone el CPV con mayor coincidencia semántica y sus alternativas ordenadas por relevancia.";
+
+        decision.articulos.push(
+
+            "Artículo 99 LCSP"
+
+        );
+
+        decision.reglasAplicadas.push(
+
+            "CPV-001"
+
+        );
+
+        return decision;
 
     }
 
