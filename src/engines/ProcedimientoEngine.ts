@@ -1,91 +1,82 @@
 /**
- * =========================================================
+ * ============================================================
  * CONTRATA IA
  * ProcedimientoEngine
- * =========================================================
+ * ============================================================
  *
- * Motor responsable de determinar el procedimiento de
- * adjudicación aplicable conforme a la LCSP.
+ * Motor responsable de determinar el procedimiento
+ * de adjudicación conforme a la LCSP.
  *
- * Funciones principales:
+ * Este motor irá creciendo hasta convertirse en uno
+ * de los componentes principales del sistema.
  *
- * - Analizar el expediente.
- * - Evaluar el valor estimado.
- * - Analizar el objeto del contrato.
- * - Comprobar circunstancias especiales.
- * - Seleccionar el procedimiento.
- * - Generar la motivación jurídica.
- * - Devolver el resultado para los generadores documentales.
+ * ============================================================
  */
 
-import { Expediente } from "../domain/expediente/Expediente";
-import { ProcedimientoContratacion } from "../domain/expediente/ProcedimientoContratacion";
+export interface ResultadoProcedimiento {
+
+    procedimiento: string;
+
+    justificacion: string;
+
+    publicidad: string;
+
+    requiereDOUE: boolean;
+
+}
 
 export class ProcedimientoEngine {
 
+    /**
+     * Determina el procedimiento aplicable.
+     */
     public determinarProcedimiento(
-        expediente: Expediente
-    ): ProcedimientoContratacion {
 
-        // -------------------------------------------------
-        // PASO 1
-        // Comprobación de expediente
-        // -------------------------------------------------
+        valorEstimado: number,
 
-        this.validarExpediente(expediente);
+        tipoContrato: string
 
-        // -------------------------------------------------
-        // PASO 2
-        // Contrato menor
-        // -------------------------------------------------
+    ): ResultadoProcedimiento {
 
-        if (this.esContratoMenor(expediente)) {
-            return ProcedimientoContratacion.NEGOCIADO;
-        }
+        return {
 
-        // -------------------------------------------------
-        // PASO 3
-        // Procedimiento abierto simplificado
-        // -------------------------------------------------
+            procedimiento: "Pendiente",
 
-        if (this.esAbiertoSimplificado(expediente)) {
-            return ProcedimientoContratacion.ABIERTO_SIMPLIFICADO;
-        }
+            justificacion:
+                "La lógica jurídica será incorporada progresivamente.",
 
-        // -------------------------------------------------
-        // PASO 4
-        // Procedimiento abierto
-        // -------------------------------------------------
+            publicidad: "Pendiente",
 
-        return ProcedimientoContratacion.ABIERTO;
+            requiereDOUE: false
+
+        };
 
     }
 
-    private validarExpediente(
-        expediente: Expediente
-    ): void {
+    /**
+     * Comprueba si existe obligación
+     * de publicidad europea.
+     */
+    public requiereDOUE(
 
-        // Implementación futura
+        valorEstimado: number
 
-    }
-
-    private esContratoMenor(
-        expediente: Expediente
     ): boolean {
-
-        // Implementación conforme a LCSP
 
         return false;
 
     }
 
-    private esAbiertoSimplificado(
-        expediente: Expediente
-    ): boolean {
+    /**
+     * Obtiene una explicación jurídica.
+     */
+    public justificar(
 
-        // Implementación conforme a LCSP
+        procedimiento: string
 
-        return false;
+    ): string {
+
+        return `El procedimiento seleccionado es ${procedimiento}.`;
 
     }
 
