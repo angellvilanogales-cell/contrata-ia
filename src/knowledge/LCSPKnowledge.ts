@@ -4,11 +4,13 @@
  * LCSPKnowledge
  * ============================================================
  *
- * Base de conocimiento de la Ley 9/2017.
+ * Base de conocimiento jurídica.
  *
- * NO almacena únicamente artículos.
+ * Esta clase constituye el punto único de acceso al
+ * conocimiento derivado de la Ley 9/2017.
  *
- * Almacena conocimiento reutilizable por todos los motores.
+ * Los motores nunca accederán directamente a la normativa.
+ * Siempre consultarán este componente.
  *
  * ============================================================
  */
@@ -21,11 +23,15 @@ export interface ArticuloLCSP {
 
     resumen: string;
 
+    finalidad: string;
+
     motores: string[];
 
     documentos: string[];
 
     reglas: string[];
+
+    preguntas: string[];
 
 }
 
@@ -34,7 +40,7 @@ export class LCSPKnowledge {
     /**
      * Devuelve todos los artículos registrados.
      */
-    public obtenerArticulos(): ArticuloLCSP[] {
+    public obtenerTodos(): ArticuloLCSP[] {
 
         return this.articulos;
 
@@ -43,7 +49,7 @@ export class LCSPKnowledge {
     /**
      * Busca un artículo concreto.
      */
-    public buscar(
+    public buscarArticulo(
         articulo: string
     ): ArticuloLCSP | undefined {
 
@@ -56,8 +62,8 @@ export class LCSPKnowledge {
     }
 
     /**
-     * Devuelve todos los artículos
-     * relacionados con un motor.
+     * Devuelve todos los artículos utilizados
+     * por un motor.
      */
     public buscarPorMotor(
         motor: string
@@ -72,9 +78,26 @@ export class LCSPKnowledge {
     }
 
     /**
-     * Base inicial.
+     * Devuelve todos los artículos relacionados
+     * con un documento.
+     */
+    public buscarPorDocumento(
+        documento: string
+    ): ArticuloLCSP[] {
+
+        return this.articulos.filter(
+
+            a => a.documentos.includes(documento)
+
+        );
+
+    }
+
+    /**
+     * Base inicial de conocimiento.
      *
-     * Crecerá progresivamente.
+     * Crecerá hasta convertirse en la representación
+     * estructurada de la LCSP.
      */
 
     private readonly articulos: ArticuloLCSP[] = [
@@ -86,7 +109,10 @@ export class LCSPKnowledge {
             titulo: "Necesidad e idoneidad",
 
             resumen:
-                "Todo contrato deberá responder a una necesidad debidamente justificada.",
+                "Todo contrato debe responder a una necesidad pública.",
+
+            finalidad:
+                "Justificar la contratación.",
 
             motores: [
 
@@ -108,6 +134,14 @@ export class LCSPKnowledge {
 
                 "Idoneidad"
 
+            ],
+
+            preguntas: [
+
+                "¿Qué necesidad pública se pretende satisfacer?",
+
+                "¿Por qué no puede atenderse con medios propios?"
+
             ]
 
         },
@@ -119,7 +153,10 @@ export class LCSPKnowledge {
             titulo: "Objeto del contrato",
 
             resumen:
-                "El objeto deberá determinarse con precisión.",
+                "El objeto debe definirse con precisión.",
+
+            finalidad:
+                "Delimitar el alcance del contrato.",
 
             motores: [
 
@@ -145,34 +182,13 @@ export class LCSPKnowledge {
 
                 "Lotes"
 
-            ]
-
-        },
-
-        {
-
-            articulo: "116",
-
-            titulo: "Expediente",
-
-            resumen:
-                "Contenido mínimo del expediente.",
-
-            motores: [
-
-                "DocumentEngine"
-
             ],
 
-            documentos: [
+            preguntas: [
 
-                "Expediente"
+                "¿Cuál es el objeto del contrato?",
 
-            ],
-
-            reglas: [
-
-                "Documentación"
+                "¿Puede dividirse en lotes?"
 
             ]
 
