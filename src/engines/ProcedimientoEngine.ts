@@ -5,19 +5,14 @@
  * ============================================================
  *
  * Motor encargado de determinar el procedimiento
- * de adjudicación.
- *
- * IMPORTANTE
- *
- * Este motor NO contiene normativa.
- *
- * Toda la normativa deberá consultarse a través
- * del KnowledgeEngine y del RuleEngine.
+ * de adjudicación utilizando el motor de inferencia.
  *
  * ============================================================
  */
 
 import { KnowledgeEngine } from "./KnowledgeEngine";
+import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+import { ReglaJuridica } from "../domain/conocimiento/ReglaJuridica";
 
 export enum TipoContrato {
 
@@ -41,15 +36,14 @@ export class ProcedimientoEngine {
 
     constructor(
 
-        private readonly knowledge: KnowledgeEngine
+        private readonly knowledge: KnowledgeEngine,
+
+        private readonly inference: InferenceEngine
 
     ) {}
 
     /**
-     * Determina el procedimiento.
-     *
-     * En esta versión el motor consulta
-     * el conocimiento disponible.
+     * Determina el procedimiento aplicable.
      */
     public async determinarProcedimiento(
 
@@ -60,38 +54,43 @@ export class ProcedimientoEngine {
         const reglas =
             await this.knowledge.obtenerReglasProcedimiento();
 
-        for (const regla of reglas) {
+        const regla = this.inference.evaluarPrimera(
 
-            if (this.cumple(regla, datos)) {
+            reglas,
 
-                return regla.consecuencia;
+            datos,
 
-            }
+            (r, d) => this.cumple(r, d)
+
+        );
+
+        if (!regla) {
+
+            return "PROCEDIMIENTO_NO_DETERMINADO";
 
         }
 
-        return "PROCEDIMIENTO_NO_DETERMINADO";
+        return regla.consecuencia;
 
     }
 
     /**
-     * Evalúa una regla.
-     *
-     * En siguientes versiones será sustituido
-     * por el verdadero motor de inferencia.
+     * Comprueba si una regla es aplicable.
      */
     private cumple(
 
-        regla: any,
+        regla: ReglaJuridica,
 
         datos: DatosProcedimiento
 
     ): boolean {
 
+        const condicion: any = regla as any;
+
         if (
 
-            regla.tipoContrato &&
-            regla.tipoContrato !== datos.tipoContrato
+            condicion.tipoContrato &&
+            condicion.tipoContrato !== datos.tipoContrato
 
         ) {
 
@@ -101,8 +100,8 @@ export class ProcedimientoEngine {
 
         if (
 
-            regla.valorMinimo !== undefined &&
-            datos.valorEstimado < regla.valorMinimo
+            condicion.valorMinimo !== undefined &&
+            datos.valorEstimado < condicion.valorMinimo
 
         ) {
 
@@ -112,8 +111,8 @@ export class ProcedimientoEngine {
 
         if (
 
-            regla.valorMaximo !== undefined &&
-            datos.valorEstimado > regla.valorMaximo
+            condicion.valorMaximo !== undefined &&
+            datos.valorEstimado > condicion.valorMaximo
 
         ) {
 
