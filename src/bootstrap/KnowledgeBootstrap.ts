@@ -4,17 +4,7 @@
  * KnowledgeBootstrap
  * ============================================================
  *
- * Inicializa todo el conocimiento del sistema.
- *
- * Carga automáticamente:
- *
- *  - Artículos LCSP
- *  - Reglas
- *  - CPV
- *  - Informes
- *  - Jurisprudencia
- *  - Cláusulas
- *  - Plantillas
+ * Inicializa todo el banco de conocimiento del sistema.
  *
  * ============================================================
  */
@@ -25,18 +15,23 @@ import { KnowledgeLoader } from "../domain/conocimiento/KnowledgeLoader";
 import { KnowledgeRepository } from "../domain/conocimiento/KnowledgeRepository";
 import { RuleDefinition } from "../domain/conocimiento/RuleLoader";
 
+import { CPVRepository } from "../domain/cpv/CPVRepository";
+import { CPVEntry } from "../domain/cpv/CPVEntry";
+
 export class KnowledgeBootstrap {
 
     constructor(
 
         private readonly repository: KnowledgeRepository,
 
+        private readonly cpvRepository: CPVRepository,
+
         private readonly loader = new KnowledgeLoader()
 
     ) {}
 
     /**
-     * Inicializa todo el banco de conocimiento.
+     * Inicializa completamente el sistema.
      */
     public inicializar(): void {
 
@@ -44,20 +39,21 @@ export class KnowledgeBootstrap {
 
         this.cargarReglas();
 
+        this.cargarCPV();
+
         // Próximamente:
         //
-        // this.cargarCPV();
+        // this.cargarPlantillas();
         // this.cargarInformes();
         // this.cargarJurisprudencia();
-        // this.cargarPlantillas();
         // this.cargarClausulas();
 
     }
 
     /**
-     * ---------------------------------------------------------
+     * =====================================================
      * LCSP
-     * ---------------------------------------------------------
+     * =====================================================
      */
     private cargarArticulos(): void {
 
@@ -90,13 +86,13 @@ export class KnowledgeBootstrap {
     }
 
     /**
-     * ---------------------------------------------------------
+     * =====================================================
      * REGLAS
-     * ---------------------------------------------------------
+     * =====================================================
      */
     private cargarReglas(): void {
 
-        const reglas = this.loader.cargarDirectorio<any>(
+        const ficheros = this.loader.cargarDirectorio<any>(
 
             path.join(
 
@@ -110,7 +106,7 @@ export class KnowledgeBootstrap {
 
         );
 
-        for (const fichero of reglas) {
+        for (const fichero of ficheros) {
 
             if (!Array.isArray(fichero.reglas)) {
 
@@ -127,6 +123,47 @@ export class KnowledgeBootstrap {
                 );
 
             }
+
+        }
+
+    }
+
+    /**
+     * =====================================================
+     * CPV
+     * =====================================================
+     */
+    private cargarCPV(): void {
+
+        const catalogo = this.loader.cargarJSON<CPVEntry[]>(
+
+            path.join(
+
+                process.cwd(),
+
+                "knowledge",
+
+                "cpv",
+
+                "cpv.json"
+
+            )
+
+        );
+
+        this.cpvRepository.cargar(
+
+            catalogo
+
+        );
+
+        for (const cpv of catalogo) {
+
+            this.repository.registrarCPV(
+
+                cpv
+
+            );
 
         }
 
