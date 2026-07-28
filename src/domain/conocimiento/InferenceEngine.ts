@@ -4,20 +4,17 @@
  * InferenceEngine
  * ============================================================
  *
- * Motor de inferencia.
+ * Motor de inferencia del sistema experto.
  *
- * Responsable de evaluar las reglas jurídicas
- * previamente cargadas por RuleEngine.
- *
- * En esta primera versión implementa la estructura
- * necesaria para evolucionar hacia un sistema
- * experto completo basado en reglas.
+ * Evalúa las reglas cargadas por RuleEngine utilizando
+ * ExpressionEvaluator.
  *
  * ============================================================
  */
 
 import { RuleDefinition } from "./RuleLoader";
 import { RuleEngine } from "./RuleEngine";
+import { ExpressionEvaluator } from "./ExpressionEvaluator";
 
 export interface RuleEvaluation {
 
@@ -31,14 +28,19 @@ export interface RuleEvaluation {
 
 export class InferenceEngine {
 
+    /**
+     * Evaluador de expresiones.
+     */
+    private readonly evaluator = new ExpressionEvaluator();
+
     constructor(
 
         private readonly ruleEngine: RuleEngine
 
-    ) { }
+    ) {}
 
     /**
-     * Evalúa todas las reglas.
+     * Ejecuta todas las reglas.
      */
     public evaluar(
 
@@ -48,19 +50,17 @@ export class InferenceEngine {
 
         const resultado: RuleEvaluation[] = [];
 
-        const reglas =
-            this.ruleEngine.obtenerReglasOrdenadas();
+        const reglas = this.ruleEngine.obtenerReglasOrdenadas();
 
         for (const regla of reglas) {
 
-            const cumplida =
-                this.evaluarCondicion(
+            const cumplida = this.evaluator.evaluar(
 
-                    regla,
+                regla.condicion,
 
-                    contexto
+                contexto
 
-                );
+            );
 
             resultado.push({
 
@@ -98,7 +98,7 @@ export class InferenceEngine {
     }
 
     /**
-     * Comprueba si todas las reglas se cumplen.
+     * Indica si todas las reglas se cumplen.
      */
     public esValido(
 
@@ -115,50 +115,19 @@ export class InferenceEngine {
     }
 
     /**
-     * =====================================================
-     * Evaluación de condiciones.
-     *
-     * En esta primera versión únicamente implementamos
-     * la infraestructura.
-     *
-     * En el siguiente sprint se sustituirá por un
-     * evaluador completo de expresiones.
-     * =====================================================
+     * Devuelve la primera regla incumplida.
      */
-    private evaluarCondicion(
-
-        regla: RuleDefinition,
+    public primerError(
 
         contexto: Record<string, unknown>
 
-    ): boolean {
+    ): RuleEvaluation | undefined {
 
-        switch (regla.condicion.trim()) {
+        return this.obtenerIncumplimientos(
 
-            case "true":
+            contexto
 
-                return true;
-
-            case "false":
-
-                return false;
-
-            default:
-
-                /**
-                 * TODO
-                 *
-                 * Aquí irá el evaluador de expresiones:
-                 *
-                 * titulo != ''
-                 * descripcion.length >= 20
-                 * valorEstimado > 0
-                 * etc.
-                 */
-
-                return true;
-
-        }
+        )[0];
 
     }
 
