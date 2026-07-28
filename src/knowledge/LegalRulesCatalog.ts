@@ -1,38 +1,22 @@
-/**
- * ============================================================
- * CONTRATA IA
- * LegalRulesCatalog
- * ============================================================
- *
- * Catálogo central de reglas jurídicas.
- *
- * Reúne todas las reglas del sistema en un único punto
- * para que el RuleEngine pueda consultarlas.
- * ============================================================
- */
-
 import { LegalRule } from "./LegalRule";
 
 import { NecesidadRules } from "./rules/NecesidadRules";
+import { ObjetoRules } from "./rules/ObjetoRules";
 
 export class LegalRulesCatalog {
 
-    /**
-     * Devuelve todas las reglas registradas.
-     */
     public obtenerTodas(): LegalRule[] {
 
         return [
 
-            ...NecesidadRules
+            ...NecesidadRules,
+
+            ...ObjetoRules
 
         ];
 
     }
 
-    /**
-     * Devuelve únicamente las reglas activas.
-     */
     public obtenerActivas(): LegalRule[] {
 
         return this.obtenerTodas()
@@ -45,10 +29,6 @@ export class LegalRulesCatalog {
 
     }
 
-    /**
-     * Devuelve todas las reglas asociadas
-     * a un artículo concreto.
-     */
     public buscarPorArticulo(
         articulo: string
     ): LegalRule[] {
@@ -63,10 +43,6 @@ export class LegalRulesCatalog {
 
     }
 
-    /**
-     * Devuelve las reglas utilizadas
-     * por un motor determinado.
-     */
     public buscarPorMotor(
         motor: string
     ): LegalRule[] {
