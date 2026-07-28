@@ -1,0 +1,44 @@
+{
+  "id": "LCSP-099",
+  "numero": "99",
+  "titulo": "Objeto del contrato",
+  "libro": "II",
+  "capitulo": "I",
+  "vigente": true,
+  "fuente": {
+    "tipo": "LEY",
+    "organismo": "Jefatura del Estado",
+    "norma": "Ley 9/2017, de Contratos del Sector Público"
+  },
+  "palabrasClave": [
+    "objeto",
+    "contrato",
+    "unidad funcional",
+    "lotes",
+    "necesidad"
+  ],
+  "reglas": [
+    {
+      "id": "OBJ-001",
+      "descripcion": "El objeto del contrato deberá ser determinado.",
+      "tipo": "OBLIGACION"
+    },
+    {
+      "id": "OBJ-002",
+      "descripcion": "El objeto deberá responder a una necesidad real.",
+      "tipo": "OBLIGACION"
+    },
+    {
+      "id": "OBJ-003",
+      "descripcion": "Se analizará la división en lotes.",
+      "tipo": "DECISION"
+    }
+  ],
+  "afectaA": [
+    "CPV",
+    "LOTES",
+    "MEMORIA",
+    "PCAP",
+    "PPT"
+  ]
+}
