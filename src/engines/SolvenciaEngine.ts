@@ -4,12 +4,14 @@
  * SolvenciaEngine
  * ============================================================
  *
- * Motor encargado de determinar automáticamente
- * el régimen de solvencia aplicable conforme a la LCSP.
+ * Motor experto para determinar el régimen de solvencia
+ * aplicable conforme a la LCSP.
  *
  * Toda la lógica jurídica se encuentra externalizada en:
  *
  * knowledge/rules/solvencia.rules.json
+ *
+ * Trabaja directamente sobre ExpedienteContext.
  *
  * ============================================================
  */
@@ -20,17 +22,10 @@ import { BaseEngine } from "./BaseEngine";
 
 import { RuleEngine } from "../domain/conocimiento/RuleEngine";
 import { InferenceEngine } from "../domain/conocimiento/InferenceEngine";
+
 import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
 
-export interface DatosSolvencia {
-
-    procedimiento: string;
-
-    tipoContrato: string;
-
-    valorEstimado: number;
-
-}
+import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
 
 export class SolvenciaEngine extends BaseEngine {
 
@@ -69,11 +64,11 @@ export class SolvenciaEngine extends BaseEngine {
     }
 
     /**
-     * Determina el régimen de solvencia.
+     * Ejecuta el motor.
      */
-    public determinar(
+    public ejecutar(
 
-        datos: DatosSolvencia
+        contexto: ExpedienteContext
 
     ): DecisionJuridica<string> {
 
@@ -85,11 +80,11 @@ export class SolvenciaEngine extends BaseEngine {
 
             this.inference.evaluar(
 
-                datos as Record<string, unknown>
+                contexto as Record<string, unknown>
 
             );
 
-        const reglaAplicada =
+        const regla =
 
             evaluaciones.find(
 
@@ -97,7 +92,7 @@ export class SolvenciaEngine extends BaseEngine {
 
             );
 
-        if (!reglaAplicada) {
+        if (!regla) {
 
             decision.confianza = 0;
 
@@ -109,21 +104,25 @@ export class SolvenciaEngine extends BaseEngine {
 
         }
 
-        decision.resultado =
+        const resultado =
 
             String(
 
-                reglaAplicada.regla.resultado
+                regla.regla.resultado
 
             );
 
+        contexto.solvencia = resultado;
+
+        decision.resultado = resultado;
+
         decision.confianza = 100;
 
-        if (reglaAplicada.regla.articulo) {
+        if (regla.regla.articulo) {
 
             decision.articulos.push(
 
-                reglaAplicada.regla.articulo
+                regla.regla.articulo
 
             );
 
@@ -131,13 +130,13 @@ export class SolvenciaEngine extends BaseEngine {
 
         decision.reglasAplicadas.push(
 
-            reglaAplicada.regla.id
+            regla.regla.id
 
         );
 
         decision.explicacion =
 
-            reglaAplicada.regla.nombre;
+            regla.regla.nombre;
 
         return decision;
 
