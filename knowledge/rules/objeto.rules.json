@@ -1,0 +1,67 @@
+{
+  "modulo": "OBJETO_CONTRATO",
+  "version": "1.0.0",
+  "descripcion": "Reglas jurídicas aplicables al objeto del contrato.",
+  "articulos": [
+    "99",
+    "100",
+    "101",
+    "102"
+  ],
+  "reglas": [
+    {
+      "id": "OBJ-001",
+      "nombre": "Objeto determinado",
+      "tipo": "VALIDACION",
+      "prioridad": 1,
+      "condicion": "titulo != ''",
+      "mensaje": "Debe indicarse el título del contrato.",
+      "articulo": "99"
+    },
+    {
+      "id": "OBJ-002",
+      "nombre": "Descripción suficiente",
+      "tipo": "VALIDACION",
+      "prioridad": 2,
+      "condicion": "descripcion.length >= 20",
+      "mensaje": "La descripción del objeto resulta insuficiente.",
+      "articulo": "99"
+    },
+    {
+      "id": "OBJ-003",
+      "nombre": "Necesidad administrativa",
+      "tipo": "VALIDACION",
+      "prioridad": 3,
+      "condicion": "necesidad != ''",
+      "mensaje": "Debe justificarse la necesidad administrativa.",
+      "articulo": "28"
+    },
+    {
+      "id": "OBJ-004",
+      "nombre": "Valor estimado",
+      "tipo": "VALIDACION",
+      "prioridad": 4,
+      "condicion": "valorEstimado > 0",
+      "mensaje": "Debe indicarse el valor estimado del contrato.",
+      "articulo": "101"
+    },
+    {
+      "id": "OBJ-005",
+      "nombre": "Duración",
+      "tipo": "VALIDACION",
+      "prioridad": 5,
+      "condicion": "duracionMeses > 0",
+      "mensaje": "Debe indicarse la duración del contrato.",
+      "articulo": "29"
+    },
+    {
+      "id": "OBJ-006",
+      "nombre": "Análisis de lotes",
+      "tipo": "DECISION",
+      "prioridad": 6,
+      "condicion": "true",
+      "mensaje": "Debe analizarse la procedencia de la división en lotes.",
+      "articulo": "99"
+    }
+  ]
+}
