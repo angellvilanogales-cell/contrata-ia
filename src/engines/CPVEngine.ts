@@ -4,14 +4,10 @@
  * CPVEngine
  * ============================================================
  *
- * Motor encargado de proponer los códigos CPV más
- * adecuados para el objeto del contrato.
+ * Motor encargado de proponer automáticamente
+ * los códigos CPV de un expediente.
  *
- * Combina:
- *
- *  • KnowledgeManager
- *  • CPVMatcher
- *  • DecisionJuridica
+ * Trabaja directamente sobre ExpedienteContext.
  *
  * ============================================================
  */
@@ -20,11 +16,12 @@ import { BaseEngine } from "./BaseEngine";
 
 import { KnowledgeManager } from "../domain/conocimiento/KnowledgeManager";
 
-import { CPVMatcher, CPVMatch } from "../domain/cpv/CPVMatcher";
-
+import { CPVMatcher } from "../domain/cpv/CPVMatcher";
 import { CPVEntry } from "../domain/cpv/CPVEntry";
 
 import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
+
+import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
 
 export class CPVEngine extends BaseEngine {
 
@@ -41,15 +38,15 @@ export class CPVEngine extends BaseEngine {
     }
 
     /**
-     * Propone los CPV más adecuados.
+     * Ejecuta el motor CPV.
      */
-    public proponer(
+    public ejecutar(
 
-        descripcion: string
+        contexto: ExpedienteContext
 
     ): DecisionJuridica<CPVEntry[]> {
 
-        const cpv =
+        const catalogo =
 
             this.knowledge.obtenerTodosCPV() as CPVEntry[];
 
@@ -57,47 +54,13 @@ export class CPVEngine extends BaseEngine {
 
             this.matcher.buscar(
 
-                descripcion,
+                contexto.objeto,
 
-                cpv,
+                catalogo,
 
                 10
 
             );
-
-        return this.crearDecision(
-
-            candidatos
-
-        );
-
-    }
-
-    /**
-     * Devuelve únicamente el mejor CPV.
-     */
-    public mejorCPV(
-
-        descripcion: string
-
-    ): CPVEntry | undefined {
-
-        const resultado =
-
-            this.proponer(descripcion);
-
-        return resultado.resultado[0];
-
-    }
-
-    /**
-     * Construye la decisión jurídica.
-     */
-    private crearDecision(
-
-        candidatos: CPVMatch[]
-
-    ): DecisionJuridica<CPVEntry[]> {
 
         const decision =
 
@@ -111,27 +74,32 @@ export class CPVEngine extends BaseEngine {
 
             );
 
-        decision.confianza =
+        if (decision.resultado.length > 0) {
 
-            candidatos.length === 0
+            contexto.cpvPrincipal =
 
-                ? 0
+                decision.resultado[0];
 
-                : candidatos[0].puntuacion;
+            contexto.cpvSecundarios =
+
+                decision.resultado.slice(1);
+
+            decision.confianza =
+
+                candidatos[0].puntuacion;
+
+        }
+        else {
+
+            contexto.cpvSecundarios = [];
+
+            decision.confianza = 0;
+
+        }
 
         decision.explicacion =
 
-            candidatos.length === 0
-
-                ? "No se ha encontrado ningún CPV compatible con la descripción indicada."
-
-                : "Se propone el CPV con mayor coincidencia semántica y sus alternativas ordenadas por relevancia.";
-
-        decision.articulos.push(
-
-            "Artículo 99 LCSP"
-
-        );
+            "Selección automática de códigos CPV basada en coincidencia semántica.";
 
         decision.reglasAplicadas.push(
 
