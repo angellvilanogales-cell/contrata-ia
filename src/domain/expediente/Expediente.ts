@@ -1,41 +1,96 @@
 /**
+ * ============================================================
  * CONTRATA IA
- * ---------------------------------------------------------
- * Agregado raíz del expediente administrativo.
- * ---------------------------------------------------------
+ * Expediente
+ * ============================================================
+ *
+ * Entidad principal del dominio.
+ *
+ * Representa un expediente completo de contratación.
+ *
+ * Conforme vayamos desarrollando módulos,
+ * esta entidad irá incorporando nueva información.
+ *
+ * ============================================================
  */
-
-import { ExpedienteId } from "../value-objects/ExpedienteId";
-import { NumeroExpediente } from "../value-objects/NumeroExpediente";
-import { EstadoExpediente } from "../value-objects/EstadoExpediente";
 
 export class Expediente {
 
-    constructor(
+    /**
+     * Identificador.
+     */
+    public id: string = "";
 
-        public readonly id: ExpedienteId,
+    /**
+     * Objeto del contrato.
+     */
+    public objetoContrato: string = "";
 
-        public readonly numero: NumeroExpediente,
+    /**
+     * Tipo de contrato.
+     */
+    public tipoContrato: string = "";
 
-        public estado: EstadoExpediente = EstadoExpediente.BORRADOR
+    /**
+     * Valor estimado.
+     */
+    public valorEstimado: number = 0;
 
-    ) {}
+    /**
+     * Código CPV principal.
+     */
+    public cpvPrincipal?: string;
 
-    public iniciarEstudio(): void {
+    /**
+     * CPV secundarios.
+     */
+    public cpvSecundarios: string[] = [];
 
-        this.estado = EstadoExpediente.EN_ESTUDIO;
+    /**
+     * Procedimiento.
+     */
+    public procedimiento?: string;
 
-    }
+    /**
+     * Tramitación.
+     */
+    public tramitacion?: string;
 
-    public validar(): void {
+    /**
+     * Responsable.
+     */
+    public responsableContrato?: string;
 
-        this.estado = EstadoExpediente.VALIDADO;
+    /**
+     * Unidad promotora.
+     */
+    public unidadPromotora?: string;
 
-    }
+    /**
+     * Fecha de creación.
+     */
+    public fechaCreacion: Date = new Date();
 
-    public finalizar(): void {
+    /**
+     * Estado del expediente.
+     */
+    public estado: string = "BORRADOR";
 
-        this.estado = EstadoExpediente.FINALIZADO;
+    /**
+     * Comprueba si el expediente
+     * dispone de la información mínima.
+     */
+    public esValido(): boolean {
+
+        return (
+
+            this.objetoContrato.trim().length > 0 &&
+
+            this.tipoContrato.trim().length > 0 &&
+
+            this.valorEstimado > 0
+
+        );
 
     }
 
