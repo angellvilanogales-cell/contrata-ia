@@ -4,121 +4,58 @@
  * KnowledgeEngine
  * ============================================================
  *
- * Motor de conocimiento jurídico.
+ * Motor encargado de consultar la base de conocimiento
+ * jurídica y proporcionar las reglas aplicables a cada
+ * expediente.
  *
- * Centraliza el acceso a:
- *
- * • LCSP
- * • Directivas Europeas
- * • Normativa autonómica
- * • Junta Consultiva
- * • Informes
- * • Instrucciones
- * • Base de conocimiento propia
- *
- * Todos los motores consultarán este componente.
  * ============================================================
  */
 
-export interface ReferenciaNormativa {
-
-    norma: string;
-
-    articulo: string;
-
-    apartado?: string;
-
-    descripcion: string;
-
-}
-
-export interface ConsultaNormativa {
-
-    termino: string;
-
-    categoria?: string;
-
-}
+import { LegalRule } from "../knowledge/LegalRule";
+import { LegalRulesCatalog } from "../knowledge/LegalRulesCatalog";
 
 export class KnowledgeEngine {
 
-    constructor() {}
+    private catalogo: LegalRulesCatalog;
 
-    /**
-     * Punto de entrada.
-     */
-    public consultar(
-        consulta: ConsultaNormativa
-    ): ReferenciaNormativa[] {
+    constructor() {
 
-        if (!consulta.termino.trim()) {
-
-            throw new Error(
-                "Debe indicarse un término de búsqueda."
-            );
-
-        }
-
-        return this.buscar(consulta);
-
-    }
-
-    // =====================================================
-    // BÚSQUEDA
-    // =====================================================
-
-    private buscar(
-        consulta: ConsultaNormativa
-    ): ReferenciaNormativa[] {
-
-        /**
-         * IMPLEMENTACIÓN FUTURA
-         *
-         * 1. LCSP
-         * 2. Reglamento
-         * 3. Directivas UE
-         * 4. Junta Consultiva
-         * 5. Base documental
-         * 6. IA
-         */
-
-        return [];
+        this.catalogo = new LegalRulesCatalog();
 
     }
 
     /**
-     * Devuelve la normativa relacionada con
-     * un artículo concreto.
+     * Obtiene todas las reglas activas.
      */
-    public buscarArticulo(
+    public obtenerReglas(): LegalRule[] {
+
+        return this.catalogo.obtenerActivas();
+
+    }
+
+    /**
+     * Busca reglas por artículo.
+     */
+    public buscarPorArticulo(
         articulo: string
-    ): ReferenciaNormativa[] {
+    ): LegalRule[] {
 
-        return [];
-
-    }
-
-    /**
-     * Devuelve todas las referencias sobre
-     * un procedimiento concreto.
-     */
-    public buscarProcedimiento(
-        procedimiento: string
-    ): ReferenciaNormativa[] {
-
-        return [];
+        return this.catalogo.buscarPorArticulo(
+            articulo
+        );
 
     }
 
     /**
-     * Devuelve todas las referencias
-     * relacionadas con un CPV.
+     * Busca reglas por motor.
      */
-    public buscarCPV(
-        codigo: string
-    ): ReferenciaNormativa[] {
+    public buscarPorMotor(
+        motor: string
+    ): LegalRule[] {
 
-        return [];
+        return this.catalogo.buscarPorMotor(
+            motor
+        );
 
     }
 
