@@ -4,79 +4,112 @@
  * ProcedimientoEngine
  * ============================================================
  *
- * Motor responsable de determinar el procedimiento
- * de adjudicación conforme a la LCSP.
+ * Determina el procedimiento de adjudicación conforme
+ * a la información disponible del expediente.
  *
- * Este motor irá creciendo hasta convertirse en uno
- * de los componentes principales del sistema.
+ * En esta primera versión únicamente clasifica
+ * el procedimiento. En las siguientes incorporaremos:
+ *
+ * - publicidad
+ * - plazos
+ * - tramitación
+ * - regulación armonizada
+ * - urgencia
+ * - emergencia
  *
  * ============================================================
  */
 
-export interface ResultadoProcedimiento {
+export enum TipoContrato {
 
-    procedimiento: string;
+    OBRAS = "OBRAS",
 
-    justificacion: string;
+    SERVICIOS = "SERVICIOS",
 
-    publicidad: string;
+    SUMINISTROS = "SUMINISTROS"
 
-    requiereDOUE: boolean;
+}
+
+export enum ProcedimientoContratacion {
+
+    MENOR = "MENOR",
+
+    ABIERTO = "ABIERTO",
+
+    ABIERTO_SIMPLIFICADO = "ABIERTO_SIMPLIFICADO",
+
+    ABIERTO_SUPERSIMPLIFICADO = "ABIERTO_SUPERSIMPLIFICADO"
+
+}
+
+export interface DatosProcedimiento {
+
+    tipoContrato: TipoContrato;
+
+    valorEstimado: number;
 
 }
 
 export class ProcedimientoEngine {
 
     /**
-     * Determina el procedimiento aplicable.
+     * Determina el procedimiento.
      */
     public determinarProcedimiento(
 
-        valorEstimado: number,
+        datos: DatosProcedimiento
 
-        tipoContrato: string
+    ): ProcedimientoContratacion {
 
-    ): ResultadoProcedimiento {
+        switch (datos.tipoContrato) {
 
-        return {
+            case TipoContrato.OBRAS:
 
-            procedimiento: "Pendiente",
+                if (datos.valorEstimado < 40000) {
 
-            justificacion:
-                "La lógica jurídica será incorporada progresivamente.",
+                    return ProcedimientoContratacion.MENOR;
 
-            publicidad: "Pendiente",
+                }
 
-            requiereDOUE: false
+                if (datos.valorEstimado <= 80000) {
 
-        };
+                    return ProcedimientoContratacion.ABIERTO_SUPERSIMPLIFICADO;
 
-    }
+                }
 
-    /**
-     * Comprueba si existe obligación
-     * de publicidad europea.
-     */
-    public requiereDOUE(
+                if (datos.valorEstimado <= 2000000) {
 
-        valorEstimado: number
+                    return ProcedimientoContratacion.ABIERTO_SIMPLIFICADO;
 
-    ): boolean {
+                }
 
-        return false;
+                return ProcedimientoContratacion.ABIERTO;
 
-    }
+            case TipoContrato.SERVICIOS:
 
-    /**
-     * Obtiene una explicación jurídica.
-     */
-    public justificar(
+            case TipoContrato.SUMINISTROS:
 
-        procedimiento: string
+                if (datos.valorEstimado < 15000) {
 
-    ): string {
+                    return ProcedimientoContratacion.MENOR;
 
-        return `El procedimiento seleccionado es ${procedimiento}.`;
+                }
+
+                if (datos.valorEstimado <= 60000) {
+
+                    return ProcedimientoContratacion.ABIERTO_SUPERSIMPLIFICADO;
+
+                }
+
+                if (datos.valorEstimado <= 100000) {
+
+                    return ProcedimientoContratacion.ABIERTO_SIMPLIFICADO;
+
+                }
+
+                return ProcedimientoContratacion.ABIERTO;
+
+        }
 
     }
 
