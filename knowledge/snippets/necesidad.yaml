@@ -1,0 +1,236 @@
+# ============================================================
+# CONTRATA IA
+# BANCO DE CONOCIMIENTO
+# NECESIDADES ADMINISTRATIVAS
+# ============================================================
+#
+# Este archivo contiene los distintos modelos de
+# justificación de la necesidad administrativa.
+#
+# Cada snippet puede ser utilizado automáticamente
+# por el TemplateEngine.
+#
+# ============================================================
+
+version: 1.0.0
+
+categoria: NECESIDAD_ADMINISTRATIVA
+
+descripcion: >
+  Banco de textos reutilizables para justificar la necesidad
+  administrativa conforme a la Ley 9/2017 de Contratos del
+  Sector Público.
+
+snippets:
+
+# ============================================================
+# NEC-001
+# ============================================================
+
+  - id: NEC-001
+
+    titulo: Necesidad administrativa general
+
+    aplica:
+
+      contratos:
+
+        - OBRAS
+        - SERVICIOS
+        - SUMINISTROS
+
+    procedimiento:
+
+      - TODOS
+
+    normativa:
+
+      - LCSP Art. 28
+      - LCSP Art. 116
+
+    etiquetas:
+
+      - necesidad
+      - interes_publico
+      - memoria
+
+    prioridad: 100
+
+    texto: |
+
+      La necesidad que motiva la presente contratación deriva del
+      cumplimiento de las competencias legalmente atribuidas al
+      órgano de contratación y responde a la obligación de garantizar
+      la adecuada prestación de los servicios públicos.
+
+      La actuación proyectada constituye el medio más adecuado para
+      satisfacer los fines públicos perseguidos, resultando necesaria
+      para asegurar el funcionamiento ordinario de la Administración.
+
+      La contratación propuesta resulta proporcionada a la necesidad
+      existente y se ajusta a los principios de necesidad, eficacia,
+      eficiencia y buena administración.
+
+# ============================================================
+# NEC-002
+# ============================================================
+
+  - id: NEC-002
+
+    titulo: Necesidad para contratos de servicios
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+
+    procedimiento:
+
+      - TODOS
+
+    normativa:
+
+      - LCSP Art. 17
+      - LCSP Art. 28
+      - LCSP Art. 116
+
+    etiquetas:
+
+      - servicios
+
+    prioridad: 200
+
+    texto: |
+
+      La prestación objeto del contrato tiene carácter continuado y
+      resulta imprescindible para garantizar el correcto funcionamiento
+      de los servicios públicos encomendados al órgano de contratación.
+
+      La adecuada ejecución de dichas prestaciones exige disponer de
+      recursos especializados durante toda la vigencia del contrato.
+
+# ============================================================
+# NEC-003
+# ============================================================
+
+  - id: NEC-003
+
+    titulo: Necesidad para contratos de suministro
+
+    aplica:
+
+      contratos:
+
+        - SUMINISTROS
+
+    procedimiento:
+
+      - TODOS
+
+    normativa:
+
+      - LCSP Art. 16
+      - LCSP Art. 28
+
+    etiquetas:
+
+      - suministros
+
+    prioridad: 200
+
+    texto: |
+
+      El suministro cuya contratación se propone resulta imprescindible
+      para atender las necesidades materiales de la unidad promotora y
+      garantizar el normal desarrollo de la actividad administrativa.
+
+# ============================================================
+# NEC-004
+# ============================================================
+
+  - id: NEC-004
+
+    titulo: Necesidad para contratos de obras
+
+    aplica:
+
+      contratos:
+
+        - OBRAS
+
+    procedimiento:
+
+      - TODOS
+
+    normativa:
+
+      - LCSP Art. 13
+      - LCSP Art. 28
+
+    etiquetas:
+
+      - obras
+
+    prioridad: 200
+
+    texto: |
+
+      La ejecución de las obras proyectadas resulta necesaria para
+      conservar, mejorar o ampliar las infraestructuras públicas,
+      garantizando su adecuada utilización y el cumplimiento de las
+      funciones que tienen encomendadas.
+
+# ============================================================
+# FUTURAS AMPLIACIONES
+# ============================================================
+
+#
+# NEC-005
+# Contratos SARA
+#
+# NEC-006
+# Fondos PRTR
+#
+# NEC-007
+# Acuerdos Marco
+#
+# NEC-008
+# Sistemas Dinámicos
+#
+# NEC-009
+# Emergencia
+#
+# NEC-010
+# Exclusividad
+#
+# NEC-011
+# Innovación
+#
+# NEC-012
+# Servicios TIC
+#
+# NEC-013
+# Servicios Sociales
+#
+# NEC-014
+# Contratos Reservados
+#
+# NEC-015
+# Contratos Verdes
+#
+# NEC-016
+# Contratación Centralizada
+#
+# NEC-017
+# Mantenimiento
+#
+# NEC-018
+# Seguridad
+#
+# NEC-019
+# Formación
+#
+# NEC-020
+# Consultoría
+#
