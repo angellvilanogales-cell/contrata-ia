@@ -1,0 +1,180 @@
+# ============================================================
+# CONTRATA IA
+# CATÁLOGO MAESTRO DE EXPEDIENTES
+# ============================================================
+#
+# Este archivo define la estructura completa de cada
+# tipo de expediente gestionado por CONTRATA IA.
+#
+# Ningún motor deberá codificar esta información.
+#
+# ============================================================
+
+version: 1.0.0
+
+expedientes:
+
+# ============================================================
+# CONTRATO DE SERVICIOS
+# ============================================================
+
+  - id: SERVICIOS
+
+    nombre: Contrato de Servicios
+
+    normativa:
+
+      - LCSP Art. 17
+      - LCSP Art. 28
+      - LCSP Art. 116
+
+    motores:
+
+      - CPVEngine
+      - ProcedimientoEngine
+      - SolvenciaEngine
+      - PublicidadEngine
+      - PlanDocumentalEngine
+
+    documentos:
+
+      obligatorios:
+
+        - memoria_justificativa
+        - informe_necesidad
+        - informe_insuficiencia_medios
+        - PPT
+        - PCAP
+
+      opcionales:
+
+        - informe_division_lotes
+        - informe_solvencia
+        - informe_criterios
+
+    snippets:
+
+      - NECESIDAD_ADMINISTRATIVA
+      - INSUFICIENCIA_MEDIOS
+      - PROCEDIMIENTO
+      - SOLVENCIA
+      - PUBLICIDAD
+      - LOTES
+      - DURACION
+      - CONCLUSION
+
+    validaciones:
+
+      - validarCPV
+      - validarValorEstimado
+      - validarProcedimiento
+      - validarPublicidad
+      - validarSolvencia
+
+# ============================================================
+# CONTRATO DE SUMINISTROS
+# ============================================================
+
+  - id: SUMINISTROS
+
+    nombre: Contrato de Suministros
+
+    normativa:
+
+      - LCSP Art. 16
+      - LCSP Art. 28
+      - LCSP Art. 116
+
+    motores:
+
+      - CPVEngine
+      - ProcedimientoEngine
+      - SolvenciaEngine
+      - PublicidadEngine
+      - PlanDocumentalEngine
+
+    documentos:
+
+      obligatorios:
+
+        - memoria_justificativa
+        - informe_necesidad
+        - informe_insuficiencia_medios
+        - PPT
+        - PCAP
+
+    snippets:
+
+      - NECESIDAD_ADMINISTRATIVA
+      - INSUFICIENCIA_MEDIOS
+      - PROCEDIMIENTO
+      - PUBLICIDAD
+
+# ============================================================
+# CONTRATO DE OBRAS
+# ============================================================
+
+  - id: OBRAS
+
+    nombre: Contrato de Obras
+
+    normativa:
+
+      - LCSP Art. 13
+      - LCSP Art. 28
+      - LCSP Art. 116
+
+    motores:
+
+      - CPVEngine
+      - ProcedimientoEngine
+      - SolvenciaEngine
+      - PublicidadEngine
+      - PlanDocumentalEngine
+
+    documentos:
+
+      obligatorios:
+
+        - memoria_justificativa
+        - proyecto
+        - PPT
+        - PCAP
+
+    snippets:
+
+      - NECESIDAD_ADMINISTRATIVA
+      - PROCEDIMIENTO
+      - PUBLICIDAD
+      - GARANTIAS
+
+# ============================================================
+# ELEMENTOS TRANSVERSALES
+# ============================================================
+
+catalogos:
+
+  criterios:
+
+    - precio
+    - calidad
+    - medioambientales
+    - sociales
+    - innovación
+
+  publicidad:
+
+    - PLACE
+    - DOUE
+    - PerfilContratante
+
+  garantias:
+
+    - provisional
+    - definitiva
+    - complementaria
+
+  recursos:
+
+    - especial
+    - ordinario
