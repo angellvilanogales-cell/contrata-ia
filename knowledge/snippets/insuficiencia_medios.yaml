@@ -1,0 +1,285 @@
+# ============================================================
+# CONTRATA IA
+# BANCO DE CONOCIMIENTO
+# INSUFICIENCIA DE MEDIOS
+# ============================================================
+
+version: 1.0.0
+
+categoria: INSUFICIENCIA_MEDIOS
+
+descripcion: >
+  Banco de conocimiento destinado a justificar la insuficiencia
+  de medios personales y materiales del órgano de contratación,
+  conforme a la legislación vigente y a los modelos utilizados
+  por la Administración Pública.
+
+normativa_general:
+
+  - LCSP Art. 28
+  - LCSP Art. 116
+  - Ley 40/2015
+  - Principio de eficiencia
+  - Principio de buena administración
+
+snippets:
+
+# ============================================================
+# INS-001
+# ============================================================
+
+  - id: INS-001
+
+    titulo: Insuficiencia general
+
+    prioridad: 100
+
+    aplica:
+
+      contratos:
+
+        - OBRAS
+        - SERVICIOS
+        - SUMINISTROS
+
+    texto: |
+
+      El órgano de contratación no dispone de medios personales
+      ni materiales suficientes para ejecutar directamente las
+      prestaciones objeto del contrato.
+
+      La ejecución mediante recursos propios comprometería el
+      normal funcionamiento de los servicios públicos y no
+      permitiría garantizar la adecuada calidad de las prestaciones.
+
+      En consecuencia, resulta necesaria la contratación externa.
+
+# ============================================================
+# INS-002
+# ============================================================
+
+  - id: INS-002
+
+    titulo: Insuficiencia por falta de personal
+
+    prioridad: 200
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+
+    texto: |
+
+      La plantilla actualmente disponible resulta insuficiente para
+      asumir las prestaciones objeto del contrato sin afectar al
+      desarrollo ordinario de las funciones que corresponden a la
+      unidad administrativa.
+
+# ============================================================
+# INS-003
+# ============================================================
+
+  - id: INS-003
+
+    titulo: Insuficiencia por especialización técnica
+
+    prioridad: 300
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+        - OBRAS
+
+    texto: |
+
+      Las prestaciones requieren conocimientos técnicos altamente
+      especializados que no forman parte de las funciones ordinarias
+      del personal de la Administración.
+
+      La contratación externa garantiza la disponibilidad inmediata
+      de profesionales cualificados.
+
+# ============================================================
+# INS-004
+# ============================================================
+
+  - id: INS-004
+
+    titulo: Insuficiencia de medios materiales
+
+    prioridad: 400
+
+    aplica:
+
+      contratos:
+
+        - SUMINISTROS
+        - SERVICIOS
+
+    texto: |
+
+      El órgano de contratación no dispone del equipamiento,
+      maquinaria, herramientas o infraestructura necesarios para
+      ejecutar directamente las prestaciones previstas.
+
+# ============================================================
+# INS-005
+# ============================================================
+
+  - id: INS-005
+
+    titulo: Mantenimiento especializado
+
+    prioridad: 500
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+
+    texto: |
+
+      El mantenimiento objeto del contrato exige disponer de medios
+      técnicos específicos, herramientas especializadas y personal
+      con formación acreditada, recursos de los que carece la unidad
+      promotora.
+
+# ============================================================
+# INS-006
+# ============================================================
+
+  - id: INS-006
+
+    titulo: Servicios TIC
+
+    prioridad: 600
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+
+    texto: |
+
+      La rápida evolución tecnológica y el elevado grado de
+      especialización requerido hacen aconsejable acudir a empresas
+      especializadas para garantizar la correcta ejecución del
+      contrato.
+
+# ============================================================
+# INS-007
+# ============================================================
+
+  - id: INS-007
+
+    titulo: Asistencia técnica
+
+    prioridad: 700
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+
+    texto: |
+
+      La asistencia técnica requiere perfiles profesionales con una
+      experiencia y capacitación específicas que no se encuentran
+      disponibles en la estructura organizativa actual.
+
+# ============================================================
+# INS-008
+# ============================================================
+
+  - id: INS-008
+
+    titulo: Continuidad del servicio
+
+    prioridad: 800
+
+    aplica:
+
+      contratos:
+
+        - SERVICIOS
+
+    texto: |
+
+      La contratación externa permite asegurar la continuidad del
+      servicio sin interrupciones y garantiza el cumplimiento de los
+      niveles de calidad exigidos.
+
+# ============================================================
+# INS-009
+# ============================================================
+
+  - id: INS-009
+
+    titulo: Razones organizativas
+
+    prioridad: 900
+
+    aplica:
+
+      contratos:
+
+        - TODOS
+
+    texto: |
+
+      La organización actual de los recursos humanos y materiales
+      impide asumir nuevas prestaciones sin afectar negativamente a
+      las funciones ordinarias del órgano de contratación.
+
+# ============================================================
+# INS-010
+# ============================================================
+
+  - id: INS-010
+
+    titulo: Justificación completa
+
+    prioridad: 1000
+
+    aplica:
+
+      contratos:
+
+        - TODOS
+
+    texto: |
+
+      Analizadas las necesidades que motivan la contratación, se
+      concluye que el órgano de contratación carece de medios
+      suficientes para atenderlas directamente.
+
+      Dicha insuficiencia afecta tanto a los recursos humanos como
+      a los medios materiales y tecnológicos necesarios para una
+      correcta ejecución.
+
+      La contratación externa constituye la alternativa más eficaz,
+      eficiente y proporcionada para satisfacer la necesidad pública,
+      garantizando la continuidad del servicio y el adecuado uso de
+      los recursos públicos.
+
+# ============================================================
+# FUTURAS INCORPORACIONES
+# ============================================================
+
+# INS-011 Fondos Europeos
+# INS-012 PRTR
+# INS-013 Acuerdo Marco
+# INS-014 SDA
+# INS-015 Seguridad
+# INS-016 Limpieza
+# INS-017 Formación
+# INS-018 Consultoría
+# INS-019 Auditoría
+# INS-020 Obras de conservación
