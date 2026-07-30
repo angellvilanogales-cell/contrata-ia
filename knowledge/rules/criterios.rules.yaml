@@ -1,0 +1,7261 @@
+# ============================================================================
+# CONTRATA IA
+# BANCO DE CONOCIMIENTO
+# ----------------------------------------------------------------------------
+# MÓDULO:
+# RULE.CRITERIOS
+# ----------------------------------------------------------------------------
+# Base normativa principal:
+# LCSP (arts. 145 a 148 y concordantes)
+#
+# Finalidad:
+# Motor experto para la selección, validación y justificación de los
+# criterios de adjudicación de los contratos públicos.
+# ============================================================================
+
+metadata:
+
+  modulo:
+
+    RULE.CRITERIOS
+
+  version:
+
+    1.0.0
+
+  estado:
+
+    PRODUCCION
+
+  propietario:
+
+    BancoConocimiento
+
+  descripcion:
+
+    Motor jurídico de criterios de adjudicación.
+
+# ============================================================================
+# PRINCIPIOS GENERALES
+# ============================================================================
+
+principios:
+
+  mejorRelacionCalidadPrecio:
+
+    obligatoria
+
+  vinculacionObjetoContrato:
+
+    obligatoria
+
+  igualdadTrato:
+
+    obligatoria
+
+  libreCompetencia:
+
+    obligatoria
+
+  transparencia:
+
+    obligatoria
+
+  proporcionalidad:
+
+    obligatoria
+
+  noDiscriminacion:
+
+    obligatoria
+
+# ============================================================================
+# REGLA CRIT-001
+# ============================================================================
+
+- id: CRIT-001
+
+  nombre: Criterios vinculados al objeto del contrato
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    verificar:
+
+      vinculacionObjetoContrato
+
+  resultado:
+
+    permitirContinuar
+
+  justificar:
+
+    Los criterios deberán estar directamente vinculados al objeto del contrato.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-002
+# ============================================================================
+
+- id: CRIT-002
+
+  nombre: Mejor relación calidad-precio
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    verificar:
+
+      mejorRelacionCalidadPrecio
+
+  resultado:
+
+    permitirContinuar
+
+  justificar:
+
+    La adjudicación deberá perseguir la mejor relación calidad-precio.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-003
+# ============================================================================
+
+- id: CRIT-003
+
+  nombre: Prohibición de criterios arbitrarios
+
+  prioridad: maxima
+
+  condicion:
+
+    existeCriterioSinJustificacion
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán utilizarse criterios arbitrarios o carentes de motivación.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-004
+# ============================================================================
+
+- id: CRIT-004
+
+  nombre: Prohibición de discriminación
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioDiscriminatorio
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Ningún criterio podrá generar discriminación entre licitadores.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-005
+# ============================================================================
+
+- id: CRIT-005
+
+  nombre: Coherencia con el procedimiento
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    verificar:
+
+      procedimientoContratacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios deberán ser compatibles con el procedimiento elegido.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+  registrarDecision:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.PROCEDIMIENTO
+
+    RULE.CPV
+
+    RULE.OBJETO
+
+    RULE.SOLVENCIA
+
+    PARAM.CRITERIOS
+
+# ============================================================================
+# FIN PARTE 1 DE 24
+# ============================================================================
+
+# ============================================================================
+# CLASIFICACIÓN GENERAL DE LOS CRITERIOS DE ADJUDICACIÓN
+# ============================================================================
+
+tiposCriterios:
+
+  automaticos:
+
+    descripcion:
+
+      Criterios evaluables mediante fórmulas objetivas.
+
+  juicioValor:
+
+    descripcion:
+
+      Criterios cuya valoración requiere apreciación técnica.
+
+  mixtos:
+
+    descripcion:
+
+      Combinación de criterios automáticos y de juicio de valor.
+
+# ============================================================================
+# REGLA CRIT-006
+# ============================================================================
+
+- id: CRIT-006
+
+  nombre: Clasificación obligatoria de criterios
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    clasificar:
+
+      criterios
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo criterio deberá clasificarse según su sistema de valoración.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-007
+# ============================================================================
+
+- id: CRIT-007
+
+  nombre: Separación de criterios automáticos
+
+  prioridad: alta
+
+  condicion:
+
+    criterioAutomatico
+
+  accion:
+
+    registrar:
+
+      automatico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios evaluables mediante fórmulas deberán identificarse de forma independiente.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-008
+# ============================================================================
+
+- id: CRIT-008
+
+  nombre: Separación de criterios de juicio de valor
+
+  prioridad: alta
+
+  condicion:
+
+    criterioJuicioValor
+
+  accion:
+
+    registrar:
+
+      juicioValor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios sometidos a juicio de valor deberán diferenciarse claramente.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-009
+# ============================================================================
+
+- id: CRIT-009
+
+  nombre: Compatibilidad entre criterios
+
+  prioridad: alta
+
+  condicion:
+
+    existenCriteriosMixtos
+
+  accion:
+
+    comprobar:
+
+      coherenciaGlobal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La combinación de criterios deberá mantener la coherencia del sistema de valoración.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-010
+# ============================================================================
+
+- id: CRIT-010
+
+  nombre: Evitar duplicidad de valoración
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioDuplicado
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Un mismo aspecto no podrá valorarse dos veces mediante criterios diferentes.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-011
+# ============================================================================
+
+- id: CRIT-011
+
+  nombre: Coherencia entre criterios y objeto
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    verificar:
+
+      coherenciaObjetoContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada criterio deberá guardar relación directa con el objeto contractual.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-012
+# ============================================================================
+
+- id: CRIT-012
+
+  nombre: Registro para auditoría
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      clasificacionCriterios
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La clasificación utilizada quedará registrada para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  clasificarAutomaticamente:
+
+    true
+
+  registrarClasificacion:
+
+    true
+
+  validarDuplicidades:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# FIN PARTE 2 DE 24
+# ============================================================================
+
+# ============================================================================
+# SISTEMA DE PONDERACIÓN DE LOS CRITERIOS
+# ============================================================================
+
+ponderacion:
+
+  obligatoria:
+
+    true
+
+  comprobarCoherencia:
+
+    true
+
+  comprobarSumaTotal:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-013
+# ============================================================================
+
+- id: CRIT-013
+
+  nombre: Todos los criterios deberán estar ponderados
+
+  prioridad: maxima
+
+  condicion:
+
+    existeCriterioSinPonderacion
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Todo criterio de adjudicación deberá disponer de una ponderación expresa.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-014
+# ============================================================================
+
+- id: CRIT-014
+
+  nombre: La suma de ponderaciones deberá ser completa
+
+  prioridad: maxima
+
+  condicion:
+
+    sumaPonderacionesDistinta100
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La suma total de las ponderaciones deberá representar la totalidad de la valoración.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-015
+# ============================================================================
+
+- id: CRIT-015
+
+  nombre: Coherencia entre importancia y ponderación
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      coherenciaImportancia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La ponderación deberá guardar relación con la importancia real del criterio.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-016
+# ============================================================================
+
+- id: CRIT-016
+
+  nombre: Evitar ponderaciones artificiales
+
+  prioridad: alta
+
+  condicion:
+
+    ponderacionArtificial
+
+  accion:
+
+    advertencia
+
+  resultado:
+
+    revisar
+
+  justificar:
+
+    Se detectan ponderaciones que podrían alterar la competencia efectiva.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-017
+# ============================================================================
+
+- id: CRIT-017
+
+  nombre: Comprobación automática de equilibrio
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    calcular:
+
+      equilibrioPonderacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará automáticamente el equilibrio global de la valoración.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-018
+# ============================================================================
+
+- id: CRIT-018
+
+  nombre: Registro de ponderaciones
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      ponderaciones
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las ponderaciones utilizadas quedarán registradas para auditoría y trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# MATRIZ DE PONDERACIÓN
+# ============================================================================
+
+matriz:
+
+  comprobarEquilibrio:
+
+    true
+
+  comprobarProporcionalidad:
+
+    true
+
+  comprobarConsistencia:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  calcularAutomaticamente:
+
+    true
+
+  validarSuma:
+
+    true
+
+  registrarResultado:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+# ============================================================================
+# FIN PARTE 3 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS EVALUABLES MEDIANTE FÓRMULAS
+# ============================================================================
+
+criteriosAutomaticos:
+
+  evaluacion:
+
+    exclusivamenteObjetiva
+
+  requiereFormula:
+
+    true
+
+  admiteCalculoAutomatico:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-019
+# ============================================================================
+
+- id: CRIT-019
+
+  nombre: Todo criterio automático deberá disponer de fórmula
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioAutomaticoSinFormula
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Todo criterio evaluable automáticamente deberá incorporar una fórmula de valoración perfectamente definida.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-020
+# ============================================================================
+
+- id: CRIT-020
+
+  nombre: Fórmula objetiva
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaSubjetiva
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Las fórmulas deberán producir idéntico resultado para cualquier evaluador.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-021
+# ============================================================================
+
+- id: CRIT-021
+
+  nombre: Fórmula reproducible
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      reproducibilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula deberá ser reproducible matemáticamente.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-022
+# ============================================================================
+
+- id: CRIT-022
+
+  nombre: Transparencia de la fórmula
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      transparencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula deberá ser comprensible para todos los licitadores.
+
+  referencia:
+
+    PRINCIPIO_TRANSPARENCIA
+
+# ============================================================================
+# REGLA CRIT-023
+# ============================================================================
+
+- id: CRIT-023
+
+  nombre: Prohibición de fórmulas ocultas
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaNoPublicada
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán utilizarse fórmulas distintas de las publicadas en los pliegos.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-024
+# ============================================================================
+
+- id: CRIT-024
+
+  nombre: Validación matemática
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      formula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de incorporarse al expediente, la fórmula será validada automáticamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-025
+# ============================================================================
+
+- id: CRIT-025
+
+  nombre: Registro para auditoría
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      formulaAplicada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las fórmulas empleadas quedarán registradas para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarFormula:
+
+    true
+
+  calcularAutomaticamente:
+
+    true
+
+  registrarCalculos:
+
+    true
+
+  registrarVersionFormula:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+# ============================================================================
+# FIN PARTE 4 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS AUTOMÁTICOS BASADOS EN EL PRECIO
+# ============================================================================
+
+criteriosPrecio:
+
+  activo:
+
+    true
+
+  requiereFormula:
+
+    true
+
+  requierePublicidad:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-026
+# ============================================================================
+
+- id: CRIT-026
+
+  nombre: El precio podrá utilizarse como criterio automático
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioPrecio
+
+  accion:
+
+    admitir
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El precio podrá utilizarse como criterio de adjudicación mediante fórmula objetiva.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-027
+# ============================================================================
+
+- id: CRIT-027
+
+  nombre: El precio deberá valorarse mediante fórmula
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioPrecioSinFormula
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La valoración del precio requiere una fórmula objetiva previamente definida.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-028
+# ============================================================================
+
+- id: CRIT-028
+
+  nombre: Prohibición de valoración subjetiva del precio
+
+  prioridad: maxima
+
+  condicion:
+
+    precioValoradoSubjetivamente
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    El criterio precio nunca podrá depender de valoraciones subjetivas.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-029
+# ============================================================================
+
+- id: CRIT-029
+
+  nombre: La fórmula deberá publicarse íntegramente
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      formulaPublicada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula aplicable deberá figurar íntegramente en los pliegos.
+
+  referencia:
+
+    PRINCIPIO_TRANSPARENCIA
+
+# ============================================================================
+# REGLA CRIT-030
+# ============================================================================
+
+- id: CRIT-030
+
+  nombre: Igualdad de tratamiento
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      igualdadAplicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula deberá aplicarse de idéntica manera a todas las ofertas.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-031
+# ============================================================================
+
+- id: CRIT-031
+
+  nombre: Comprobación automática de coherencia
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      formulaPrecio
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA verificará automáticamente la coherencia matemática de la fórmula utilizada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-032
+# ============================================================================
+
+- id: CRIT-032
+
+  nombre: Registro para auditoría
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      criterioPrecio
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda valoración económica quedará registrada para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarPrecio:
+
+    true
+
+  validarFormula:
+
+    true
+
+  registrarCalculo:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 5 DE 24
+# ============================================================================
+
+# ============================================================================
+# VALIDACIÓN JURÍDICA DE LAS FÓRMULAS ECONÓMICAS
+# ============================================================================
+
+formulasEconomicas:
+
+  activas:
+
+    true
+
+  validarAutomaticamente:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-033
+# ============================================================================
+
+- id: CRIT-033
+
+  nombre: Toda fórmula deberá ser objetiva
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      objetividadFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula deberá producir resultados objetivos e independientes del evaluador.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-034
+# ============================================================================
+
+- id: CRIT-034
+
+  nombre: La fórmula deberá ser verificable
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      verificabilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo licitador deberá poder reproducir el cálculo.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-035
+# ============================================================================
+
+- id: CRIT-035
+
+  nombre: Prohibición de fórmulas arbitrarias
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaArbitraria
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán utilizarse fórmulas que produzcan resultados arbitrarios.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-036
+# ============================================================================
+
+- id: CRIT-036
+
+  nombre: Prohibición de alterar el orden económico
+
+  prioridad: alta
+
+  condicion:
+
+    formulaAlteraOrdenNatural
+
+  accion:
+
+    advertencia
+
+  resultado:
+
+    revisar
+
+  justificar:
+
+    La fórmula no debería alterar injustificadamente el orden derivado de las ofertas económicas.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-037
+# ============================================================================
+
+- id: CRIT-037
+
+  nombre: Comprobación de continuidad
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      continuidadFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que la función matemática no genere saltos injustificados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-038
+# ============================================================================
+
+- id: CRIT-038
+
+  nombre: Comprobación de proporcionalidad
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      proporcionalidadFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración deberá mantener proporcionalidad entre las diferencias económicas.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-039
+# ============================================================================
+
+- id: CRIT-039
+
+  nombre: Detección de efectos distorsionadores
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    analizar:
+
+      distorsion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA detectará automáticamente fórmulas susceptibles de distorsionar la competencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-040
+# ============================================================================
+
+- id: CRIT-040
+
+  nombre: Registro matemático
+
+  prioridad: baja
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      formulaMatematica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula aplicada quedará registrada para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarPropiedadesMatematicas:
+
+    true
+
+  detectarDistorsiones:
+
+    true
+
+  registrarResultados:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+# ============================================================================
+# FIN PARTE 6 DE 24
+# ============================================================================
+
+# ============================================================================
+# FÓRMULAS ECONÓMICAS
+# FAMILIA: PROPORCIONAL INVERSA
+# ============================================================================
+
+formulaProporcionalInversa:
+
+  activa:
+
+    true
+
+  requiereValidacion:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-041
+# ============================================================================
+
+- id: CRIT-041
+
+  nombre: Utilización de fórmula proporcional inversa
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaSeleccionada == proporcional_inversa
+
+  accion:
+
+    aplicarFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración económica podrá realizarse mediante fórmula proporcional inversa.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-042
+# ============================================================================
+
+- id: CRIT-042
+
+  nombre: La mejor oferta económica obtiene la máxima puntuación
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      maximaPuntuacionMejorOferta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La oferta económicamente más ventajosa deberá obtener la puntuación máxima prevista.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-043
+# ============================================================================
+
+- id: CRIT-043
+
+  nombre: Descenso proporcional de puntuación
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      proporcionalidadDescenso
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las restantes ofertas recibirán puntuación proporcional.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-044
+# ============================================================================
+
+- id: CRIT-044
+
+  nombre: Prohibición de saltos artificiales
+
+  prioridad: maxima
+
+  condicion:
+
+    existenSaltosPuntuacion
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La fórmula no podrá introducir saltos artificiales entre ofertas similares.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-045
+# ============================================================================
+
+- id: CRIT-045
+
+  nombre: Validación matemática
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      formulaMatematica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA comprobará automáticamente la corrección matemática de la fórmula.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-046
+# ============================================================================
+
+- id: CRIT-046
+
+  nombre: Comprobación de estabilidad
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    analizar:
+
+      estabilidadResultados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará que pequeñas diferencias económicas no produzcan alteraciones desproporcionadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-047
+# ============================================================================
+
+- id: CRIT-047
+
+  nombre: Registro del cálculo
+
+  prioridad: baja
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      formulaProporcionalInversa
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cálculo efectuado quedará registrado para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarProporcionalidad:
+
+    true
+
+  detectarSaltos:
+
+    true
+
+  registrarCalculos:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+# ============================================================================
+# FIN PARTE 7 DE 24
+# ============================================================================
+
+# ============================================================================
+# FÓRMULAS ECONÓMICAS
+# FAMILIA: PROPORCIONAL LINEAL
+# ============================================================================
+
+formulaLineal:
+
+  activa:
+
+    true
+
+  requiereValidacion:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-048
+# ============================================================================
+
+- id: CRIT-048
+
+  nombre: Utilización de fórmula lineal
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaSeleccionada == proporcional_lineal
+
+  accion:
+
+    aplicarFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración podrá realizarse mediante fórmula lineal cuando resulte adecuada al objeto del contrato.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-049
+# ============================================================================
+
+- id: CRIT-049
+
+  nombre: Escala lineal continua
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      continuidadEscala
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación deberá evolucionar de forma continua y proporcional.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-050
+# ============================================================================
+
+- id: CRIT-050
+
+  nombre: Ausencia de discriminación matemática
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaGeneraDiscriminacion
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La fórmula no podrá favorecer injustificadamente determinadas ofertas.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-051
+# ============================================================================
+
+- id: CRIT-051
+
+  nombre: Comprobación de pendiente
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      pendienteFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que la pendiente utilizada mantenga la proporcionalidad de la valoración.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-052
+# ============================================================================
+
+- id: CRIT-052
+
+  nombre: Comprobación de extremos
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      valoresExtremos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema verificará el comportamiento de la fórmula en los valores máximos y mínimos.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-053
+# ============================================================================
+
+- id: CRIT-053
+
+  nombre: Estabilidad frente a pequeñas variaciones
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    analizar:
+
+      estabilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Pequeñas diferencias económicas no deberán producir alteraciones desproporcionadas en la puntuación.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-054
+# ============================================================================
+
+- id: CRIT-054
+
+  nombre: Registro de cálculo lineal
+
+  prioridad: baja
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      formulaLineal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La aplicación de la fórmula lineal quedará registrada para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarPendiente:
+
+    true
+
+  validarContinuidad:
+
+    true
+
+  registrarCalculos:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+# ============================================================================
+# FIN PARTE 8 DE 24
+# ============================================================================
+
+# ============================================================================
+# FÓRMULAS ECONÓMICAS
+# FAMILIA: BAJA MEDIA Y DESVIACIÓN
+# ============================================================================
+
+formulaBajaMedia:
+
+  activa:
+
+    true
+
+  requiereValidacion:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-055
+# ============================================================================
+
+- id: CRIT-055
+
+  nombre: Utilización de fórmulas basadas en baja media
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaSeleccionada == baja_media
+
+  accion:
+
+    aplicarFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Podrán emplearse fórmulas basadas en la media de las ofertas cuando resulten adecuadas y suficientemente justificadas.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-056
+# ============================================================================
+
+- id: CRIT-056
+
+  nombre: Prohibición de alterar artificialmente la media
+
+  prioridad: maxima
+
+  condicion:
+
+    formulaManipulaMedia
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La fórmula no podrá alterar artificialmente el valor medio de referencia.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-057
+# ============================================================================
+
+- id: CRIT-057
+
+  nombre: Comprobación estadística
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      distribucionOfertas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará la distribución estadística de las ofertas antes de aplicar la fórmula.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-058
+# ============================================================================
+
+- id: CRIT-058
+
+  nombre: Validación de desviaciones
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    calcular:
+
+      desviacionMedia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán automáticamente las desviaciones respecto de la media.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-059
+# ============================================================================
+
+- id: CRIT-059
+
+  nombre: Comprobación de estabilidad estadística
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    analizar:
+
+      estabilidadEstadistica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula deberá mantener un comportamiento estadísticamente estable.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-060
+# ============================================================================
+
+- id: CRIT-060
+
+  nombre: Evitar distorsiones por valores extremos
+
+  prioridad: maxima
+
+  condicion:
+
+    valoresExtremosDistorsionan
+
+  accion:
+
+    advertencia
+
+  resultado:
+
+    revisar
+
+  justificar:
+
+    Se detectan ofertas extremas que pueden alterar significativamente la valoración.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-061
+# ============================================================================
+
+- id: CRIT-061
+
+  nombre: Registro de cálculos estadísticos
+
+  prioridad: baja
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      calculosEstadisticos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los cálculos estadísticos quedarán registrados para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  calcularMedia:
+
+    true
+
+  calcularDesviaciones:
+
+    true
+
+  detectarValoresExtremos:
+
+    true
+
+  registrarCalculos:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+# ============================================================================
+# FIN PARTE 9 DE 24
+# ============================================================================
+
+# ============================================================================
+# FÓRMULAS ECONÓMICAS AVANZADAS
+# ESCALONADAS, MIXTAS Y CON UMBRALES
+# ============================================================================
+
+formulasAvanzadas:
+
+  activas:
+
+    true
+
+  requierenJustificacion:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-062
+# ============================================================================
+
+- id: CRIT-062
+
+  nombre: Utilización de fórmulas escalonadas
+
+  prioridad: alta
+
+  condicion:
+
+    formulaSeleccionada == escalonada
+
+  accion:
+
+    comprobar:
+
+      justificacionTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las fórmulas escalonadas deberán justificarse expresamente en el expediente.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-063
+# ============================================================================
+
+- id: CRIT-063
+
+  nombre: Umbrales objetivos
+
+  prioridad: maxima
+
+  condicion:
+
+    existenUmbrales
+
+  accion:
+
+    validar:
+
+      objetividadUmbrales
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo umbral deberá responder a criterios objetivos y verificables.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-064
+# ============================================================================
+
+- id: CRIT-064
+
+  nombre: Prohibición de umbrales arbitrarios
+
+  prioridad: maxima
+
+  condicion:
+
+    umbralArbitrario
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán establecerse umbrales sin motivación técnica suficiente.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-065
+# ============================================================================
+
+- id: CRIT-065
+
+  nombre: Validación de fórmulas mixtas
+
+  prioridad: alta
+
+  condicion:
+
+    formulaSeleccionada == mixta
+
+  accion:
+
+    comprobar:
+
+      coherenciaMatematica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las fórmulas mixtas deberán mantener coherencia matemática en todas sus fases.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-066
+# ============================================================================
+
+- id: CRIT-066
+
+  nombre: Continuidad entre escalones
+
+  prioridad: alta
+
+  condicion:
+
+    formulaEscalonada
+
+  accion:
+
+    validar:
+
+      continuidadEscalones
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El paso entre escalones no deberá producir efectos desproporcionados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-067
+# ============================================================================
+
+- id: CRIT-067
+
+  nombre: Límite máximo de puntuación
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      limiteSuperior
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Ninguna fórmula podrá superar la puntuación máxima prevista para el criterio.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-068
+# ============================================================================
+
+- id: CRIT-068
+
+  nombre: Límite mínimo de puntuación
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      limiteInferior
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fórmula respetará los límites mínimos definidos en los pliegos.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-069
+# ============================================================================
+
+- id: CRIT-069
+
+  nombre: Simulación previa
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    simular:
+
+      comportamientoFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA simulará automáticamente el comportamiento de la fórmula antes de su utilización.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-070
+# ============================================================================
+
+- id: CRIT-070
+
+  nombre: Registro de simulaciones
+
+  prioridad: baja
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      simulacionesFormula
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las simulaciones efectuadas quedarán registradas para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarUmbrales:
+
+    true
+
+  validarEscalones:
+
+    true
+
+  ejecutarSimulaciones:
+
+    true
+
+  registrarResultados:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+# ============================================================================
+# FIN PARTE 10 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS EVALUABLES MEDIANTE JUICIO DE VALOR
+# BLOQUE GENERAL
+# ============================================================================
+
+criteriosJuicioValor:
+
+  activos:
+
+    true
+
+  requierenMotivacion:
+
+    true
+
+  requierenInformeTecnico:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-071
+# ============================================================================
+
+- id: CRIT-071
+
+  nombre: Identificación de criterios de juicio de valor
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioJuicioValor
+
+  accion:
+
+    clasificar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo criterio basado en juicio de valor deberá identificarse expresamente.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-072
+# ============================================================================
+
+- id: CRIT-072
+
+  nombre: Motivación obligatoria
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioJuicioValor
+
+  accion:
+
+    comprobar:
+
+      motivacionTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda puntuación otorgada mediante juicio de valor deberá estar suficientemente motivada.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-073
+# ============================================================================
+
+- id: CRIT-073
+
+  nombre: Informe técnico obligatorio
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioJuicioValor
+
+  accion:
+
+    exigir:
+
+      informeTecnico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración deberá apoyarse en un informe técnico suficientemente razonado.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-074
+# ============================================================================
+
+- id: CRIT-074
+
+  nombre: Prohibición de arbitrariedad
+
+  prioridad: maxima
+
+  condicion:
+
+    valoracionArbitraria
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán emitirse valoraciones arbitrarias o carentes de fundamento técnico.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-075
+# ============================================================================
+
+- id: CRIT-075
+
+  nombre: Coherencia de la valoración
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      coherenciaValoracion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación deberá guardar coherencia con el contenido realmente evaluado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-076
+# ============================================================================
+
+- id: CRIT-076
+
+  nombre: Igualdad de tratamiento
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      igualdadValoracion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los licitadores deberán ser evaluados mediante idénticos criterios.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-077
+# ============================================================================
+
+- id: CRIT-077
+
+  nombre: Separación respecto de criterios automáticos
+
+  prioridad: alta
+
+  condicion:
+
+    existenCriteriosMixtos
+
+  accion:
+
+    verificar:
+
+      separacionValoraciones
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración subjetiva deberá mantenerse separada de la valoración automática.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-078
+# ============================================================================
+
+- id: CRIT-078
+
+  nombre: Registro completo de la evaluación
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      evaluacionJuicioValor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la valoración realizada quedará registrada para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarMotivacion:
+
+    true
+
+  validarInformeTecnico:
+
+    true
+
+  registrarEvaluacion:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 11 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS DE CALIDAD TÉCNICA
+# MEMORIA TÉCNICA, METODOLOGÍA Y ORGANIZACIÓN
+# ============================================================================
+
+calidadTecnica:
+
+  activa:
+
+    true
+
+  requiereMotivacion:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-079
+# ============================================================================
+
+- id: CRIT-079
+
+  nombre: Calidad técnica vinculada al objeto
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioCalidadTecnica
+
+  accion:
+
+    comprobar:
+
+      vinculacionObjeto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La calidad técnica únicamente podrá valorarse cuando esté directamente vinculada al objeto del contrato.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-080
+# ============================================================================
+
+- id: CRIT-080
+
+  nombre: Evaluación de la memoria técnica
+
+  prioridad: alta
+
+  condicion:
+
+    memoriaTecnicaSolicitada
+
+  accion:
+
+    evaluar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La memoria técnica será evaluada conforme a los criterios previamente definidos.
+
+  referencia:
+
+    LCSP_146
+
+# ============================================================================
+# REGLA CRIT-081
+# ============================================================================
+
+- id: CRIT-081
+
+  nombre: Valoración de la metodología
+
+  prioridad: alta
+
+  condicion:
+
+    criterioMetodologia
+
+  accion:
+
+    comprobar:
+
+      metodologiaPropuesta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La metodología podrá valorarse cuando aporte mejoras objetivamente apreciables.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-082
+# ============================================================================
+
+- id: CRIT-082
+
+  nombre: Valoración de la organización de los trabajos
+
+  prioridad: alta
+
+  condicion:
+
+    criterioOrganizacion
+
+  accion:
+
+    comprobar:
+
+      organizacionPropuesta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La organización propuesta deberá guardar relación directa con la correcta ejecución del contrato.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-083
+# ============================================================================
+
+- id: CRIT-083
+
+  nombre: Prohibición de valoraciones genéricas
+
+  prioridad: maxima
+
+  condicion:
+
+    valoracionGenerica
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán emitirse valoraciones genéricas carentes de motivación individualizada.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-084
+# ============================================================================
+
+- id: CRIT-084
+
+  nombre: Coherencia entre memoria y puntuación
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      coherenciaMemoria
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación deberá corresponderse con el contenido real de la memoria técnica.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-085
+# ============================================================================
+
+- id: CRIT-085
+
+  nombre: Igualdad en la evaluación
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      igualdadEvaluacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las memorias deberán evaluarse utilizando exactamente los mismos criterios.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-086
+# ============================================================================
+
+- id: CRIT-086
+
+  nombre: Registro de la valoración técnica
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      valoracionTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración de la calidad técnica quedará registrada para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarMemoriaTecnica:
+
+    true
+
+  validarMetodologia:
+
+    true
+
+  validarOrganizacion:
+
+    true
+
+  registrarValoraciones:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 12 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS DE INNOVACIÓN, MEJORAS TÉCNICAS Y VALOR AÑADIDO
+# ============================================================================
+
+innovacion:
+
+  activa:
+
+    true
+
+  requiereDefinicionPrevia:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-087
+# ============================================================================
+
+- id: CRIT-087
+
+  nombre: Mejoras vinculadas al objeto
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioMejora
+
+  accion:
+
+    comprobar:
+
+      vinculacionObjeto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las mejoras únicamente podrán valorarse cuando estén directamente vinculadas al objeto contractual.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-088
+# ============================================================================
+
+- id: CRIT-088
+
+  nombre: Mejoras previamente definidas
+
+  prioridad: maxima
+
+  condicion:
+
+    mejoraNoDefinida
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Las mejoras deberán describirse previamente en los pliegos.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-089
+# ============================================================================
+
+- id: CRIT-089
+
+  nombre: Prohibición de mejoras genéricas
+
+  prioridad: maxima
+
+  condicion:
+
+    mejoraGenerica
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán valorarse mejoras formuladas de forma genérica o indeterminada.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-090
+# ============================================================================
+
+- id: CRIT-090
+
+  nombre: Innovación técnicamente justificable
+
+  prioridad: alta
+
+  condicion:
+
+    criterioInnovacion
+
+  accion:
+
+    comprobar:
+
+      justificacionTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La innovación deberá aportar un valor añadido objetivamente apreciable.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-091
+# ============================================================================
+
+- id: CRIT-091
+
+  nombre: Prohibición de modificar el objeto contractual
+
+  prioridad: maxima
+
+  condicion:
+
+    mejoraModificaObjeto
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Las mejoras no podrán alterar la naturaleza del objeto del contrato.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-092
+# ============================================================================
+
+- id: CRIT-092
+
+  nombre: Valor añadido verificable
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      valorAnadido
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El valor añadido deberá ser técnicamente verificable.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-093
+# ============================================================================
+
+- id: CRIT-093
+
+  nombre: Igualdad en la valoración de mejoras
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      igualdadEvaluacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las mejoras deberán evaluarse utilizando exactamente el mismo sistema de valoración.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-094
+# ============================================================================
+
+- id: CRIT-094
+
+  nombre: Registro de innovación y mejoras
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      mejorasInnovacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las mejoras valoradas quedarán registradas para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarInnovacion:
+
+    true
+
+  validarMejoras:
+
+    true
+
+  validarValorAnadido:
+
+    true
+
+  registrarEvaluaciones:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 13 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS SOCIALES Y MEDIOAMBIENTALES
+# ============================================================================
+
+criteriosSocialesAmbientales:
+
+  activos:
+
+    true
+
+  requierenVinculacionObjeto:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-095
+# ============================================================================
+
+- id: CRIT-095
+
+  nombre: Criterios sociales vinculados al objeto
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioSocial
+
+  accion:
+
+    comprobar:
+
+      vinculacionObjeto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios sociales deberán guardar relación directa con el objeto del contrato.
+
+  referencia:
+
+    LCSP_145_2
+
+# ============================================================================
+# REGLA CRIT-096
+# ============================================================================
+
+- id: CRIT-096
+
+  nombre: Criterios medioambientales vinculados al objeto
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioMedioambiental
+
+  accion:
+
+    comprobar:
+
+      vinculacionObjeto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios medioambientales deberán estar vinculados al objeto contractual.
+
+  referencia:
+
+    LCSP_145_2
+
+# ============================================================================
+# REGLA CRIT-097
+# ============================================================================
+
+- id: CRIT-097
+
+  nombre: Verificabilidad del criterio social
+
+  prioridad: alta
+
+  condicion:
+
+    criterioSocial
+
+  accion:
+
+    comprobar:
+
+      verificabilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo criterio social deberá poder verificarse objetivamente.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-098
+# ============================================================================
+
+- id: CRIT-098
+
+  nombre: Verificabilidad del criterio medioambiental
+
+  prioridad: alta
+
+  condicion:
+
+    criterioMedioambiental
+
+  accion:
+
+    comprobar:
+
+      verificabilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo criterio medioambiental deberá ser susceptible de comprobación objetiva.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-099
+# ============================================================================
+
+- id: CRIT-099
+
+  nombre: Prohibición de discriminación
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioDiscriminatorio
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Los criterios sociales o medioambientales no podrán generar discriminación entre licitadores.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-100
+# ============================================================================
+
+- id: CRIT-100
+
+  nombre: Coherencia con la ejecución
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      coherenciaEjecucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios deberán guardar coherencia con las obligaciones previstas durante la ejecución del contrato.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-101
+# ============================================================================
+
+- id: CRIT-101
+
+  nombre: Prohibición de criterios simbólicos
+
+  prioridad: alta
+
+  condicion:
+
+    criterioSinImpactoReal
+
+  accion:
+
+    advertencia
+
+  resultado:
+
+    revisar
+
+  justificar:
+
+    No deberían incorporarse criterios sociales o medioambientales meramente simbólicos o sin incidencia efectiva en la prestación.
+
+  referencia:
+
+    DOCTRINA_TACRC
+
+# ============================================================================
+# REGLA CRIT-102
+# ============================================================================
+
+- id: CRIT-102
+
+  nombre: Registro de criterios sociales y medioambientales
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      criteriosSocialesAmbientales
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los criterios sociales y medioambientales utilizados quedarán registrados para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarCriteriosSociales:
+
+    true
+
+  validarCriteriosAmbientales:
+
+    true
+
+  validarVerificabilidad:
+
+    true
+
+  registrarEvaluaciones:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 14 DE 24
+# ============================================================================
+
+# ============================================================================
+# COSTE DEL CICLO DE VIDA
+# ============================================================================
+
+costeCicloVida:
+
+  activo:
+
+    true
+
+  requiereMetodologia:
+
+    true
+
+  requiereJustificacion:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-103
+# ============================================================================
+
+- id: CRIT-103
+
+  nombre: Utilización del coste del ciclo de vida
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioCosteCicloVida
+
+  accion:
+
+    comprobar:
+
+      metodologiaCalculo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El coste del ciclo de vida únicamente podrá utilizarse cuando exista una metodología objetiva de cálculo.
+
+  referencia:
+
+    LCSP_148
+
+# ============================================================================
+# REGLA CRIT-104
+# ============================================================================
+
+- id: CRIT-104
+
+  nombre: Componentes del coste del ciclo de vida
+
+  prioridad: alta
+
+  condicion:
+
+    criterioCosteCicloVida
+
+  accion:
+
+    validar:
+
+      componentesCoste
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La metodología deberá identificar claramente todos los componentes económicos considerados.
+
+  referencia:
+
+    LCSP_148
+
+# ============================================================================
+# REGLA CRIT-105
+# ============================================================================
+
+- id: CRIT-105
+
+  nombre: Costes de utilización
+
+  prioridad: media
+
+  condicion:
+
+    criterioCosteCicloVida
+
+  accion:
+
+    comprobar:
+
+      costesUtilizacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Podrán incluirse costes de explotación, mantenimiento y consumo durante la vida útil.
+
+  referencia:
+
+    DIRECTIVA_2014_24_UE
+
+# ============================================================================
+# REGLA CRIT-106
+# ============================================================================
+
+- id: CRIT-106
+
+  nombre: Costes medioambientales
+
+  prioridad: media
+
+  condicion:
+
+    criterioCosteCicloVida
+
+  accion:
+
+    comprobar:
+
+      costesAmbientales
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Podrán incorporarse costes ambientales cuando puedan cuantificarse objetivamente.
+
+  referencia:
+
+    LCSP_148
+
+# ============================================================================
+# REGLA CRIT-107
+# ============================================================================
+
+- id: CRIT-107
+
+  nombre: Prohibición de estimaciones arbitrarias
+
+  prioridad: maxima
+
+  condicion:
+
+    costesNoObjetivos
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán utilizarse estimaciones económicas carentes de base objetiva o verificable.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-108
+# ============================================================================
+
+- id: CRIT-108
+
+  nombre: Igualdad metodológica
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      igualdadMetodologia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La misma metodología deberá aplicarse a todas las ofertas.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-109
+# ============================================================================
+
+- id: CRIT-109
+
+  nombre: Auditoría del cálculo
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      calculoCosteCicloVida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cálculo completo del coste del ciclo de vida quedará registrado para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-110
+# ============================================================================
+
+- id: CRIT-110
+
+  nombre: Explicabilidad del resultado
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    generar:
+
+      explicacionCalculo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA generará una explicación comprensible del cálculo efectuado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarMetodologia:
+
+    true
+
+  validarCostes:
+
+    true
+
+  registrarCalculos:
+
+    true
+
+  generarExplicacion:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 15 DE 24
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS DE DESEMPATE
+# LCSP ARTÍCULO 147
+# ============================================================================
+
+criteriosDesempate:
+
+  activos:
+
+    true
+
+  aplicacionSecuencial:
+
+    true
+
+  requierenPublicidad:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-111
+# ============================================================================
+
+- id: CRIT-111
+
+  nombre: Aplicación únicamente en caso de empate
+
+  prioridad: maxima
+
+  condicion:
+
+    empatePuntuacionFinal
+
+  accion:
+
+    iniciarProcesoDesempate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios de desempate únicamente se aplicarán cuando exista igualdad de puntuación final.
+
+  referencia:
+
+    LCSP_147
+
+# ============================================================================
+# REGLA CRIT-112
+# ============================================================================
+
+- id: CRIT-112
+
+  nombre: Aplicación secuencial
+
+  prioridad: maxima
+
+  condicion:
+
+    existenVariosCriteriosDesempate
+
+  accion:
+
+    aplicarSecuencialmente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios deberán aplicarse en el orden establecido en los pliegos.
+
+  referencia:
+
+    LCSP_147
+
+# ============================================================================
+# REGLA CRIT-113
+# ============================================================================
+
+- id: CRIT-113
+
+  nombre: Criterios previamente publicados
+
+  prioridad: maxima
+
+  condicion:
+
+    criterioDesempateNoPublicado
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán utilizarse criterios de desempate no previstos previamente.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-114
+# ============================================================================
+
+- id: CRIT-114
+
+  nombre: Igualdad de aplicación
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      igualdadAplicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios de desempate deberán aplicarse de forma idéntica a todos los licitadores.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-115
+# ============================================================================
+
+- id: CRIT-115
+
+  nombre: Registro del criterio aplicado
+
+  prioridad: alta
+
+  condicion:
+
+    desempateAplicado
+
+  accion:
+
+    registrar:
+
+      criterioUtilizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El criterio de desempate utilizado quedará registrado para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-116
+# ============================================================================
+
+- id: CRIT-116
+
+  nombre: Registro del resultado
+
+  prioridad: alta
+
+  condicion:
+
+    desempateAplicado
+
+  accion:
+
+    registrar:
+
+      resultadoDesempate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El resultado completo del desempate quedará documentado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-117
+# ============================================================================
+
+- id: CRIT-117
+
+  nombre: Generación automática de motivación
+
+  prioridad: media
+
+  condicion:
+
+    desempateAplicado
+
+  accion:
+
+    generar:
+
+      motivacionDesempate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA generará automáticamente la motivación del desempate.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-118
+# ============================================================================
+
+- id: CRIT-118
+
+  nombre: Trazabilidad completa
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      trazabilidadCompleta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el proceso de desempate quedará completamente trazado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  aplicarDesempates:
+
+    true
+
+  registrarProceso:
+
+    true
+
+  generarMotivacion:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 16 DE 24
+# ============================================================================
+
+# ============================================================================
+# OFERTAS ANORMALMENTE BAJAS
+# LCSP ARTÍCULO 149
+# ============================================================================
+
+ofertasAnormalmenteBajas:
+
+  activas:
+
+    true
+
+  requierenJustificacion:
+
+    true
+
+  exclusionAutomatica:
+
+    false
+
+# ============================================================================
+# REGLA CRIT-119
+# ============================================================================
+
+- id: CRIT-119
+
+  nombre: Detección automática
+
+  prioridad: maxima
+
+  condicion:
+
+    ofertaDetectadaComoAnormal
+
+  accion:
+
+    iniciarExpedienteJustificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una oferta anormalmente baja deberá iniciarse el procedimiento previsto legalmente.
+
+  referencia:
+
+    LCSP_149
+
+# ============================================================================
+# REGLA CRIT-120
+# ============================================================================
+
+- id: CRIT-120
+
+  nombre: Prohibición de exclusión automática
+
+  prioridad: maxima
+
+  condicion:
+
+    ofertaAnormal
+
+  accion:
+
+    impedirExclusionAutomatica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La existencia de una oferta anormalmente baja no implica por sí sola su exclusión.
+
+  referencia:
+
+    LCSP_149
+
+# ============================================================================
+# REGLA CRIT-121
+# ============================================================================
+
+- id: CRIT-121
+
+  nombre: Solicitud de justificación
+
+  prioridad: maxima
+
+  condicion:
+
+    ofertaAnormal
+
+  accion:
+
+    solicitarJustificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación solicitará la justificación correspondiente al licitador.
+
+  referencia:
+
+    LCSP_149
+
+# ============================================================================
+# REGLA CRIT-122
+# ============================================================================
+
+- id: CRIT-122
+
+  nombre: Valoración técnica de la justificación
+
+  prioridad: alta
+
+  condicion:
+
+    justificacionRecibida
+
+  accion:
+
+    evaluarJustificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La justificación aportada deberá evaluarse técnicamente antes de adoptar una decisión.
+
+  referencia:
+
+    LCSP_149
+
+# ============================================================================
+# REGLA CRIT-123
+# ============================================================================
+
+- id: CRIT-123
+
+  nombre: Resolución motivada
+
+  prioridad: maxima
+
+  condicion:
+
+    procedimientoFinalizado
+
+  accion:
+
+    generarResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La aceptación o rechazo de la oferta deberá estar motivada.
+
+  referencia:
+
+    LCSP_149
+
+# ============================================================================
+# REGLA CRIT-124
+# ============================================================================
+
+- id: CRIT-124
+
+  nombre: Registro completo del procedimiento
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      expedienteOfertaAnormal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento quedará registrado para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-125
+# ============================================================================
+
+- id: CRIT-125
+
+  nombre: Auditoría de la decisión
+
+  prioridad: media
+
+  condicion:
+
+    procedimientoFinalizado
+
+  accion:
+
+    generarAuditoria
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA conservará el historial completo de la decisión adoptada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-126
+# ============================================================================
+
+- id: CRIT-126
+
+  nombre: Explicabilidad del procedimiento
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    generarExplicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema generará automáticamente una explicación comprensible del procedimiento seguido.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  detectarAutomaticamente:
+
+    true
+
+  solicitarJustificacion:
+
+    true
+
+  registrarExpediente:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+  generarExplicabilidad:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    PARAM.CRITERIOS
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+    RULE.SOLVENCIA
+
+# ============================================================================
+# FIN PARTE 17 DE 24
+# ============================================================================
+
+# ============================================================================
+# INTEGRACIÓN CON EL RULE ENGINE Y EL WORKFLOW ENGINE
+# ============================================================================
+
+integracion:
+
+  ruleEngine:
+
+    activo: true
+
+  workflowEngine:
+
+    activo: true
+
+  auditoria:
+
+    activa: true
+
+  ia:
+
+    activa: true
+
+# ============================================================================
+# REGLA CRIT-127
+# ============================================================================
+
+- id: CRIT-127
+
+  nombre: Comunicación con RuleEngine
+
+  prioridad: maxima
+
+  condicion:
+
+    criteriosValidados
+
+  accion:
+
+    publicarEvento
+
+  resultado:
+
+    continuar
+
+  evento:
+
+    criterios.validados
+
+  justificar:
+
+    Una vez validados los criterios se notificará al RuleEngine.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-128
+# ============================================================================
+
+- id: CRIT-128
+
+  nombre: Comunicación con WorkflowEngine
+
+  prioridad: maxima
+
+  condicion:
+
+    criteriosValidados
+
+  accion:
+
+    publicarEvento
+
+  resultado:
+
+    continuar
+
+  evento:
+
+    workflow.actualizar
+
+  justificar:
+
+    El Workflow actualizará automáticamente las fases posteriores.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-129
+# ============================================================================
+
+- id: CRIT-129
+
+  nombre: Actualización automática del PCAP
+
+  prioridad: alta
+
+  condicion:
+
+    criteriosModificados
+
+  accion:
+
+    regenerarDocumento
+
+  resultado:
+
+    continuar
+
+  documento:
+
+    PCAP
+
+  justificar:
+
+    Toda modificación de criterios obligará a regenerar el PCAP.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-130
+# ============================================================================
+
+- id: CRIT-130
+
+  nombre: Actualización automática del PPT
+
+  prioridad: alta
+
+  condicion:
+
+    criteriosTecnicosModificados
+
+  accion:
+
+    regenerarDocumento
+
+  resultado:
+
+    continuar
+
+  documento:
+
+    PPT
+
+  justificar:
+
+    Las modificaciones técnicas deberán reflejarse automáticamente en el PPT.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-131
+# ============================================================================
+
+- id: CRIT-131
+
+  nombre: Sincronización con Auditor Jurídico
+
+  prioridad: alta
+
+  condicion:
+
+    criteriosValidados
+
+  accion:
+
+    sincronizar
+
+  resultado:
+
+    continuar
+
+  destino:
+
+    AuditorJuridico
+
+  justificar:
+
+    El auditor jurídico recibirá la configuración definitiva de los criterios.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-132
+# ============================================================================
+
+- id: CRIT-132
+
+  nombre: Sincronización con Motor IA
+
+  prioridad: alta
+
+  condicion:
+
+    criteriosValidados
+
+  accion:
+
+    sincronizar
+
+  resultado:
+
+    continuar
+
+  destino:
+
+    MotorIA
+
+  justificar:
+
+    El motor IA utilizará estos criterios para generar documentos y propuestas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-133
+# ============================================================================
+
+- id: CRIT-133
+
+  nombre: Invalidación de caché
+
+  prioridad: media
+
+  condicion:
+
+    criteriosModificados
+
+  accion:
+
+    invalidarCache
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda modificación invalidará las versiones anteriores para evitar incoherencias.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-134
+# ============================================================================
+
+- id: CRIT-134
+
+  nombre: Registro de sincronización
+
+  prioridad: baja
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar
+
+  resultado:
+
+    continuar
+
+  registro:
+
+    sincronizacionCompleta
+
+  justificar:
+
+    Todas las sincronizaciones quedarán registradas para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  publicarEventos:
+
+    true
+
+  sincronizacionAutomatica:
+
+    true
+
+  regeneracionDocumentos:
+
+    true
+
+  invalidarCache:
+
+    true
+
+  registrarEventos:
+
+    true
+
+# ============================================================================
+# EVENTOS GENERADOS
+# ============================================================================
+
+eventos:
+
+  - criterios.validados
+
+  - criterios.modificados
+
+  - workflow.actualizar
+
+  - documentos.regenerar
+
+  - auditoria.sincronizar
+
+  - ia.actualizar
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.PROCEDIMIENTO
+
+    RULE.OBJETO
+
+    RULE.SOLVENCIA
+
+    PARAM.CRITERIOS
+
+# ============================================================================
+# FIN PARTE 18 DE 24
+# ============================================================================
+
+# ============================================================================
+# VALIDACIONES GLOBALES Y CONTROLES DE COHERENCIA
+# ============================================================================
+
+validacionGlobal:
+
+  activa:
+
+    true
+
+  detenerExpediente:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-135
+# ============================================================================
+
+- id: CRIT-135
+
+  nombre: Coherencia global de criterios
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      coherenciaGlobal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los criterios deberán mantener coherencia jurídica y técnica entre sí.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-136
+# ============================================================================
+
+- id: CRIT-136
+
+  nombre: Coherencia entre objeto y criterios
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      objetoVsCriterios
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios deberán guardar relación directa con el objeto contractual.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-137
+# ============================================================================
+
+- id: CRIT-137
+
+  nombre: Coherencia entre procedimiento y criterios
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      procedimientoVsCriterios
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El procedimiento elegido deberá ser compatible con el sistema de adjudicación previsto.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-138
+# ============================================================================
+
+- id: CRIT-138
+
+  nombre: Comprobación de contradicciones
+
+  prioridad: maxima
+
+  condicion:
+
+    contradiccionesDetectadas
+
+  accion:
+
+    rechazar
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrán coexistir reglas incompatibles dentro del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-139
+# ============================================================================
+
+- id: CRIT-139
+
+  nombre: Validación de dependencias
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      dependenciasCompletas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las dependencias declaradas deberán encontrarse disponibles.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-140
+# ============================================================================
+
+- id: CRIT-140
+
+  nombre: Detección de reglas duplicadas
+
+  prioridad: alta
+
+  condicion:
+
+    reglasDuplicadas
+
+  accion:
+
+    advertencia
+
+  resultado:
+
+    revisar
+
+  justificar:
+
+    Se detectan reglas redundantes que conviene revisar para evitar inconsistencias.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-141
+# ============================================================================
+
+- id: CRIT-141
+
+  nombre: Validación integral antes de finalizar
+
+  prioridad: maxima
+
+  condicion:
+
+    expedientePreparado
+
+  accion:
+
+    ejecutar:
+
+      validacionCompleta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de finalizar el expediente se ejecutará una validación integral de todos los criterios.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-142
+# ============================================================================
+
+- id: CRIT-142
+
+  nombre: Registro de incidencias
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      incidenciasValidacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las incidencias detectadas durante la validación quedarán registradas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarCoherencia:
+
+    true
+
+  detectarDuplicidades:
+
+    true
+
+  validarDependencias:
+
+    true
+
+  detenerErroresCriticos:
+
+    true
+
+  registrarIncidencias:
+
+    true
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+    PARAM.CRITERIOS
+
+    RULE.PCAP
+
+# ============================================================================
+# FIN PARTE 19 DE 24
+# ============================================================================
+
+# ============================================================================
+# MOTOR DE EXPLICABILIDAD JURÍDICA
+# ============================================================================
+
+explicabilidad:
+
+  activa:
+
+    true
+
+  obligatoria:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-143
+# ============================================================================
+
+- id: CRIT-143
+
+  nombre: Toda decisión deberá ser explicable
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    generarExplicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda decisión adoptada por el motor deberá disponer de una explicación jurídica.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-144
+# ============================================================================
+
+- id: CRIT-144
+
+  nombre: Identificación de la regla aplicada
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      reglaAplicada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La explicación identificará la regla concreta utilizada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-145
+# ============================================================================
+
+- id: CRIT-145
+
+  nombre: Incorporación del fundamento jurídico
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    incluir:
+
+      fundamentoNormativo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La explicación incorporará el fundamento jurídico correspondiente.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-146
+# ============================================================================
+
+- id: CRIT-146
+
+  nombre: Explicación del razonamiento
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    construir:
+
+      razonamiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se describirá el razonamiento seguido por el motor para alcanzar la decisión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-147
+# ============================================================================
+
+- id: CRIT-147
+
+  nombre: Relación con el expediente
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    relacionar:
+
+      documentosExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La explicación indicará los documentos del expediente afectados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-148
+# ============================================================================
+
+- id: CRIT-148
+
+  nombre: Trazabilidad temporal
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      fechaHoraDecision
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda decisión incorporará sello temporal para garantizar la trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-149
+# ============================================================================
+
+- id: CRIT-149
+
+  nombre: Identificación del motor
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      motorOrigen
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se registrará el componente que originó la decisión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-150
+# ============================================================================
+
+- id: CRIT-150
+
+  nombre: Registro completo de explicabilidad
+
+  prioridad: media
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      explicacionCompleta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las explicaciones generadas quedarán registradas para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  generarExplicaciones:
+
+    true
+
+  registrarFundamentos:
+
+    true
+
+  registrarRazonamiento:
+
+    true
+
+  registrarEventos:
+
+    true
+
+  generarAuditoria:
+
+    true
+
+# ============================================================================
+# SALIDAS GENERADAS
+# ============================================================================
+
+salidas:
+
+  - informeExplicativo
+
+  - justificacionJuridica
+
+  - razonamientoIA
+
+  - referenciasNormativas
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+    RULE.PCAP
+
+    PARAM.CRITERIOS
+
+# ============================================================================
+# FIN PARTE 20 DE 24
+# ============================================================================
+
+# ============================================================================
+# MOTOR DE AUDITORÍA AVANZADA Y TRAZABILIDAD INTEGRAL
+# ============================================================================
+
+auditoriaAvanzada:
+
+  activa:
+
+    true
+
+  registrarTodo:
+
+    true
+
+  conservarHistorico:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-151
+# ============================================================================
+
+- id: CRIT-151
+
+  nombre: Registro de todas las decisiones
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      decisionCompleta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda decisión generada por el motor deberá quedar registrada íntegramente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-152
+# ============================================================================
+
+- id: CRIT-152
+
+  nombre: Registro del usuario responsable
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      usuarioResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se identificará el usuario que valida o modifica cada decisión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-153
+# ============================================================================
+
+- id: CRIT-153
+
+  nombre: Registro de la versión normativa
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      versionNormativa
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda decisión incorporará la versión normativa aplicada.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-154
+# ============================================================================
+
+- id: CRIT-154
+
+  nombre: Registro de la versión del motor
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      versionMotor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se almacenará la versión exacta del motor que originó la decisión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-155
+# ============================================================================
+
+- id: CRIT-155
+
+  nombre: Registro de documentos afectados
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    registrar:
+
+      documentosModificados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los documentos modificados quedarán vinculados al evento.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-156
+# ============================================================================
+
+- id: CRIT-156
+
+  nombre: Historial de modificaciones
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteActualizado
+
+  accion:
+
+    registrar:
+
+      historialCambios
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se conservará el historial completo de modificaciones del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-157
+# ============================================================================
+
+- id: CRIT-157
+
+  nombre: Integridad del registro
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    validar:
+
+      integridadRegistro
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema verificará que los registros no hayan sido alterados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-158
+# ============================================================================
+
+- id: CRIT-158
+
+  nombre: Exportación para auditoría
+
+  prioridad: media
+
+  condicion:
+
+    solicitudAuditoria
+
+  accion:
+
+    generar:
+
+      informeAuditoria
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    CONTRATA IA podrá generar un informe completo para auditorías internas o externas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarEventos:
+
+    true
+
+  registrarVersiones:
+
+    true
+
+  conservarHistorico:
+
+    true
+
+  validarIntegridad:
+
+    true
+
+  generarInformes:
+
+    true
+
+# ============================================================================
+# SALIDAS GENERADAS
+# ============================================================================
+
+salidas:
+
+  - auditoriaCompleta
+
+  - historialExpediente
+
+  - informeCambios
+
+  - registroIntegridad
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+    RULE.PCAP
+
+    PARAM.CRITERIOS
+
+# ============================================================================
+# FIN PARTE 21 DE 24
+# ============================================================================
+
+# ============================================================================
+# VALIDACIÓN JURÍDICA INTEGRAL
+# COMPROBACIONES CRUZADAS FINALES
+# ============================================================================
+
+validacionJuridicaIntegral:
+
+  activa:
+
+    true
+
+  bloquearErroresCriticos:
+
+    true
+
+# ============================================================================
+# REGLA CRIT-159
+# ============================================================================
+
+- id: CRIT-159
+
+  nombre: Validación integral previa
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteListo
+
+  accion:
+
+    ejecutar:
+
+      validacionIntegral
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de finalizar el expediente deberá ejecutarse una validación jurídica completa.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-160
+# ============================================================================
+
+- id: CRIT-160
+
+  nombre: Comprobación normativa
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      cumplimientoNormativo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará el cumplimiento de toda la normativa aplicable.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-161
+# ============================================================================
+
+- id: CRIT-161
+
+  nombre: Coherencia entre motores
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      coherenciaMotores
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los motores deberán producir resultados compatibles.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-162
+# ============================================================================
+
+- id: CRIT-162
+
+  nombre: Validación documental
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      coherenciaDocumental
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los documentos generados deberán mantener coherencia entre sí.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-163
+# ============================================================================
+
+- id: CRIT-163
+
+  nombre: Validación de puntuaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    comprobar:
+
+      puntuacionesFinales
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará que todas las puntuaciones sean coherentes con los criterios aplicados.
+
+  referencia:
+
+    LCSP_145
+
+# ============================================================================
+# REGLA CRIT-164
+# ============================================================================
+
+- id: CRIT-164
+
+  nombre: Detección de incoherencias
+
+  prioridad: maxima
+
+  condicion:
+
+    incoherenciaDetectada
+
+  accion:
+
+    bloquearExpediente
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La existencia de incoherencias impedirá la finalización automática del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-165
+# ============================================================================
+
+- id: CRIT-165
+
+  nombre: Generación de informe de incidencias
+
+  prioridad: alta
+
+  condicion:
+
+    erroresDetectados
+
+  accion:
+
+    generar:
+
+      informeIncidencias
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará un informe detallado de todas las incidencias detectadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-166
+# ============================================================================
+
+- id: CRIT-166
+
+  nombre: Aprobación jurídica automática
+
+  prioridad: media
+
+  condicion:
+
+    validacionCorrecta
+
+  accion:
+
+    marcar:
+
+      validacionJuridicaSuperada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando todas las comprobaciones resulten satisfactorias se marcará la validación jurídica como superada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  validarNormativa:
+
+    true
+
+  validarMotores:
+
+    true
+
+  validarDocumentacion:
+
+    true
+
+  bloquearErrores:
+
+    true
+
+  generarInformes:
+
+    true
+
+# ============================================================================
+# SALIDAS GENERADAS
+# ============================================================================
+
+salidas:
+
+  - informeValidacionIntegral
+
+  - informeIncidencias
+
+  - validacionJuridica
+
+  - expedienteValidado
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+    RULE.PCAP
+
+    RULE.PPT
+
+    PARAM.CRITERIOS
+
+# ============================================================================
+# FIN PARTE 22 DE 24
+# ============================================================================
+
+# ============================================================================
+# MOTOR DE CERTIFICACIÓN JURÍDICA AUTOMÁTICA
+# ============================================================================
+
+certificacionJuridica:
+
+  activa:
+
+    true
+
+  requiereValidacionIntegral:
+
+    true
+
+  caracter:
+
+    "informe_tecnico"
+
+# ============================================================================
+# REGLA CRIT-167
+# ============================================================================
+
+- id: CRIT-167
+
+  nombre: Requisito previo de validación integral
+
+  prioridad: maxima
+
+  condicion:
+
+    validacionJuridicaSuperada
+
+  accion:
+
+    permitirCertificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo podrá emitirse la certificación cuando la validación jurídica integral haya sido superada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-168
+# ============================================================================
+
+- id: CRIT-168
+
+  nombre: Certificación automática
+
+  prioridad: maxima
+
+  condicion:
+
+    validacionJuridicaSuperada
+
+  accion:
+
+    generar:
+
+      certificadoJuridico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema emitirá un certificado técnico interno del resultado de las validaciones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-169
+# ============================================================================
+
+- id: CRIT-169
+
+  nombre: Inclusión de normativa aplicada
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    incorporar:
+
+      normativaAplicada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El certificado identificará la normativa utilizada durante las comprobaciones.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-170
+# ============================================================================
+
+- id: CRIT-170
+
+  nombre: Inclusión de reglas ejecutadas
+
+  prioridad: alta
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    incorporar:
+
+      reglasEjecutadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El certificado relacionará las reglas ejecutadas durante el proceso.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-171
+# ============================================================================
+
+- id: CRIT-171
+
+  nombre: Resultado global
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    calcular:
+
+      resultadoGlobal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El certificado indicará el resultado global de las comprobaciones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-172
+# ============================================================================
+
+- id: CRIT-172
+
+  nombre: Advertencias pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    advertenciasExistentes
+
+  accion:
+
+    incorporar:
+
+      advertencias
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las advertencias pendientes aparecerán expresamente en el certificado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# REGLA CRIT-173
+# ============================================================================
+
+- id: CRIT-173
+
+  nombre: Exclusión de responsabilidad jurídica automática
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre
+
+  accion:
+
+    incluir:
+
+      clausulaResponsabilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El certificado indicará expresamente que constituye un informe técnico y no sustituye la competencia del órgano de contratación.
+
+  referencia:
+
+    LCSP
+
+# ============================================================================
+# REGLA CRIT-174
+# ============================================================================
+
+- id: CRIT-174
+
+  nombre: Registro del certificado
+
+  prioridad: media
+
+  condicion:
+
+    certificadoEmitido
+
+  accion:
+
+    registrar:
+
+      certificadoCompleto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El certificado emitido quedará incorporado al expediente electrónico.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  emitirCertificado:
+
+    true
+
+  incorporarNormativa:
+
+    true
+
+  incorporarReglas:
+
+    true
+
+  registrarCertificado:
+
+    true
+
+  generarHashDocumento:
+
+    true
+
+# ============================================================================
+# SALIDAS GENERADAS
+# ============================================================================
+
+salidas:
+
+  - certificadoJuridicoTecnico
+
+  - resumenValidaciones
+
+  - listadoNormativa
+
+  - listadoReglas
+
+  - hashCertificado
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    RULE.OBJETO
+
+    RULE.PROCEDIMIENTO
+
+    RULE.SOLVENCIA
+
+    RULE.PCAP
+
+    RULE.PPT
+
+    PARAM.CRITERIOS
+
+# ============================================================================
+# FIN PARTE 23 DE 24
+# ============================================================================
+
+# ============================================================================
+# CONFIGURACIÓN FINAL DEL MÓDULO RULE.CRITERIOS
+# ============================================================================
+
+modulo:
+
+  id:
+
+    RULE.CRITERIOS
+
+  nombre:
+
+    Motor de Criterios de Adjudicación
+
+  version:
+
+    "1.0.0"
+
+  estado:
+
+    PRODUCCION
+
+  certificado:
+
+    true
+
+# ============================================================================
+# PARÁMETROS GENERALES
+# ============================================================================
+
+configuracion:
+
+  activarExplicabilidad:
+
+    true
+
+  activarAuditoria:
+
+    true
+
+  activarCertificacion:
+
+    true
+
+  activarWorkflow:
+
+    true
+
+  activarRuleEngine:
+
+    true
+
+  activarIA:
+
+    true
+
+# ============================================================================
+# COMPATIBILIDAD
+# ============================================================================
+
+compatibilidad:
+
+  motores:
+
+    - RULE.OBJETO
+
+    - RULE.PROCEDIMIENTO
+
+    - RULE.SOLVENCIA
+
+    - RULE.PCAP
+
+    - RULE.PPT
+
+    - RULE.MEMORIA
+
+    - RULE.EVALUACION
+
+    - RULE.EXPEDIENTE
+
+    - WORKFLOW
+
+    - AUDITOR
+
+    - MOTOR_IA
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+metricas:
+
+  registrarTiempo:
+
+    true
+
+  registrarErrores:
+
+    true
+
+  registrarAdvertencias:
+
+    true
+
+  registrarEventos:
+
+    true
+
+# ============================================================================
+# AUTOCOMPROBACIÓN
+# ============================================================================
+
+autodiagnostico:
+
+  activo:
+
+    true
+
+  ejecutarAlInicio:
+
+    true
+
+  ejecutarAntesCertificacion:
+
+    true
+
+# ============================================================================
+# RESULTADOS DEL MÓDULO
+# ============================================================================
+
+salidas:
+
+  - criteriosValidados
+
+  - puntuacionesCalculadas
+
+  - desempatesResueltos
+
+  - ofertasAnormalesAnalizadas
+
+  - explicacionesGeneradas
+
+  - auditoriaCompleta
+
+  - certificacionEmitida
+
+# ============================================================================
+# EVENTOS
+# ============================================================================
+
+eventos:
+
+  inicioModulo:
+
+    true
+
+  finModulo:
+
+    true
+
+  errorCritico:
+
+    true
+
+  advertencia:
+
+    true
+
+  validacionCompleta:
+
+    true
+
+# ============================================================================
+# INFORMACIÓN DEL MÓDULO
+# ============================================================================
+
+informacion:
+
+  descripcion:
+
+    Motor integral de gestión, validación, auditoría y certificación de los criterios de adjudicación.
+
+  ambito:
+
+    Expedientes de contratación pública sujetos a la LCSP.
+
+  preparadoParaProduccion:
+
+    true
+
+# ============================================================================
+# CERTIFICACIÓN FINAL
+# ============================================================================
+
+certificacionFinal:
+
+  modulo:
+
+    RULE.CRITERIOS
+
+  version:
+
+    "1.0.0"
+
+  estado:
+
+    COMPLETADO
+
+  reglasImplementadas:
+
+    174
+
+  integracion:
+
+    COMPLETA
+
+  auditoria:
+
+    COMPLETA
+
+  explicabilidad:
+
+    COMPLETA
+
+  certificacion:
+
+    COMPLETA
+
+  listoParaIntegracion:
+
+    true
+
+# ============================================================================
+# FIN DEL MÓDULO RULE.CRITERIOS
+# ============================================================================
