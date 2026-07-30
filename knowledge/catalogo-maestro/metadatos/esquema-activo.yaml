@@ -1,0 +1,237 @@
+# ==========================================================
+# CONTRATA IA
+# Esquema Oficial de Activos Documentales
+# ==========================================================
+
+schema:
+  id: CONTRATAIA.ACTIVO.1.0
+  version: 1.0.0
+  status: vigente
+
+# ==========================================================
+# IDENTIFICACIÓN
+# ==========================================================
+
+identificacion:
+
+  id: ""
+
+  codigo: ""
+
+  titulo: ""
+
+  descripcion: ""
+
+  categoria: ""
+
+  subcategoria: ""
+
+  tipo: ""
+
+# ==========================================================
+# VERSIONADO
+# ==========================================================
+
+versionado:
+
+  version: "1.0.0"
+
+  estado: borrador
+
+  fechaCreacion: ""
+
+  fechaModificacion: ""
+
+  autor: ""
+
+# ==========================================================
+# APLICABILIDAD
+# ==========================================================
+
+aplicabilidad:
+
+  tiposContrato:
+
+    - servicios
+
+    - suministros
+
+    - obras
+
+    - concesion_servicios
+
+    - concesion_obras
+
+    - mixto
+
+  procedimientos:
+
+    - abierto
+
+    - abierto_simplificado
+
+    - abierto_simplificado_abreviado
+
+    - negociado
+
+    - menor
+
+  documentos:
+
+    - memoria
+
+    - pcap
+
+    - ppt
+
+    - informe
+
+    - resolucion
+
+# ==========================================================
+# CONTENIDO
+# ==========================================================
+
+contenido:
+
+  resumen: ""
+
+  textoBase: ""
+
+  observaciones: ""
+
+# ==========================================================
+# VARIANTES
+# ==========================================================
+
+variantes:
+
+  corta: ""
+
+  media: ""
+
+  extensa: ""
+
+# ==========================================================
+# DEPENDENCIAS
+# ==========================================================
+
+dependencias:
+
+  requiere:
+
+    []
+
+  incompatibleCon:
+
+    []
+
+  sustituye:
+
+    []
+
+# ==========================================================
+# REFERENCIAS NORMATIVAS
+# ==========================================================
+
+normativa:
+
+  leyes:
+
+    []
+
+  articulos:
+
+    []
+
+  reglamentos:
+
+    []
+
+  instrucciones:
+
+    []
+
+  jurisprudencia:
+
+    []
+
+# ==========================================================
+# FUENTES
+# ==========================================================
+
+fuentes:
+
+  modelos:
+
+    []
+
+  documentos:
+
+    []
+
+  observaciones: ""
+
+# ==========================================================
+# METADATOS
+# ==========================================================
+
+metadatos:
+
+  etiquetas:
+
+    []
+
+  palabrasClave:
+
+    []
+
+  idioma: es
+
+  pais: ES
+
+# ==========================================================
+# TRAZABILIDAD
+# ==========================================================
+
+trazabilidad:
+
+  creadoDesde: ""
+
+  reutilizadoPor:
+
+    []
+
+  modificaciones:
+
+    []
+
+# ==========================================================
+# VALIDACIÓN
+# ==========================================================
+
+validacion:
+
+  validado: false
+
+  fechaValidacion: ""
+
+  validador: ""
+
+# ==========================================================
+# MOTOR EXPERTO
+# ==========================================================
+
+motor:
+
+  prioridad: 100
+
+  confianza: 1.00
+
+  activo: true
+
+  experimental: false
+
+# ==========================================================
+# FIN DEL ESQUEMA
+# ==========================================================
