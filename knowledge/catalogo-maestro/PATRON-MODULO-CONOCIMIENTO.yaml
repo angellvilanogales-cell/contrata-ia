@@ -1,0 +1,2327 @@
+# ============================================================================
+# CONTRATA IA
+# BANCO DE CONOCIMIENTO
+# ============================================================================
+#
+# MÓDULO..............: PATRÓN MAESTRO DE MÓDULOS DE CONOCIMIENTO
+# CÓDIGO..............: BK.STANDARD.MODULO
+# VERSIÓN.............: 1.0.0
+# ESTADO..............: OFICIAL
+# TIPO................: ESTÁNDAR
+# CRITICIDAD..........: MÁXIMA
+# APLICACIÓN..........: TODOS LOS MÓDULOS DEL BANCO DE CONOCIMIENTO
+# AUTOR...............: CONTRATA IA
+# ÚLTIMA REVISIÓN.....: 30/07/2026
+#
+# ============================================================================
+
+schema:
+
+  id: CONTRATAIA.STANDARD.MODULO
+
+  version: 1.0.0
+
+  estado: oficial
+
+# ============================================================================
+# OBJETIVO
+# ============================================================================
+
+objetivo:
+
+  descripcion: >
+
+    Este documento establece el estándar oficial que deberán seguir
+    todos los módulos del Banco de Conocimiento de CONTRATA IA.
+
+  finalidad:
+
+    - Uniformidad
+
+    - Mantenibilidad
+
+    - Escalabilidad
+
+    - Reutilización
+
+    - Compatibilidad futura
+
+# ============================================================================
+# FILOSOFÍA
+# ============================================================================
+
+filosofia:
+
+  principios:
+
+    - El conocimiento nunca deberá programarse.
+
+    - El código nunca contendrá decisiones jurídicas.
+
+    - Toda decisión deberá proceder del Banco de Conocimiento.
+
+    - Todo documento deberá poder reconstruirse únicamente mediante
+      conocimiento estructurado.
+
+    - Todo módulo deberá ser reutilizable.
+
+    - Todo módulo deberá ser independiente.
+
+# ============================================================================
+# TIPOS DE MÓDULO
+# ============================================================================
+
+tipos:
+
+  conocimiento:
+
+    descripcion: >
+
+      Contiene conocimiento jurídico y administrativo.
+
+  documental:
+
+    descripcion: >
+
+      Contiene textos reutilizables.
+
+  reglas:
+
+    descripcion: >
+
+      Contiene reglas ejecutables por el motor experto.
+
+  semantico:
+
+    descripcion: >
+
+      Contiene ontología y relaciones conceptuales.
+
+  tecnico:
+
+    descripcion: >
+
+      Contiene configuración del sistema.
+
+# ============================================================================
+# ESTRUCTURA OBLIGATORIA
+# ============================================================================
+
+estructura:
+
+  orden:
+
+    - cabecera
+
+    - identificacion
+
+    - metadatos
+
+    - descripcion
+
+    - objetivo
+
+    - normativa
+
+    - conceptos
+
+    - variables
+
+    - reglas
+
+    - casuistica
+
+    - variantes
+
+    - textos
+
+    - ejemplos
+
+    - validaciones
+
+    - integracion
+
+    - semantica
+
+    - auditoria
+
+    - historial
+
+    - firma
+
+# ============================================================================
+# IDENTIFICACIÓN
+# ============================================================================
+
+identificacion:
+
+  obligatoria: true
+
+  campos:
+
+    - id
+
+    - codigo
+
+    - titulo
+
+    - categoria
+
+    - subcategoria
+
+    - version
+
+# ============================================================================
+# VERSIONADO
+# ============================================================================
+
+versionado:
+
+  reglas:
+
+    major:
+
+      descripcion: >
+
+        Cambio incompatible.
+
+    minor:
+
+      descripcion: >
+
+        Nuevas funcionalidades.
+
+    patch:
+
+      descripcion: >
+
+        Correcciones.
+
+# ============================================================================
+# NOMENCLATURA
+# ============================================================================
+
+nomenclatura:
+
+  archivos:
+
+    usar:
+
+      - minusculas
+
+      - guiones
+
+    evitar:
+
+      - espacios
+
+      - acentos
+
+      - caracteres especiales
+
+  codigos:
+
+    formato:
+
+      MOD.CATEGORIA
+
+    ejemplos:
+
+      - MEM.NEC
+
+      - MEM.OBJ
+
+      - PCAP.SOLV
+
+      - PPT.CRIT
+
+# ============================================================================
+# CRITERIOS DE CALIDAD
+# ============================================================================
+
+calidad:
+
+  obligatorios:
+
+    coherencia: true
+
+    trazabilidad: true
+
+    reutilizacion: true
+
+    explicabilidad: true
+
+    documentacion: true
+
+# ============================================================================
+# PRINCIPIOS DE DISEÑO
+# ============================================================================
+
+diseno:
+
+  evitar:
+
+    - duplicidad
+
+    - reglas contradictorias
+
+    - textos repetidos
+
+    - referencias circulares
+
+  fomentar:
+
+    - modularidad
+
+    - simplicidad
+
+    - reutilizacion
+
+    - independencia
+
+# ============================================================================
+# FIN PARTE 1
+# ============================================================================
+
+# ============================================================================
+# ARQUITECTURA DEL MÓDULO
+# ============================================================================
+
+arquitectura:
+
+  objetivo:
+
+    Todo módulo del Banco de Conocimiento deberá ser simultáneamente:
+
+      - legible por personas
+
+      - interpretable por motores
+
+      - reutilizable
+
+      - versionable
+
+      - auditable
+
+      - trazable
+
+      - extensible
+
+  capas:
+
+    conocimiento:
+
+      descripcion: >
+
+        Contiene la representación del conocimiento jurídico y
+        administrativo.
+
+    documental:
+
+      descripcion: >
+
+        Contiene textos reutilizables destinados a la generación de
+        documentos administrativos.
+
+    reglas:
+
+      descripcion: >
+
+        Contiene reglas ejecutables por el motor experto.
+
+    semantica:
+
+      descripcion: >
+
+        Contiene relaciones conceptuales y estructura ontológica.
+
+    integracion:
+
+      descripcion: >
+
+        Define cómo interactúa el módulo con el resto del Banco de
+        Conocimiento.
+
+# ============================================================================
+# ORGANIZACIÓN INTERNA
+# ============================================================================
+
+organizacion:
+
+  bloquesObligatorios:
+
+    - identificacion
+
+    - metadatos
+
+    - objetivo
+
+    - normativa
+
+    - conocimiento
+
+    - reglas
+
+    - documentos
+
+    - validaciones
+
+    - integracion
+
+    - auditoria
+
+    - historial
+
+  bloquesOpcionales:
+
+    - ejemplos
+
+    - jurisprudencia
+
+    - doctrina
+
+    - informes
+
+    - preguntasIA
+
+    - embeddings
+
+# ============================================================================
+# REPRESENTACIÓN DEL CONOCIMIENTO
+# ============================================================================
+
+conocimiento:
+
+  principios:
+
+    - No almacenar información redundante.
+
+    - Cada concepto deberá existir una sola vez.
+
+    - Cada regla tendrá un único responsable.
+
+    - Cada decisión deberá ser justificable.
+
+    - Toda información deberá ser trazable.
+
+  tipos:
+
+    concepto
+
+    regla
+
+    ejemplo
+
+    variante
+
+    validacion
+
+    dependencia
+
+    recomendacion
+
+# ============================================================================
+# ESTÁNDAR DE REGLAS
+# ============================================================================
+
+reglas:
+
+  filosofia:
+
+    Las reglas deberán ser estructuradas.
+
+  formato:
+
+    id:
+
+      obligatorio: true
+
+    descripcion:
+
+      obligatorio: true
+
+    prioridad:
+
+      obligatorio: true
+
+    condicion:
+
+      obligatorio: true
+
+    accion:
+
+      obligatorio: true
+
+  ejemplo:
+
+    id: NEC-001
+
+    prioridad: 100
+
+    condicion:
+
+      campo: contrato.tipo
+
+      operador: equals
+
+      valor: servicios
+
+    accion:
+
+      utilizarVariante:
+
+        servicios
+
+# ============================================================================
+# OPERADORES OFICIALES
+# ============================================================================
+
+operadores:
+
+  comparacion:
+
+    - equals
+
+    - not_equals
+
+    - greater_than
+
+    - less_than
+
+    - greater_or_equal
+
+    - less_or_equal
+
+  logicos:
+
+    - and
+
+    - or
+
+    - not
+
+    - exists
+
+    - contains
+
+# ============================================================================
+# PRIORIDADES
+# ============================================================================
+
+prioridades:
+
+  100:
+
+    critica
+
+  90:
+
+    muy_alta
+
+  80:
+
+    alta
+
+  70:
+
+    media
+
+  60:
+
+    baja
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  tipos:
+
+    obligatoria
+
+    opcional
+
+    recomendada
+
+    incompatible
+
+  comportamiento:
+
+    obligatoria:
+
+      bloquearSiNoExiste: true
+
+    incompatible:
+
+      impedirCarga: true
+
+# ============================================================================
+# GESTIÓN DOCUMENTAL
+# ============================================================================
+
+documentacion:
+
+  textos:
+
+    independientes: true
+
+    reutilizables: true
+
+    parametrizables: true
+
+  ejemplos:
+
+    obligatorios: true
+
+    clasificados: true
+
+    valorados: true
+
+# ============================================================================
+# PARAMETRIZACIÓN
+# ============================================================================
+
+parametros:
+
+  admitirVariables: true
+
+  variables:
+
+    texto
+
+    numero
+
+    fecha
+
+    boolean
+
+    lista
+
+    objeto
+
+# ============================================================================
+# REGLAS PARA IA
+# ============================================================================
+
+ia:
+
+  principios:
+
+    - Nunca inventar normativa.
+
+    - Nunca eliminar motivaciones jurídicas.
+
+    - Nunca modificar referencias legales.
+
+    - Mantener el lenguaje administrativo.
+
+    - Priorizar el conocimiento frente a la generación libre.
+
+# ============================================================================
+# COMPATIBILIDAD
+# ============================================================================
+
+compatibilidad:
+
+  motores:
+
+    documental: true
+
+    reglas: true
+
+    conocimiento: true
+
+    semantico: true
+
+    ia: true
+
+  formatos:
+
+    yaml
+
+    json
+
+    jsonld
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+metricas:
+
+  longitudIdeal:
+
+    minima: 700
+
+    recomendada: 1000
+
+    maxima: 1500
+
+  reutilizacionObjetivo:
+
+    95
+
+  duplicidadMaxima:
+
+    2
+
+# ============================================================================
+# FIN PARTE 2
+# ============================================================================
+
+# ============================================================================
+# MODELO DE MOTORES
+# ============================================================================
+
+motores:
+
+  objetivo:
+
+    Todos los módulos deberán poder ser interpretados por cualquier
+    motor de CONTRATA IA sin modificaciones específicas.
+
+  disponibles:
+
+    documental:
+
+      descripcion: >
+
+        Construye documentos administrativos.
+
+    reglas:
+
+      descripcion: >
+
+        Evalúa condiciones jurídicas.
+
+    conocimiento:
+
+      descripcion: >
+
+        Recupera conocimiento estructurado.
+
+    semantico:
+
+      descripcion: >
+
+        Localiza conceptos relacionados.
+
+    validacion:
+
+      descripcion: >
+
+        Comprueba la integridad del expediente.
+
+    ia:
+
+      descripcion: >
+
+        Asiste en la redacción administrativa.
+
+# ============================================================================
+# CONTRATO ENTRE MÓDULOS
+# ============================================================================
+
+contrato:
+
+  principio:
+
+    Ningún módulo accederá directamente al contenido interno de otro.
+
+  comunicacion:
+
+    exclusivamente:
+
+      - entradas
+
+      - salidas
+
+      - dependencias
+
+      - relaciones
+
+# ============================================================================
+# ENTRADAS Y SALIDAS
+# ============================================================================
+
+interfaz:
+
+  entradas:
+
+    descripcion: >
+
+      Información necesaria para que el módulo pueda funcionar.
+
+  salidas:
+
+    descripcion: >
+
+      Información generada que podrá utilizar otro módulo.
+
+  restricciones:
+
+    nuncaModificarEntradas: true
+
+    nuncaEliminarSalidas: true
+
+# ============================================================================
+# ESTÁNDAR DE VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  categorias:
+
+    documental
+
+    juridica
+
+    tecnica
+
+    semantica
+
+    integracion
+
+  niveles:
+
+    informacion
+
+    advertencia
+
+    error
+
+    bloqueo
+
+# ============================================================================
+# GESTIÓN DE ERRORES
+# ============================================================================
+
+errores:
+
+  comportamiento:
+
+    informacion:
+
+      continuar: true
+
+    advertencia:
+
+      registrar: true
+
+    error:
+
+      solicitarRevision: true
+
+    bloqueo:
+
+      detenerGeneracion: true
+
+# ============================================================================
+# ESTÁNDAR DOCUMENTAL
+# ============================================================================
+
+documentos:
+
+  principio:
+
+    Ningún documento contendrá conocimiento embebido.
+
+  todoDocumento:
+
+    deberaProceder:
+
+      - activos
+
+      - reglas
+
+      - plantillas
+
+      - decisionesMotor
+
+# ============================================================================
+# ESTÁNDAR DE TEXTOS
+# ============================================================================
+
+textos:
+
+  cadaTexto:
+
+    deberaDisponerDe:
+
+      identificador
+
+      variante
+
+      finalidad
+
+      contexto
+
+      normativa
+
+      reutilizable
+
+  prohibiciones:
+
+    duplicarTextos: true
+
+    modificarNormativa: true
+
+# ============================================================================
+# ESTÁNDAR DE EJEMPLOS
+# ============================================================================
+
+ejemplos:
+
+  cadaEjemplo:
+
+    deberaIndicar:
+
+      calidad
+
+      tipoContrato
+
+      procedimiento
+
+      resultado
+
+      observaciones
+
+# ============================================================================
+# MODELO SEMÁNTICO
+# ============================================================================
+
+semantica:
+
+  conceptos:
+
+    reutilizables: true
+
+  relaciones:
+
+    bidireccionales: true
+
+  sinonimos:
+
+    permitidos: true
+
+  definiciones:
+
+    obligatorias: true
+
+# ============================================================================
+# PREPARACIÓN PARA BÚSQUEDA VECTORIAL
+# ============================================================================
+
+vectorizacion:
+
+  indexable: true
+
+  dividirEnChunks: true
+
+  conservarContexto: true
+
+  incluirNormativa: true
+
+# ============================================================================
+# PREPARACIÓN PARA RAG
+# ============================================================================
+
+rag:
+
+  estrategia:
+
+    recuperar
+
+    justificar
+
+    redactar
+
+    validar
+
+  prioridad:
+
+    normativa
+
+    reglas
+
+    conocimiento
+
+    ejemplos
+
+# ============================================================================
+# PREPARACIÓN PARA KNOWLEDGE GRAPH
+# ============================================================================
+
+knowledgeGraph:
+
+  nodo:
+
+    obligatorio: true
+
+  relaciones:
+
+    obligatorias: true
+
+  identificadores:
+
+    unicos: true
+
+# ============================================================================
+# CRITERIOS DE MANTENIBILIDAD
+# ============================================================================
+
+mantenibilidad:
+
+  evitar:
+
+    referenciasDuplicadas
+
+    reglasDuplicadas
+
+    conceptosDuplicados
+
+    textosDuplicados
+
+  fomentar:
+
+    reutilizacion
+
+    modularidad
+
+    simplicidad
+
+# ============================================================================
+# INDICADORES DE CALIDAD
+# ============================================================================
+
+indicadores:
+
+  moduloExcelente:
+
+    reutilizacion: 95
+
+    coherencia: 95
+
+    trazabilidad: 100
+
+    documentacion: 100
+
+  moduloAceptable:
+
+    reutilizacion: 80
+
+    coherencia: 80
+
+# ============================================================================
+# FIN PARTE 3
+# ============================================================================
+
+# ============================================================================
+# GOBERNANZA DEL BANCO DE CONOCIMIENTO
+# ============================================================================
+
+gobernanza:
+
+  objetivo: >
+
+    Garantizar que todo el conocimiento incorporado al Banco de
+    Conocimiento mantenga unos criterios homogéneos de calidad,
+    trazabilidad, reutilización y seguridad jurídica.
+
+  principios:
+
+    - fuente_unica_de_verdad
+
+    - conocimiento_reutilizable
+
+    - normativa_prioritaria
+
+    - trazabilidad_total
+
+    - explicabilidad
+
+    - versionado_controlado
+
+# ============================================================================
+# RESPONSABILIDADES
+# ============================================================================
+
+responsables:
+
+  responsableConocimiento:
+
+    funciones:
+
+      - validar_modulos
+
+      - aprobar_cambios
+
+      - revisar_normativa
+
+      - controlar_versiones
+
+  responsableTecnico:
+
+    funciones:
+
+      - mantener_esquemas
+
+      - mantener_motores
+
+      - garantizar_compatibilidad
+
+  motorIA:
+
+    funciones:
+
+      - interpretar_conocimiento
+
+      - generar_documentos
+
+      - justificar_decisiones
+
+      - registrar_trazabilidad
+
+# ============================================================================
+# CICLO DE VIDA DEL CONOCIMIENTO
+# ============================================================================
+
+cicloVida:
+
+  estados:
+
+    - borrador
+
+    - revision
+
+    - validado
+
+    - produccion
+
+    - obsoleto
+
+    - archivado
+
+  transiciones:
+
+    borrador:
+
+      siguiente:
+
+        revision
+
+    revision:
+
+      siguiente:
+
+        validado
+
+        borrador
+
+    validado:
+
+      siguiente:
+
+        produccion
+
+    produccion:
+
+      siguiente:
+
+        obsoleto
+
+    obsoleto:
+
+      siguiente:
+
+        archivado
+
+# ============================================================================
+# POLÍTICA DE VERSIONADO
+# ============================================================================
+
+versionado:
+
+  reglas:
+
+    major:
+
+      descripcion: >
+
+        Cambios incompatibles con versiones anteriores.
+
+    minor:
+
+      descripcion: >
+
+        Incorporación de nuevas funcionalidades.
+
+    patch:
+
+      descripcion: >
+
+        Correcciones sin impacto funcional.
+
+  compatibilidad:
+
+    mantenerCompatibilidad:
+
+      true
+
+# ============================================================================
+# CONTROL DE CAMBIOS
+# ============================================================================
+
+controlCambios:
+
+  registrar:
+
+    autor
+
+    fecha
+
+    descripcion
+
+    motivo
+
+    normativa
+
+  obligatorio:
+
+    true
+
+# ============================================================================
+# TRAZABILIDAD NORMATIVA
+# ============================================================================
+
+trazabilidadNormativa:
+
+  todaRegla:
+
+    deberaIndicar:
+
+      ley
+
+      articulo
+
+      apartado
+
+      organismo
+
+      fecha
+
+  prioridad:
+
+    normativa_vigente
+
+# ============================================================================
+# CRITERIOS DE INCORPORACIÓN
+# ============================================================================
+
+incorporacion:
+
+  obligatorio:
+
+    identificacion
+
+    descripcion
+
+    normativa
+
+    ejemplos
+
+    validaciones
+
+    dependencias
+
+    historial
+
+  recomendado:
+
+    jurisprudencia
+
+    informes
+
+    doctrina
+
+    preguntasIA
+
+# ============================================================================
+# POLÍTICA DE DUPLICIDAD
+# ============================================================================
+
+duplicidad:
+
+  permitir:
+
+    false
+
+  excepciones:
+
+    - referencias_normativas
+
+    - identificadores_historicos
+
+# ============================================================================
+# MATRIZ DE DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  niveles:
+
+    estructural
+
+    documental
+
+    juridica
+
+    semantica
+
+  reglas:
+
+    estructural:
+
+      critica
+
+    juridica:
+
+      critica
+
+    documental:
+
+      alta
+
+    semantica:
+
+      media
+
+# ============================================================================
+# REGLAS DE CALIDAD
+# ============================================================================
+
+calidad:
+
+  comprobaciones:
+
+    - modulo_documentado
+
+    - normativa_actualizada
+
+    - reglas_sin_conflictos
+
+    - dependencias_validas
+
+    - ejemplos_existentes
+
+    - version_correcta
+
+    - identificador_unico
+
+# ============================================================================
+# AUDITORÍA AUTOMÁTICA
+# ============================================================================
+
+auditoria:
+
+  ejecutar:
+
+    al_crear
+
+    al_modificar
+
+    al_publicar
+
+  comprobar:
+
+    estructura
+
+    versionado
+
+    normativa
+
+    relaciones
+
+    dependencias
+
+    metadatos
+
+# ============================================================================
+# INDICADORES DEL REPOSITORIO
+# ============================================================================
+
+indicadoresRepositorio:
+
+  calidadObjetivo:
+
+    100
+
+  coberturaNormativa:
+
+    100
+
+  reutilizacion:
+
+    95
+
+  duplicidadMaxima:
+
+    1
+
+  trazabilidad:
+
+    100
+
+# ============================================================================
+# PREPARACIÓN PARA FUTURAS VERSIONES
+# ============================================================================
+
+evolucion:
+
+  prevista:
+
+    - validacion_semantica
+
+    - aprendizaje_controlado
+
+    - conocimiento_multiorganismo
+
+    - soporte_multinormativa
+
+    - razonamiento_juridico
+
+# ============================================================================
+# FIN PARTE 4
+# ============================================================================
+
+# ============================================================================
+# CERTIFICACIÓN DE MÓDULOS
+# ============================================================================
+
+certificacion:
+
+  objetivo: >
+
+    Todo módulo incorporado al Banco de Conocimiento deberá superar
+    un proceso de certificación antes de considerarse apto para
+    producción.
+
+  niveles:
+
+    desarrollo
+
+    pruebas
+
+    validado
+
+    certificado
+
+    produccion
+
+# ============================================================================
+# CHECKLIST DE CERTIFICACIÓN
+# ============================================================================
+
+checklist:
+
+  identificacion:
+
+    obligatorio: true
+
+  metadatos:
+
+    obligatorio: true
+
+  normativa:
+
+    obligatorio: true
+
+  conceptos:
+
+    obligatorio: true
+
+  reglas:
+
+    obligatorio: true
+
+  ejemplos:
+
+    obligatorio: true
+
+  textos:
+
+    obligatorio: true
+
+  dependencias:
+
+    obligatorio: true
+
+  auditoria:
+
+    obligatorio: true
+
+  historial:
+
+    obligatorio: true
+
+# ============================================================================
+# CRITERIOS DE ACEPTACIÓN
+# ============================================================================
+
+criteriosAceptacion:
+
+  estructura:
+
+    completa: true
+
+  normativa:
+
+    actualizada: true
+
+  reglas:
+
+    coherentes: true
+
+  textos:
+
+    reutilizables: true
+
+  dependencias:
+
+    resueltas: true
+
+  identificadores:
+
+    unicos: true
+
+# ============================================================================
+# MÉTRICAS DE CALIDAD
+# ============================================================================
+
+metricasCalidad:
+
+  completitud:
+
+    objetivo: 100
+
+  coherencia:
+
+    objetivo: 100
+
+  reutilizacion:
+
+    objetivo: 95
+
+  trazabilidad:
+
+    objetivo: 100
+
+  explicabilidad:
+
+    objetivo: 100
+
+# ============================================================================
+# PRUEBAS OBLIGATORIAS
+# ============================================================================
+
+pruebas:
+
+  estructurales:
+
+    - validar_schema
+
+    - validar_campos
+
+    - validar_dependencias
+
+  juridicas:
+
+    - validar_normativa
+
+    - validar_reglas
+
+    - validar_referencias
+
+  documentales:
+
+    - validar_textos
+
+    - validar_ejemplos
+
+    - validar_variantes
+
+  semanticas:
+
+    - validar_conceptos
+
+    - validar_relaciones
+
+# ============================================================================
+# CAUSAS DE RECHAZO
+# ============================================================================
+
+rechazo:
+
+  criticas:
+
+    - normativa_inexistente
+
+    - reglas_contradictorias
+
+    - identificadores_duplicados
+
+    - dependencias_rotas
+
+    - referencias_invalidas
+
+  graves:
+
+    - ejemplos_insuficientes
+
+    - textos_duplicados
+
+    - metadatos_incompletos
+
+# ============================================================================
+# INFORME DE CERTIFICACIÓN
+# ============================================================================
+
+informe:
+
+  generarAutomaticamente: true
+
+  incluir:
+
+    - resumen
+
+    - puntuacion
+
+    - incidencias
+
+    - advertencias
+
+    - recomendaciones
+
+    - fecha
+
+    - version
+
+# ============================================================================
+# SELLO DE CALIDAD
+# ============================================================================
+
+selloCalidad:
+
+  niveles:
+
+    bronce:
+
+      puntuacionMinima: 70
+
+    plata:
+
+      puntuacionMinima: 85
+
+    oro:
+
+      puntuacionMinima: 95
+
+    platino:
+
+      puntuacionMinima: 100
+
+# ============================================================================
+# REGLAS DE PUBLICACIÓN
+# ============================================================================
+
+publicacion:
+
+  permitir:
+
+    soloCertificados: true
+
+  bloquear:
+
+    modulosEnRevision: true
+
+    modulosObsoletos: true
+
+# ============================================================================
+# CONTROL DE OBSOLESCENCIA
+# ============================================================================
+
+obsolescencia:
+
+  revisarCada:
+
+    meses: 12
+
+  revisarCuando:
+
+    - cambia_normativa
+
+    - aparece_jurisprudencia
+
+    - cambia_doctrina
+
+    - cambia_modelo_documental
+
+# ============================================================================
+# INDICADORES DEL BANCO DE CONOCIMIENTO
+# ============================================================================
+
+indicadoresGlobales:
+
+  porcentajeModulosCertificados:
+
+    objetivo: 100
+
+  porcentajeNormativaActualizada:
+
+    objetivo: 100
+
+  porcentajeReglasValidadas:
+
+    objetivo: 100
+
+  porcentajeCoberturaExpediente:
+
+    objetivo: 100
+
+# ============================================================================
+# FIN PARTE 5
+# ============================================================================
+
+# ============================================================================
+# EVOLUCIÓN Y GOBIERNO DEL BANCO DE CONOCIMIENTO
+# ============================================================================
+
+evolucion:
+
+  objetivo: >
+
+    Garantizar la evolución del Banco de Conocimiento sin afectar a la
+    estabilidad del sistema ni romper la compatibilidad entre módulos.
+
+  principios:
+
+    - compatibilidad_hacia_atras
+
+    - crecimiento_controlado
+
+    - conocimiento_reutilizable
+
+    - independencia_funcional
+
+    - estabilidad
+
+# ============================================================================
+# CICLO DE MEJORA CONTINUA
+# ============================================================================
+
+mejoraContinua:
+
+  fases:
+
+    detectar
+
+    analizar
+
+    diseñar
+
+    validar
+
+    publicar
+
+    monitorizar
+
+  fuentes:
+
+    - cambios_normativos
+
+    - nueva_jurisprudencia
+
+    - informes_consultivos
+
+    - experiencia_usuarios
+
+    - auditorias
+
+# ============================================================================
+# GESTIÓN DE COMPATIBILIDAD
+# ============================================================================
+
+compatibilidad:
+
+  reglas:
+
+    mantenerIdentificadores:
+
+      obligatorio: true
+
+    mantenerEstructura:
+
+      obligatorio: true
+
+    permitirNuevosCampos:
+
+      true
+
+    eliminarCampos:
+
+      prohibido
+
+  excepciones:
+
+    soloVersionMajor
+
+# ============================================================================
+# POLÍTICA DE DEPRECIACIÓN
+# ============================================================================
+
+deprecacion:
+
+  proceso:
+
+    marcar
+
+    advertir
+
+    sustituir
+
+    retirar
+
+  periodoMinimo:
+
+    meses: 12
+
+# ============================================================================
+# MATRIZ DE MADUREZ
+# ============================================================================
+
+madurez:
+
+  niveles:
+
+    M0:
+
+      nombre: Borrador
+
+    M1:
+
+      nombre: Experimental
+
+    M2:
+
+      nombre: Validado
+
+    M3:
+
+      nombre: Producción
+
+    M4:
+
+      nombre: Optimizado
+
+    M5:
+
+      nombre: Referencia Oficial
+
+# ============================================================================
+# INDICADORES DE MADUREZ
+# ============================================================================
+
+indicadoresMadurez:
+
+  documentacion:
+
+    peso: 20
+
+  normativa:
+
+    peso: 20
+
+  reglas:
+
+    peso: 20
+
+  reutilizacion:
+
+    peso: 20
+
+  auditoria:
+
+    peso: 20
+
+# ============================================================================
+# CATÁLOGO DE DEPENDENCIAS
+# ============================================================================
+
+catalogoDependencias:
+
+  estructurales:
+
+    descripcion: >
+
+      Necesarias para el funcionamiento del módulo.
+
+  funcionales:
+
+    descripcion: >
+
+      Mejoran el funcionamiento del expediente.
+
+  documentales:
+
+    descripcion: >
+
+      Utilizadas únicamente para generación documental.
+
+  semanticas:
+
+    descripcion: >
+
+      Empleadas para navegación y recuperación de conocimiento.
+
+# ============================================================================
+# MATRIZ DE IMPACTO
+# ============================================================================
+
+impacto:
+
+  bajo:
+
+    descripcion: >
+
+      Cambios locales.
+
+  medio:
+
+    descripcion: >
+
+      Cambios que afectan a varios módulos.
+
+  alto:
+
+    descripcion: >
+
+      Cambios que afectan al Banco de Conocimiento.
+
+  critico:
+
+    descripcion: >
+
+      Cambios que afectan al motor de decisión.
+
+# ============================================================================
+# GESTIÓN DE RIESGOS
+# ============================================================================
+
+riesgos:
+
+  identificar:
+
+    - duplicidad
+
+    - contradicciones
+
+    - normativa_obsoleta
+
+    - referencias_rotas
+
+    - dependencias_invalidas
+
+  acciones:
+
+    preventiva
+
+    correctiva
+
+    seguimiento
+
+# ============================================================================
+# REPOSITORIO OFICIAL
+# ============================================================================
+
+repositorio:
+
+  estructura:
+
+    estandares
+
+    modulos
+
+    normativa
+
+    modelos
+
+    plantillas
+
+    reglas
+
+    snippets
+
+  criterio:
+
+    un_modulo_una_responsabilidad
+
+# ============================================================================
+# REGLAS PARA FUTUROS DESARROLLADORES
+# ============================================================================
+
+desarrollo:
+
+  obligatorio:
+
+    seguirPatron: true
+
+    mantenerCompatibilidad: true
+
+    documentarCambios: true
+
+    justificarModificaciones: true
+
+  prohibido:
+
+    - conocimiento_en_codigo
+
+    - reglas_embebidas
+
+    - decisiones_hardcodeadas
+
+    - duplicar_modulos
+
+# ============================================================================
+# PREPARACIÓN PARA IA AVANZADA
+# ============================================================================
+
+iaAvanzada:
+
+  preparado:
+
+    razonamiento_juridico
+
+    agentes
+
+    RAG
+
+    KnowledgeGraph
+
+    embeddings
+
+    recuperacion_semantica
+
+    explicabilidad
+
+# ============================================================================
+# VISIÓN DEL PROYECTO
+# ============================================================================
+
+vision:
+
+  objetivoFinal: >
+
+    Disponer de un Banco de Conocimiento capaz de representar de forma
+    estructurada todo el conocimiento necesario para construir un
+    expediente completo de contratación pública conforme a la normativa
+    vigente, manteniendo la separación entre conocimiento, reglas,
+    documentos y motores de ejecución.
+
+# ============================================================================
+# FIN PARTE 6
+# ============================================================================
+
+# ============================================================================
+# CRITERIOS OFICIALES DE ACEPTACIÓN DE MÓDULOS
+# ============================================================================
+
+aceptacion:
+
+  objetivo: >
+
+    Garantizar que únicamente los módulos que cumplen íntegramente el
+    estándar oficial puedan incorporarse al Banco de Conocimiento.
+
+  requisitosObligatorios:
+
+    identificacionCompleta: true
+
+    metadatosCompletos: true
+
+    normativaReferenciada: true
+
+    conceptosDefinidos: true
+
+    reglasDocumentadas: true
+
+    ejemplosDisponibles: true
+
+    validacionesImplementadas: true
+
+    dependenciasDeclaradas: true
+
+    historialDisponible: true
+
+    versionadoCorrecto: true
+
+# ============================================================================
+# CHECKLIST OFICIAL DE REVISIÓN
+# ============================================================================
+
+checklistRevision:
+
+  estructura:
+
+    - Cabecera oficial
+
+    - Identificación
+
+    - Objetivo
+
+    - Normativa
+
+    - Conceptos
+
+    - Variables
+
+    - Reglas
+
+    - Casuística
+
+    - Ejemplos
+
+    - Textos
+
+    - Validaciones
+
+    - Integración
+
+    - Auditoría
+
+    - Historial
+
+    - Firma
+
+  normativa:
+
+    - artículos referenciados
+
+    - referencias vigentes
+
+    - ausencia de contradicciones
+
+  calidad:
+
+    - reutilización
+
+    - coherencia
+
+    - trazabilidad
+
+    - explicabilidad
+
+# ============================================================================
+# MATRIZ DE CERTIFICACIÓN
+# ============================================================================
+
+certificacionFinal:
+
+  niveles:
+
+    A:
+
+      descripcion: >
+
+        Módulo certificado para producción.
+
+    B:
+
+      descripcion: >
+
+        Módulo válido con mejoras pendientes.
+
+    C:
+
+      descripcion: >
+
+        Requiere revisión antes de publicarse.
+
+    D:
+
+      descripcion: >
+
+        No puede incorporarse al Banco.
+
+# ============================================================================
+# MATRIZ DE COBERTURA
+# ============================================================================
+
+cobertura:
+
+  evaluar:
+
+    normativa
+
+    documentos
+
+    reglas
+
+    ejemplos
+
+    conocimiento
+
+    relaciones
+
+  objetivo:
+
+    coberturaMinima: 95
+
+# ============================================================================
+# REGLAS PARA MODIFICACIONES FUTURAS
+# ============================================================================
+
+modificaciones:
+
+  permitidas:
+
+    añadirConceptos
+
+    ampliarEjemplos
+
+    incorporarNormativa
+
+    mejorarRedaccion
+
+    ampliarReglas
+
+  prohibidas:
+
+    eliminarIdentificadores
+
+    romperCompatibilidad
+
+    duplicarConceptos
+
+    modificarCodigosHistoricos
+
+# ============================================================================
+# HOJA DE RUTA DEL BANCO DE CONOCIMIENTO
+# ============================================================================
+
+roadmap:
+
+  fase1:
+
+    descripcion: >
+
+      Construcción de módulos base.
+
+    modulos:
+
+      - necesidad
+
+      - objeto
+
+      - insuficiencia-medios
+
+      - cpv
+
+      - procedimiento
+
+  fase2:
+
+    descripcion: >
+
+      Construcción documental.
+
+    modulos:
+
+      - PCAP
+
+      - PPT
+
+      - Memorias
+
+      - Informes
+
+      - Resoluciones
+
+  fase3:
+
+    descripcion: >
+
+      Inteligencia documental.
+
+    funcionalidades:
+
+      - búsqueda semántica
+
+      - RAG
+
+      - motor experto
+
+      - generación automática
+
+  fase4:
+
+    descripcion: >
+
+      Inteligencia jurídica avanzada.
+
+    funcionalidades:
+
+      - agentes especializados
+
+      - inferencia jurídica
+
+      - razonamiento documental
+
+      - recomendaciones automáticas
+
+# ============================================================================
+# DECLARACIÓN DE PRINCIPIOS
+# ============================================================================
+
+declaracion:
+
+  texto: >
+
+    CONTRATA IA adopta un modelo de conocimiento desacoplado del código,
+    donde todas las decisiones jurídicas, administrativas y documentales
+    deberán estar representadas mediante módulos estructurados,
+    reutilizables, auditables y trazables.
+
+# ============================================================================
+# FIRMA DEL ESTÁNDAR
+# ============================================================================
+
+firma:
+
+  nombre:
+
+    PATRÓN OFICIAL DEL BANCO DE CONOCIMIENTO
+
+  codigo:
+
+    BK.STANDARD.MODULO
+
+  version:
+
+    1.0.0
+
+  estado:
+
+    PRODUCCION
+
+  mantenedor:
+
+    CONTRATA IA
+
+  aplicacion:
+
+    Obligatoria para todos los módulos del Banco de Conocimiento.
+
+# ============================================================================
+# FIN DEL ESTÁNDAR
+# ============================================================================
