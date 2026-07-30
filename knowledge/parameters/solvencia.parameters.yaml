@@ -1,0 +1,3267 @@
+# ============================================================================
+# CONTRATA IA
+# BANCO DE CONOCIMIENTO
+# ----------------------------------------------------------------------------
+# MÓDULO:
+# PARAM.SOLVENCIA
+# ----------------------------------------------------------------------------
+# Finalidad:
+# Parámetros configurables utilizados por RULE.SOLVENCIA.
+# No contiene lógica jurídica.
+# Contiene únicamente valores, catálogos y configuraciones.
+# ============================================================================
+
+metadata:
+
+  modulo:
+
+    PARAM.SOLVENCIA
+
+  version:
+
+    1.0.0
+
+  estado:
+
+    PRODUCCION
+
+  propietario:
+
+    BancoConocimiento
+
+  descripcion:
+
+    Parámetros configurables del motor de solvencia.
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  activa:
+
+    true
+
+  permiteActualizacion:
+
+    true
+
+  requiereAuditoria:
+
+    true
+
+  requiereVersionado:
+
+    true
+
+# ============================================================================
+# PRINCIPIOS GENERALES
+# ============================================================================
+
+principios:
+
+  vinculacionObjetoContrato:
+
+    true
+
+  proporcionalidad:
+
+    true
+
+  igualdadTrato:
+
+    true
+
+  libreConcurrencia:
+
+    true
+
+  transparencia:
+
+    true
+
+  noDiscriminacion:
+
+    true
+
+# ============================================================================
+# TIPOS DE SOLVENCIA
+# ============================================================================
+
+tiposSolvencia:
+
+  economicaFinanciera:
+
+    activa: true
+
+  tecnicaProfesional:
+
+    activa: true
+
+# ============================================================================
+# MEDIOS DE ACREDITACIÓN ADMITIDOS
+# ============================================================================
+
+mediosAcreditacion:
+
+  economica:
+
+    - volumenNegocio
+
+    - patrimonioNeto
+
+    - cuentasAnuales
+
+    - seguroResponsabilidadCivil
+
+    - otrosPermitidosNormativa
+
+  tecnica:
+
+    - relacionTrabajos
+
+    - personalTecnico
+
+    - mediosMateriales
+
+    - titulaciones
+
+    - certificadosCalidad
+
+    - certificadosAmbientales
+
+    - controlesCalidad
+
+    - otrosPermitidosNormativa
+
+# ============================================================================
+# OPCIONES DE CONFIGURACIÓN
+# ============================================================================
+
+configuracionMotor:
+
+  permitirMediosExternos:
+
+    true
+
+  permitirUTE:
+
+    true
+
+  permitirClasificacion:
+
+    true
+
+  permitirLotes:
+
+    true
+
+# ============================================================================
+# PARÁMETROS GENERALES
+# ============================================================================
+
+parametros:
+
+  comprobarProporcionalidad:
+
+    true
+
+  comprobarObjetoContrato:
+
+    true
+
+  comprobarLibreConcurrencia:
+
+    true
+
+  comprobarRestricciones:
+
+    true
+
+# ============================================================================
+# FIN PARTE 1 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE SOLVENCIA ECONÓMICA Y FINANCIERA
+# ============================================================================
+
+solvenciaEconomica:
+
+  activa:
+
+    true
+
+  requiereEvaluacion:
+
+    true
+
+  aplicarProporcionalidad:
+
+    true
+
+  vinculacionObjetoContrato:
+
+    obligatoria
+
+# ============================================================================
+# NIVELES DE EXIGENCIA
+# ============================================================================
+
+niveles:
+
+  minima:
+
+    activa: true
+
+    descripcion:
+
+      Exigencia mínima compatible con el contrato.
+
+  baja:
+
+    activa: true
+
+    descripcion:
+
+      Exigencia reducida.
+
+  media:
+
+    activa: true
+
+    descripcion:
+
+      Exigencia ordinaria.
+
+  alta:
+
+    activa: true
+
+    descripcion:
+
+      Exigencia elevada.
+
+  maxima:
+
+    activa: true
+
+    descripcion:
+
+      Exigencia excepcional.
+
+# ============================================================================
+# MEDIOS ADMISIBLES
+# ============================================================================
+
+mediosEconomicos:
+
+  volumenNegocio:
+
+    habilitado: true
+
+  cuentasAnuales:
+
+    habilitado: true
+
+  patrimonioNeto:
+
+    habilitado: true
+
+  seguroResponsabilidadCivil:
+
+    habilitado: true
+
+  otrosMediosLegales:
+
+    habilitado: true
+
+# ============================================================================
+# RESTRICCIONES
+# ============================================================================
+
+restricciones:
+
+  impedirExigenciasDesproporcionadas:
+
+    true
+
+  impedirDuplicidades:
+
+    true
+
+  impedirDiscriminacion:
+
+    true
+
+  impedirRestriccionesCompetencia:
+
+    true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  comprobar:
+
+    proporcionalidad
+
+    objetoContrato
+
+    valorEstimado
+
+    procedimiento
+
+    normativaAplicable
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  recalculoAutomatico:
+
+    true
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+# ============================================================================
+# FIN PARTE 2 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE SOLVENCIA TÉCNICA Y PROFESIONAL
+# ============================================================================
+
+solvenciaTecnica:
+
+  activa:
+
+    true
+
+  requiereEvaluacion:
+
+    true
+
+  aplicarProporcionalidad:
+
+    true
+
+  vinculacionObjetoContrato:
+
+    obligatoria
+
+# ============================================================================
+# NIVELES DE EXIGENCIA TÉCNICA
+# ============================================================================
+
+niveles:
+
+  minima:
+
+    activa: true
+
+    descripcion:
+
+      Solvencia técnica mínima.
+
+  baja:
+
+    activa: true
+
+    descripcion:
+
+      Solvencia técnica reducida.
+
+  media:
+
+    activa: true
+
+    descripcion:
+
+      Solvencia técnica ordinaria.
+
+  alta:
+
+    activa: true
+
+    descripcion:
+
+      Solvencia técnica elevada.
+
+  maxima:
+
+    activa: true
+
+    descripcion:
+
+      Solvencia técnica excepcional.
+
+# ============================================================================
+# MEDIOS DE ACREDITACIÓN ADMITIDOS
+# ============================================================================
+
+mediosTecnicos:
+
+  relacionTrabajos:
+
+    habilitado: true
+
+  personalTecnico:
+
+    habilitado: true
+
+  titulaciones:
+
+    habilitado: true
+
+  mediosMateriales:
+
+    habilitado: true
+
+  certificadosCalidad:
+
+    habilitado: true
+
+  certificadosAmbientales:
+
+    habilitado: true
+
+  controlesCalidad:
+
+    habilitado: true
+
+  maquinaria:
+
+    habilitado: true
+
+  instalaciones:
+
+    habilitado: true
+
+  otrosMediosLegales:
+
+    habilitado: true
+
+# ============================================================================
+# EXPERIENCIA
+# ============================================================================
+
+experiencia:
+
+  permitirExperienciaSimilar:
+
+    true
+
+  exigirRelacionObjeto:
+
+    true
+
+  permitirAcumulacion:
+
+    true
+
+# ============================================================================
+# RESTRICCIONES
+# ============================================================================
+
+restricciones:
+
+  impedirExperienciaDesproporcionada:
+
+    true
+
+  impedirRequisitosDiscriminatorios:
+
+    true
+
+  impedirRestriccionesCompetencia:
+
+    true
+
+  impedirDuplicidades:
+
+    true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  comprobar:
+
+    objetoContrato
+
+    experiencia
+
+    mediosTecnicos
+
+    proporcionalidad
+
+    normativaAplicable
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  recalculoAutomatico:
+
+    true
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+# ============================================================================
+# COMPATIBILIDAD
+# ============================================================================
+
+compatibilidad:
+
+  clasificacionEmpresarial:
+
+    true
+
+  mediosExternos:
+
+    true
+
+  UTE:
+
+    true
+
+  lotes:
+
+    true
+
+# ============================================================================
+# FIN PARTE 3 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE CLASIFICACIÓN EMPRESARIAL
+# ============================================================================
+
+clasificacionEmpresarial:
+
+  activa:
+
+    true
+
+  comprobarAutomaticamente:
+
+    true
+
+  sustituyeSolvenciaCuandoProceda:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  requiereGrupo:
+
+    true
+
+  requiereSubgrupo:
+
+    true
+
+  requiereCategoria:
+
+    true
+
+  comprobarVigencia:
+
+    true
+
+  comprobarValidez:
+
+    true
+
+# ============================================================================
+# MODOS DE FUNCIONAMIENTO
+# ============================================================================
+
+modos:
+
+  obligatoria:
+
+    activa: true
+
+  voluntaria:
+
+    activa: true
+
+  noAplicable:
+
+    activa: true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  grupo:
+
+    obligatorio: true
+
+  subgrupo:
+
+    obligatorio: true
+
+  categoria:
+
+    obligatoria: true
+
+  vigencia:
+
+    obligatoria: true
+
+  organismoEmisor:
+
+    obligatorio: true
+
+# ============================================================================
+# COMPROBACIONES
+# ============================================================================
+
+comprobaciones:
+
+  comprobarCorrespondenciaObjeto:
+
+    true
+
+  comprobarCategoria:
+
+    true
+
+  comprobarCompatibilidadCPV:
+
+    true
+
+  comprobarProcedimiento:
+
+    true
+
+# ============================================================================
+# RELACIÓN CON SOLVENCIA
+# ============================================================================
+
+integracion:
+
+  sustituirSolvencia:
+
+    permitido: true
+
+  recalcularSolvencia:
+
+    permitido: true
+
+  validarCompatibilidad:
+
+    permitido: true
+
+# ============================================================================
+# RESTRICCIONES
+# ============================================================================
+
+restricciones:
+
+  impedirClasificacionCaducada:
+
+    true
+
+  impedirCategoriaInsuficiente:
+
+    true
+
+  impedirGrupoIncorrecto:
+
+    true
+
+  impedirSubgrupoIncorrecto:
+
+    true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  clasificacionCaducada:
+
+    activa: true
+
+  clasificacionInsuficiente:
+
+    activa: true
+
+  clasificacionIncompatible:
+
+    activa: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+  registrarDecision:
+
+    true
+
+# ============================================================================
+# PREPARADO PARA INTEGRACIÓN
+# ============================================================================
+
+integraciones:
+
+  ROLECE:
+
+    preparada: true
+
+  RegistroAutonomico:
+
+    preparada: true
+
+  PlataformaContratacion:
+
+    preparada: true
+
+# ============================================================================
+# FIN PARTE 4 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE INTEGRACIÓN DE SOLVENCIA MEDIANTE MEDIOS EXTERNOS
+# ============================================================================
+
+mediosExternos:
+
+  activo:
+
+    true
+
+  comprobarAutomaticamente:
+
+    true
+
+  permitirIntegracion:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  requiereCompromisoDisponibilidad:
+
+    true
+
+  requiereEntidadColaboradora:
+
+    true
+
+  requiereValidacionCapacidad:
+
+    true
+
+  requiereComprobacionProhibiciones:
+
+    true
+
+# ============================================================================
+# DOCUMENTACIÓN EXIGIBLE
+# ============================================================================
+
+documentacion:
+
+  compromisoDisponibilidad:
+
+    obligatorio: true
+
+  identificacionEntidad:
+
+    obligatoria: true
+
+  acreditacionCapacidad:
+
+    obligatoria: true
+
+  declaracionResponsable:
+
+    obligatoria: true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  entidadColaboradora:
+
+    obligatoria: true
+
+  capacidadTecnica:
+
+    obligatoria: true
+
+  capacidadEconomica:
+
+    obligatoria: true
+
+  disponibilidadReal:
+
+    obligatoria: true
+
+# ============================================================================
+# COMPROBACIONES
+# ============================================================================
+
+comprobaciones:
+
+  comprobarObjetoContrato:
+
+    true
+
+  comprobarProporcionalidad:
+
+    true
+
+  comprobarLibreConcurrencia:
+
+    true
+
+  comprobarCompatibilidadClasificacion:
+
+    true
+
+# ============================================================================
+# RESTRICCIONES
+# ============================================================================
+
+restricciones:
+
+  impedirEntidadSinCapacidad:
+
+    true
+
+  impedirCompromisosIncompletos:
+
+    true
+
+  impedirMediosInsuficientes:
+
+    true
+
+  impedirIncumplimientoNormativo:
+
+    true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  compromisoNoPresentado:
+
+    activa: true
+
+  entidadNoValida:
+
+    activa: true
+
+  capacidadInsuficiente:
+
+    activa: true
+
+  documentacionIncompleta:
+
+    activa: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+  registrarDecision:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA FUTURAS INTEGRACIONES
+# ============================================================================
+
+integraciones:
+
+  RegistroEmpresas:
+
+    preparada: true
+
+  RegistroLicitadores:
+
+    preparada: true
+
+  ServiciosVerificacion:
+
+    preparada: true
+
+# ============================================================================
+# FIN PARTE 5 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE UNIONES TEMPORALES DE EMPRESAS (UTE)
+# ============================================================================
+
+UTE:
+
+  activa:
+
+    true
+
+  comprobarAutomaticamente:
+
+    true
+
+  permitirAcumulacionSolvencia:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  requiereCompromisoConstitucion:
+
+    true
+
+  requiereIdentificacionIntegrantes:
+
+    true
+
+  requiereRepresentante:
+
+    true
+
+  requiereParticipacionDefinida:
+
+    true
+
+# ============================================================================
+# DOCUMENTACIÓN EXIGIBLE
+# ============================================================================
+
+documentacion:
+
+  compromisoConstitucion:
+
+    obligatorio: true
+
+  identificacionIntegrantes:
+
+    obligatoria: true
+
+  designacionRepresentante:
+
+    obligatoria: true
+
+  distribucionPrestaciones:
+
+    obligatoria: true
+
+  declaracionResponsable:
+
+    obligatoria: true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  integrantes:
+
+    obligatoria: true
+
+  solvenciaConjunta:
+
+    obligatoria: true
+
+  capacidadIndividual:
+
+    obligatoria: true
+
+  prohibicionesContratar:
+
+    obligatoria: true
+
+# ============================================================================
+# ACUMULACIÓN DE SOLVENCIA
+# ============================================================================
+
+acumulacion:
+
+  economica:
+
+    permitida: true
+
+  tecnica:
+
+    permitida: true
+
+  clasificacion:
+
+    configurable: true
+
+# ============================================================================
+# COMPROBACIONES
+# ============================================================================
+
+comprobaciones:
+
+  comprobarIntegrantes:
+
+    true
+
+  comprobarObjetoContrato:
+
+    true
+
+  comprobarDistribucionPrestaciones:
+
+    true
+
+  comprobarLibreCompetencia:
+
+    true
+
+  comprobarCompatibilidadClasificacion:
+
+    true
+
+# ============================================================================
+# RESTRICCIONES
+# ============================================================================
+
+restricciones:
+
+  impedirIntegrantesNoValidos:
+
+    true
+
+  impedirCompromisosIncompletos:
+
+    true
+
+  impedirDistribucionIncoherente:
+
+    true
+
+  impedirAcumulacionNoPermitida:
+
+    true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  compromisoNoPresentado:
+
+    activa: true
+
+  integranteNoValido:
+
+    activa: true
+
+  solvenciaInsuficiente:
+
+    activa: true
+
+  documentacionIncompleta:
+
+    activa: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+  registrarDecision:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA FUTURAS INTEGRACIONES
+# ============================================================================
+
+integraciones:
+
+  RegistroLicitadores:
+
+    preparada: true
+
+  RegistroMercantil:
+
+    preparada: true
+
+  ServiciosVerificacion:
+
+    preparada: true
+
+# ============================================================================
+# FIN PARTE 6 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE SOLVENCIA EN CONTRATOS DIVIDIDOS EN LOTES
+# ============================================================================
+
+lotes:
+
+  activo:
+
+    true
+
+  comprobarAutomaticamente:
+
+    true
+
+  permitirAcumulacion:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  solvenciaPorLote:
+
+    true
+
+  permitirAcumulacionLotes:
+
+    true
+
+  comprobarAdjudicacionMultiple:
+
+    true
+
+  comprobarProporcionalidad:
+
+    true
+
+# ============================================================================
+# MODOS DE CÁLCULO
+# ============================================================================
+
+modos:
+
+  porLote:
+
+    activo: true
+
+  porContrato:
+
+    activo: true
+
+  mixto:
+
+    activo: true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  numeroLotes:
+
+    obligatoria: true
+
+  solvenciaIndividual:
+
+    obligatoria: true
+
+  solvenciaAcumulada:
+
+    obligatoria: true
+
+  adjudicacionMultiple:
+
+    obligatoria: true
+
+# ============================================================================
+# COMPROBACIONES
+# ============================================================================
+
+comprobaciones:
+
+  comprobarObjetoContrato:
+
+    true
+
+  comprobarLibreConcurrencia:
+
+    true
+
+  comprobarAcumulacion:
+
+    true
+
+  comprobarProporcionalidad:
+
+    true
+
+  comprobarCompatibilidadClasificacion:
+
+    true
+
+# ============================================================================
+# RESTRICCIONES
+# ============================================================================
+
+restricciones:
+
+  impedirAcumulacionIncorrecta:
+
+    true
+
+  impedirSolvenciaDesproporcionada:
+
+    true
+
+  impedirLimitacionCompetencia:
+
+    true
+
+  impedirConfiguracionIncoherente:
+
+    true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  acumulacionIncorrecta:
+
+    activa: true
+
+  solvenciaInsuficiente:
+
+    activa: true
+
+  limitacionCompetencia:
+
+    activa: true
+
+  adjudicacionExcesiva:
+
+    activa: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarAuditoria:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarJustificacion:
+
+    true
+
+  registrarDecision:
+
+    true
+
+# ============================================================================
+# PARÁMETROS DE ADJUDICACIÓN MÚLTIPLE
+# ============================================================================
+
+adjudicacionMultiple:
+
+  permitida:
+
+    configurable
+
+  comprobarCapacidad:
+
+    true
+
+  comprobarRecursos:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA FUTURAS VERSIONES
+# ============================================================================
+
+integraciones:
+
+  RuleLotes:
+
+    preparada: true
+
+  RuleSolvencia:
+
+    preparada: true
+
+  RuleClasificacion:
+
+    preparada: true
+
+# ============================================================================
+# FIN PARTE 7 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE AUDITORÍA JURÍDICA Y EXPLICABILIDAD
+# ============================================================================
+
+auditoria:
+
+  activa:
+
+    true
+
+  ejecutarAutomaticamente:
+
+    true
+
+  registrarResultado:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  calcularNivelConfianza:
+
+    true
+
+  detectarInconsistencias:
+
+    true
+
+  detectarContradicciones:
+
+    true
+
+  recomendarRevisionHumana:
+
+    true
+
+# ============================================================================
+# NIVELES DE CONFIANZA
+# ============================================================================
+
+nivelesConfianza:
+
+  excelente:
+
+    minimo: 95
+
+  alta:
+
+    minimo: 85
+
+  media:
+
+    minimo: 70
+
+  baja:
+
+    minimo: 50
+
+  insuficiente:
+
+    menorQue: 50
+
+# ============================================================================
+# TIPOS DE INCIDENCIA
+# ============================================================================
+
+incidencias:
+
+  critica:
+
+    activa: true
+
+  alta:
+
+    activa: true
+
+  media:
+
+    activa: true
+
+  baja:
+
+    activa: true
+
+# ============================================================================
+# CRITERIOS DE REVISIÓN
+# ============================================================================
+
+revisionHumana:
+
+  confianzaMinima:
+
+    configurable
+
+  contradiccionNormativa:
+
+    obligatoria
+
+  expedienteIncompleto:
+
+    obligatoria
+
+  incoherenciaDetectada:
+
+    obligatoria
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+validaciones:
+
+  comprobar:
+
+    reglasAplicadas
+
+    normativaConsultada
+
+    parametrosUtilizados
+
+    coherenciaGlobal
+
+    trazabilidadCompleta
+
+# ============================================================================
+# EXPLICABILIDAD
+# ============================================================================
+
+explicabilidad:
+
+  mostrarCadenaInferencia:
+
+    true
+
+  mostrarNormativa:
+
+    true
+
+  mostrarParametros:
+
+    true
+
+  mostrarAlternativas:
+
+    true
+
+  mostrarJustificacion:
+
+    true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  confianzaInsuficiente:
+
+    activa: true
+
+  contradiccionNormativa:
+
+    activa: true
+
+  requiereRevisionHumana:
+
+    activa: true
+
+  expedienteIncompleto:
+
+    activa: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarAuditoria:
+
+    true
+
+  registrarMetricas:
+
+    true
+
+  registrarTrazabilidad:
+
+    true
+
+  generarInforme:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA IA EXPLICABLE
+# ============================================================================
+
+IAExplicable:
+
+  habilitada:
+
+    true
+
+  registrarRazonamiento:
+
+    true
+
+  registrarCadenaInferencia:
+
+    true
+
+  justificarDecisiones:
+
+    true
+
+# ============================================================================
+# FIN PARTE 8 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE MÉTRICAS, RENDIMIENTO Y MONITORIZACIÓN
+# ============================================================================
+
+metricas:
+
+  activas:
+
+    true
+
+  registrarAutomaticamente:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  almacenarHistorico:
+
+    true
+
+  generarEstadisticas:
+
+    true
+
+  actualizarIndicadores:
+
+    true
+
+  conservarHistorico:
+
+    true
+
+# ============================================================================
+# MÉTRICAS DE EJECUCIÓN
+# ============================================================================
+
+ejecucion:
+
+  registrarTiempoCalculo:
+
+    true
+
+  registrarTiempoAuditoria:
+
+    true
+
+  registrarTiempoRespuesta:
+
+    true
+
+  registrarTiempoTotal:
+
+    true
+
+# ============================================================================
+# MÉTRICAS FUNCIONALES
+# ============================================================================
+
+funcionales:
+
+  registrarReglasEjecutadas:
+
+    true
+
+  registrarReglasAplicadas:
+
+    true
+
+  registrarReglasDescartadas:
+
+    true
+
+  registrarParametrosConsultados:
+
+    true
+
+# ============================================================================
+# MÉTRICAS JURÍDICAS
+# ============================================================================
+
+juridicas:
+
+  registrarContradicciones:
+
+    true
+
+  registrarAdvertencias:
+
+    true
+
+  registrarRevisionesHumanas:
+
+    true
+
+  registrarIncidencias:
+
+    true
+
+# ============================================================================
+# INDICADORES DE CALIDAD
+# ============================================================================
+
+indicadores:
+
+  precision:
+
+    activa: true
+
+  coherencia:
+
+    activa: true
+
+  mantenibilidad:
+
+    activa: true
+
+  estabilidad:
+
+    activa: true
+
+  reutilizacion:
+
+    activa: true
+
+  explicabilidad:
+
+    activa: true
+
+# ============================================================================
+# UMBRALES CONFIGURABLES
+# ============================================================================
+
+umbrales:
+
+  confianzaMinima:
+
+    configurable
+
+  precisionMinima:
+
+    configurable
+
+  coherenciaMinima:
+
+    configurable
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  precisionBaja:
+
+    activa: true
+
+  coherenciaBaja:
+
+    activa: true
+
+  excesoIncidencias:
+
+    activa: true
+
+  excesoRevisionesHumanas:
+
+    activa: true
+
+# ============================================================================
+# EXPORTACIÓN DE MÉTRICAS
+# ============================================================================
+
+exportacion:
+
+  dashboard:
+
+    preparada: true
+
+  informes:
+
+    preparada: true
+
+  api:
+
+    preparada: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarMetricas:
+
+    true
+
+  registrarHistorico:
+
+    true
+
+  registrarAuditoria:
+
+    true
+
+  registrarVersionMotor:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA ANALÍTICA
+# ============================================================================
+
+analitica:
+
+  inteligenciaNegocio:
+
+    preparada: true
+
+  cuadrosMando:
+
+    preparada: true
+
+  indicadoresPredictivos:
+
+    preparada: true
+
+# ============================================================================
+# FIN PARTE 9 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE GOBERNANZA Y MANTENIMIENTO
+# ============================================================================
+
+gobernanza:
+
+  modulo:
+
+    PARAM.SOLVENCIA
+
+  propietario:
+
+    BancoConocimiento
+
+  responsable:
+
+    RuleEngine
+
+  estado:
+
+    PRODUCCION
+
+# ============================================================================
+# CONTROL DE VERSIONES
+# ============================================================================
+
+versionado:
+
+  versionActual:
+
+    1.0.0
+
+  compatibleDesde:
+
+    1.0.0
+
+  compatibleHasta:
+
+    2.x
+
+  permiteVersionesIntermedias:
+
+    true
+
+# ============================================================================
+# POLÍTICA DE ACTUALIZACIÓN
+# ============================================================================
+
+actualizacion:
+
+  actualizarParametros:
+
+    permitido
+
+  actualizarCatalogos:
+
+    permitido
+
+  actualizarNormativa:
+
+    permitido
+
+  modificarSoftware:
+
+    prohibido
+
+# ============================================================================
+# CONTROL DE CAMBIOS
+# ============================================================================
+
+controlCambios:
+
+  registrarCambios:
+
+    true
+
+  registrarAutor:
+
+    true
+
+  registrarFecha:
+
+    true
+
+  registrarVersion:
+
+    true
+
+  registrarMotivo:
+
+    true
+
+# ============================================================================
+# GESTIÓN DEL CONOCIMIENTO
+# ============================================================================
+
+gestionConocimiento:
+
+  almacenarHistorico:
+
+    true
+
+  almacenarVersiones:
+
+    true
+
+  almacenarIncidencias:
+
+    true
+
+  almacenarMejoras:
+
+    true
+
+# ============================================================================
+# MANTENIMIENTO
+# ============================================================================
+
+mantenimiento:
+
+  revisarNormativa:
+
+    continua
+
+  revisarParametros:
+
+    continua
+
+  revisarCatalogos:
+
+    continua
+
+  revisarCompatibilidad:
+
+    continua
+
+# ============================================================================
+# COMPATIBILIDAD
+# ============================================================================
+
+compatibilidad:
+
+  RuleEngine:
+
+    true
+
+  WorkflowEngine:
+
+    true
+
+  KnowledgeGraph:
+
+    true
+
+  MotorDocumental:
+
+    true
+
+  MotorRAG:
+
+    true
+
+  Auditoria:
+
+    true
+
+# ============================================================================
+# REUTILIZACIÓN
+# ============================================================================
+
+reutilizacion:
+
+  disponiblePara:
+
+    RULE.SOLVENCIA
+
+    RULE.CLASIFICACION
+
+    RULE.LOTES
+
+    RULE.UTE
+
+    RULE.PROCEDIMIENTO
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarVersion:
+
+    true
+
+  registrarActualizacion:
+
+    true
+
+  registrarMantenimiento:
+
+    true
+
+  registrarCompatibilidad:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA FUTURAS VERSIONES
+# ============================================================================
+
+roadmap:
+
+  version_1_1:
+
+    preparada: true
+
+  version_1_2:
+
+    preparada: true
+
+  version_2_0:
+
+    preparada: true
+
+# ============================================================================
+# FIN PARTE 10 DE 15
+# ============================================================================
+
+# ============================================================================
+# PARÁMETROS DE INTEGRACIÓN DEL SISTEMA
+# ============================================================================
+
+integracionSistema:
+
+  activa:
+
+    true
+
+  sincronizacionAutomatica:
+
+    true
+
+# ============================================================================
+# RULE ENGINE
+# ============================================================================
+
+ruleEngine:
+
+  habilitado:
+
+    true
+
+  consultarParametros:
+
+    true
+
+  registrarResultados:
+
+    true
+
+  validarDependencias:
+
+    true
+
+# ============================================================================
+# WORKFLOW ENGINE
+# ============================================================================
+
+workflowEngine:
+
+  habilitado:
+
+    true
+
+  actualizarEstado:
+
+    true
+
+  generarEventos:
+
+    true
+
+  sincronizarExpediente:
+
+    true
+
+# ============================================================================
+# MOTOR DOCUMENTAL
+# ============================================================================
+
+motorDocumental:
+
+  habilitado:
+
+    true
+
+  generarInformes:
+
+    true
+
+  actualizarPlantillas:
+
+    true
+
+  sincronizarDocumentacion:
+
+    true
+
+# ============================================================================
+# KNOWLEDGE GRAPH
+# ============================================================================
+
+knowledgeGraph:
+
+  habilitado:
+
+    true
+
+  registrarEntidades:
+
+    true
+
+  registrarRelaciones:
+
+    true
+
+  actualizarNodos:
+
+    true
+
+# ============================================================================
+# MOTOR RAG
+# ============================================================================
+
+motorRAG:
+
+  habilitado:
+
+    true
+
+  indexarParametros:
+
+    true
+
+  indexarNormativa:
+
+    true
+
+  indexarJustificaciones:
+
+    true
+
+# ============================================================================
+# MOTOR DE AUDITORÍA
+# ============================================================================
+
+motorAuditoria:
+
+  habilitado:
+
+    true
+
+  registrarCambios:
+
+    true
+
+  registrarIncidencias:
+
+    true
+
+  registrarVersiones:
+
+    true
+
+# ============================================================================
+# MOTOR DE EXPLICABILIDAD
+# ============================================================================
+
+motorExplicabilidad:
+
+  habilitado:
+
+    true
+
+  registrarCadenaInferencia:
+
+    true
+
+  registrarParametros:
+
+    true
+
+  registrarJustificaciones:
+
+    true
+
+# ============================================================================
+# API DEL SISTEMA
+# ============================================================================
+
+api:
+
+  habilitada:
+
+    true
+
+  lectura:
+
+    permitida
+
+  escritura:
+
+    permitida
+
+  validacion:
+
+    obligatoria
+
+# ============================================================================
+# SINCRONIZACIÓN
+# ============================================================================
+
+sincronizacion:
+
+  inmediata:
+
+    true
+
+  persistente:
+
+    true
+
+  validarIntegridad:
+
+    true
+
+  registrarErrores:
+
+    true
+
+# ============================================================================
+# GESTIÓN DE ERRORES
+# ============================================================================
+
+errores:
+
+  registrar:
+
+    true
+
+  reintentarSincronizacion:
+
+    true
+
+  generarAlerta:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  registrarIntegraciones:
+
+    true
+
+  registrarSincronizaciones:
+
+    true
+
+  registrarErrores:
+
+    true
+
+  registrarEventos:
+
+    true
+
+# ============================================================================
+# FIN PARTE 11 DE 15
+# ============================================================================
+
+# ============================================================================
+# CONFIGURACIÓN AVANZADA DEL MÓDULO
+# ============================================================================
+
+configuracionAvanzada:
+
+  activa:
+
+    true
+
+# ============================================================================
+# SEGURIDAD
+# ============================================================================
+
+seguridad:
+
+  validarEntradas:
+
+    true
+
+  validarParametros:
+
+    true
+
+  impedirParametrosNulos:
+
+    true
+
+  impedirDuplicidades:
+
+    true
+
+  registrarErrores:
+
+    true
+
+# ============================================================================
+# VALIDACIONES TÉCNICAS
+# ============================================================================
+
+validacionesTecnicas:
+
+  comprobarIntegridad:
+
+    true
+
+  comprobarDependencias:
+
+    true
+
+  comprobarCompatibilidad:
+
+    true
+
+  comprobarVersiones:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DE RENDIMIENTO
+# ============================================================================
+
+rendimiento:
+
+  cache:
+
+    habilitada: true
+
+  reutilizarResultados:
+
+    true
+
+  optimizarConsultas:
+
+    true
+
+  minimizarRecalculos:
+
+    true
+
+# ============================================================================
+# GESTIÓN DE MEMORIA
+# ============================================================================
+
+memoria:
+
+  liberarRecursos:
+
+    automatico
+
+  conservarHistorico:
+
+    true
+
+  mantenerCache:
+
+    true
+
+# ============================================================================
+# TOLERANCIA A FALLOS
+# ============================================================================
+
+toleranciaFallos:
+
+  reintentarOperacion:
+
+    true
+
+  registrarIncidencia:
+
+    true
+
+  continuarSiEsPosible:
+
+    true
+
+  bloquearErroresCriticos:
+
+    true
+
+# ============================================================================
+# CONTROL DE DEPENDENCIAS
+# ============================================================================
+
+dependencias:
+
+  verificarAntesCarga:
+
+    true
+
+  verificarDespuesCarga:
+
+    true
+
+  registrarResultado:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DE LOGS
+# ============================================================================
+
+logs:
+
+  registrarInicio:
+
+    true
+
+  registrarFin:
+
+    true
+
+  registrarErrores:
+
+    true
+
+  registrarAdvertencias:
+
+    true
+
+  registrarEventos:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  inicializacionAutomatica:
+
+    true
+
+  comprobacionInicial:
+
+    true
+
+  cierreSeguro:
+
+    true
+
+  autodiagnostico:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA ESCALABILIDAD
+# ============================================================================
+
+escalabilidad:
+
+  preparada:
+
+    true
+
+  soporteModular:
+
+    true
+
+  soporteVersiones:
+
+    true
+
+  soporteNuevosParametros:
+
+    true
+
+# ============================================================================
+# FIN PARTE 12 DE 15
+# ============================================================================
+
+# ============================================================================
+# CONTROL DE CALIDAD, MONITORIZACIÓN Y MANTENIMIENTO PREVENTIVO
+# ============================================================================
+
+controlCalidad:
+
+  activo:
+
+    true
+
+# ============================================================================
+# VALIDACIONES DE CALIDAD
+# ============================================================================
+
+validacionesCalidad:
+
+  comprobarIntegridad:
+
+    true
+
+  comprobarConsistencia:
+
+    true
+
+  comprobarCompletitud:
+
+    true
+
+  comprobarDuplicidades:
+
+    true
+
+  comprobarParametrosObsoletos:
+
+    true
+
+# ============================================================================
+# MONITORIZACIÓN CONTINUA
+# ============================================================================
+
+monitorizacion:
+
+  activa:
+
+    true
+
+  frecuencia:
+
+    continua
+
+  registrarIncidencias:
+
+    true
+
+  registrarAnomalias:
+
+    true
+
+# ============================================================================
+# INDICADORES DE CALIDAD
+# ============================================================================
+
+indicadores:
+
+  integridad:
+
+    obligatorio: true
+
+  consistencia:
+
+    obligatorio: true
+
+  disponibilidad:
+
+    obligatorio: true
+
+  mantenibilidad:
+
+    obligatorio: true
+
+  reutilizacion:
+
+    obligatorio: true
+
+  estabilidad:
+
+    obligatorio: true
+
+# ============================================================================
+# MANTENIMIENTO PREVENTIVO
+# ============================================================================
+
+mantenimientoPreventivo:
+
+  revisarParametros:
+
+    true
+
+  revisarCatalogos:
+
+    true
+
+  revisarDependencias:
+
+    true
+
+  revisarVersiones:
+
+    true
+
+  revisarCompatibilidad:
+
+    true
+
+# ============================================================================
+# DETECCIÓN DE OBSOLESCENCIA
+# ============================================================================
+
+obsolescencia:
+
+  detectarParametrosSinUso:
+
+    true
+
+  detectarCatalogosAntiguos:
+
+    true
+
+  detectarDependenciasObsoletas:
+
+    true
+
+  detectarConfiguracionesDuplicadas:
+
+    true
+
+# ============================================================================
+# GESTIÓN DE INCIDENCIAS
+# ============================================================================
+
+incidencias:
+
+  registrar:
+
+    true
+
+  clasificar:
+
+    true
+
+  priorizar:
+
+    true
+
+  generarRecomendaciones:
+
+    true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alertas:
+
+  perdidaIntegridad:
+
+    activa: true
+
+  inconsistenciaDetectada:
+
+    activa: true
+
+  parametroObsoleto:
+
+    activa: true
+
+  mantenimientoNecesario:
+
+    activa: true
+
+# ============================================================================
+# MÉTRICAS DE CALIDAD
+# ============================================================================
+
+metricas:
+
+  registrarNumeroIncidencias:
+
+    true
+
+  registrarTiempoResolucion:
+
+    true
+
+  registrarCalidadGlobal:
+
+    true
+
+  registrarNivelEstabilidad:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  ejecutarAutocomprobacion:
+
+    true
+
+  registrarResultado:
+
+    true
+
+  generarInformeCalidad:
+
+    true
+
+  actualizarIndicadores:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA CERTIFICACIÓN
+# ============================================================================
+
+preCertificacion:
+
+  validarIntegridad:
+
+    true
+
+  validarCalidad:
+
+    true
+
+  validarCompatibilidad:
+
+    true
+
+  validarConfiguracion:
+
+    true
+
+# ============================================================================
+# FIN PARTE 13 DE 15
+# ============================================================================
+
+# ============================================================================
+# PRECERTIFICACIÓN TÉCNICA DEL MÓDULO
+# ============================================================================
+
+preCertificacion:
+
+  activa:
+
+    true
+
+# ============================================================================
+# VALIDACIÓN DE INTEGRIDAD
+# ============================================================================
+
+integridad:
+
+  comprobarArchivoCompleto:
+
+    true
+
+  comprobarParametros:
+
+    true
+
+  comprobarCatalogos:
+
+    true
+
+  comprobarDependencias:
+
+    true
+
+  comprobarVersion:
+
+    true
+
+# ============================================================================
+# VALIDACIÓN FUNCIONAL
+# ============================================================================
+
+funcional:
+
+  comprobarCarga:
+
+    true
+
+  comprobarConsultas:
+
+    true
+
+  comprobarIntegraciones:
+
+    true
+
+  comprobarRespuesta:
+
+    true
+
+# ============================================================================
+# VALIDACIÓN DE COMPATIBILIDAD
+# ============================================================================
+
+compatibilidad:
+
+  RuleEngine:
+
+    obligatoria
+
+  WorkflowEngine:
+
+    obligatoria
+
+  MotorDocumental:
+
+    obligatoria
+
+  KnowledgeGraph:
+
+    obligatoria
+
+  MotorRAG:
+
+    obligatoria
+
+  Auditoria:
+
+    obligatoria
+
+# ============================================================================
+# VALIDACIÓN DE SEGURIDAD
+# ============================================================================
+
+seguridad:
+
+  comprobarParametrosInvalidos:
+
+    true
+
+  comprobarDuplicidades:
+
+    true
+
+  comprobarConfiguraciones:
+
+    true
+
+  comprobarDependenciasExternas:
+
+    true
+
+# ============================================================================
+# VALIDACIÓN DE RENDIMIENTO
+# ============================================================================
+
+rendimiento:
+
+  comprobarTiempoRespuesta:
+
+    true
+
+  comprobarConsumoMemoria:
+
+    true
+
+  comprobarCache:
+
+    true
+
+  comprobarEscalabilidad:
+
+    true
+
+# ============================================================================
+# VALIDACIÓN DE CALIDAD
+# ============================================================================
+
+calidad:
+
+  comprobarConsistencia:
+
+    true
+
+  comprobarIntegridad:
+
+    true
+
+  comprobarMantenibilidad:
+
+    true
+
+  comprobarReutilizacion:
+
+    true
+
+# ============================================================================
+# VALIDACIÓN DE AUDITORÍA
+# ============================================================================
+
+auditoria:
+
+  comprobarTrazabilidad:
+
+    true
+
+  comprobarLogs:
+
+    true
+
+  comprobarHistorico:
+
+    true
+
+  comprobarVersionado:
+
+    true
+
+# ============================================================================
+# RESULTADOS POSIBLES
+# ============================================================================
+
+resultado:
+
+  apto:
+
+    true
+
+  requiereCorrecciones:
+
+    true
+
+  noApto:
+
+    true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  generarInformePrecertificacion:
+
+    true
+
+  registrarResultado:
+
+    true
+
+  registrarIncidencias:
+
+    true
+
+  actualizarEstado:
+
+    true
+
+# ============================================================================
+# PREPARACIÓN PARA CERTIFICACIÓN FINAL
+# ============================================================================
+
+preparacionFinal:
+
+  checklistCompleto:
+
+    true
+
+  dependenciasValidadas:
+
+    true
+
+  integridadVerificada:
+
+    true
+
+  listoParaCertificacion:
+
+    true
+
+# ============================================================================
+# FIN PARTE 14 DE 15
+# ============================================================================
+
+# ============================================================================
+# CERTIFICACIÓN DEFINITIVA DEL MÓDULO PARAM.SOLVENCIA
+# ============================================================================
+
+certificacionFinal:
+
+  modulo:
+
+    PARAM.SOLVENCIA
+
+  version:
+
+    1.0.0
+
+  estado:
+
+    CERTIFICADO
+
+  listoProduccion:
+
+    true
+
+# ============================================================================
+# CHECKLIST FINAL
+# ============================================================================
+
+checklist:
+
+  estructuraCompleta:
+
+    true
+
+  parametrosValidados:
+
+    true
+
+  catalogosValidados:
+
+    true
+
+  dependenciasResueltas:
+
+    true
+
+  compatibilidadComprobada:
+
+    true
+
+  auditoriaSuperada:
+
+    true
+
+  trazabilidadCompleta:
+
+    true
+
+  versionadoCorrecto:
+
+    true
+
+  seguridadValidada:
+
+    true
+
+  calidadValidada:
+
+    true
+
+# ============================================================================
+# COMPATIBILIDAD GLOBAL
+# ============================================================================
+
+compatibilidadGlobal:
+
+  catalogoMaestro:
+
+    true
+
+  RULE.OBJETO:
+
+    true
+
+  RULE.CPV:
+
+    true
+
+  RULE.PROCEDIMIENTO:
+
+    true
+
+  RULE.SOLVENCIA:
+
+    true
+
+  WorkflowEngine:
+
+    true
+
+  RuleEngine:
+
+    true
+
+  KnowledgeGraph:
+
+    true
+
+  MotorDocumental:
+
+    true
+
+  MotorRAG:
+
+    true
+
+# ============================================================================
+# INDICADORES FINALES
+# ============================================================================
+
+indicadores:
+
+  mantenibilidad:
+
+    alta
+
+  reutilizacion:
+
+    alta
+
+  estabilidad:
+
+    alta
+
+  escalabilidad:
+
+    alta
+
+  modularidad:
+
+    alta
+
+# ============================================================================
+# PREPARACIÓN PARA EVOLUCIÓN
+# ============================================================================
+
+evolucion:
+
+  admiteNuevosParametros:
+
+    true
+
+  admiteNuevaNormativa:
+
+    true
+
+  admiteNuevosCatalogos:
+
+    true
+
+  admiteNuevasIntegraciones:
+
+    true
+
+# ============================================================================
+# FIRMA DEL BANCO DE CONOCIMIENTO
+# ============================================================================
+
+firmaBancoConocimiento:
+
+  proyecto:
+
+    CONTRATA IA
+
+  componente:
+
+    PARAM.SOLVENCIA
+
+  certificado:
+
+    true
+
+  version:
+
+    1.0.0
+
+  estado:
+
+    PRODUCCION
+
+# ============================================================================
+# CIERRE OFICIAL DEL ARCHIVO
+# ============================================================================
+
+cierre:
+
+  archivoCompleto:
+
+    true
+
+  certificado:
+
+    true
+
+  listoIntegracion:
+
+    true
+
+  listoProduccion:
+
+    true
+
+  requiereRevisionPosterior:
+
+    soloAnteCambiosNormativos
+
+# ============================================================================
+# FIN DEL ARCHIVO
+# PARAM.SOLVENCIA
+# ============================================================================
