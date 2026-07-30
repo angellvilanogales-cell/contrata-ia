@@ -1,0 +1,8302 @@
+# ============================================================================
+# CONTRATA-IA
+# RULE ENGINE
+# MOTOR DE EJECUCIÓN DEL CONTRATO
+# Archivo:
+# knowledge/rules/ejecucion.rules.yaml
+# ============================================================================
+
+metadata:
+
+  id: RULE.EJECUCION
+
+  nombre: Motor de Ejecución del Contrato
+
+  version: 1.0.0
+
+  estado: PRODUCCION
+
+  propietario: CONTRATA-IA
+
+  descripcion: >
+    Motor encargado de controlar toda la ejecución del contrato
+    administrativo desde la formalización hasta su extinción,
+    incluyendo seguimiento, incidencias, penalidades,
+    modificaciones, recepción, liquidación y cierre.
+
+# ============================================================================
+# NORMATIVA
+# ============================================================================
+
+normativa:
+
+  principal:
+
+    - LCSP
+
+    - Ley39_2015
+
+    - Ley40_2015
+
+    - ENS
+
+    - ENI
+
+  complementaria:
+
+    - AI_ACT
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  auditoriaCompleta: true
+
+  explicabilidad: true
+
+  registrarEventos: true
+
+  registrarCambiosEstado: true
+
+  registrarVersiones: true
+
+  validarNormativa: true
+
+  workflowAutomatico: true
+
+# ============================================================================
+# ESTADOS DEL MOTOR
+# ============================================================================
+
+estados:
+
+  - FORMALIZADO
+
+  - EJECUCION
+
+  - SEGUIMIENTO
+
+  - INCIDENCIA
+
+  - PENALIDAD
+
+  - MODIFICACION
+
+  - PRORROGA
+
+  - RECEPCION
+
+  - LIQUIDACION
+
+  - CIERRE
+
+# ============================================================================
+# EVENTOS
+# ============================================================================
+
+eventos:
+
+  inicio:
+
+    contrato.formalizado
+
+  seguimiento:
+
+    seguimiento.programado
+
+    seguimiento.realizado
+
+  incidencias:
+
+    incidencia.detectada
+
+    incidencia.resuelta
+
+  modificaciones:
+
+    modificacion.iniciada
+
+    modificacion.aprobada
+
+  cierre:
+
+    contrato.finalizado
+
+# ============================================================================
+# REGLA EJE-001
+# ============================================================================
+
+- id: EJE-001
+
+  nombre: Inicio del motor de ejecución
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: contrato.formalizado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: FORMALIZADO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La ejecución del contrato comienza tras su formalización.
+
+  referencia:
+
+    LCSP_153
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-002
+# ----------------------------------------------------------------------------
+
+- id: EJE-002
+
+  nombre: Verificación del contrato formalizado
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoContrato: FORMALIZADO
+
+  accion:
+
+    verificar:
+
+      contratoFormalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Únicamente podrán ejecutarse contratos válidamente formalizados.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-003
+# ----------------------------------------------------------------------------
+
+- id: EJE-003
+
+  nombre: Activación de la ejecución
+
+  prioridad: maxima
+
+  condicion:
+
+    contratoFormalizado: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EJECUCION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Verificada la formalización comenzará la ejecución contractual.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-004
+# ----------------------------------------------------------------------------
+
+- id: EJE-004
+
+  nombre: Registro del inicio de ejecución
+
+  prioridad: alta
+
+  condicion:
+
+    estadoMotor: EJECUCION
+
+  accion:
+
+    registrar:
+
+      inicioEjecucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El inicio de la ejecución quedará registrado para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-005
+# ----------------------------------------------------------------------------
+
+- id: EJE-005
+
+  nombre: Publicación del evento de ejecución
+
+  prioridad: alta
+
+  condicion:
+
+    estadoMotor: EJECUCION
+
+  accion:
+
+    publicarEvento:
+
+      nombre: ejecucion.iniciada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine iniciará el resto de procesos de seguimiento.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+inicioEjecucion:
+
+  registrarInicio: true
+
+  validarFormalizacion: true
+
+  publicarEventos: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 1 DE 20
+# ============================================================================
+
+# ============================================================================
+# ACTA DE INICIO DEL CONTRATO
+# ============================================================================
+
+actaInicio:
+
+  activa: true
+
+  generarAutomaticamente: true
+
+  verificarFirmantes: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-006
+# ============================================================================
+
+- id: EJE-006
+
+  nombre: Inicio del procedimiento de acta
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ejecucion.iniciada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: ACTA_INICIO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La ejecución material del contrato comenzará mediante el acta de inicio cuando resulte preceptiva.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-007
+# ----------------------------------------------------------------------------
+
+- id: EJE-007
+
+  nombre: Comprobación de necesidad de acta
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      requiereActaInicio
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema determinará si el contrato requiere acta de inicio conforme a su naturaleza y al PCAP.
+
+  referencia:
+
+    PCAP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-008
+# ----------------------------------------------------------------------------
+
+- id: EJE-008
+
+  nombre: Generación automática del acta
+
+  prioridad: maxima
+
+  condicion:
+
+    requiereActaInicio: true
+
+  accion:
+
+    generar:
+
+      actaInicioContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el borrador del acta de inicio.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-009
+# ----------------------------------------------------------------------------
+
+- id: EJE-009
+
+  nombre: Incorporación de datos del contrato
+
+  prioridad: alta
+
+  condicion:
+
+    actaInicioContratoGenerada: true
+
+  accion:
+
+    completar:
+
+      datosContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El acta incluirá automáticamente los datos identificativos del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-010
+# ----------------------------------------------------------------------------
+
+- id: EJE-010
+
+  nombre: Identificación del responsable del contrato
+
+  prioridad: alta
+
+  condicion:
+
+    actaInicioContratoGenerada: true
+
+  accion:
+
+    incorporar:
+
+      responsableContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El acta reflejará el responsable designado para el seguimiento de la ejecución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-011
+# ----------------------------------------------------------------------------
+
+- id: EJE-011
+
+  nombre: Identificación del representante del contratista
+
+  prioridad: alta
+
+  condicion:
+
+    actaInicioContratoGenerada: true
+
+  accion:
+
+    incorporar:
+
+      representanteContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El representante del contratista quedará identificado en el acta.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-012
+# ----------------------------------------------------------------------------
+
+- id: EJE-012
+
+  nombre: Fecha efectiva de inicio
+
+  prioridad: maxima
+
+  condicion:
+
+    actaInicioContratoGenerada: true
+
+  accion:
+
+    registrar:
+
+      fechaInicioEfectiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La fecha efectiva de inicio será registrada para el control de plazos.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-013
+# ----------------------------------------------------------------------------
+
+- id: EJE-013
+
+  nombre: Registro de asistentes
+
+  prioridad: alta
+
+  condicion:
+
+    actaInicioContratoGenerada: true
+
+  accion:
+
+    registrar:
+
+      asistentesActa
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se registrarán todas las personas asistentes al acto de inicio.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-014
+# ----------------------------------------------------------------------------
+
+- id: EJE-014
+
+  nombre: Firma del acta
+
+  prioridad: maxima
+
+  condicion:
+
+    asistentesRegistrados: true
+
+  accion:
+
+    solicitar:
+
+      firmaActaInicio
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El acta deberá ser firmada por quienes corresponda.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-015
+# ----------------------------------------------------------------------------
+
+- id: EJE-015
+
+  nombre: Registro definitivo del acta
+
+  prioridad: alta
+
+  condicion:
+
+    actaFirmada: true
+
+  accion:
+
+    registrar:
+
+      actaInicioFirmada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El acta firmada quedará incorporada al expediente electrónico.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-016
+# ----------------------------------------------------------------------------
+
+- id: EJE-016
+
+  nombre: Publicación del evento
+
+  prioridad: media
+
+  condicion:
+
+    actaFirmada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: acta.inicio.firmada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el acta comenzará el seguimiento ordinario de la ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+acta:
+
+  generarAutomaticamente: true
+
+  registrarFirmas: true
+
+  registrarAsistentes: true
+
+  registrarAuditoria: true
+
+  publicarEventos: true
+
+# ============================================================================
+# FIN PARTE 2 DE 20
+# ============================================================================
+
+# ============================================================================
+# RESPONSABLE DEL CONTRATO
+# Artículo 62 LCSP
+# ============================================================================
+
+responsableContrato:
+
+  activo: true
+
+  designacionObligatoria: true
+
+  registrarActuaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-017
+# ============================================================================
+
+- id: EJE-017
+
+  nombre: Inicio del control del responsable del contrato
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: acta.inicio.firmada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RESPONSABLE_CONTRATO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Tras el acta de inicio comenzará el seguimiento por el responsable del contrato.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-018
+# ----------------------------------------------------------------------------
+
+- id: EJE-018
+
+  nombre: Verificación del responsable designado
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      responsableDesignado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo contrato deberá tener un responsable designado cuando proceda conforme a la LCSP.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-019
+# ----------------------------------------------------------------------------
+
+- id: EJE-019
+
+  nombre: Registro del nombramiento
+
+  prioridad: alta
+
+  condicion:
+
+    responsableDesignado: true
+
+  accion:
+
+    registrar:
+
+      nombramientoResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El nombramiento quedará incorporado al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-020
+# ----------------------------------------------------------------------------
+
+- id: EJE-020
+
+  nombre: Registro de funciones asignadas
+
+  prioridad: alta
+
+  condicion:
+
+    responsableDesignado: true
+
+  accion:
+
+    registrar:
+
+      funcionesResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema registrará las funciones asignadas al responsable del contrato.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-021
+# ----------------------------------------------------------------------------
+
+- id: EJE-021
+
+  nombre: Registro de actuaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      actuacionesResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones realizadas por el responsable quedarán registradas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-022
+# ----------------------------------------------------------------------------
+
+- id: EJE-022
+
+  nombre: Registro de instrucciones
+
+  prioridad: alta
+
+  condicion:
+
+    instruccionEmitida: true
+
+  accion:
+
+    registrar:
+
+      instruccionesResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las instrucciones emitidas durante la ejecución quedarán documentadas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-023
+# ----------------------------------------------------------------------------
+
+- id: EJE-023
+
+  nombre: Sustitución del responsable
+
+  prioridad: alta
+
+  condicion:
+
+    sustitucionResponsable: true
+
+  accion:
+
+    registrar:
+
+      nuevoResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cualquier sustitución del responsable deberá quedar registrada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-024
+# ----------------------------------------------------------------------------
+
+- id: EJE-024
+
+  nombre: Transferencia de seguimiento
+
+  prioridad: alta
+
+  condicion:
+
+    nuevoResponsable: true
+
+  accion:
+
+    transferir:
+
+      seguimientoContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El historial de seguimiento será transferido al nuevo responsable.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-025
+# ----------------------------------------------------------------------------
+
+- id: EJE-025
+
+  nombre: Auditoría de actuaciones
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones quedarán disponibles para auditoría.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-026
+# ----------------------------------------------------------------------------
+
+- id: EJE-026
+
+  nombre: Evaluación periódica
+
+  prioridad: media
+
+  condicion:
+
+    seguimientoProgramado: true
+
+  accion:
+
+    programar:
+
+      revisionPeriodica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El responsable realizará revisiones periódicas durante la ejecución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-027
+# ----------------------------------------------------------------------------
+
+- id: EJE-027
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    responsableActivo: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: responsable.contrato.activo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Activado el responsable comenzará el seguimiento ordinario del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+seguimientoResponsable:
+
+  registrarNombramientos: true
+
+  registrarFunciones: true
+
+  registrarActuaciones: true
+
+  registrarInstrucciones: true
+
+  registrarSustituciones: true
+
+  registrarAuditoria: true
+
+  revisionesPeriodicas: true
+
+# ============================================================================
+# FIN PARTE 3 DE 20
+# ============================================================================
+
+# ============================================================================
+# SEGUIMIENTO DE LA EJECUCIÓN DEL CONTRATO
+# Artículos 62 y concordantes LCSP
+# ============================================================================
+
+seguimientoContrato:
+
+  activo: true
+
+  seguimientoAutomatico: true
+
+  registrarIndicadores: true
+
+  generarInformes: true
+
+# ============================================================================
+# REGLA EJE-028
+# ============================================================================
+
+- id: EJE-028
+
+  nombre: Inicio del seguimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: responsable.contrato.activo
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: SEGUIMIENTO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Activado el responsable del contrato comenzará el seguimiento ordinario de la ejecución.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-029
+# ----------------------------------------------------------------------------
+
+- id: EJE-029
+
+  nombre: Planificación del seguimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoMotor: SEGUIMIENTO
+
+  accion:
+
+    generar:
+
+      planSeguimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el plan de seguimiento del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-030
+# ----------------------------------------------------------------------------
+
+- id: EJE-030
+
+  nombre: Programación de revisiones
+
+  prioridad: alta
+
+  condicion:
+
+    planSeguimientoGenerado: true
+
+  accion:
+
+    programar:
+
+      revisionesPeriodicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se establecerá un calendario de revisiones durante toda la ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-031
+# ----------------------------------------------------------------------------
+
+- id: EJE-031
+
+  nombre: Registro de hitos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      hitosContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los hitos relevantes quedarán registrados.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-032
+# ----------------------------------------------------------------------------
+
+- id: EJE-032
+
+  nombre: Evaluación de cumplimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    revisionRealizada: true
+
+  accion:
+
+    evaluar:
+
+      gradoCumplimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada revisión evaluará el nivel de cumplimiento contractual.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-033
+# ----------------------------------------------------------------------------
+
+- id: EJE-033
+
+  nombre: Registro de indicadores
+
+  prioridad: alta
+
+  condicion:
+
+    revisionRealizada: true
+
+  accion:
+
+    registrar:
+
+      indicadoresSeguimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se almacenarán los indicadores obtenidos durante la ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-034
+# ----------------------------------------------------------------------------
+
+- id: EJE-034
+
+  nombre: Detección de desviaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    desviacionDetectada: true
+
+  accion:
+
+    generarAlerta: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema detectará automáticamente posibles desviaciones en la ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-035
+# ----------------------------------------------------------------------------
+
+- id: EJE-035
+
+  nombre: Clasificación de la desviación
+
+  prioridad: alta
+
+  condicion:
+
+    desviacionDetectada: true
+
+  accion:
+
+    clasificar:
+
+      gravedadDesviacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada desviación será clasificada según su gravedad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-036
+# ----------------------------------------------------------------------------
+
+- id: EJE-036
+
+  nombre: Generación del informe periódico
+
+  prioridad: alta
+
+  condicion:
+
+    revisionRealizada: true
+
+  accion:
+
+    generar:
+
+      informeSeguimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Tras cada revisión se emitirá un informe de seguimiento.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-037
+# ----------------------------------------------------------------------------
+
+- id: EJE-037
+
+  nombre: Registro del informe
+
+  prioridad: alta
+
+  condicion:
+
+    informeSeguimientoGenerado: true
+
+  accion:
+
+    registrar:
+
+      informeSeguimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los informes periódicos formarán parte del expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-038
+# ----------------------------------------------------------------------------
+
+- id: EJE-038
+
+  nombre: Auditoría del seguimiento
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaSeguimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones de seguimiento quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-039
+# ----------------------------------------------------------------------------
+
+- id: EJE-039
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    seguimientoActivo: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: seguimiento.actualizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine actualizará el estado general de la ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+seguimiento:
+
+  planAutomatico: true
+
+  registrarIndicadores: true
+
+  registrarHitos: true
+
+  detectarDesviaciones: true
+
+  generarInformes: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 4 DE 20
+# ============================================================================
+
+# ============================================================================
+# CONTROL DE HITOS Y CUMPLIMIENTO CONTRACTUAL
+# ============================================================================
+
+controlHitos:
+
+  activo: true
+
+  verificarEntregables: true
+
+  controlarCumplimiento: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-040
+# ============================================================================
+
+- id: EJE-040
+
+  nombre: Inicio del control de hitos
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: seguimiento.actualizado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CONTROL_HITOS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema iniciará el control automático de los hitos contractuales.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-041
+# ----------------------------------------------------------------------------
+
+- id: EJE-041
+
+  nombre: Obtención de hitos definidos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    recuperar:
+
+      hitosPCAP
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los hitos contractuales se obtendrán del PCAP y del PPT.
+
+  referencia:
+
+    PCAP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-042
+# ----------------------------------------------------------------------------
+
+- id: EJE-042
+
+  nombre: Programación de hitos
+
+  prioridad: alta
+
+  condicion:
+
+    hitosPCAPRecuperados: true
+
+  accion:
+
+    programar:
+
+      calendarioHitos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los hitos quedarán calendarizados automáticamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-043
+# ----------------------------------------------------------------------------
+
+- id: EJE-043
+
+  nombre: Verificación de entregables
+
+  prioridad: maxima
+
+  condicion:
+
+    hitoAlcanzado: true
+
+  accion:
+
+    verificar:
+
+      entregablesPresentados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que los entregables previstos han sido presentados.
+
+  referencia:
+
+    PPT
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-044
+# ----------------------------------------------------------------------------
+
+- id: EJE-044
+
+  nombre: Validación técnica
+
+  prioridad: maxima
+
+  condicion:
+
+    entregablesPresentados: true
+
+  accion:
+
+    validar:
+
+      entregablesCorrectos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará la conformidad técnica de las prestaciones entregadas.
+
+  referencia:
+
+    PPT
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-045
+# ----------------------------------------------------------------------------
+
+- id: EJE-045
+
+  nombre: Aceptación del hito
+
+  prioridad: maxima
+
+  condicion:
+
+    entregablesCorrectos: true
+
+  accion:
+
+    aprobar:
+
+      hitoContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El responsable del contrato validará el cumplimiento del hito.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-046
+# ----------------------------------------------------------------------------
+
+- id: EJE-046
+
+  nombre: Rechazo del hito
+
+  prioridad: maxima
+
+  condicion:
+
+    entregablesCorrectos: false
+
+  accion:
+
+    rechazar:
+
+      hitoContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El hito será rechazado cuando la prestación no cumpla las condiciones establecidas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-047
+# ----------------------------------------------------------------------------
+
+- id: EJE-047
+
+  nombre: Registro del cumplimiento
+
+  prioridad: alta
+
+  condicion:
+
+    hitoAprobado: true
+
+  accion:
+
+    registrar:
+
+      cumplimientoHito
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cumplimiento del hito quedará registrado en el expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-048
+# ----------------------------------------------------------------------------
+
+- id: EJE-048
+
+  nombre: Registro del incumplimiento
+
+  prioridad: alta
+
+  condicion:
+
+    hitoRechazado: true
+
+  accion:
+
+    registrar:
+
+      incumplimientoHito
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El incumplimiento quedará documentado para posibles actuaciones posteriores.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-049
+# ----------------------------------------------------------------------------
+
+- id: EJE-049
+
+  nombre: Apertura automática de incidencia
+
+  prioridad: maxima
+
+  condicion:
+
+    hitoRechazado: true
+
+  accion:
+
+    generarIncidencia: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo incumplimiento generará automáticamente una incidencia de ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-050
+# ----------------------------------------------------------------------------
+
+- id: EJE-050
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    hitoEvaluado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: hito.evaluado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará el flujo de ejecución del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+hitos:
+
+  controlarCalendario: true
+
+  verificarEntregables: true
+
+  validarPrestaciones: true
+
+  registrarCumplimiento: true
+
+  registrarIncumplimientos: true
+
+  generarIncidencias: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 5 DE 20
+# ============================================================================
+
+# ============================================================================
+# CONTROL DE PLAZOS DE EJECUCIÓN
+# LCSP
+# ============================================================================
+
+controlPlazos:
+
+  activo: true
+
+  controlarAutomaticamente: true
+
+  generarAlertas: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-051
+# ============================================================================
+
+- id: EJE-051
+
+  nombre: Inicio del control de plazos
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: hito.evaluado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CONTROL_PLAZOS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema iniciará el control automático de todos los plazos contractuales.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-052
+# ----------------------------------------------------------------------------
+
+- id: EJE-052
+
+  nombre: Obtención del calendario contractual
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    recuperar:
+
+      calendarioContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El calendario contractual se obtendrá del expediente aprobado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-053
+# ----------------------------------------------------------------------------
+
+- id: EJE-053
+
+  nombre: Registro de fechas límite
+
+  prioridad: alta
+
+  condicion:
+
+    calendarioContratoRecuperado: true
+
+  accion:
+
+    registrar:
+
+      fechasLimite
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las fechas límite quedarán registradas para su seguimiento.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-054
+# ----------------------------------------------------------------------------
+
+- id: EJE-054
+
+  nombre: Seguimiento diario
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    comprobar:
+
+      plazosPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El motor revisará diariamente los plazos pendientes.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-055
+# ----------------------------------------------------------------------------
+
+- id: EJE-055
+
+  nombre: Alerta preventiva
+
+  prioridad: maxima
+
+  condicion:
+
+    diasRestantes: "<=15"
+
+  accion:
+
+    generarAviso:
+
+      tipo: PREVENTIVO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema avisará con antelación suficiente del vencimiento próximo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-056
+# ----------------------------------------------------------------------------
+
+- id: EJE-056
+
+  nombre: Alerta urgente
+
+  prioridad: maxima
+
+  condicion:
+
+    diasRestantes: "<=5"
+
+  accion:
+
+    generarAviso:
+
+      tipo: URGENTE
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se notificará de forma urgente la proximidad del vencimiento.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-057
+# ----------------------------------------------------------------------------
+
+- id: EJE-057
+
+  nombre: Detección de retraso
+
+  prioridad: maxima
+
+  condicion:
+
+    plazoSuperado: true
+
+  accion:
+
+    registrar:
+
+      retrasoDetectado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo incumplimiento del plazo contractual quedará registrado.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-058
+# ----------------------------------------------------------------------------
+
+- id: EJE-058
+
+  nombre: Clasificación del retraso
+
+  prioridad: alta
+
+  condicion:
+
+    retrasoDetectado: true
+
+  accion:
+
+    clasificar:
+
+      gravedadRetraso
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El retraso será clasificado según su impacto contractual.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-059
+# ----------------------------------------------------------------------------
+
+- id: EJE-059
+
+  nombre: Apertura automática de expediente de demora
+
+  prioridad: maxima
+
+  condicion:
+
+    retrasoDetectado: true
+
+  accion:
+
+    iniciar:
+
+      expedienteDemora
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los retrasos podrán originar el procedimiento correspondiente por demora.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-060
+# ----------------------------------------------------------------------------
+
+- id: EJE-060
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaPlazos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las comprobaciones de plazos quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-061
+# ----------------------------------------------------------------------------
+
+- id: EJE-061
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    controlPlazosActivo: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: plazos.controlados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará con el control de incidencias o penalidades cuando proceda.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+plazos:
+
+  seguimientoDiario: true
+
+  alerta15Dias: true
+
+  alerta5Dias: true
+
+  registrarRetrasos: true
+
+  iniciarExpedienteDemora: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 6 DE 20
+# ============================================================================
+
+# ============================================================================
+# GESTIÓN DE INCIDENCIAS DURANTE LA EJECUCIÓN
+# ============================================================================
+
+incidencias:
+
+  activa: true
+
+  clasificacionAutomatica: true
+
+  seguimientoAutomatico: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-062
+# ============================================================================
+
+- id: EJE-062
+
+  nombre: Inicio de gestión de incidencias
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: plazos.controlados
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: INCIDENCIAS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Durante la ejecución podrán producirse incidencias que deberán ser gestionadas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-063
+# ----------------------------------------------------------------------------
+
+- id: EJE-063
+
+  nombre: Registro de incidencia
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciaDetectada: true
+
+  accion:
+
+    registrar:
+
+      incidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda incidencia será incorporada al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-064
+# ----------------------------------------------------------------------------
+
+- id: EJE-064
+
+  nombre: Clasificación automática
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciaRegistrada: true
+
+  accion:
+
+    clasificar:
+
+      tipoIncidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las incidencias serán clasificadas automáticamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-065
+# ----------------------------------------------------------------------------
+
+- id: EJE-065
+
+  nombre: Determinación de gravedad
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciaClasificada: true
+
+  accion:
+
+    clasificar:
+
+      gravedad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se determinará el nivel de gravedad de la incidencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-066
+# ----------------------------------------------------------------------------
+
+- id: EJE-066
+
+  nombre: Asignación del responsable
+
+  prioridad: alta
+
+  condicion:
+
+    gravedadCalculada: true
+
+  accion:
+
+    asignar:
+
+      responsableGestion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda incidencia tendrá un responsable asignado.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-067
+# ----------------------------------------------------------------------------
+
+- id: EJE-067
+
+  nombre: Propuesta de actuación
+
+  prioridad: alta
+
+  condicion:
+
+    responsableAsignado: true
+
+  accion:
+
+    generar:
+
+      propuestaActuacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema propondrá la actuación adecuada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-068
+# ----------------------------------------------------------------------------
+
+- id: EJE-068
+
+  nombre: Control de subsanación
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaAceptada: true
+
+  accion:
+
+    controlar:
+
+      subsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se realizará seguimiento hasta la completa subsanación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-069
+# ----------------------------------------------------------------------------
+
+- id: EJE-069
+
+  nombre: Incidencia resuelta
+
+  prioridad: alta
+
+  condicion:
+
+    subsanacionCompleta: true
+
+  accion:
+
+    cerrar:
+
+      incidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La incidencia será cerrada una vez resuelta.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-070
+# ----------------------------------------------------------------------------
+
+- id: EJE-070
+
+  nombre: Incidencia no resuelta
+
+  prioridad: maxima
+
+  condicion:
+
+    subsanacionCompleta: false
+
+  accion:
+
+    escalar:
+
+      incidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las incidencias no resueltas serán escaladas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-071
+# ----------------------------------------------------------------------------
+
+- id: EJE-071
+
+  nombre: Escalado a penalidad
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciaEscalada: true
+
+    origen: incumplimientoContratista
+
+  accion:
+
+    publicarEvento:
+
+      nombre: penalidad.evaluar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los incumplimientos podrán dar lugar al inicio del procedimiento de penalidades.
+
+  referencia:
+
+    LCSP_192
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-072
+# ----------------------------------------------------------------------------
+
+- id: EJE-072
+
+  nombre: Escalado a modificación contractual
+
+  prioridad: alta
+
+  condicion:
+
+    incidenciaEscalada: true
+
+    origen: necesidadSobrevenida
+
+  accion:
+
+    publicarEvento:
+
+      nombre: modificacion.evaluar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las necesidades sobrevenidas podrán originar una modificación contractual cuando sea legalmente procedente.
+
+  referencia:
+
+    LCSP_203
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-073
+# ----------------------------------------------------------------------------
+
+- id: EJE-073
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaIncidencias
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el ciclo de vida de la incidencia quedará registrado.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-074
+# ----------------------------------------------------------------------------
+
+- id: EJE-074
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    incidenciaGestionada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: incidencia.gestionada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará el proceso correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+gestionIncidencias:
+
+  clasificacionAutomatica: true
+
+  calcularGravedad: true
+
+  controlarSubsanacion: true
+
+  escalarPenalidades: true
+
+  escalarModificaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 7 DE 20
+# ============================================================================
+
+# ============================================================================
+# PENALIDADES POR INCUMPLIMIENTO
+# Artículos 192 a 195 LCSP
+# ============================================================================
+
+penalidades:
+
+  activa: true
+
+  calculoAutomatico: true
+
+  audienciaObligatoria: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-075
+# ============================================================================
+
+- id: EJE-075
+
+  nombre: Inicio del procedimiento de penalidades
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: penalidad.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: PENALIDADES
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectado un posible incumplimiento se iniciará el procedimiento para valorar la imposición de penalidades.
+
+  referencia:
+
+    LCSP_192
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-076
+# ----------------------------------------------------------------------------
+
+- id: EJE-076
+
+  nombre: Verificación de incumplimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      incumplimientoAcreditado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de imponer penalidades deberá acreditarse el incumplimiento contractual.
+
+  referencia:
+
+    LCSP_192
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-077
+# ----------------------------------------------------------------------------
+
+- id: EJE-077
+
+  nombre: Clasificación del incumplimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    incumplimientoAcreditado: true
+
+  accion:
+
+    clasificar:
+
+      gravedadIncumplimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El incumplimiento será clasificado conforme a los pliegos y la normativa.
+
+  referencia:
+
+    PCAP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-078
+# ----------------------------------------------------------------------------
+
+- id: EJE-078
+
+  nombre: Cálculo automático de penalidad
+
+  prioridad: maxima
+
+  condicion:
+
+    gravedadIncumplimientoCalculada: true
+
+  accion:
+
+    calcular:
+
+      penalidadEconomica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará automáticamente la penalidad aplicable.
+
+  referencia:
+
+    LCSP_192
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-079
+# ----------------------------------------------------------------------------
+
+- id: EJE-079
+
+  nombre: Verificación de límites
+
+  prioridad: maxima
+
+  condicion:
+
+    penalidadEconomicaCalculada: true
+
+  accion:
+
+    verificar:
+
+      limitesPenalidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La penalidad deberá respetar los límites establecidos en los pliegos y en la LCSP.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-080
+# ----------------------------------------------------------------------------
+
+- id: EJE-080
+
+  nombre: Propuesta de resolución
+
+  prioridad: alta
+
+  condicion:
+
+    limitesPenalidadCorrectos: true
+
+  accion:
+
+    generar:
+
+      propuestaPenalidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará automáticamente la propuesta de imposición de penalidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-081
+# ----------------------------------------------------------------------------
+
+- id: EJE-081
+
+  nombre: Trámite de audiencia
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaPenalidadGenerada: true
+
+  accion:
+
+    iniciar:
+
+      audienciaContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se concederá audiencia al contratista antes de resolver.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-082
+# ----------------------------------------------------------------------------
+
+- id: EJE-082
+
+  nombre: Recepción de alegaciones
+
+  prioridad: alta
+
+  condicion:
+
+    audienciaFinalizada: true
+
+  accion:
+
+    registrar:
+
+      alegacionesContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alegaciones quedarán incorporadas al expediente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-083
+# ----------------------------------------------------------------------------
+
+- id: EJE-083
+
+  nombre: Valoración de alegaciones
+
+  prioridad: alta
+
+  condicion:
+
+    alegacionesRegistradas: true
+
+  accion:
+
+    evaluar:
+
+      alegaciones
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alegaciones serán evaluadas antes de adoptar la resolución definitiva.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-084
+# ----------------------------------------------------------------------------
+
+- id: EJE-084
+
+  nombre: Resolución definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    alegacionesEvaluadas: true
+
+  accion:
+
+    resolver:
+
+      procedimientoPenalidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la instrucción se dictará la resolución correspondiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-085
+# ----------------------------------------------------------------------------
+
+- id: EJE-085
+
+  nombre: Registro de penalidad
+
+  prioridad: alta
+
+  condicion:
+
+    penalidadImpuesta: true
+
+  accion:
+
+    registrar:
+
+      penalidadExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La penalidad impuesta quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-086
+# ----------------------------------------------------------------------------
+
+- id: EJE-086
+
+  nombre: Comunicación económica
+
+  prioridad: alta
+
+  condicion:
+
+    penalidadImpuesta: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: pago.penalidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comunicará la penalidad al módulo económico correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-087
+# ----------------------------------------------------------------------------
+
+- id: EJE-087
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaPenalidades
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones del procedimiento sancionador quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-088
+# ----------------------------------------------------------------------------
+
+- id: EJE-088
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    procedimientoPenalidadFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: penalidad.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el procedimiento continuará el flujo de ejecución correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+procedimientoPenalidades:
+
+  calcularAutomaticamente: true
+
+  audienciaObligatoria: true
+
+  valorarAlegaciones: true
+
+  registrarResolucion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 8 DE 20
+# ============================================================================
+
+# ============================================================================
+# MODIFICACIONES DEL CONTRATO
+# Artículos 203 a 207 LCSP
+# ============================================================================
+
+modificaciones:
+
+  activa: true
+
+  verificarLimites: true
+
+  controlarLegalidad: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-089
+# ============================================================================
+
+- id: EJE-089
+
+  nombre: Inicio del procedimiento de modificación
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: modificacion.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: MODIFICACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada la necesidad de modificar el contrato comenzará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_203
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-090
+# ----------------------------------------------------------------------------
+
+- id: EJE-090
+
+  nombre: Identificación del tipo de modificación
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    clasificar:
+
+      tipoModificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema distinguirá entre modificaciones previstas y no previstas.
+
+  referencia:
+
+    LCSP_203
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-091
+# ----------------------------------------------------------------------------
+
+- id: EJE-091
+
+  nombre: Verificación de modificación prevista
+
+  prioridad: maxima
+
+  condicion:
+
+    tipoModificacion: PREVISTA
+
+  accion:
+
+    verificar:
+
+      clausulasPCAP
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las modificaciones previstas deberán encontrarse reguladas en los pliegos.
+
+  referencia:
+
+    LCSP_204
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-092
+# ----------------------------------------------------------------------------
+
+- id: EJE-092
+
+  nombre: Verificación de modificación no prevista
+
+  prioridad: maxima
+
+  condicion:
+
+    tipoModificacion: NO_PREVISTA
+
+  accion:
+
+    verificar:
+
+      supuestoLegal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las modificaciones no previstas únicamente podrán realizarse en los supuestos legalmente establecidos.
+
+  referencia:
+
+    LCSP_205
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-093
+# ----------------------------------------------------------------------------
+
+- id: EJE-093
+
+  nombre: Cálculo del impacto económico
+
+  prioridad: maxima
+
+  condicion:
+
+    modificacionAdmisible: true
+
+  accion:
+
+    calcular:
+
+      impactoEconomico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda modificación incorporará el cálculo de su repercusión económica.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-094
+# ----------------------------------------------------------------------------
+
+- id: EJE-094
+
+  nombre: Verificación de límites legales
+
+  prioridad: maxima
+
+  condicion:
+
+    impactoEconomicoCalculado: true
+
+  accion:
+
+    verificar:
+
+      limitesModificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará el cumplimiento de los límites legales de modificación.
+
+  referencia:
+
+    LCSP_205
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-095
+# ----------------------------------------------------------------------------
+
+- id: EJE-095
+
+  nombre: Solicitud de informe técnico
+
+  prioridad: alta
+
+  condicion:
+
+    limitesCorrectos: true
+
+  accion:
+
+    solicitar:
+
+      informeTecnico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se recabará informe técnico justificativo cuando resulte exigible.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-096
+# ----------------------------------------------------------------------------
+
+- id: EJE-096
+
+  nombre: Solicitud de informe jurídico
+
+  prioridad: alta
+
+  condicion:
+
+    informeTecnicoEmitido: true
+
+  accion:
+
+    solicitar:
+
+      informeJuridico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El procedimiento incorporará informe jurídico cuando proceda.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-097
+# ----------------------------------------------------------------------------
+
+- id: EJE-097
+
+  nombre: Elaboración de propuesta
+
+  prioridad: alta
+
+  condicion:
+
+    informesFavorables: true
+
+  accion:
+
+    generar:
+
+      propuestaModificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará la propuesta de modificación contractual.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-098
+# ----------------------------------------------------------------------------
+
+- id: EJE-098
+
+  nombre: Resolución de modificación
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaModificacionGenerada: true
+
+  accion:
+
+    resolver:
+
+      modificacionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente resolverá el procedimiento de modificación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-099
+# ----------------------------------------------------------------------------
+
+- id: EJE-099
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    modificacionAprobada: true
+
+  accion:
+
+    actualizar:
+
+      expedienteContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente incorporará toda la documentación derivada de la modificación.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-100
+# ----------------------------------------------------------------------------
+
+- id: EJE-100
+
+  nombre: Publicación del evento
+
+  prioridad: media
+
+  condicion:
+
+    modificacionAprobada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: modificacion.aprobada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará la ejecución conforme a las nuevas condiciones del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+modificacion:
+
+  verificarSupuestos: true
+
+  verificarLimites: true
+
+  calcularImpacto: true
+
+  solicitarInformes: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 9 DE 20
+# ============================================================================
+
+# ============================================================================
+# SUSPENSIÓN DEL CONTRATO
+# Artículos 208 y concordantes LCSP
+# ============================================================================
+
+suspensionContrato:
+
+  activa: true
+
+  generarActa: true
+
+  controlarPlazos: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-101
+# ============================================================================
+
+- id: EJE-101
+
+  nombre: Inicio del procedimiento de suspensión
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: suspension.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: SUSPENSION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una posible causa de suspensión comenzará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_208
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-102
+# ----------------------------------------------------------------------------
+
+- id: EJE-102
+
+  nombre: Identificación de la causa
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    clasificar:
+
+      causaSuspension
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará la causa jurídica que motiva la suspensión.
+
+  referencia:
+
+    LCSP_208
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-103
+# ----------------------------------------------------------------------------
+
+- id: EJE-103
+
+  nombre: Verificación de legalidad
+
+  prioridad: maxima
+
+  condicion:
+
+    causaSuspensionIdentificada: true
+
+  accion:
+
+    verificar:
+
+      suspensionLegal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo podrán suspenderse los contratos en los supuestos legalmente previstos.
+
+  referencia:
+
+    LCSP_208
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-104
+# ----------------------------------------------------------------------------
+
+- id: EJE-104
+
+  nombre: Elaboración del acta de suspensión
+
+  prioridad: maxima
+
+  condicion:
+
+    suspensionLegal: true
+
+  accion:
+
+    generar:
+
+      actaSuspension
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará el acta de suspensión con las circunstancias concurrentes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-105
+# ----------------------------------------------------------------------------
+
+- id: EJE-105
+
+  nombre: Registro de fecha de suspensión
+
+  prioridad: alta
+
+  condicion:
+
+    actaSuspensionGenerada: true
+
+  accion:
+
+    registrar:
+
+      fechaSuspension
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se registrará la fecha efectiva de suspensión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-106
+# ----------------------------------------------------------------------------
+
+- id: EJE-106
+
+  nombre: Paralización de plazos
+
+  prioridad: maxima
+
+  condicion:
+
+    suspensionAcordada: true
+
+  accion:
+
+    suspender:
+
+      computoPlazos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Durante la suspensión quedará interrumpido el cómputo de los plazos afectados.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-107
+# ----------------------------------------------------------------------------
+
+- id: EJE-107
+
+  nombre: Evaluación de efectos económicos
+
+  prioridad: alta
+
+  condicion:
+
+    suspensionAcordada: true
+
+  accion:
+
+    calcular:
+
+      efectosEconomicos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán los efectos económicos derivados de la suspensión.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-108
+# ----------------------------------------------------------------------------
+
+- id: EJE-108
+
+  nombre: Registro de obligaciones pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    suspensionAcordada: true
+
+  accion:
+
+    registrar:
+
+      obligacionesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se identificarán las obligaciones pendientes durante la suspensión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-109
+# ----------------------------------------------------------------------------
+
+- id: EJE-109
+
+  nombre: Reanudación del contrato
+
+  prioridad: maxima
+
+  condicion:
+
+    suspensionLevantada: true
+
+  accion:
+
+    reanudar:
+
+      ejecucionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Desaparecida la causa de suspensión se reanudará la ejecución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-110
+# ----------------------------------------------------------------------------
+
+- id: EJE-110
+
+  nombre: Reactivación de plazos
+
+  prioridad: maxima
+
+  condicion:
+
+    ejecucionReanudada: true
+
+  accion:
+
+    reactivar:
+
+      computoPlazos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se reanudará el cómputo de los plazos contractuales.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-111
+# ----------------------------------------------------------------------------
+
+- id: EJE-111
+
+  nombre: Registro de la reanudación
+
+  prioridad: alta
+
+  condicion:
+
+    ejecucionReanudada: true
+
+  accion:
+
+    registrar:
+
+      actaReanudacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La reanudación quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-112
+# ----------------------------------------------------------------------------
+
+- id: EJE-112
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    ejecucionReanudada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: suspension.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará la ejecución normal del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+suspension:
+
+  generarActa: true
+
+  suspenderPlazos: true
+
+  calcularEfectosEconomicos: true
+
+  registrarObligaciones: true
+
+  registrarReanudacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 10 DE 20
+# ============================================================================
+
+# ============================================================================
+# PRÓRROGAS DEL CONTRATO
+# Artículo 29 LCSP
+# ============================================================================
+
+prorrogas:
+
+  activa: true
+
+  verificarPrevision: true
+
+  controlarLimites: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-113
+# ============================================================================
+
+- id: EJE-113
+
+  nombre: Inicio del procedimiento de prórroga
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: prorroga.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: PRORROGA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada la necesidad de ampliar la duración del contrato comenzará el procedimiento de prórroga.
+
+  referencia:
+
+    LCSP_29
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-114
+# ----------------------------------------------------------------------------
+
+- id: EJE-114
+
+  nombre: Comprobación de previsión en los pliegos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      prorrogaPrevistaPCAP
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La prórroga únicamente podrá acordarse cuando esté prevista en los pliegos.
+
+  referencia:
+
+    LCSP_29
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-115
+# ----------------------------------------------------------------------------
+
+- id: EJE-115
+
+  nombre: Verificación del plazo máximo
+
+  prioridad: maxima
+
+  condicion:
+
+    prorrogaPrevistaPCAP: true
+
+  accion:
+
+    verificar:
+
+      limiteTemporalContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que la duración total del contrato no supera los límites legales.
+
+  referencia:
+
+    LCSP_29
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-116
+# ----------------------------------------------------------------------------
+
+- id: EJE-116
+
+  nombre: Comprobación de vigencia
+
+  prioridad: alta
+
+  condicion:
+
+    limiteTemporalContratoCorrecto: true
+
+  accion:
+
+    verificar:
+
+      contratoNoFinalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La prórroga deberá acordarse antes de la finalización del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-117
+# ----------------------------------------------------------------------------
+
+- id: EJE-117
+
+  nombre: Elaboración de propuesta de prórroga
+
+  prioridad: alta
+
+  condicion:
+
+    contratoNoFinalizado: true
+
+  accion:
+
+    generar:
+
+      propuestaProrroga
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente la propuesta de prórroga.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-118
+# ----------------------------------------------------------------------------
+
+- id: EJE-118
+
+  nombre: Solicitud de informes
+
+  prioridad: alta
+
+  condicion:
+
+    propuestaProrrogaGenerada: true
+
+  accion:
+
+    solicitar:
+
+      informesProrroga
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se recabarán los informes preceptivos cuando resulten exigibles.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-119
+# ----------------------------------------------------------------------------
+
+- id: EJE-119
+
+  nombre: Resolución de la prórroga
+
+  prioridad: maxima
+
+  condicion:
+
+    informesFavorables: true
+
+  accion:
+
+    resolver:
+
+      prorrogaContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación resolverá sobre la prórroga.
+
+  referencia:
+
+    LCSP_29
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-120
+# ----------------------------------------------------------------------------
+
+- id: EJE-120
+
+  nombre: Actualización de fechas
+
+  prioridad: maxima
+
+  condicion:
+
+    prorrogaAprobada: true
+
+  accion:
+
+    actualizar:
+
+      calendarioContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El calendario contractual será actualizado automáticamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-121
+# ----------------------------------------------------------------------------
+
+- id: EJE-121
+
+  nombre: Actualización de hitos
+
+  prioridad: alta
+
+  condicion:
+
+    calendarioContratoActualizado: true
+
+  accion:
+
+    actualizar:
+
+      hitosContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los hitos contractuales se adaptarán a la nueva duración.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-122
+# ----------------------------------------------------------------------------
+
+- id: EJE-122
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    prorrogaAprobada: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación de la prórroga quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-123
+# ----------------------------------------------------------------------------
+
+- id: EJE-123
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaProrrogas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento de prórroga quedará registrado para auditoría.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-124
+# ----------------------------------------------------------------------------
+
+- id: EJE-124
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    prorrogaAprobada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: prorroga.aprobada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará la ejecución conforme al nuevo calendario.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+prorroga:
+
+  verificarPrevision: true
+
+  verificarLimites: true
+
+  actualizarCalendario: true
+
+  actualizarHitos: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 11 DE 20
+# ============================================================================
+
+# ============================================================================
+# RECEPCIÓN PARCIAL DEL CONTRATO
+# Artículos 210 y concordantes LCSP
+# ============================================================================
+
+recepcionParcial:
+
+  activa: true
+
+  verificarPrestaciones: true
+
+  generarActa: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-125
+# ============================================================================
+
+- id: EJE-125
+
+  nombre: Inicio del procedimiento de recepción parcial
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: recepcion.parcial.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RECEPCION_PARCIAL
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Alcanzado un hito susceptible de recepción comenzará el procedimiento de recepción parcial.
+
+  referencia:
+
+    LCSP_210
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-126
+# ----------------------------------------------------------------------------
+
+- id: EJE-126
+
+  nombre: Verificación de recepción parcial prevista
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      recepcionParcialPermitida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que el contrato admite recepciones parciales.
+
+  referencia:
+
+    PCAP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-127
+# ----------------------------------------------------------------------------
+
+- id: EJE-127
+
+  nombre: Verificación de prestaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    recepcionParcialPermitida: true
+
+  accion:
+
+    verificar:
+
+      prestacionesEjecutadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que las prestaciones correspondientes al hito han sido ejecutadas.
+
+  referencia:
+
+    PPT
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-128
+# ----------------------------------------------------------------------------
+
+- id: EJE-128
+
+  nombre: Comprobación técnica
+
+  prioridad: maxima
+
+  condicion:
+
+    prestacionesEjecutadas: true
+
+  accion:
+
+    validar:
+
+      conformidadTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El responsable del contrato verificará la conformidad técnica.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-129
+# ----------------------------------------------------------------------------
+
+- id: EJE-129
+
+  nombre: Elaboración del acta de recepción parcial
+
+  prioridad: maxima
+
+  condicion:
+
+    conformidadTecnica: true
+
+  accion:
+
+    generar:
+
+      actaRecepcionParcial
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el acta correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-130
+# ----------------------------------------------------------------------------
+
+- id: EJE-130
+
+  nombre: Registro de reservas
+
+  prioridad: alta
+
+  condicion:
+
+    existenReservas: true
+
+  accion:
+
+    registrar:
+
+      reservasRecepcion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las reservas formuladas quedarán incorporadas al expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-131
+# ----------------------------------------------------------------------------
+
+- id: EJE-131
+
+  nombre: Rechazo de prestaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    conformidadTecnica: false
+
+  accion:
+
+    rechazar:
+
+      prestaciones
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las prestaciones no conformes serán rechazadas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-132
+# ----------------------------------------------------------------------------
+
+- id: EJE-132
+
+  nombre: Apertura de subsanación
+
+  prioridad: maxima
+
+  condicion:
+
+    prestacionesRechazadas: true
+
+  accion:
+
+    iniciar:
+
+      procedimientoSubsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El contratista deberá subsanar las deficiencias detectadas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-133
+# ----------------------------------------------------------------------------
+
+- id: EJE-133
+
+  nombre: Certificación parcial
+
+  prioridad: alta
+
+  condicion:
+
+    actaRecepcionParcialGenerada: true
+
+  accion:
+
+    generar:
+
+      certificacionParcial
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La recepción parcial permitirá emitir la certificación correspondiente cuando proceda.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-134
+# ----------------------------------------------------------------------------
+
+- id: EJE-134
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: alta
+
+  condicion:
+
+    certificacionParcialGenerada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: pago.certificacion.parcial
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico iniciará la tramitación del pago correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-135
+# ----------------------------------------------------------------------------
+
+- id: EJE-135
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaRecepcionParcial
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento quedará registrado para auditoría.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-136
+# ----------------------------------------------------------------------------
+
+- id: EJE-136
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    recepcionParcialFinalizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: recepcion.parcial.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará la ejecución del contrato tras la recepción parcial.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+recepcionParcialConfig:
+
+  comprobarPrestaciones: true
+
+  generarActas: true
+
+  registrarReservas: true
+
+  generarCertificaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 12 DE 20
+# ============================================================================
+
+# ============================================================================
+# RECEPCIÓN DEFINITIVA DEL CONTRATO
+# Artículos 210 y concordantes LCSP
+# ============================================================================
+
+recepcionDefinitiva:
+
+  activa: true
+
+  comprobarEjecucionCompleta: true
+
+  generarActa: true
+
+  iniciarGarantia: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-137
+# ============================================================================
+
+- id: EJE-137
+
+  nombre: Inicio de la recepción definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: recepcion.definitiva.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RECEPCION_DEFINITIVA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la ejecución del contrato comenzará el procedimiento de recepción definitiva.
+
+  referencia:
+
+    LCSP_210
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-138
+# ----------------------------------------------------------------------------
+
+- id: EJE-138
+
+  nombre: Verificación de finalización
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      contratoFinalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que todas las prestaciones previstas han sido ejecutadas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-139
+# ----------------------------------------------------------------------------
+
+- id: EJE-139
+
+  nombre: Verificación de cumplimiento íntegro
+
+  prioridad: maxima
+
+  condicion:
+
+    contratoFinalizado: true
+
+  accion:
+
+    verificar:
+
+      cumplimientoTotal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El contrato deberá haberse ejecutado conforme al PCAP y al PPT.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-140
+# ----------------------------------------------------------------------------
+
+- id: EJE-140
+
+  nombre: Comprobación técnica final
+
+  prioridad: maxima
+
+  condicion:
+
+    cumplimientoTotal: true
+
+  accion:
+
+    validar:
+
+      conformidadFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El responsable del contrato verificará la conformidad final.
+
+  referencia:
+
+    LCSP_62
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-141
+# ----------------------------------------------------------------------------
+
+- id: EJE-141
+
+  nombre: Elaboración del acta de recepción definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    conformidadFinal: true
+
+  accion:
+
+    generar:
+
+      actaRecepcionDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el acta de recepción definitiva.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-142
+# ----------------------------------------------------------------------------
+
+- id: EJE-142
+
+  nombre: Registro de reservas finales
+
+  prioridad: alta
+
+  condicion:
+
+    reservasFinales: true
+
+  accion:
+
+    registrar:
+
+      reservasRecepcionDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las reservas formuladas en la recepción definitiva quedarán documentadas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-143
+# ----------------------------------------------------------------------------
+
+- id: EJE-143
+
+  nombre: Inicio del plazo de garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    actaRecepcionDefinitivaGenerada: true
+
+  accion:
+
+    iniciar:
+
+      plazoGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La recepción definitiva iniciará el plazo de garantía cuando proceda.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-144
+# ----------------------------------------------------------------------------
+
+- id: EJE-144
+
+  nombre: Registro de fecha de garantía
+
+  prioridad: alta
+
+  condicion:
+
+    plazoGarantiaIniciado: true
+
+  accion:
+
+    registrar:
+
+      fechaInicioGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El inicio del plazo de garantía quedará registrado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-145
+# ----------------------------------------------------------------------------
+
+- id: EJE-145
+
+  nombre: Liquidación provisional
+
+  prioridad: alta
+
+  condicion:
+
+    actaRecepcionDefinitivaGenerada: true
+
+  accion:
+
+    generar:
+
+      liquidacionProvisional
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema preparará la liquidación provisional del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-146
+# ----------------------------------------------------------------------------
+
+- id: EJE-146
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionProvisionalGenerada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: liquidacion.provisional
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico continuará la tramitación correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-147
+# ----------------------------------------------------------------------------
+
+- id: EJE-147
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaRecepcionDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento de recepción definitiva quedará registrado.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-148
+# ----------------------------------------------------------------------------
+
+- id: EJE-148
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    recepcionDefinitivaFinalizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: recepcion.definitiva.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará con el procedimiento de garantía y cierre del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+recepcionDefinitivaConfig:
+
+  verificarCumplimiento: true
+
+  generarActa: true
+
+  iniciarGarantia: true
+
+  generarLiquidacionProvisional: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 13 DE 20
+# ============================================================================
+
+# ============================================================================
+# LIQUIDACIÓN DEL CONTRATO
+# Artículos 210 y concordantes LCSP
+# ============================================================================
+
+liquidacionContrato:
+
+  activa: true
+
+  calcularSaldoFinal: true
+
+  generarLiquidacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-149
+# ============================================================================
+
+- id: EJE-149
+
+  nombre: Inicio del procedimiento de liquidación
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: recepcion.definitiva.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: LIQUIDACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Tras la recepción definitiva comenzará el procedimiento de liquidación del contrato.
+
+  referencia:
+
+    LCSP_210
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-150
+# ----------------------------------------------------------------------------
+
+- id: EJE-150
+
+  nombre: Verificación de recepción definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      recepcionDefinitivaValida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo podrán liquidarse contratos correctamente recepcionados.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-151
+# ----------------------------------------------------------------------------
+
+- id: EJE-151
+
+  nombre: Obtención de certificaciones
+
+  prioridad: alta
+
+  condicion:
+
+    recepcionDefinitivaValida: true
+
+  accion:
+
+    recuperar:
+
+      certificacionesEmitidas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema recuperará todas las certificaciones emitidas durante la ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-152
+# ----------------------------------------------------------------------------
+
+- id: EJE-152
+
+  nombre: Cálculo del importe ejecutado
+
+  prioridad: maxima
+
+  condicion:
+
+    certificacionesEmitidasRecuperadas: true
+
+  accion:
+
+    calcular:
+
+      importeEjecutado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calculará el importe realmente ejecutado.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-153
+# ----------------------------------------------------------------------------
+
+- id: EJE-153
+
+  nombre: Cálculo del saldo final
+
+  prioridad: maxima
+
+  condicion:
+
+    importeEjecutadoCalculado: true
+
+  accion:
+
+    calcular:
+
+      saldoFinalContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará automáticamente el saldo final del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-154
+# ----------------------------------------------------------------------------
+
+- id: EJE-154
+
+  nombre: Comprobación de compensaciones
+
+  prioridad: alta
+
+  condicion:
+
+    saldoFinalContratoCalculado: true
+
+  accion:
+
+    verificar:
+
+      compensacionesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobarán compensaciones económicas pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-155
+# ----------------------------------------------------------------------------
+
+- id: EJE-155
+
+  nombre: Elaboración de liquidación definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    compensacionesPendientesVerificadas: true
+
+  accion:
+
+    generar:
+
+      liquidacionDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará la liquidación definitiva del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-156
+# ----------------------------------------------------------------------------
+
+- id: EJE-156
+
+  nombre: Validación de liquidación
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionDefinitivaGenerada: true
+
+  accion:
+
+    validar:
+
+      liquidacionCorrecta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará la coherencia económica de la liquidación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-157
+# ----------------------------------------------------------------------------
+
+- id: EJE-157
+
+  nombre: Registro de liquidación
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionCorrecta: true
+
+  accion:
+
+    registrar:
+
+      liquidacionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La liquidación definitiva quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-158
+# ----------------------------------------------------------------------------
+
+- id: EJE-158
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionContratoRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: pago.liquidacion.final
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico tramitará el pago o reintegro correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-159
+# ----------------------------------------------------------------------------
+
+- id: EJE-159
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaLiquidacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento de liquidación quedará registrado.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-160
+# ----------------------------------------------------------------------------
+
+- id: EJE-160
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    liquidacionContratoRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: liquidacion.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la liquidación continuará el procedimiento de garantía.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+liquidacion:
+
+  calcularSaldoFinal: true
+
+  verificarCompensaciones: true
+
+  generarLiquidacion: true
+
+  registrarLiquidacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 14 DE 20
+# ============================================================================
+
+# ============================================================================
+# GARANTÍAS CONTRACTUALES
+# Artículos 110 a 113 LCSP
+# ============================================================================
+
+garantias:
+
+  activa: true
+
+  controlarPlazoGarantia: true
+
+  registrarIncidencias: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-161
+# ============================================================================
+
+- id: EJE-161
+
+  nombre: Inicio del seguimiento del plazo de garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: liquidacion.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: GARANTIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la liquidación comenzará el seguimiento del plazo de garantía.
+
+  referencia:
+
+    LCSP_111
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-162
+# ----------------------------------------------------------------------------
+
+- id: EJE-162
+
+  nombre: Verificación de existencia de garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      garantiaConstituida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará la existencia de garantía definitiva cuando resulte exigible.
+
+  referencia:
+
+    LCSP_107
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-163
+# ----------------------------------------------------------------------------
+
+- id: EJE-163
+
+  nombre: Registro del inicio del plazo
+
+  prioridad: alta
+
+  condicion:
+
+    garantiaConstituida: true
+
+  accion:
+
+    registrar:
+
+      inicioPlazoGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Quedará registrada la fecha de inicio del plazo de garantía.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-164
+# ----------------------------------------------------------------------------
+
+- id: EJE-164
+
+  nombre: Seguimiento periódico
+
+  prioridad: alta
+
+  condicion:
+
+    plazoGarantiaActivo: true
+
+  accion:
+
+    programar:
+
+      revisionesGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Durante el plazo de garantía se efectuarán comprobaciones periódicas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-165
+# ----------------------------------------------------------------------------
+
+- id: EJE-165
+
+  nombre: Registro de defectos detectados
+
+  prioridad: maxima
+
+  condicion:
+
+    defectoDetectado: true
+
+  accion:
+
+    registrar:
+
+      defectoGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda deficiencia detectada durante la garantía será registrada.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-166
+# ----------------------------------------------------------------------------
+
+- id: EJE-166
+
+  nombre: Requerimiento de subsanación
+
+  prioridad: maxima
+
+  condicion:
+
+    defectoGarantiaRegistrado: true
+
+  accion:
+
+    requerir:
+
+      subsanacionContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El contratista será requerido para subsanar los defectos observados.
+
+  referencia:
+
+    LCSP_311
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-167
+# ----------------------------------------------------------------------------
+
+- id: EJE-167
+
+  nombre: Control de subsanación
+
+  prioridad: maxima
+
+  condicion:
+
+    requerimientoEmitido: true
+
+  accion:
+
+    controlar:
+
+      cumplimientoSubsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema controlará el cumplimiento del requerimiento realizado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-168
+# ----------------------------------------------------------------------------
+
+- id: EJE-168
+
+  nombre: Defecto subsanado
+
+  prioridad: alta
+
+  condicion:
+
+    defectoSubsanado: true
+
+  accion:
+
+    cerrar:
+
+      incidenciaGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La incidencia quedará cerrada tras la correcta subsanación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-169
+# ----------------------------------------------------------------------------
+
+- id: EJE-169
+
+  nombre: Incumplimiento del requerimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    defectoSubsanado: false
+
+  accion:
+
+    publicarEvento:
+
+      nombre: garantia.incumplida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El incumplimiento podrá dar lugar a la incautación de la garantía.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-170
+# ----------------------------------------------------------------------------
+
+- id: EJE-170
+
+  nombre: Comprobación de vencimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    plazoGarantiaFinalizado: true
+
+  accion:
+
+    verificar:
+
+      incidenciasPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de finalizar la garantía se comprobará la inexistencia de incidencias pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-171
+# ----------------------------------------------------------------------------
+
+- id: EJE-171
+
+  nombre: Finalización del plazo de garantía
+
+  prioridad: alta
+
+  condicion:
+
+    incidenciasPendientes: false
+
+  accion:
+
+    registrar:
+
+      garantiaFinalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado correctamente el plazo de garantía se registrará su terminación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-172
+# ----------------------------------------------------------------------------
+
+- id: EJE-172
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    garantiaFinalizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: garantia.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine iniciará el procedimiento de devolución o cancelación de la garantía.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+garantia:
+
+  controlarPlazo: true
+
+  registrarDefectos: true
+
+  controlarSubsanacion: true
+
+  registrarIncidencias: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 15 DE 20
+# ============================================================================
+
+# ============================================================================
+# DEVOLUCIÓN O INCAUTACIÓN DE LA GARANTÍA DEFINITIVA
+# Artículos 110 a 113 LCSP
+# ============================================================================
+
+garantiaDefinitiva:
+
+  activa: true
+
+  comprobarIncidencias: true
+
+  resolverAutomaticamente: false
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-173
+# ============================================================================
+
+- id: EJE-173
+
+  nombre: Inicio del procedimiento de devolución de garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: garantia.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: DEVOLUCION_GARANTIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado correctamente el plazo de garantía comenzará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_111
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-174
+# ----------------------------------------------------------------------------
+
+- id: EJE-174
+
+  nombre: Verificación de incidencias pendientes
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      incidenciasGarantiaPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo podrá devolverse la garantía cuando no existan incidencias pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-175
+# ----------------------------------------------------------------------------
+
+- id: EJE-175
+
+  nombre: Comprobación de penalidades pendientes
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciasGarantiaPendientes: false
+
+  accion:
+
+    verificar:
+
+      penalidadesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que no existan penalidades pendientes de ejecución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-176
+# ----------------------------------------------------------------------------
+
+- id: EJE-176
+
+  nombre: Comprobación de daños pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    penalidadesPendientes: false
+
+  accion:
+
+    verificar:
+
+      danosPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará la inexistencia de daños imputables al contratista.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-177
+# ----------------------------------------------------------------------------
+
+- id: EJE-177
+
+  nombre: Propuesta de devolución
+
+  prioridad: alta
+
+  condicion:
+
+    danosPendientes: false
+
+  accion:
+
+    generar:
+
+      propuestaDevolucionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará la propuesta de devolución de la garantía.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-178
+# ----------------------------------------------------------------------------
+
+- id: EJE-178
+
+  nombre: Resolución favorable
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaDevolucionGarantiaGenerada: true
+
+  accion:
+
+    resolver:
+
+      devolucionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente resolverá la devolución de la garantía.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-179
+# ----------------------------------------------------------------------------
+
+- id: EJE-179
+
+  nombre: Propuesta de incautación
+
+  prioridad: maxima
+
+  condicion:
+
+    danosPendientes: true
+
+  accion:
+
+    generar:
+
+      propuestaIncautacionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La existencia de daños podrá justificar la incautación total o parcial de la garantía.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-180
+# ----------------------------------------------------------------------------
+
+- id: EJE-180
+
+  nombre: Determinación del importe
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaIncautacionGarantiaGenerada: true
+
+  accion:
+
+    calcular:
+
+      importeIncautacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calculará el importe objeto de incautación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-181
+# ----------------------------------------------------------------------------
+
+- id: EJE-181
+
+  nombre: Resolución de incautación
+
+  prioridad: maxima
+
+  condicion:
+
+    importeIncautacionCalculado: true
+
+  accion:
+
+    resolver:
+
+      incautacionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente resolverá sobre la incautación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-182
+# ----------------------------------------------------------------------------
+
+- id: EJE-182
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    devolucionGarantiaResuelta: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La resolución será incorporada automáticamente al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-183
+# ----------------------------------------------------------------------------
+
+- id: EJE-183
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: alta
+
+  condicion:
+
+    devolucionGarantiaResuelta: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: garantia.devolver
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico ejecutará la devolución de la garantía.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-184
+# ----------------------------------------------------------------------------
+
+- id: EJE-184
+
+  nombre: Comunicación de incautación
+
+  prioridad: alta
+
+  condicion:
+
+    incautacionGarantiaResuelta: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: garantia.incautada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico ejecutará la incautación aprobada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+devolucionGarantia:
+
+  comprobarIncidencias: true
+
+  comprobarPenalidades: true
+
+  comprobarDanos: true
+
+  generarResolucion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 16 DE 20
+# ============================================================================
+
+# ============================================================================
+# RESOLUCIÓN DEL CONTRATO
+# Artículos 211 a 213 LCSP
+# ============================================================================
+
+resolucionContrato:
+
+  activa: true
+
+  verificarCausas: true
+
+  generarResolucion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-185
+# ============================================================================
+
+- id: EJE-185
+
+  nombre: Inicio del procedimiento de resolución
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: resolucion.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RESOLUCION_CONTRATO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una posible causa de resolución comenzará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-186
+# ----------------------------------------------------------------------------
+
+- id: EJE-186
+
+  nombre: Identificación de la causa
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    clasificar:
+
+      causaResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará automáticamente la causa legal de resolución.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-187
+# ----------------------------------------------------------------------------
+
+- id: EJE-187
+
+  nombre: Verificación jurídica
+
+  prioridad: maxima
+
+  condicion:
+
+    causaResolucionIdentificada: true
+
+  accion:
+
+    verificar:
+
+      causaLegalValida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La resolución únicamente podrá producirse por causas legalmente previstas.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-188
+# ----------------------------------------------------------------------------
+
+- id: EJE-188
+
+  nombre: Solicitud de informes
+
+  prioridad: alta
+
+  condicion:
+
+    causaLegalValida: true
+
+  accion:
+
+    solicitar:
+
+      informesResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se solicitarán los informes preceptivos antes de resolver.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-189
+# ----------------------------------------------------------------------------
+
+- id: EJE-189
+
+  nombre: Trámite de audiencia
+
+  prioridad: maxima
+
+  condicion:
+
+    informesResolucionEmitidos: true
+
+  accion:
+
+    iniciar:
+
+      audienciaResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se concederá audiencia al contratista cuando resulte procedente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-190
+# ----------------------------------------------------------------------------
+
+- id: EJE-190
+
+  nombre: Registro de alegaciones
+
+  prioridad: alta
+
+  condicion:
+
+    audienciaResolucionFinalizada: true
+
+  accion:
+
+    registrar:
+
+      alegacionesResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alegaciones presentadas quedarán incorporadas al expediente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-191
+# ----------------------------------------------------------------------------
+
+- id: EJE-191
+
+  nombre: Valoración de alegaciones
+
+  prioridad: alta
+
+  condicion:
+
+    alegacionesResolucionRegistradas: true
+
+  accion:
+
+    evaluar:
+
+      alegacionesResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alegaciones serán evaluadas antes de dictar resolución.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-192
+# ----------------------------------------------------------------------------
+
+- id: EJE-192
+
+  nombre: Resolución del contrato
+
+  prioridad: maxima
+
+  condicion:
+
+    alegacionesResolucionEvaluadas: true
+
+  accion:
+
+    resolver:
+
+      contrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación resolverá motivadamente el procedimiento.
+
+  referencia:
+
+    LCSP_212
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-193
+# ----------------------------------------------------------------------------
+
+- id: EJE-193
+
+  nombre: Determinación de efectos
+
+  prioridad: maxima
+
+  condicion:
+
+    contratoResuelto: true
+
+  accion:
+
+    calcular:
+
+      efectosResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se determinarán automáticamente los efectos jurídicos y económicos derivados de la resolución.
+
+  referencia:
+
+    LCSP_213
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-194
+# ----------------------------------------------------------------------------
+
+- id: EJE-194
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    efectosResolucionCalculados: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación será incorporada al expediente electrónico.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-195
+# ----------------------------------------------------------------------------
+
+- id: EJE-195
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: alta
+
+  condicion:
+
+    contratoResuelto: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: contrato.resuelto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico iniciará las actuaciones derivadas de la resolución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-196
+# ----------------------------------------------------------------------------
+
+- id: EJE-196
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento quedará registrado para auditoría.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+resolucion:
+
+  verificarCausas: true
+
+  solicitarInformes: true
+
+  tramitarAudiencia: true
+
+  calcularEfectos: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 17 DE 20
+# ============================================================================
+
+# ============================================================================
+# CESIÓN DEL CONTRATO Y SUBCONTRATACIÓN
+# Artículos 214 a 217 LCSP
+# ============================================================================
+
+cesionSubcontratacion:
+
+  activa: true
+
+  controlarCesion: true
+
+  controlarSubcontratacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-197
+# ============================================================================
+
+- id: EJE-197
+
+  nombre: Inicio del procedimiento de cesión
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: cesion.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CESION_CONTRATO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una solicitud de cesión comenzará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_214
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-198
+# ----------------------------------------------------------------------------
+
+- id: EJE-198
+
+  nombre: Verificación de cesión permitida
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      cesionPermitida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La cesión únicamente podrá realizarse cuando concurran los requisitos legales.
+
+  referencia:
+
+    LCSP_214
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-199
+# ----------------------------------------------------------------------------
+
+- id: EJE-199
+
+  nombre: Verificación del cesionario
+
+  prioridad: maxima
+
+  condicion:
+
+    cesionPermitida: true
+
+  accion:
+
+    verificar:
+
+      cesionarioApto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cesionario deberá reunir los requisitos exigidos para contratar.
+
+  referencia:
+
+    LCSP_214
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-200
+# ----------------------------------------------------------------------------
+
+- id: EJE-200
+
+  nombre: Resolución sobre la cesión
+
+  prioridad: maxima
+
+  condicion:
+
+    cesionarioApto: true
+
+  accion:
+
+    resolver:
+
+      cesionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación resolverá la solicitud de cesión.
+
+  referencia:
+
+    LCSP_214
+
+# ============================================================================
+# SUBCONTRATACIÓN
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-201
+# ----------------------------------------------------------------------------
+
+- id: EJE-201
+
+  nombre: Inicio del procedimiento de subcontratación
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: subcontratacion.evaluar
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: SUBCONTRATACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Comunicada una subcontratación comenzará su comprobación.
+
+  referencia:
+
+    LCSP_215
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-202
+# ----------------------------------------------------------------------------
+
+- id: EJE-202
+
+  nombre: Verificación de límites
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      limitesSubcontratacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará el cumplimiento de los límites establecidos en los pliegos y en la LCSP.
+
+  referencia:
+
+    LCSP_215
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-203
+# ----------------------------------------------------------------------------
+
+- id: EJE-203
+
+  nombre: Comprobación del subcontratista
+
+  prioridad: maxima
+
+  condicion:
+
+    limitesSubcontratacionCorrectos: true
+
+  accion:
+
+    verificar:
+
+      subcontratistaValido
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El subcontratista deberá cumplir los requisitos legalmente exigibles.
+
+  referencia:
+
+    LCSP_215
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-204
+# ----------------------------------------------------------------------------
+
+- id: EJE-204
+
+  nombre: Registro del subcontrato
+
+  prioridad: alta
+
+  condicion:
+
+    subcontratistaValido: true
+
+  accion:
+
+    registrar:
+
+      subcontrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La subcontratación quedará incorporada al expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-205
+# ----------------------------------------------------------------------------
+
+- id: EJE-205
+
+  nombre: Control de pagos al subcontratista
+
+  prioridad: alta
+
+  condicion:
+
+    subcontratoRegistrado: true
+
+  accion:
+
+    controlar:
+
+      pagosSubcontratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema realizará el seguimiento de los pagos al subcontratista cuando resulte exigible.
+
+  referencia:
+
+    LCSP_216
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-206
+# ----------------------------------------------------------------------------
+
+- id: EJE-206
+
+  nombre: Detección de incumplimientos
+
+  prioridad: maxima
+
+  condicion:
+
+    incumplimientoSubcontratacion: true
+
+  accion:
+
+    iniciar:
+
+      procedimientoIncumplimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El incumplimiento del régimen de subcontratación iniciará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-207
+# ----------------------------------------------------------------------------
+
+- id: EJE-207
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    cesionContratoResuelta: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La documentación relativa a la cesión quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-208
+# ----------------------------------------------------------------------------
+
+- id: EJE-208
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaCesionSubcontratacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones quedarán registradas para auditoría.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+cesionSubcontratacionConfig:
+
+  verificarCesion: true
+
+  verificarSubcontratacion: true
+
+  controlarPagos: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 18 DE 20
+# ============================================================================
+
+# ============================================================================
+# INCIDENCIAS EXTRAORDINARIAS DURANTE LA EJECUCIÓN
+# LCSP - Fuerza mayor, incidencias excepcionales y gestión de riesgos
+# ============================================================================
+
+incidenciasExtraordinarias:
+
+  activa: true
+
+  evaluarRiesgos: true
+
+  registrarEventos: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-209
+# ============================================================================
+
+- id: EJE-209
+
+  nombre: Detección de incidencia extraordinaria
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: incidencia.extraordinaria
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: INCIDENCIA_EXTRAORDINARIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una incidencia extraordinaria se iniciará automáticamente el procedimiento de evaluación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-210
+# ----------------------------------------------------------------------------
+
+- id: EJE-210
+
+  nombre: Clasificación de la incidencia
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    clasificar:
+
+      tipoIncidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema clasificará automáticamente la naturaleza de la incidencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-211
+# ----------------------------------------------------------------------------
+
+- id: EJE-211
+
+  nombre: Verificación de fuerza mayor
+
+  prioridad: maxima
+
+  condicion:
+
+    tipoIncidencia: FUERZA_MAYOR
+
+  accion:
+
+    verificar:
+
+      requisitosFuerzaMayor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará si concurren circunstancias constitutivas de fuerza mayor.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-212
+# ----------------------------------------------------------------------------
+
+- id: EJE-212
+
+  nombre: Activación del protocolo de emergencia
+
+  prioridad: maxima
+
+  condicion:
+
+    tipoIncidencia: EMERGENCIA
+
+  accion:
+
+    activar:
+
+      protocoloEmergencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Ante una situación de emergencia se activarán los protocolos correspondientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-213
+# ----------------------------------------------------------------------------
+
+- id: EJE-213
+
+  nombre: Registro de órdenes contradictorias
+
+  prioridad: alta
+
+  condicion:
+
+    ordenesContradictorias: true
+
+  accion:
+
+    registrar:
+
+      incidenciaOrdenes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las órdenes contradictorias emitidas durante la ejecución quedarán documentadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-214
+# ----------------------------------------------------------------------------
+
+- id: EJE-214
+
+  nombre: Evaluación del impacto
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciaDetectada: true
+
+  accion:
+
+    calcular:
+
+      impactoIncidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema evaluará automáticamente el impacto técnico, económico y temporal.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-215
+# ----------------------------------------------------------------------------
+
+- id: EJE-215
+
+  nombre: Propuesta de actuación
+
+  prioridad: alta
+
+  condicion:
+
+    impactoIncidenciaCalculado: true
+
+  accion:
+
+    generar:
+
+      propuestaActuacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se propondrá la actuación más adecuada conforme al tipo de incidencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-216
+# ----------------------------------------------------------------------------
+
+- id: EJE-216
+
+  nombre: Resolución de la incidencia
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaActuacionGenerada: true
+
+  accion:
+
+    resolver:
+
+      incidencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente resolverá la incidencia extraordinaria.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-217
+# ----------------------------------------------------------------------------
+
+- id: EJE-217
+
+  nombre: Actualización del plan de riesgos
+
+  prioridad: alta
+
+  condicion:
+
+    incidenciaResuelta: true
+
+  accion:
+
+    actualizar:
+
+      mapaRiesgos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema actualizará automáticamente el mapa de riesgos del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-218
+# ----------------------------------------------------------------------------
+
+- id: EJE-218
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    incidenciaResuelta: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación derivada de la incidencia quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-219
+# ----------------------------------------------------------------------------
+
+- id: EJE-219
+
+  nombre: Registro estadístico
+
+  prioridad: media
+
+  condicion:
+
+    incidenciaResuelta: true
+
+  accion:
+
+    registrar:
+
+      estadisticasIncidencias
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La incidencia alimentará la base histórica para mejorar futuras decisiones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-220
+# ----------------------------------------------------------------------------
+
+- id: EJE-220
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    incidenciaResuelta: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: incidencia.extraordinaria.resuelta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará la ejecución normal del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+incidencias:
+
+  evaluarImpacto: true
+
+  actualizarMapaRiesgos: true
+
+  registrarHistorico: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 19 DE 20
+# ============================================================================
+
+# ============================================================================
+# CIERRE DEFINITIVO DEL CONTRATO
+# Cierre administrativo, económico y documental
+# ============================================================================
+
+cierreContrato:
+
+  activa: true
+
+  verificarIntegridad: true
+
+  generarResumen: true
+
+  archivarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EJE-221
+# ============================================================================
+
+- id: EJE-221
+
+  nombre: Inicio del cierre definitivo
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: liquidacion.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CIERRE_CONTRATO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizadas todas las actuaciones comenzará el cierre definitivo del expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-222
+# ----------------------------------------------------------------------------
+
+- id: EJE-222
+
+  nombre: Verificación de integridad documental
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      expedienteCompleto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente deberá contener toda la documentación obligatoria.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-223
+# ----------------------------------------------------------------------------
+
+- id: EJE-223
+
+  nombre: Verificación de actuaciones pendientes
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteCompleto: true
+
+  accion:
+
+    verificar:
+
+      actuacionesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    No podrá cerrarse el expediente mientras existan actuaciones pendientes.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-224
+# ----------------------------------------------------------------------------
+
+- id: EJE-224
+
+  nombre: Verificación económica
+
+  prioridad: alta
+
+  condicion:
+
+    actuacionesPendientes: false
+
+  accion:
+
+    verificar:
+
+      cierreEconomicoCorrecto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que todos los movimientos económicos estén finalizados.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-225
+# ----------------------------------------------------------------------------
+
+- id: EJE-225
+
+  nombre: Verificación de garantías
+
+  prioridad: alta
+
+  condicion:
+
+    cierreEconomicoCorrecto: true
+
+  accion:
+
+    verificar:
+
+      garantiasFinalizadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará que el procedimiento relativo a la garantía esté completamente finalizado.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-226
+# ----------------------------------------------------------------------------
+
+- id: EJE-226
+
+  nombre: Generación del informe final
+
+  prioridad: maxima
+
+  condicion:
+
+    garantiasFinalizadas: true
+
+  accion:
+
+    generar:
+
+      informeFinalContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema generará automáticamente el informe final del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-227
+# ----------------------------------------------------------------------------
+
+- id: EJE-227
+
+  nombre: Generación de indicadores
+
+  prioridad: alta
+
+  condicion:
+
+    informeFinalContratoGenerado: true
+
+  accion:
+
+    calcular:
+
+      indicadoresContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán los indicadores finales de ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-228
+# ----------------------------------------------------------------------------
+
+- id: EJE-228
+
+  nombre: Actualización de estadísticas
+
+  prioridad: media
+
+  condicion:
+
+    indicadoresContratoCalculados: true
+
+  accion:
+
+    registrar:
+
+      estadisticasContratacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los indicadores alimentarán el sistema estadístico de contratación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-229
+# ----------------------------------------------------------------------------
+
+- id: EJE-229
+
+  nombre: Archivado electrónico
+
+  prioridad: maxima
+
+  condicion:
+
+    estadisticasContratacionRegistradas: true
+
+  accion:
+
+    archivar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente será archivado conforme al Esquema Nacional de Interoperabilidad.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-230
+# ----------------------------------------------------------------------------
+
+- id: EJE-230
+
+  nombre: Sellado temporal
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoArchivado: true
+
+  accion:
+
+    sellar:
+
+      expediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente quedará sellado electrónicamente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-231
+# ----------------------------------------------------------------------------
+
+- id: EJE-231
+
+  nombre: Registro de auditoría final
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteSellado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaFinalContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se registrará la auditoría completa del contrato.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EJE-232
+# ----------------------------------------------------------------------------
+
+- id: EJE-232
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: maxima
+
+  condicion:
+
+    auditoriaFinalContratoRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: contrato.cerrado
+
+  resultado:
+
+    finalizar
+
+  justificar:
+
+    El Workflow Engine marcará el expediente como completamente finalizado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN FINAL DEL MÓDULO
+# ============================================================================
+
+cierre:
+
+  verificarIntegridad: true
+
+  generarInformeFinal: true
+
+  calcularIndicadores: true
+
+  archivarExpediente: true
+
+  registrarAuditoria: true
+
+  comunicarWorkflow: true
+
+# ============================================================================
+# MÉTRICAS DEL MÓDULO
+# ============================================================================
+
+metricas:
+
+  modulo: EJECUCION
+
+  version: 1.0
+
+  reglasTotales: 232
+
+  bloquesPrincipales: 20
+
+  coberturaLCSP:
+
+    ejecucion: true
+
+    modificacion: true
+
+    penalidades: true
+
+    pagos: true
+
+    certificaciones: true
+
+    recepcion: true
+
+    garantia: true
+
+    liquidacion: true
+
+    resolucion: true
+
+    cesion: true
+
+    subcontratacion: true
+
+    incidencias: true
+
+    cierre: true
+
+# ============================================================================
+# FIN DEL ARCHIVO
+# knowledge/rules/ejecucion.rules.yaml
+# ============================================================================
