@@ -1,0 +1,52 @@
+project:
+  name: CONTRATA IA
+  description: Asistente Inteligente para la Elaboración de Expedientes de Contratación Pública
+  organization: Consejería de Empleo - Junta de Andalucía
+
+knowledge:
+  version: 1.0.0
+  release: Sprint-01A
+  status: development
+
+catalog:
+  version: 1.0.0
+  format: yaml
+  architecture: modular
+
+compatibility:
+  minimumApplicationVersion: 1.0.0
+  minimumKnowledgeVersion: 1.0.0
+
+statistics:
+  documentAssets: 0
+  legalRules: 0
+  templates: 0
+  snippets: 0
+  cpvCatalogs: 0
+  legalReferences: 0
+
+lastUpdate:
+  date: 2026-07-30
+  author: ChatGPT
+  sprint: Sprint-01A
+
+principles:
+  - Separación código/conocimiento
+  - Reutilización documental
+  - Versionado completo
+  - Trazabilidad normativa
+  - Arquitectura modular
+  - Explicabilidad de decisiones
+
+roadmap:
+  currentSprint: Sprint-01A
+  nextSprint: Sprint-01B
+  objective: Construcción del Catálogo Maestro
+
+repository:
+  knowledgeRoot: knowledge/
+  catalogRoot: knowledge/catalogo-maestro/
+
+license:
+  owner: Junta de Andalucía
+  project: CONTRATA IA
