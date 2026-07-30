@@ -1,0 +1,286 @@
+# ==========================================================
+# CONTRATA IA
+# MÓDULO DE CONOCIMIENTO
+# MEMORIA JUSTIFICATIVA
+# BLOQUE: NECESIDAD DEL CONTRATO
+# ==========================================================
+
+schema: CONTRATAIA.ACTIVO.1.0
+
+identificacion:
+
+  id: MEMORIA.NECESIDAD
+
+  codigo: MEM.NEC
+
+  titulo: Justificación de la necesidad del contrato
+
+  categoria: MEMORIA
+
+  subcategoria: NECESIDAD
+
+  tipo: ACTIVO_DOCUMENTAL
+
+versionado:
+
+  version: 1.0.0
+
+  estado: vigente
+
+  autor: CONTRATA IA
+
+  fechaCreacion: 2026-07-30
+
+  fechaRevision: 2026-07-30
+
+descripcion: >
+
+  Este módulo contiene el conocimiento necesario para construir la
+  justificación de la necesidad de un contrato administrativo conforme
+  a la Ley 9/2017 de Contratos del Sector Público.
+
+objetivo:
+
+  principal: >
+
+    Justificar documentalmente la existencia de una necesidad pública
+    cuya satisfacción requiere la celebración de un contrato.
+
+  secundarios:
+
+    - Garantizar la motivación del expediente.
+
+    - Justificar el interés público.
+
+    - Servir de base para el resto del expediente.
+
+aplicabilidad:
+
+  contratos:
+
+    - servicios
+
+    - suministros
+
+    - obras
+
+    - concesion_servicios
+
+    - concesion_obras
+
+    - mixto
+
+  procedimientos:
+
+    - abierto
+
+    - abierto_simplificado
+
+    - abierto_simplificado_abreviado
+
+    - negociado
+
+    - menor
+
+referenciasNormativas:
+
+  principal:
+
+    ley: Ley 9/2017
+
+    articulo: 28
+
+    descripcion: Necesidad e idoneidad del contrato
+
+  complementarias:
+
+    - Ley 39/2015
+
+    - Ley 40/2015
+
+    - Principios de buena administración
+
+conceptos:
+
+  necesidad:
+
+    descripcion: >
+
+      Carencia objetiva cuya satisfacción resulta imprescindible para
+      garantizar el funcionamiento del servicio público.
+
+  interesPublico:
+
+    descripcion: >
+
+      Finalidad pública perseguida mediante la contratación.
+
+  eficiencia:
+
+    descripcion: >
+
+      La solución contractual debe ser la alternativa más eficiente
+      para satisfacer la necesidad detectada.
+
+variables:
+
+  necesitaJustificacionInsuficiencia:
+
+    tipo: boolean
+
+    defecto: true
+
+  requiereCPV:
+
+    tipo: boolean
+
+    defecto: true
+
+  admiteLotes:
+
+    tipo: boolean
+
+    defecto: true
+
+dependencias:
+
+  previas:
+
+    - OBJETO
+
+    - UNIDAD_PROPONENTE
+
+  posteriores:
+
+    - CPV
+
+    - PROCEDIMIENTO
+
+    - LOTES
+
+reglasSeleccion:
+
+  - id: NEC-001
+
+    descripcion: >
+
+      Toda memoria deberá incorporar un bloque de necesidad.
+
+    prioridad: 100
+
+  - id: NEC-002
+
+    descripcion: >
+
+      La necesidad deberá describirse de forma objetiva.
+
+    prioridad: 95
+
+  - id: NEC-003
+
+    descripcion: >
+
+      No se admitirán expresiones genéricas sin relación con el objeto
+      contractual.
+
+    prioridad: 90
+
+  - id: NEC-004
+
+    descripcion: >
+
+      La necesidad deberá guardar coherencia con el objeto del contrato.
+
+    prioridad: 90
+
+criteriosCalidad:
+
+  claridad:
+
+    obligatorio: true
+
+  concrecion:
+
+    obligatorio: true
+
+  coherencia:
+
+    obligatorio: true
+
+  objetividad:
+
+    obligatorio: true
+
+  motivacion:
+
+    obligatorio: true
+
+variantes:
+
+  generica:
+
+    descripcion: >
+
+      Variante utilizada cuando todavía no se dispone de información
+      específica del expediente.
+
+  servicios:
+
+    descripcion: >
+
+      Variante específica para contratos de servicios.
+
+  suministros:
+
+    descripcion: >
+
+      Variante específica para contratos de suministro.
+
+  obras:
+
+    descripcion: >
+
+      Variante específica para contratos de obras.
+
+  concesiones:
+
+    descripcion: >
+
+      Variante específica para concesiones.
+
+bloquesDocumentales:
+
+  introduccion:
+
+    obligatorio: true
+
+  descripcionNecesidad:
+
+    obligatorio: true
+
+  interesPublico:
+
+    obligatorio: true
+
+  conclusion:
+
+    obligatorio: true
+
+textos:
+
+  introduccion:
+
+    base: |
+
+      La presente memoria tiene por objeto justificar la necesidad de
+      celebrar el contrato propuesto, de conformidad con lo previsto en
+      el artículo 28 de la Ley 9/2017, de 8 de noviembre, de Contratos
+      del Sector Público.
+
+  interesPublico:
+
+    base: |
+
+      La actuación proyectada responde a una necesidad vinculada al
+      interés público cuya satisfacción resulta imprescindible para el
+      adecuado funcionamiento del servicio.
