@@ -1,0 +1,7371 @@
+# ============================================================================
+# CONTRATA IA
+# RULE.EVALUACION
+# Motor Central de Evaluación de Ofertas
+# ============================================================================
+#
+# Versión: 1.0.0
+# Estado: DESARROLLO
+#
+# Este motor coordina todo el proceso de evaluación de ofertas conforme a la
+# Ley 9/2017, de Contratos del Sector Público (LCSP).
+#
+# No calcula únicamente puntuaciones.
+#
+# Actúa como orquestador de todos los motores jurídicos:
+#
+#   • RULE.OBJETO
+#   • RULE.PROCEDIMIENTO
+#   • RULE.SOLVENCIA
+#   • RULE.CRITERIOS
+#   • RULE.PCAP
+#   • RULE.PPT
+#   • RULE.MEMORIA
+#   • RULE.EXPEDIENTE
+#
+# Además coordina:
+#
+#   • Workflow Engine
+#   • Auditor Jurídico IA
+#   • Motor IA
+#
+# ============================================================================
+
+modulo:
+
+  id: RULE.EVALUACION
+
+  nombre: Motor Central de Evaluación
+
+  version: "1.0.0"
+
+  estado: DESARROLLO
+
+# ============================================================================
+# OBJETIVO
+# ============================================================================
+
+objetivo:
+
+  descripcion: >
+
+    Coordinar íntegramente el procedimiento de evaluación de ofertas,
+    aplicando automáticamente la LCSP y las reglas definidas por los
+    distintos motores de CONTRATA IA.
+
+# ============================================================================
+# FUNCIONES PRINCIPALES
+# ============================================================================
+
+funciones:
+
+  - Recepción de ofertas
+
+  - Validación documental
+
+  - Gestión de subsanaciones
+
+  - Validación de solvencia
+
+  - Ejecución de criterios automáticos
+
+  - Gestión del juicio de valor
+
+  - Integración de puntuaciones
+
+  - Gestión de empates
+
+  - Gestión de ofertas anormalmente bajas
+
+  - Clasificación automática
+
+  - Generación de propuesta de adjudicación
+
+  - Auditoría
+
+  - Explicabilidad
+
+  - Certificación
+
+# ============================================================================
+# MOTORES CON LOS QUE INTERACTÚA
+# ============================================================================
+
+dependencias:
+
+  consultar:
+
+    - RULE.OBJETO
+
+    - RULE.PROCEDIMIENTO
+
+    - RULE.SOLVENCIA
+
+    - RULE.CRITERIOS
+
+    - RULE.PCAP
+
+    - RULE.PPT
+
+    - RULE.MEMORIA
+
+    - RULE.EXPEDIENTE
+
+# ============================================================================
+# EVENTOS DE ENTRADA
+# ============================================================================
+
+eventosEntrada:
+
+  - expediente.iniciado
+
+  - procedimiento.validado
+
+  - objeto.validado
+
+  - solvencia.validada
+
+  - criterios.validados
+
+  - ofertas.recibidas
+
+# ============================================================================
+# EVENTOS DE SALIDA
+# ============================================================================
+
+eventosSalida:
+
+  - evaluacion.iniciada
+
+  - ofertas.validadas
+
+  - puntuaciones.calculadas
+
+  - clasificacion.generada
+
+  - propuesta.adjudicacion
+
+  - workflow.actualizar
+
+  - auditoria.actualizada
+
+# ============================================================================
+# MÁQUINA DE ESTADOS
+# ============================================================================
+
+estados:
+
+  - INICIAL
+
+  - RECEPCION_OFERTAS
+
+  - VALIDACION_DOCUMENTAL
+
+  - SUBSANACION
+
+  - VALIDACION_SOLVENCIA
+
+  - EVALUACION_AUTOMATICA
+
+  - JUICIO_VALOR
+
+  - INTEGRACION
+
+  - EMPATES
+
+  - OFERTAS_ANORMALMENTE_BAJAS
+
+  - CLASIFICACION
+
+  - PROPUESTA_ADJUDICACION
+
+  - FINALIZADO
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  workflowAutomatico: true
+
+  auditoriaAutomatica: true
+
+  explicabilidadAutomatica: true
+
+  registrarEventos: true
+
+  generarMetricas: true
+
+# ============================================================================
+# REGLAS DEL MOTOR
+# ============================================================================
+
+- id: EVA-001
+
+  nombre: Inicio del proceso de evaluación
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteCompleto: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RECEPCION_OFERTAS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La evaluación únicamente podrá iniciarse cuando el expediente se
+    encuentre completo y preparado para recibir ofertas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+
+- id: EVA-002
+
+  nombre: Publicación del evento de inicio
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: RECEPCION_OFERTAS
+
+  accion:
+
+    publicarEvento:
+
+      nombre: evaluacion.iniciada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El inicio de la evaluación será comunicado automáticamente al resto
+    de motores del sistema.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+
+- id: EVA-003
+
+  nombre: Inicialización de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    estadoActual: RECEPCION_OFERTAS
+
+  accion:
+
+    iniciarAuditoria: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el proceso de evaluación quedará auditado desde su inicio.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+
+- id: EVA-004
+
+  nombre: Inicialización del registro de explicabilidad
+
+  prioridad: alta
+
+  condicion:
+
+    estadoActual: RECEPCION_OFERTAS
+
+  accion:
+
+    iniciarExplicabilidad: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Desde el inicio se registrarán todas las decisiones tomadas por el
+    motor para garantizar su completa explicabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+motor:
+
+  maquinaEstados: true
+
+  workflow: true
+
+  eventos: true
+
+  auditoria: true
+
+  explicabilidad: true
+
+  certificacion: true
+
+# ============================================================================
+# FIN PARTE 1 DE 20
+# ============================================================================
+
+# ============================================================================
+# RECEPCIÓN Y REGISTRO DE OFERTAS
+# ============================================================================
+
+recepcionOfertas:
+
+  activa: true
+
+  requiereRegistroEntrada: true
+
+  verificarPlazoPresentacion: true
+
+  verificarIntegridadDocumental: true
+
+# ============================================================================
+# REGLA EVA-005
+# ============================================================================
+
+- id: EVA-005
+
+  nombre: Recepción de ofertas
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ofertas.recibidas
+
+  accion:
+
+    registrarOfertas: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda oferta recibida deberá registrarse automáticamente en el expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-006
+# ----------------------------------------------------------------------------
+
+- id: EVA-006
+
+  nombre: Comprobación del plazo
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    comprobar:
+
+      plazoPresentacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que la oferta ha sido presentada dentro del plazo.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-007
+# ----------------------------------------------------------------------------
+
+- id: EVA-007
+
+  nombre: Oferta presentada fuera de plazo
+
+  prioridad: maxima
+
+  condicion:
+
+    fueraPlazo: true
+
+  accion:
+
+    excluirOferta: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Las ofertas presentadas fuera del plazo legal no podrán admitirse.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-008
+# ----------------------------------------------------------------------------
+
+- id: EVA-008
+
+  nombre: Registro de fecha y hora
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      fechaHoraEntrada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se registrará la fecha y hora oficial de recepción.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-009
+# ----------------------------------------------------------------------------
+
+- id: EVA-009
+
+  nombre: Registro del licitador
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      identificacionLicitador
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada oferta quedará vinculada al licitador correspondiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-010
+# ----------------------------------------------------------------------------
+
+- id: EVA-010
+
+  nombre: Generación del identificador interno
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    generar:
+
+      idOferta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada oferta dispondrá de un identificador único dentro del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-011
+# ----------------------------------------------------------------------------
+
+- id: EVA-011
+
+  nombre: Comprobación de documentación presentada
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      documentacionPresentada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará la existencia de toda la documentación exigida.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-012
+# ----------------------------------------------------------------------------
+
+- id: EVA-012
+
+  nombre: Registro documental
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      documentosRecibidos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los documentos aportados quedarán asociados al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-013
+# ----------------------------------------------------------------------------
+
+- id: EVA-013
+
+  nombre: Publicación del evento de validación inicial
+
+  prioridad: media
+
+  condicion:
+
+    documentacionRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: ofertas.registradas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el registro inicial comenzará la validación documental.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+recepcion:
+
+  registrarMetadatos: true
+
+  registrarHuellaDigital: true
+
+  registrarHoraServidor: true
+
+  registrarUsuario: true
+
+  auditoriaCompleta: true
+
+# ============================================================================
+# FIN PARTE 2 DE 20
+# ============================================================================
+
+# ============================================================================
+# VALIDACIÓN ADMINISTRATIVA DE LAS OFERTAS
+# ============================================================================
+
+validacionAdministrativa:
+
+  activa: true
+
+  permitirSubsanacion: true
+
+  validarFirmaElectronica: true
+
+  validarRepresentacion: true
+
+# ============================================================================
+# REGLA EVA-014
+# ============================================================================
+
+- id: EVA-014
+
+  nombre: Inicio de validación administrativa
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ofertas.registradas
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: VALIDACION_DOCUMENTAL
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Tras registrar las ofertas comienza la comprobación administrativa.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-015
+# ----------------------------------------------------------------------------
+
+- id: EVA-015
+
+  nombre: Comprobación del DEUC o declaración responsable
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      deucPresentado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará la existencia del DEUC o de la declaración responsable exigible.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-016
+# ----------------------------------------------------------------------------
+
+- id: EVA-016
+
+  nombre: Validación de firma electrónica
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      firmaElectronicaValida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación deberá encontrarse firmada electrónicamente cuando proceda.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-017
+# ----------------------------------------------------------------------------
+
+- id: EVA-017
+
+  nombre: Comprobación de representación
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      poderesRepresentacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que quien presenta la oferta dispone de representación suficiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-018
+# ----------------------------------------------------------------------------
+
+- id: EVA-018
+
+  nombre: Comprobación de garantía provisional
+
+  prioridad: alta
+
+  condicion:
+
+    garantiaProvisionalExigida: true
+
+  accion:
+
+    verificar:
+
+      garantiaPresentada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando los pliegos exijan garantía provisional se comprobará su aportación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-019
+# ----------------------------------------------------------------------------
+
+- id: EVA-019
+
+  nombre: Detección de defectos subsanables
+
+  prioridad: maxima
+
+  condicion:
+
+    defectoSubsanable: true
+
+  accion:
+
+    generarRequerimientoSubsanacion: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los defectos subsanables darán lugar al correspondiente requerimiento.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-020
+# ----------------------------------------------------------------------------
+
+- id: EVA-020
+
+  nombre: Detección de defectos no subsanables
+
+  prioridad: maxima
+
+  condicion:
+
+    defectoNoSubsanable: true
+
+  accion:
+
+    proponerExclusion: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Los defectos no subsanables impedirán la admisión de la oferta.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-021
+# ----------------------------------------------------------------------------
+
+- id: EVA-021
+
+  nombre: Registro de incidencias administrativas
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      incidenciasAdministrativas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las incidencias detectadas quedarán registradas para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-022
+# ----------------------------------------------------------------------------
+
+- id: EVA-022
+
+  nombre: Finalización de la validación administrativa
+
+  prioridad: media
+
+  condicion:
+
+    validacionAdministrativaCorrecta: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: validacion.administrativa.superada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Superada la validación administrativa continuará la evaluación de las ofertas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+validacion:
+
+  comprobarFirmas: true
+
+  comprobarRepresentacion: true
+
+  comprobarDocumentacion: true
+
+  permitirSubsanaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 3 DE 20
+# ============================================================================
+
+# ============================================================================
+# GESTIÓN DEL PROCEDIMIENTO DE SUBSANACIÓN
+# ============================================================================
+
+subsanacion:
+
+  activa: true
+
+  controlarPlazos: true
+
+  registrarRequerimientos: true
+
+  registrarRespuesta: true
+
+# ============================================================================
+# REGLA EVA-023
+# ============================================================================
+
+- id: EVA-023
+
+  nombre: Inicio del procedimiento de subsanación
+
+  prioridad: maxima
+
+  condicion:
+
+    defectoSubsanable: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: SUBSANACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectado un defecto subsanable se iniciará el procedimiento de subsanación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-024
+# ----------------------------------------------------------------------------
+
+- id: EVA-024
+
+  nombre: Generación automática del requerimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: SUBSANACION
+
+  accion:
+
+    generar:
+
+      requerimientoSubsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el requerimiento de subsanación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-025
+# ----------------------------------------------------------------------------
+
+- id: EVA-025
+
+  nombre: Cálculo automático del plazo
+
+  prioridad: maxima
+
+  condicion:
+
+    requerimientoGenerado: true
+
+  accion:
+
+    calcular:
+
+      plazoSubsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El plazo de subsanación será calculado automáticamente conforme a la normativa y a los pliegos.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-026
+# ----------------------------------------------------------------------------
+
+- id: EVA-026
+
+  nombre: Registro del requerimiento
+
+  prioridad: alta
+
+  condicion:
+
+    requerimientoGenerado: true
+
+  accion:
+
+    registrar:
+
+      requerimientoEmitido
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El requerimiento quedará incorporado al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-027
+# ----------------------------------------------------------------------------
+
+- id: EVA-027
+
+  nombre: Recepción de documentación subsanada
+
+  prioridad: alta
+
+  condicion:
+
+    documentacionRecibida: true
+
+  accion:
+
+    registrar:
+
+      documentacionSubsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación presentada durante la subsanación quedará registrada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-028
+# ----------------------------------------------------------------------------
+
+- id: EVA-028
+
+  nombre: Verificación de la documentación aportada
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionRecibida: true
+
+  accion:
+
+    verificar:
+
+      subsanacionCorrecta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que la documentación presentada corrige el defecto detectado.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-029
+# ----------------------------------------------------------------------------
+
+- id: EVA-029
+
+  nombre: Subsanación correcta
+
+  prioridad: maxima
+
+  condicion:
+
+    subsanacionCorrecta: true
+
+  accion:
+
+    admitirOferta: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Si la subsanación es correcta la oferta continuará en el procedimiento.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-030
+# ----------------------------------------------------------------------------
+
+- id: EVA-030
+
+  nombre: Subsanación incorrecta
+
+  prioridad: maxima
+
+  condicion:
+
+    subsanacionCorrecta: false
+
+  accion:
+
+    excluirOferta: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    Si la subsanación no corrige el defecto la oferta será propuesta para exclusión.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-031
+# ----------------------------------------------------------------------------
+
+- id: EVA-031
+
+  nombre: Finalización del plazo sin respuesta
+
+  prioridad: maxima
+
+  condicion:
+
+    plazoSubsanacionFinalizado: true
+
+    documentacionRecibida: false
+
+  accion:
+
+    excluirOferta: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La falta de respuesta dentro del plazo implicará la exclusión cuando proceda.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-032
+# ----------------------------------------------------------------------------
+
+- id: EVA-032
+
+  nombre: Comunicación del resultado
+
+  prioridad: media
+
+  condicion:
+
+    procedimientoSubsanacionFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: subsanacion.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el procedimiento continuará la siguiente fase de evaluación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+subsanaciones:
+
+  generarPlantillas: true
+
+  controlarPlazos: true
+
+  registrarNotificaciones: true
+
+  registrarRespuesta: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 4 DE 20
+# ============================================================================
+
+# ============================================================================
+# ADMISIÓN Y EXCLUSIÓN DEFINITIVA DE OFERTAS
+# ============================================================================
+
+admisionOfertas:
+
+  activa: true
+
+  generarActa: true
+
+  motivacionObligatoria: true
+
+# ============================================================================
+# REGLA EVA-033
+# ============================================================================
+
+- id: EVA-033
+
+  nombre: Inicio de admisión definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: subsanacion.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: ADMISION_OFERTAS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el procedimiento de subsanación se iniciará la admisión definitiva de las ofertas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-034
+# ----------------------------------------------------------------------------
+
+- id: EVA-034
+
+  nombre: Comprobación final de requisitos administrativos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      requisitosAdministrativosCumplidos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de admitir definitivamente una oferta deberán verificarse todos los requisitos administrativos.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-035
+# ----------------------------------------------------------------------------
+
+- id: EVA-035
+
+  nombre: Admisión definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    requisitosAdministrativosCumplidos: true
+
+  accion:
+
+    admitirOferta: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cumplidos todos los requisitos la oferta será admitida para su valoración.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-036
+# ----------------------------------------------------------------------------
+
+- id: EVA-036
+
+  nombre: Exclusión definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    requisitosAdministrativosCumplidos: false
+
+  accion:
+
+    excluirOferta: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La oferta que no cumpla los requisitos administrativos será excluida.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-037
+# ----------------------------------------------------------------------------
+
+- id: EVA-037
+
+  nombre: Motivación automática de la exclusión
+
+  prioridad: maxima
+
+  condicion:
+
+    ofertaExcluida: true
+
+  accion:
+
+    generar:
+
+      motivacionExclusion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda exclusión deberá encontrarse debidamente motivada.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-038
+# ----------------------------------------------------------------------------
+
+- id: EVA-038
+
+  nombre: Elaboración automática del acta de admisión
+
+  prioridad: alta
+
+  condicion:
+
+    procesoAdmisionFinalizado: true
+
+  accion:
+
+    generar:
+
+      actaAdmision
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el acta de admisión y exclusión de ofertas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-039
+# ----------------------------------------------------------------------------
+
+- id: EVA-039
+
+  nombre: Registro de ofertas admitidas
+
+  prioridad: alta
+
+  condicion:
+
+    procesoAdmisionFinalizado: true
+
+  accion:
+
+    registrar:
+
+      ofertasAdmitidas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las ofertas admitidas quedarán registradas para iniciar la valoración.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-040
+# ----------------------------------------------------------------------------
+
+- id: EVA-040
+
+  nombre: Registro de ofertas excluidas
+
+  prioridad: alta
+
+  condicion:
+
+    procesoAdmisionFinalizado: true
+
+  accion:
+
+    registrar:
+
+      ofertasExcluidas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las ofertas excluidas quedarán registradas junto con su motivación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-041
+# ----------------------------------------------------------------------------
+
+- id: EVA-041
+
+  nombre: Publicación del evento de admisión
+
+  prioridad: media
+
+  condicion:
+
+    procesoAdmisionFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: ofertas.admitidas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El motor comunicará que únicamente las ofertas admitidas continuarán la evaluación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-042
+# ----------------------------------------------------------------------------
+
+- id: EVA-042
+
+  nombre: Preparación para valoración
+
+  prioridad: media
+
+  condicion:
+
+    evento: ofertas.admitidas
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: VALIDACION_SOLVENCIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la admisión comenzará la comprobación definitiva de solvencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+admision:
+
+  generarActa: true
+
+  registrarMotivaciones: true
+
+  registrarAuditoria: true
+
+  publicarEventos: true
+
+  generarExplicabilidad: true
+
+# ============================================================================
+# FIN PARTE 5 DE 20
+# ============================================================================
+
+# ============================================================================
+# VALIDACIÓN DEFINITIVA DE LA SOLVENCIA
+# Integración con RULE.SOLVENCIA
+# ============================================================================
+
+validacionSolvencia:
+
+  activa: true
+
+  utilizarRuleEngine: true
+
+  bloquearOfertasNoSolventes: true
+
+# ============================================================================
+# REGLA EVA-043
+# ============================================================================
+
+- id: EVA-043
+
+  nombre: Inicio de comprobación de solvencia
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ofertas.admitidas
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: VALIDACION_SOLVENCIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Una vez admitidas las ofertas comenzará la comprobación definitiva de la solvencia.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-044
+# ----------------------------------------------------------------------------
+
+- id: EVA-044
+
+  nombre: Consulta del motor RULE.SOLVENCIA
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    ejecutarMotor:
+
+      nombre: RULE.SOLVENCIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La comprobación será realizada por el motor especializado de solvencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-045
+# ----------------------------------------------------------------------------
+
+- id: EVA-045
+
+  nombre: Verificación de solvencia económica
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      solvenciaEconomica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará el cumplimiento de la solvencia económica exigida.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-046
+# ----------------------------------------------------------------------------
+
+- id: EVA-046
+
+  nombre: Verificación de solvencia técnica
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      solvenciaTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará el cumplimiento de la solvencia técnica o profesional.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-047
+# ----------------------------------------------------------------------------
+
+- id: EVA-047
+
+  nombre: Solvencia acreditada
+
+  prioridad: maxima
+
+  condicion:
+
+    solvenciaCorrecta: true
+
+  accion:
+
+    marcar:
+
+      ofertaSolvente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La oferta podrá continuar la evaluación al acreditarse la solvencia exigida.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-048
+# ----------------------------------------------------------------------------
+
+- id: EVA-048
+
+  nombre: Solvencia no acreditada
+
+  prioridad: maxima
+
+  condicion:
+
+    solvenciaCorrecta: false
+
+  accion:
+
+    excluirOferta: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La falta de acreditación de la solvencia impedirá continuar en el procedimiento.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-049
+# ----------------------------------------------------------------------------
+
+- id: EVA-049
+
+  nombre: Generación de informe de solvencia
+
+  prioridad: alta
+
+  condicion:
+
+    comprobacionFinalizada: true
+
+  accion:
+
+    generar:
+
+      informeSolvencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el informe de comprobación de solvencia.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-050
+# ----------------------------------------------------------------------------
+
+- id: EVA-050
+
+  nombre: Registro de comprobaciones
+
+  prioridad: alta
+
+  condicion:
+
+    comprobacionFinalizada: true
+
+  accion:
+
+    registrar:
+
+      comprobacionesSolvencia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las verificaciones realizadas quedarán registradas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-051
+# ----------------------------------------------------------------------------
+
+- id: EVA-051
+
+  nombre: Publicación del resultado
+
+  prioridad: media
+
+  condicion:
+
+    comprobacionFinalizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: solvencia.validada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El resultado de la comprobación será comunicado al resto de motores.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-052
+# ----------------------------------------------------------------------------
+
+- id: EVA-052
+
+  nombre: Preparación para valoración automática
+
+  prioridad: media
+
+  condicion:
+
+    evento: solvencia.validada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EVALUACION_AUTOMATICA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Superada la comprobación de solvencia comenzará la valoración automática de las ofertas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+solvencia:
+
+  utilizarMotorEspecializado: true
+
+  generarInformes: true
+
+  registrarAuditoria: true
+
+  publicarEventos: true
+
+  generarExplicabilidad: true
+
+# ============================================================================
+# FIN PARTE 6 DE 20
+# ============================================================================
+
+# ============================================================================
+# VALORACIÓN AUTOMÁTICA
+# Criterios evaluables mediante fórmulas
+# Integración con RULE.CRITERIOS
+# ============================================================================
+
+valoracionAutomatica:
+
+  activa: true
+
+  utilizarMotorCriterios: true
+
+  registrarCalculos: true
+
+# ============================================================================
+# REGLA EVA-053
+# ============================================================================
+
+- id: EVA-053
+
+  nombre: Inicio de valoración automática
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: solvencia.validada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EVALUACION_AUTOMATICA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La valoración automática únicamente comenzará tras superar la comprobación de solvencia.
+
+  referencia:
+
+    LCSP_145
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-054
+# ----------------------------------------------------------------------------
+
+- id: EVA-054
+
+  nombre: Consulta del motor RULE.CRITERIOS
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    ejecutarMotor:
+
+      nombre: RULE.CRITERIOS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las fórmulas de valoración serán ejecutadas por el motor especializado de criterios.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-055
+# ----------------------------------------------------------------------------
+
+- id: EVA-055
+
+  nombre: Obtención de criterios automáticos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    cargar:
+
+      criteriosAutomaticos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema recuperará únicamente los criterios evaluables mediante fórmulas.
+
+  referencia:
+
+    LCSP_145
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-056
+# ----------------------------------------------------------------------------
+
+- id: EVA-056
+
+  nombre: Aplicación de fórmulas
+
+  prioridad: maxima
+
+  condicion:
+
+    criteriosAutomaticosDisponibles: true
+
+  accion:
+
+    calcular:
+
+      puntuacionAutomatica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación objetiva será calculada conforme a las fórmulas previstas en los pliegos.
+
+  referencia:
+
+    LCSP_145
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-057
+# ----------------------------------------------------------------------------
+
+- id: EVA-057
+
+  nombre: Validación matemática
+
+  prioridad: maxima
+
+  condicion:
+
+    calculoRealizado: true
+
+  accion:
+
+    verificar:
+
+      resultadoMatematico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los cálculos serán comprobados automáticamente antes de aceptarse.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-058
+# ----------------------------------------------------------------------------
+
+- id: EVA-058
+
+  nombre: Registro del cálculo
+
+  prioridad: alta
+
+  condicion:
+
+    calculoCorrecto: true
+
+  accion:
+
+    registrar:
+
+      puntuacionAutomatica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada cálculo quedará registrado para garantizar su trazabilidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-059
+# ----------------------------------------------------------------------------
+
+- id: EVA-059
+
+  nombre: Registro de fórmula utilizada
+
+  prioridad: alta
+
+  condicion:
+
+    calculoCorrecto: true
+
+  accion:
+
+    registrar:
+
+      formulaAplicada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema almacenará la fórmula concreta utilizada para cada criterio.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-060
+# ----------------------------------------------------------------------------
+
+- id: EVA-060
+
+  nombre: Explicación automática del cálculo
+
+  prioridad: alta
+
+  condicion:
+
+    calculoCorrecto: true
+
+  accion:
+
+    generar:
+
+      explicacionCalculo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación obtenida irá acompañada de una explicación automática.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-061
+# ----------------------------------------------------------------------------
+
+- id: EVA-061
+
+  nombre: Auditoría del cálculo
+
+  prioridad: media
+
+  condicion:
+
+    calculoCorrecto: true
+
+  accion:
+
+    registrar:
+
+      auditoriaCalculo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las operaciones matemáticas quedarán registradas para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-062
+# ----------------------------------------------------------------------------
+
+- id: EVA-062
+
+  nombre: Finalización de la valoración automática
+
+  prioridad: media
+
+  condicion:
+
+    valoracionAutomaticaFinalizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: valoracion.automatica.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la valoración objetiva comenzará la evaluación de los criterios sujetos a juicio de valor.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+valoracion:
+
+  ejecutarFormulas: true
+
+  validarResultados: true
+
+  registrarFormulas: true
+
+  generarExplicaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 7 DE 20
+# ============================================================================
+
+# ============================================================================
+# EVALUACIÓN DE CRITERIOS SUJETOS A JUICIO DE VALOR
+# Integración con Comisión Técnica / Mesa de Contratación
+# ============================================================================
+
+juicioValor:
+
+  activa: true
+
+  requiereInformeTecnico: true
+
+  registrarMotivacion: true
+
+  auditoriaCompleta: true
+
+# ============================================================================
+# REGLA EVA-063
+# ============================================================================
+
+- id: EVA-063
+
+  nombre: Inicio del juicio de valor
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: valoracion.automatica.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: JUICIO_VALOR
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la valoración automática comenzará la evaluación de los criterios sujetos a juicio de valor.
+
+  referencia:
+
+    LCSP_146
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-064
+# ----------------------------------------------------------------------------
+
+- id: EVA-064
+
+  nombre: Obtención de criterios subjetivos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    cargar:
+
+      criteriosJuicioValor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se recuperarán únicamente los criterios definidos como juicio de valor.
+
+  referencia:
+
+    LCSP_146
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-065
+# ----------------------------------------------------------------------------
+
+- id: EVA-065
+
+  nombre: Asignación a comisión técnica
+
+  prioridad: maxima
+
+  condicion:
+
+    criteriosJuicioValorDisponibles: true
+
+  accion:
+
+    asignar:
+
+      evaluadorTecnico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios subjetivos serán evaluados por el órgano técnico competente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-066
+# ----------------------------------------------------------------------------
+
+- id: EVA-066
+
+  nombre: Registro del evaluador
+
+  prioridad: alta
+
+  condicion:
+
+    evaluadorAsignado: true
+
+  accion:
+
+    registrar:
+
+      evaluadorResponsable
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Quedará identificado el responsable de la valoración técnica.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-067
+# ----------------------------------------------------------------------------
+
+- id: EVA-067
+
+  nombre: Registro de puntuaciones técnicas
+
+  prioridad: maxima
+
+  condicion:
+
+    informeTecnicoEmitido: true
+
+  accion:
+
+    registrar:
+
+      puntuacionesTecnicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las puntuaciones otorgadas por el órgano técnico serán registradas íntegramente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-068
+# ----------------------------------------------------------------------------
+
+- id: EVA-068
+
+  nombre: Registro de motivaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    informeTecnicoEmitido: true
+
+  accion:
+
+    registrar:
+
+      motivacionesTecnicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda puntuación deberá encontrarse suficientemente motivada.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-069
+# ----------------------------------------------------------------------------
+
+- id: EVA-069
+
+  nombre: Validación de coherencia
+
+  prioridad: alta
+
+  condicion:
+
+    informeTecnicoEmitido: true
+
+  accion:
+
+    verificar:
+
+      coherenciaValoracionTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema verificará la coherencia entre la puntuación y su motivación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-070
+# ----------------------------------------------------------------------------
+
+- id: EVA-070
+
+  nombre: Detección de inconsistencias
+
+  prioridad: maxima
+
+  condicion:
+
+    incoherenciaDetectada: true
+
+  accion:
+
+    solicitarRevisionTecnica: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando exista incoherencia entre motivación y puntuación se solicitará revisión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-071
+# ----------------------------------------------------------------------------
+
+- id: EVA-071
+
+  nombre: Auditoría del juicio de valor
+
+  prioridad: alta
+
+  condicion:
+
+    informeTecnicoEmitido: true
+
+  accion:
+
+    registrar:
+
+      auditoriaJuicioValor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el proceso quedará incorporado a la auditoría del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-072
+# ----------------------------------------------------------------------------
+
+- id: EVA-072
+
+  nombre: Finalización del juicio de valor
+
+  prioridad: media
+
+  condicion:
+
+    juicioValorFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: juicio.valor.finalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la valoración técnica comenzará la integración de todas las puntuaciones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+juicioValorConfig:
+
+  registrarEvaluadores: true
+
+  registrarInformes: true
+
+  registrarMotivaciones: true
+
+  registrarAuditoria: true
+
+  validarCoherencia: true
+
+# ============================================================================
+# FIN PARTE 8 DE 20
+# ============================================================================
+
+# ============================================================================
+# INTEGRACIÓN DE PUNTUACIONES
+# Consolidación de criterios automáticos y juicio de valor
+# ============================================================================
+
+integracionPuntuaciones:
+
+  activa: true
+
+  validarPesos: true
+
+  generarRanking: true
+
+# ============================================================================
+# REGLA EVA-073
+# ============================================================================
+
+- id: EVA-073
+
+  nombre: Inicio de integración de puntuaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: juicio.valor.finalizado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: INTEGRACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la evaluación técnica comenzará la integración de todas las puntuaciones.
+
+  referencia:
+
+    LCSP_145
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-074
+# ----------------------------------------------------------------------------
+
+- id: EVA-074
+
+  nombre: Recuperación de puntuaciones automáticas
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    cargar:
+
+      puntuacionesAutomaticas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se recuperarán todas las puntuaciones obtenidas mediante fórmulas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-075
+# ----------------------------------------------------------------------------
+
+- id: EVA-075
+
+  nombre: Recuperación de puntuaciones técnicas
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    cargar:
+
+      puntuacionesTecnicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se recuperarán las puntuaciones otorgadas mediante juicio de valor.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-076
+# ----------------------------------------------------------------------------
+
+- id: EVA-076
+
+  nombre: Comprobación de pesos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      pesosCorrectos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que los porcentajes asignados a cada criterio coinciden con los establecidos en el PCAP.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-077
+# ----------------------------------------------------------------------------
+
+- id: EVA-077
+
+  nombre: Cálculo de la puntuación total
+
+  prioridad: maxima
+
+  condicion:
+
+    pesosCorrectos: true
+
+  accion:
+
+    calcular:
+
+      puntuacionTotal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación final será el resultado de integrar todas las valoraciones.
+
+  referencia:
+
+    LCSP_145
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-078
+# ----------------------------------------------------------------------------
+
+- id: EVA-078
+
+  nombre: Validación del cálculo total
+
+  prioridad: maxima
+
+  condicion:
+
+    puntuacionTotalCalculada: true
+
+  accion:
+
+    verificar:
+
+      integridadCalculo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará automáticamente la corrección del cálculo final.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-079
+# ----------------------------------------------------------------------------
+
+- id: EVA-079
+
+  nombre: Registro de puntuación final
+
+  prioridad: alta
+
+  condicion:
+
+    integridadCalculo: true
+
+  accion:
+
+    registrar:
+
+      puntuacionFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación consolidada quedará incorporada al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-080
+# ----------------------------------------------------------------------------
+
+- id: EVA-080
+
+  nombre: Generación del ranking provisional
+
+  prioridad: alta
+
+  condicion:
+
+    puntuacionFinalRegistrada: true
+
+  accion:
+
+    generar:
+
+      rankingProvisional
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará la clasificación provisional de las ofertas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-081
+# ----------------------------------------------------------------------------
+
+- id: EVA-081
+
+  nombre: Explicabilidad de la puntuación final
+
+  prioridad: alta
+
+  condicion:
+
+    rankingProvisionalGenerado: true
+
+  accion:
+
+    generar:
+
+      explicacionPuntuacionFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La puntuación final irá acompañada de una explicación completa del proceso de cálculo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-082
+# ----------------------------------------------------------------------------
+
+- id: EVA-082
+
+  nombre: Auditoría de integración
+
+  prioridad: media
+
+  condicion:
+
+    rankingProvisionalGenerado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaIntegracion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las operaciones de integración quedarán registradas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-083
+# ----------------------------------------------------------------------------
+
+- id: EVA-083
+
+  nombre: Publicación del ranking provisional
+
+  prioridad: media
+
+  condicion:
+
+    rankingProvisionalGenerado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: ranking.provisional.generado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la integración comenzará el análisis de posibles empates.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+integracion:
+
+  validarPesos: true
+
+  validarCalculos: true
+
+  registrarResultados: true
+
+  generarRanking: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 9 DE 20
+# ============================================================================
+
+# ============================================================================
+# GESTIÓN AUTOMÁTICA DE EMPATES
+# Aplicación de los criterios de desempate
+# ============================================================================
+
+gestionEmpates:
+
+  activa: true
+
+  aplicarLCSP: true
+
+  aplicarPCAP: true
+
+  registrarDecision: true
+
+# ============================================================================
+# REGLA EVA-084
+# ============================================================================
+
+- id: EVA-084
+
+  nombre: Inicio del análisis de empates
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ranking.provisional.generado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EMPATES
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Una vez calculada la clasificación provisional se analizará la existencia de empates.
+
+  referencia:
+
+    LCSP_147
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-085
+# ----------------------------------------------------------------------------
+
+- id: EVA-085
+
+  nombre: Detección automática de empate
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    detectar:
+
+      empatePuntuacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema detectará automáticamente las ofertas con idéntica puntuación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-086
+# ----------------------------------------------------------------------------
+
+- id: EVA-086
+
+  nombre: Consulta de criterios de desempate
+
+  prioridad: maxima
+
+  condicion:
+
+    empatePuntuacion: true
+
+  accion:
+
+    cargar:
+
+      criteriosDesempate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se aplicarán los criterios previstos en el PCAP o, en su defecto, en la LCSP.
+
+  referencia:
+
+    LCSP_147
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-087
+# ----------------------------------------------------------------------------
+
+- id: EVA-087
+
+  nombre: Aplicación automática de criterios
+
+  prioridad: maxima
+
+  condicion:
+
+    criteriosDesempateDisponibles: true
+
+  accion:
+
+    aplicar:
+
+      criteriosDesempate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los criterios de desempate se aplicarán en el orden establecido.
+
+  referencia:
+
+    LCSP_147
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-088
+# ----------------------------------------------------------------------------
+
+- id: EVA-088
+
+  nombre: Persistencia del empate
+
+  prioridad: alta
+
+  condicion:
+
+    empateResuelto: false
+
+  accion:
+
+    generar:
+
+      propuestaResolucionManual
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando los criterios legales no resuelvan el empate será necesaria actuación del órgano competente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-089
+# ----------------------------------------------------------------------------
+
+- id: EVA-089
+
+  nombre: Registro del criterio aplicado
+
+  prioridad: alta
+
+  condicion:
+
+    empateResuelto: true
+
+  accion:
+
+    registrar:
+
+      criterioDesempateAplicado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente registrará el criterio concreto utilizado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-090
+# ----------------------------------------------------------------------------
+
+- id: EVA-090
+
+  nombre: Registro de la resolución
+
+  prioridad: alta
+
+  condicion:
+
+    empateResuelto: true
+
+  accion:
+
+    registrar:
+
+      resolucionEmpate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La resolución del empate quedará incorporada al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-091
+# ----------------------------------------------------------------------------
+
+- id: EVA-091
+
+  nombre: Explicación automática
+
+  prioridad: alta
+
+  condicion:
+
+    empateResuelto: true
+
+  accion:
+
+    generar:
+
+      explicacionDesempate
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema explicará el motivo por el que una oferta prevalece sobre otra.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-092
+# ----------------------------------------------------------------------------
+
+- id: EVA-092
+
+  nombre: Auditoría del desempate
+
+  prioridad: media
+
+  condicion:
+
+    procesoEmpateFinalizado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaEmpates
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento de desempate será auditado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-093
+# ----------------------------------------------------------------------------
+
+- id: EVA-093
+
+  nombre: Publicación del ranking definitivo
+
+  prioridad: media
+
+  condicion:
+
+    procesoEmpateFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: ranking.definitivo.generado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Resueltos los empates continuará el análisis de ofertas anormalmente bajas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+empates:
+
+  aplicarLCSP: true
+
+  aplicarPCAP: true
+
+  registrarMotivacion: true
+
+  generarExplicaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 10 DE 20
+# ============================================================================
+
+# ============================================================================
+# OFERTAS ANORMALMENTE BAJAS
+# Artículo 149 LCSP
+# ============================================================================
+
+ofertasAnormales:
+
+  activa: true
+
+  aplicarLCSP149: true
+
+  solicitarJustificacion: true
+
+  generarInforme: true
+
+# ============================================================================
+# REGLA EVA-094
+# ============================================================================
+
+- id: EVA-094
+
+  nombre: Inicio del análisis de ofertas anormalmente bajas
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ranking.definitivo.generado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: OFERTAS_ANORMALMENTE_BAJAS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la clasificación comenzará el análisis de ofertas incursas en presunción de anormalidad.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-095
+# ----------------------------------------------------------------------------
+
+- id: EVA-095
+
+  nombre: Detección automática
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    detectar:
+
+      ofertasAnormalmenteBajas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema aplicará automáticamente los parámetros establecidos en el PCAP para detectar ofertas incursas en presunción de anormalidad.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-096
+# ----------------------------------------------------------------------------
+
+- id: EVA-096
+
+  nombre: Generación del requerimiento de justificación
+
+  prioridad: maxima
+
+  condicion:
+
+    ofertaAnormal: true
+
+  accion:
+
+    generar:
+
+      requerimientoJustificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El licitador dispondrá del trámite de audiencia previsto en la normativa.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-097
+# ----------------------------------------------------------------------------
+
+- id: EVA-097
+
+  nombre: Registro del requerimiento
+
+  prioridad: alta
+
+  condicion:
+
+    requerimientoJustificacionGenerado: true
+
+  accion:
+
+    registrar:
+
+      requerimientoJustificacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El requerimiento quedará incorporado al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-098
+# ----------------------------------------------------------------------------
+
+- id: EVA-098
+
+  nombre: Recepción de la justificación
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionJustificacionRecibida: true
+
+  accion:
+
+    registrar:
+
+      justificacionOferta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación presentada será registrada.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-099
+# ----------------------------------------------------------------------------
+
+- id: EVA-099
+
+  nombre: Análisis técnico
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionJustificacionRecibida: true
+
+  accion:
+
+    solicitar:
+
+      informeTecnicoOfertaAnormal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La Mesa de Contratación solicitará el informe técnico correspondiente.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-100
+# ----------------------------------------------------------------------------
+
+- id: EVA-100
+
+  nombre: Justificación aceptada
+
+  prioridad: maxima
+
+  condicion:
+
+    informeTecnicoFavorable: true
+
+  accion:
+
+    mantenerOferta: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La oferta continuará en el procedimiento al quedar justificada.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-101
+# ----------------------------------------------------------------------------
+
+- id: EVA-101
+
+  nombre: Justificación rechazada
+
+  prioridad: maxima
+
+  condicion:
+
+    informeTecnicoFavorable: false
+
+  accion:
+
+    excluirOferta: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La oferta será excluida cuando la justificación resulte insuficiente.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-102
+# ----------------------------------------------------------------------------
+
+- id: EVA-102
+
+  nombre: Motivación automática
+
+  prioridad: alta
+
+  condicion:
+
+    decisionOfertaAnormalTomada: true
+
+  accion:
+
+    generar:
+
+      motivacionOfertaAnormal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La decisión quedará completamente motivada.
+
+  referencia:
+
+    LCSP_149
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-103
+# ----------------------------------------------------------------------------
+
+- id: EVA-103
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    decisionOfertaAnormalTomada: true
+
+  accion:
+
+    registrar:
+
+      auditoriaOfertaAnormal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento será registrado para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-104
+# ----------------------------------------------------------------------------
+
+- id: EVA-104
+
+  nombre: Publicación del resultado
+
+  prioridad: media
+
+  condicion:
+
+    procesoOfertasAnormalesFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: ofertas.anormales.finalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado este análisis comenzará la propuesta automática de adjudicación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+ofertasAnormalesConfig:
+
+  aplicarParametrosPCAP: true
+
+  solicitarInformeTecnico: true
+
+  generarMotivacion: true
+
+  registrarAuditoria: true
+
+  generarExplicabilidad: true
+
+# ============================================================================
+# FIN PARTE 11 DE 20
+# ============================================================================
+
+# ============================================================================
+# PROPUESTA AUTOMÁTICA DE ADJUDICACIÓN
+# ============================================================================
+
+propuestaAdjudicacion:
+
+  activa: true
+
+  generarInforme: true
+
+  generarClasificacion: true
+
+  generarMotivacion: true
+
+# ============================================================================
+# REGLA EVA-105
+# ============================================================================
+
+- id: EVA-105
+
+  nombre: Inicio de la propuesta de adjudicación
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: ofertas.anormales.finalizado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: PROPUESTA_ADJUDICACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el análisis de ofertas anormalmente bajas comenzará la elaboración de la propuesta de adjudicación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-106
+# ----------------------------------------------------------------------------
+
+- id: EVA-106
+
+  nombre: Obtención de clasificación definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    cargar:
+
+      clasificacionDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema utilizará la clasificación definitiva obtenida durante la evaluación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-107
+# ----------------------------------------------------------------------------
+
+- id: EVA-107
+
+  nombre: Identificación del licitador mejor clasificado
+
+  prioridad: maxima
+
+  condicion:
+
+    clasificacionDisponible: true
+
+  accion:
+
+    seleccionar:
+
+      primerClasificado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La propuesta recaerá sobre la oferta con mayor puntuación definitiva.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-108
+# ----------------------------------------------------------------------------
+
+- id: EVA-108
+
+  nombre: Comprobación previa a la adjudicación
+
+  prioridad: maxima
+
+  condicion:
+
+    primerClasificadoDisponible: true
+
+  accion:
+
+    verificar:
+
+      requisitosPreviosAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de formular la propuesta deberán comprobarse todos los requisitos exigidos por la normativa.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-109
+# ----------------------------------------------------------------------------
+
+- id: EVA-109
+
+  nombre: Generación de la propuesta
+
+  prioridad: maxima
+
+  condicion:
+
+    requisitosPreviosCorrectos: true
+
+  accion:
+
+    generar:
+
+      propuestaAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente la propuesta de adjudicación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-110
+# ----------------------------------------------------------------------------
+
+- id: EVA-110
+
+  nombre: Elaboración del informe de adjudicación
+
+  prioridad: alta
+
+  condicion:
+
+    propuestaGenerada: true
+
+  accion:
+
+    generar:
+
+      informeAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La propuesta irá acompañada del correspondiente informe justificativo.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-111
+# ----------------------------------------------------------------------------
+
+- id: EVA-111
+
+  nombre: Motivación completa
+
+  prioridad: alta
+
+  condicion:
+
+    propuestaGenerada: true
+
+  accion:
+
+    generar:
+
+      motivacionAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La propuesta contendrá una motivación completa de la clasificación obtenida.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-112
+# ----------------------------------------------------------------------------
+
+- id: EVA-112
+
+  nombre: Registro de la propuesta
+
+  prioridad: alta
+
+  condicion:
+
+    propuestaGenerada: true
+
+  accion:
+
+    registrar:
+
+      propuestaAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La propuesta quedará incorporada automáticamente al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-113
+# ----------------------------------------------------------------------------
+
+- id: EVA-113
+
+  nombre: Auditoría de la propuesta
+
+  prioridad: alta
+
+  condicion:
+
+    propuestaGenerada: true
+
+  accion:
+
+    registrar:
+
+      auditoriaAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones realizadas durante la propuesta quedarán auditadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-114
+# ----------------------------------------------------------------------------
+
+- id: EVA-114
+
+  nombre: Publicación del evento
+
+  prioridad: media
+
+  condicion:
+
+    propuestaGenerada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: propuesta.adjudicacion.generada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará automáticamente con la fase de adjudicación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+adjudicacion:
+
+  generarInformes: true
+
+  generarMotivaciones: true
+
+  registrarAuditoria: true
+
+  registrarExplicabilidad: true
+
+  publicarEventos: true
+
+# ============================================================================
+# FIN PARTE 12 DE 20
+# ============================================================================
+
+# ============================================================================
+# REQUERIMIENTO DE DOCUMENTACIÓN PREVIA A LA ADJUDICACIÓN
+# Artículos 150 y concordantes LCSP
+# ============================================================================
+
+documentacionAdjudicatario:
+
+  activa: true
+
+  controlarPlazos: true
+
+  verificarDocumentacion: true
+
+  generarRequerimientos: true
+
+# ============================================================================
+# REGLA EVA-115
+# ============================================================================
+
+- id: EVA-115
+
+  nombre: Inicio del requerimiento al adjudicatario
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: propuesta.adjudicacion.generada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: REQUERIMIENTO_DOCUMENTACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Tras formular la propuesta comenzará el requerimiento de documentación al licitador mejor clasificado.
+
+  referencia:
+
+    LCSP_150
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-116
+# ----------------------------------------------------------------------------
+
+- id: EVA-116
+
+  nombre: Generación automática del requerimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaGenerada: true
+
+  accion:
+
+    generar:
+
+      requerimientoDocumentacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente el requerimiento previo a la adjudicación.
+
+  referencia:
+
+    LCSP_150
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-117
+# ----------------------------------------------------------------------------
+
+- id: EVA-117
+
+  nombre: Cálculo del plazo
+
+  prioridad: maxima
+
+  condicion:
+
+    requerimientoGenerado: true
+
+  accion:
+
+    calcular:
+
+      plazoPresentacionDocumentacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará automáticamente el plazo previsto legalmente.
+
+  referencia:
+
+    LCSP_150
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-118
+# ----------------------------------------------------------------------------
+
+- id: EVA-118
+
+  nombre: Registro del requerimiento
+
+  prioridad: alta
+
+  condicion:
+
+    requerimientoGenerado: true
+
+  accion:
+
+    registrar:
+
+      requerimientoDocumentacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El requerimiento quedará incorporado al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-119
+# ----------------------------------------------------------------------------
+
+- id: EVA-119
+
+  nombre: Recepción de documentación
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionRecibida: true
+
+  accion:
+
+    registrar:
+
+      documentacionAdjudicatario
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación presentada será registrada automáticamente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-120
+# ----------------------------------------------------------------------------
+
+- id: EVA-120
+
+  nombre: Comprobación de documentación
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionRecibida: true
+
+  accion:
+
+    verificar:
+
+      documentacionCorrecta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará la documentación exigida antes de adjudicar.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-121
+# ----------------------------------------------------------------------------
+
+- id: EVA-121
+
+  nombre: Documentación correcta
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionCorrecta: true
+
+  accion:
+
+    continuarProcedimiento: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Si toda la documentación es correcta continuará el procedimiento de adjudicación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-122
+# ----------------------------------------------------------------------------
+
+- id: EVA-122
+
+  nombre: Documentación incorrecta
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionCorrecta: false
+
+  accion:
+
+    generarIncidencia: true
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las incidencias documentales quedarán registradas para su resolución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-123
+# ----------------------------------------------------------------------------
+
+- id: EVA-123
+
+  nombre: Incumplimiento del requerimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    plazoFinalizado: true
+
+    documentacionRecibida: false
+
+  accion:
+
+    retirarPropuestaAdjudicacion: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    La falta de presentación de la documentación producirá los efectos previstos en la LCSP.
+
+  referencia:
+
+    LCSP_150
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-124
+# ----------------------------------------------------------------------------
+
+- id: EVA-124
+
+  nombre: Registro de incidencias
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      incidenciasDocumentacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las incidencias serán registradas para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-125
+# ----------------------------------------------------------------------------
+
+- id: EVA-125
+
+  nombre: Publicación del resultado
+
+  prioridad: media
+
+  condicion:
+
+    procedimientoDocumentacionFinalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: documentacion.adjudicatario.validada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Validada la documentación podrá iniciarse la adjudicación definitiva.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+documentacion:
+
+  controlarPlazos: true
+
+  registrarNotificaciones: true
+
+  registrarDocumentos: true
+
+  registrarAuditoria: true
+
+  generarExplicabilidad: true
+
+# ============================================================================
+# FIN PARTE 13 DE 20
+# ============================================================================
+
+# ============================================================================
+# ADJUDICACIÓN DEFINITIVA Y FORMALIZACIÓN DEL CONTRATO
+# Artículos 150, 151 y 153 LCSP
+# ============================================================================
+
+adjudicacionDefinitiva:
+
+  activa: true
+
+  generarResolucion: true
+
+  controlarPlazosFormalizacion: true
+
+  publicarAdjudicacion: true
+
+# ============================================================================
+# REGLA EVA-126
+# ============================================================================
+
+- id: EVA-126
+
+  nombre: Inicio de la adjudicación definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: documentacion.adjudicatario.validada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: ADJUDICACION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Validada la documentación del adjudicatario podrá iniciarse la adjudicación definitiva.
+
+  referencia:
+
+    LCSP_150
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-127
+# ----------------------------------------------------------------------------
+
+- id: EVA-127
+
+  nombre: Generación automática de la resolución
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionCorrecta: true
+
+  accion:
+
+    generar:
+
+      resolucionAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente la resolución de adjudicación.
+
+  referencia:
+
+    LCSP_151
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-128
+# ----------------------------------------------------------------------------
+
+- id: EVA-128
+
+  nombre: Generación del informe jurídico final
+
+  prioridad: alta
+
+  condicion:
+
+    resolucionGenerada: true
+
+  accion:
+
+    generar:
+
+      informeJuridicoFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La resolución irá acompañada del correspondiente informe jurídico.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-129
+# ----------------------------------------------------------------------------
+
+- id: EVA-129
+
+  nombre: Registro de la resolución
+
+  prioridad: alta
+
+  condicion:
+
+    resolucionGenerada: true
+
+  accion:
+
+    registrar:
+
+      resolucionAdjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La resolución quedará incorporada automáticamente al expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-130
+# ----------------------------------------------------------------------------
+
+- id: EVA-130
+
+  nombre: Publicación de la adjudicación
+
+  prioridad: maxima
+
+  condicion:
+
+    resolucionGenerada: true
+
+  accion:
+
+    publicar:
+
+      adjudicacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La adjudicación será publicada conforme a la normativa aplicable.
+
+  referencia:
+
+    LCSP_151
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-131
+# ----------------------------------------------------------------------------
+
+- id: EVA-131
+
+  nombre: Cálculo del plazo de formalización
+
+  prioridad: maxima
+
+  condicion:
+
+    adjudicacionPublicada: true
+
+  accion:
+
+    calcular:
+
+      plazoFormalizacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará automáticamente el plazo legal para la formalización.
+
+  referencia:
+
+    LCSP_153
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-132
+# ----------------------------------------------------------------------------
+
+- id: EVA-132
+
+  nombre: Control del plazo
+
+  prioridad: alta
+
+  condicion:
+
+    plazoFormalizacionActivo: true
+
+  accion:
+
+    controlar:
+
+      plazoFormalizacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema supervisará el cumplimiento del plazo de formalización.
+
+  referencia:
+
+    LCSP_153
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-133
+# ----------------------------------------------------------------------------
+
+- id: EVA-133
+
+  nombre: Registro de la formalización
+
+  prioridad: maxima
+
+  condicion:
+
+    contratoFormalizado: true
+
+  accion:
+
+    registrar:
+
+      formalizacionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La formalización del contrato quedará incorporada al expediente.
+
+  referencia:
+
+    LCSP_153
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-134
+# ----------------------------------------------------------------------------
+
+- id: EVA-134
+
+  nombre: Auditoría de la adjudicación
+
+  prioridad: alta
+
+  condicion:
+
+    contratoFormalizado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaAdjudicacionDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento de adjudicación quedará auditado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-135
+# ----------------------------------------------------------------------------
+
+- id: EVA-135
+
+  nombre: Inicio de la ejecución
+
+  prioridad: media
+
+  condicion:
+
+    contratoFormalizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: contrato.formalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Formalizado el contrato comenzará automáticamente la fase de ejecución.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+formalizacion:
+
+  generarResolucion: true
+
+  controlarPlazos: true
+
+  registrarFormalizacion: true
+
+  registrarAuditoria: true
+
+  publicarEventos: true
+
+# ============================================================================
+# FIN PARTE 14 DE 20
+# ============================================================================
+
+# ============================================================================
+# SISTEMA DE AUDITORÍA Y TRAZABILIDAD COMPLETA
+# ============================================================================
+
+auditoriaIntegral:
+
+  activa: true
+
+  registrarTodo: true
+
+  generarTimeline: true
+
+  registrarExplicabilidad: true
+
+# ============================================================================
+# REGLA EVA-136
+# ============================================================================
+
+- id: EVA-136
+
+  nombre: Inicio de auditoría final
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: contrato.formalizado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: AUDITORIA_FINAL
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Formalizado el contrato se consolidará toda la trazabilidad del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-137
+# ----------------------------------------------------------------------------
+
+- id: EVA-137
+
+  nombre: Registro cronológico completo
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    generar:
+
+      timelineExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente dispondrá de una línea temporal completa con todas las actuaciones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-138
+# ----------------------------------------------------------------------------
+
+- id: EVA-138
+
+  nombre: Registro de cambios de estado
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      cambiosEstado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los cambios de estado quedarán registrados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-139
+# ----------------------------------------------------------------------------
+
+- id: EVA-139
+
+  nombre: Registro de decisiones
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      decisionesTomadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las decisiones adoptadas serán incorporadas al historial del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-140
+# ----------------------------------------------------------------------------
+
+- id: EVA-140
+
+  nombre: Registro de cálculos
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      operacionesMatematicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los cálculos realizados durante la evaluación quedarán registrados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-141
+# ----------------------------------------------------------------------------
+
+- id: EVA-141
+
+  nombre: Registro de motores ejecutados
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      motoresEjecutados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente conservará qué motores han intervenido y cuándo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-142
+# ----------------------------------------------------------------------------
+
+- id: EVA-142
+
+  nombre: Registro de usuarios
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      usuariosIntervinientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se identificará cada usuario que intervenga en el procedimiento.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-143
+# ----------------------------------------------------------------------------
+
+- id: EVA-143
+
+  nombre: Registro de versiones
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      versionesExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada modificación generará una nueva versión del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-144
+# ----------------------------------------------------------------------------
+
+- id: EVA-144
+
+  nombre: Registro de documentos generados
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      documentosGenerados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los documentos producidos automáticamente quedarán registrados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-145
+# ----------------------------------------------------------------------------
+
+- id: EVA-145
+
+  nombre: Registro de explicabilidad
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      explicabilidadIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema conservará la explicación de todas las decisiones automáticas.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-146
+# ----------------------------------------------------------------------------
+
+- id: EVA-146
+
+  nombre: Registro de incidencias
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      incidenciasExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las incidencias detectadas durante el procedimiento quedarán registradas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-147
+# ----------------------------------------------------------------------------
+
+- id: EVA-147
+
+  nombre: Registro de eventos
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      eventosWorkflow
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El historial almacenará todos los eventos generados por el Workflow Engine.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-148
+# ----------------------------------------------------------------------------
+
+- id: EVA-148
+
+  nombre: Registro de integridad
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      integridadExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará que no existan pérdidas de información durante todo el procedimiento.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-149
+# ----------------------------------------------------------------------------
+
+- id: EVA-149
+
+  nombre: Consolidación de auditoría
+
+  prioridad: media
+
+  condicion:
+
+    auditoriaCompleta: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: auditoria.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la auditoría comenzará la generación del expediente definitivo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+auditoria:
+
+  timeline: true
+
+  versionado: true
+
+  auditoriaCompleta: true
+
+  registrarEventos: true
+
+  registrarUsuarios: true
+
+  registrarExplicabilidad: true
+
+  verificarIntegridad: true
+
+# ============================================================================
+# FIN PARTE 15 DE 20
+# ============================================================================
+
+# ============================================================================
+# GENERACIÓN AUTOMÁTICA DEL EXPEDIENTE FINAL
+# Consolidación documental
+# ============================================================================
+
+expedienteFinal:
+
+  activa: true
+
+  consolidarDocumentos: true
+
+  verificarIntegridad: true
+
+  generarIndice: true
+
+# ============================================================================
+# REGLA EVA-150
+# ============================================================================
+
+- id: EVA-150
+
+  nombre: Inicio de generación del expediente final
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: auditoria.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: GENERANDO_EXPEDIENTE
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la auditoría se procederá a consolidar el expediente electrónico.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-151
+# ----------------------------------------------------------------------------
+
+- id: EVA-151
+
+  nombre: Recuperación de documentos
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    recopilar:
+
+      documentosExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema recopilará todos los documentos generados durante la tramitación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-152
+# ----------------------------------------------------------------------------
+
+- id: EVA-152
+
+  nombre: Ordenación documental
+
+  prioridad: alta
+
+  condicion:
+
+    documentosRecuperados: true
+
+  accion:
+
+    ordenar:
+
+      expedienteAdministrativo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los documentos serán ordenados conforme a la estructura oficial del expediente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-153
+# ----------------------------------------------------------------------------
+
+- id: EVA-153
+
+  nombre: Generación del índice
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteOrdenado: true
+
+  accion:
+
+    generar:
+
+      indiceExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente incorporará un índice electrónico.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-154
+# ----------------------------------------------------------------------------
+
+- id: EVA-154
+
+  nombre: Verificación de documentos obligatorios
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteOrdenado: true
+
+  accion:
+
+    verificar:
+
+      documentosObligatorios
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que todos los documentos exigidos por la normativa forman parte del expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-155
+# ----------------------------------------------------------------------------
+
+- id: EVA-155
+
+  nombre: Detección de documentos ausentes
+
+  prioridad: maxima
+
+  condicion:
+
+    faltaDocumentoObligatorio: true
+
+  accion:
+
+    generarIncidencia: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    No podrá cerrarse el expediente si falta documentación obligatoria.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-156
+# ----------------------------------------------------------------------------
+
+- id: EVA-156
+
+  nombre: Generación del expediente electrónico
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteCompleto: true
+
+  accion:
+
+    generar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema consolidará toda la documentación en un expediente único.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-157
+# ----------------------------------------------------------------------------
+
+- id: EVA-157
+
+  nombre: Generación del resumen ejecutivo
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoGenerado: true
+
+  accion:
+
+    generar:
+
+      resumenExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará un resumen ejecutivo del procedimiento completo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-158
+# ----------------------------------------------------------------------------
+
+- id: EVA-158
+
+  nombre: Generación del informe final
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoGenerado: true
+
+  accion:
+
+    generar:
+
+      informeFinalExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente incluirá un informe final con todas las actuaciones realizadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-159
+# ----------------------------------------------------------------------------
+
+- id: EVA-159
+
+  nombre: Firma pendiente
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoGenerado: true
+
+  accion:
+
+    marcar:
+
+      pendienteFirmaElectronica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente quedará preparado para su firma electrónica.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-160
+# ----------------------------------------------------------------------------
+
+- id: EVA-160
+
+  nombre: Auditoría del expediente
+
+  prioridad: media
+
+  condicion:
+
+    expedienteElectronicoGenerado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaExpedienteFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La consolidación documental será registrada para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-161
+# ----------------------------------------------------------------------------
+
+- id: EVA-161
+
+  nombre: Expediente preparado
+
+  prioridad: media
+
+  condicion:
+
+    expedienteElectronicoGenerado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: expediente.final.generado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente queda preparado para su firma y cierre administrativo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+expediente:
+
+  generarIndice: true
+
+  verificarDocumentacion: true
+
+  generarResumen: true
+
+  generarInformeFinal: true
+
+  registrarAuditoria: true
+
+  verificarIntegridad: true
+
+# ============================================================================
+# FIN PARTE 16 DE 20
+# ============================================================================
+
+# ============================================================================
+# FIRMA ELECTRÓNICA, CIERRE Y ARCHIVO DEL EXPEDIENTE
+# Ley 39/2015, Ley 40/2015, ENI y eIDAS
+# ============================================================================
+
+cierreExpediente:
+
+  activa: true
+
+  firmaElectronica: true
+
+  selladoTemporal: true
+
+  archivoElectronico: true
+
+# ============================================================================
+# REGLA EVA-162
+# ============================================================================
+
+- id: EVA-162
+
+  nombre: Inicio de la firma electrónica
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: expediente.final.generado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: FIRMA_ELECTRONICA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la generación del expediente comenzará el proceso de firma electrónica.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-163
+# ----------------------------------------------------------------------------
+
+- id: EVA-163
+
+  nombre: Verificación de firmantes
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      firmantesAutorizados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Únicamente podrán firmar los órganos o personas autorizadas.
+
+  referencia:
+
+    Ley40_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-164
+# ----------------------------------------------------------------------------
+
+- id: EVA-164
+
+  nombre: Validación del certificado electrónico
+
+  prioridad: maxima
+
+  condicion:
+
+    firmantesAutorizados: true
+
+  accion:
+
+    verificar:
+
+      certificadoValido
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de firmar deberá comprobarse la validez del certificado electrónico.
+
+  referencia:
+
+    eIDAS
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-165
+# ----------------------------------------------------------------------------
+
+- id: EVA-165
+
+  nombre: Aplicación de firma electrónica
+
+  prioridad: maxima
+
+  condicion:
+
+    certificadoValido: true
+
+  accion:
+
+    firmar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente será firmado electrónicamente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-166
+# ----------------------------------------------------------------------------
+
+- id: EVA-166
+
+  nombre: Sellado temporal
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteFirmado: true
+
+  accion:
+
+    aplicar:
+
+      selloTemporal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente incorporará un sello temporal para garantizar su integridad.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-167
+# ----------------------------------------------------------------------------
+
+- id: EVA-167
+
+  nombre: Verificación de integridad
+
+  prioridad: alta
+
+  condicion:
+
+    selloTemporalAplicado: true
+
+  accion:
+
+    verificar:
+
+      hashExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que el expediente no ha sufrido modificaciones.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-168
+# ----------------------------------------------------------------------------
+
+- id: EVA-168
+
+  nombre: Cierre administrativo
+
+  prioridad: maxima
+
+  condicion:
+
+    integridadCorrecta: true
+
+  accion:
+
+    cerrar:
+
+      expediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente quedará oficialmente cerrado.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-169
+# ----------------------------------------------------------------------------
+
+- id: EVA-169
+
+  nombre: Archivo electrónico
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteCerrado: true
+
+  accion:
+
+    archivar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente será incorporado al archivo electrónico corporativo.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-170
+# ----------------------------------------------------------------------------
+
+- id: EVA-170
+
+  nombre: Generación de metadatos
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteArchivado: true
+
+  accion:
+
+    generar:
+
+      metadatosArchivo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente incorporará los metadatos exigidos por el ENI.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-171
+# ----------------------------------------------------------------------------
+
+- id: EVA-171
+
+  nombre: Registro del cierre
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteArchivado: true
+
+  accion:
+
+    registrar:
+
+      cierreExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cierre quedará registrado para auditoría.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-172
+# ----------------------------------------------------------------------------
+
+- id: EVA-172
+
+  nombre: Publicación del evento final
+
+  prioridad: media
+
+  condicion:
+
+    expedienteArchivado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: expediente.cerrado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine marcará el expediente como completamente finalizado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+firma:
+
+  validarCertificados: true
+
+  aplicarSelladoTemporal: true
+
+  comprobarIntegridad: true
+
+  generarMetadatos: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 17 DE 20
+# ============================================================================
+
+# ============================================================================
+# SISTEMA AVANZADO DE EXPLICABILIDAD DE LA IA
+# AI Act + ENS + LCSP
+# ============================================================================
+
+explicabilidadIA:
+
+  activa: true
+
+  registrarRazonamiento: true
+
+  registrarNormativa: true
+
+  generarInforme: true
+
+# ============================================================================
+# REGLA EVA-173
+# ============================================================================
+
+- id: EVA-173
+
+  nombre: Inicio de la explicabilidad
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: expediente.cerrado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EXPLICABILIDAD
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el expediente se consolidará la información necesaria para explicar todas las decisiones automáticas.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-174
+# ----------------------------------------------------------------------------
+
+- id: EVA-174
+
+  nombre: Registro de reglas ejecutadas
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      reglasAplicadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se registrarán todas las reglas ejecutadas durante el procedimiento.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-175
+# ----------------------------------------------------------------------------
+
+- id: EVA-175
+
+  nombre: Registro de normativa utilizada
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      normativaAplicada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda decisión incorporará la normativa aplicada.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-176
+# ----------------------------------------------------------------------------
+
+- id: EVA-176
+
+  nombre: Registro de documentos utilizados
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      documentosConsultados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema almacenará qué documentos justificaron cada decisión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-177
+# ----------------------------------------------------------------------------
+
+- id: EVA-177
+
+  nombre: Registro del razonamiento
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      razonamientoIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se conservará el razonamiento seguido por el motor de decisión.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-178
+# ----------------------------------------------------------------------------
+
+- id: EVA-178
+
+  nombre: Registro de alternativas descartadas
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      alternativasDescartadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se documentarán las alternativas consideradas y descartadas.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-179
+# ----------------------------------------------------------------------------
+
+- id: EVA-179
+
+  nombre: Registro del nivel de confianza
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      nivelConfianza
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada decisión incluirá un nivel de confianza del sistema.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-180
+# ----------------------------------------------------------------------------
+
+- id: EVA-180
+
+  nombre: Generación de explicación legible
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    generar:
+
+      explicacionUsuario
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La explicación será comprensible para personal no técnico.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-181
+# ----------------------------------------------------------------------------
+
+- id: EVA-181
+
+  nombre: Generación de explicación técnica
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    generar:
+
+      explicacionTecnica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará una explicación detallada para auditoría técnica.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-182
+# ----------------------------------------------------------------------------
+
+- id: EVA-182
+
+  nombre: Relación decisión-normativa
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    relacionar:
+
+      decisionesNormativa
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cada decisión quedará vinculada a la norma que la sustenta.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-183
+# ----------------------------------------------------------------------------
+
+- id: EVA-183
+
+  nombre: Auditoría de explicabilidad
+
+  prioridad: media
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaExplicabilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el proceso de explicabilidad quedará auditado.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-184
+# ----------------------------------------------------------------------------
+
+- id: EVA-184
+
+  nombre: Publicación del informe de explicabilidad
+
+  prioridad: media
+
+  condicion:
+
+    auditoriaExplicabilidadFinalizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: explicabilidad.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la explicabilidad comenzará la validación global del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+explicabilidad:
+
+  registrarReglas: true
+
+  registrarNormativa: true
+
+  registrarDocumentos: true
+
+  registrarAlternativas: true
+
+  registrarConfianza: true
+
+  generarInformeUsuario: true
+
+  generarInformeTecnico: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 18 DE 20
+# ============================================================================
+
+# ============================================================================
+# VALIDACIÓN GLOBAL DEL EXPEDIENTE
+# Control integral previo al cierre definitivo
+# ============================================================================
+
+validacionGlobal:
+
+  activa: true
+
+  validarIntegridad: true
+
+  validarNormativa: true
+
+  emitirCertificado: true
+
+# ============================================================================
+# REGLA EVA-185
+# ============================================================================
+
+- id: EVA-185
+
+  nombre: Inicio de la validación global
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: explicabilidad.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: VALIDACION_GLOBAL
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la generación de la explicabilidad se realizará una validación completa del expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-186
+# ----------------------------------------------------------------------------
+
+- id: EVA-186
+
+  nombre: Comprobación de integridad documental
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      integridadDocumental
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará que todos los documentos obligatorios forman parte del expediente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-187
+# ----------------------------------------------------------------------------
+
+- id: EVA-187
+
+  nombre: Comprobación de integridad procedimental
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      integridadProcedimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El procedimiento deberá contener todas las actuaciones exigidas por la normativa.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-188
+# ----------------------------------------------------------------------------
+
+- id: EVA-188
+
+  nombre: Verificación normativa
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      cumplimientoNormativo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará el cumplimiento de toda la normativa aplicada durante el expediente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-189
+# ----------------------------------------------------------------------------
+
+- id: EVA-189
+
+  nombre: Comprobación de trazabilidad
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      trazabilidadCompleta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las decisiones deberán ser completamente trazables.
+
+  referencia:
+
+    AI_ACT
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-190
+# ----------------------------------------------------------------------------
+
+- id: EVA-190
+
+  nombre: Comprobación de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      auditoriaCompleta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará que todos los registros de auditoría existen y son consistentes.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-191
+# ----------------------------------------------------------------------------
+
+- id: EVA-191
+
+  nombre: Detección de incidencias pendientes
+
+  prioridad: maxima
+
+  condicion:
+
+    incidenciasPendientes: true
+
+  accion:
+
+    bloquearCierre: true
+
+  resultado:
+
+    error
+
+  justificar:
+
+    El expediente no podrá cerrarse mientras existan incidencias pendientes.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-192
+# ----------------------------------------------------------------------------
+
+- id: EVA-192
+
+  nombre: Certificado de conformidad
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteValido: true
+
+  accion:
+
+    generar:
+
+      certificadoConformidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema emitirá un certificado acreditando que el expediente supera todas las verificaciones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-193
+# ----------------------------------------------------------------------------
+
+- id: EVA-193
+
+  nombre: Registro de la validación
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteValido: true
+
+  accion:
+
+    registrar:
+
+      validacionFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La validación final quedará incorporada al historial del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-194
+# ----------------------------------------------------------------------------
+
+- id: EVA-194
+
+  nombre: Informe global de validación
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteValido: true
+
+  accion:
+
+    generar:
+
+      informeValidacionGlobal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará un informe resumen con todas las comprobaciones realizadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-195
+# ----------------------------------------------------------------------------
+
+- id: EVA-195
+
+  nombre: Publicación del expediente validado
+
+  prioridad: media
+
+  condicion:
+
+    expedienteValido: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: expediente.validado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente queda validado y preparado para su cierre definitivo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN
+# ============================================================================
+
+validacion:
+
+  verificarNormativa: true
+
+  verificarDocumentacion: true
+
+  verificarProcedimiento: true
+
+  verificarAuditoria: true
+
+  verificarTrazabilidad: true
+
+  generarCertificado: true
+
+  generarInformeFinal: true
+
+# ============================================================================
+# FIN PARTE 19 DE 20
+# ============================================================================
+
+# ============================================================================
+# CIERRE MAESTRO DEL MOTOR DE EVALUACIÓN
+# ============================================================================
+
+motorEvaluacion:
+
+  nombre: RULE.EVALUACION
+
+  version: 1.0.0
+
+  estado: PRODUCCION
+
+  propietario: CONTRATA_IA
+
+  compatible:
+
+    - RULE.EXPEDIENTE
+    - RULE.CPV
+    - RULE.PROCEDIMIENTO
+    - RULE.SOLVENCIA
+    - RULE.CRITERIOS
+    - RULE.PCAP
+    - RULE.PPT
+    - RULE.PUBLICIDAD
+    - RULE.EJECUCION
+    - RULE.MODIFICADOS
+    - RULE.PENALIDADES
+    - RULE.PAGO
+    - RULE.CIERRE
+
+# ============================================================================
+# MÉTRICAS DEL MOTOR
+# ============================================================================
+
+metricas:
+
+  registrarTiempoProceso: true
+
+  registrarNumeroReglas: true
+
+  registrarNumeroEventos: true
+
+  registrarErrores: true
+
+  registrarAdvertencias: true
+
+  registrarReintentos: true
+
+  registrarVersionMotor: true
+
+# ============================================================================
+# DIAGNÓSTICO AUTOMÁTICO
+# ============================================================================
+
+diagnostico:
+
+  activo: true
+
+  verificarConfiguracion: true
+
+  verificarDependencias: true
+
+  verificarMotoresExternos: true
+
+  verificarIntegridadReglas: true
+
+  verificarEventos: true
+
+# ============================================================================
+# REGLA EVA-196
+# ============================================================================
+
+- id: EVA-196
+
+  nombre: Diagnóstico inicial
+
+  prioridad: maxima
+
+  condicion:
+
+    inicioMotor: true
+
+  accion:
+
+    ejecutar:
+
+      autodiagnostico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de ejecutarse el motor comprobará automáticamente su configuración.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-197
+# ----------------------------------------------------------------------------
+
+- id: EVA-197
+
+  nombre: Validación de dependencias
+
+  prioridad: maxima
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    verificar:
+
+      dependenciasMotores
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará la disponibilidad de todos los motores relacionados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-198
+# ----------------------------------------------------------------------------
+
+- id: EVA-198
+
+  nombre: Registro de estadísticas
+
+  prioridad: alta
+
+  condicion:
+
+    expediente.validado: true
+
+  accion:
+
+    generar:
+
+      estadisticasMotor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará estadísticas completas del funcionamiento del motor.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-199
+# ----------------------------------------------------------------------------
+
+- id: EVA-199
+
+  nombre: Consolidación del historial
+
+  prioridad: alta
+
+  condicion:
+
+    expediente.validado: true
+
+  accion:
+
+    consolidar:
+
+      historialMotor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se consolidará el historial completo de ejecución del motor.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-200
+# ----------------------------------------------------------------------------
+
+- id: EVA-200
+
+  nombre: Finalización del motor
+
+  prioridad: maxima
+
+  condicion:
+
+    expediente.validado: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: FINALIZADO
+
+  resultado:
+
+    correcto
+
+  justificar:
+
+    El motor de evaluación finaliza correctamente tras validar el expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EVA-201
+# ----------------------------------------------------------------------------
+
+- id: EVA-201
+
+  nombre: Publicación del evento final
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoMotor: FINALIZADO
+
+  accion:
+
+    publicarEvento:
+
+      nombre: workflow.evaluacion.finalizado
+
+  resultado:
+
+    correcto
+
+  justificar:
+
+    Se comunica al Workflow Engine la finalización completa del proceso de evaluación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracionGlobal:
+
+  version: "1.0.0"
+
+  lenguaje: "es"
+
+  trazabilidadCompleta: true
+
+  explicabilidadIA: true
+
+  auditoriaCompleta: true
+
+  registroEventos: true
+
+  registroMetricas: true
+
+  autodiagnostico: true
+
+  compatibleWorkflowEngine: true
+
+  compatibleRuleEngine: true
+
+  compatibleKnowledgeBase: true
+
+# ============================================================================
+# RESUMEN DEL MOTOR
+# ============================================================================
+
+resumen:
+
+  reglasTotales: 201
+
+  fasesEvaluacion: 20
+
+  compatibleLCSP: true
+
+  compatibleENS: true
+
+  compatibleENI: true
+
+  compatibleLey39: true
+
+  compatibleLey40: true
+
+  compatibleAIAct: true
+
+  preparadoProduccion: true
+
+# ============================================================================
+# FIN DEL ARCHIVO
+# knowledge/rules/evaluacion.rules.yaml
+# ============================================================================
