@@ -1,0 +1,223 @@
+# ==========================================================
+# CONTRATA IA
+# Esquema Oficial de Plantillas Documentales
+# ==========================================================
+
+schema:
+  id: CONTRATAIA.PLANTILLA.1.0
+  version: 1.0.0
+  status: vigente
+
+# ==========================================================
+# IDENTIFICACIÓN
+# ==========================================================
+
+identificacion:
+
+  id: ""
+
+  codigo: ""
+
+  nombre: ""
+
+  descripcion: ""
+
+  categoria: ""
+
+  tipoDocumento: ""
+
+# ==========================================================
+# VERSIONADO
+# ==========================================================
+
+versionado:
+
+  version: "1.0.0"
+
+  estado: borrador
+
+  fechaCreacion: ""
+
+  fechaModificacion: ""
+
+  autor: ""
+
+# ==========================================================
+# APLICABILIDAD
+# ==========================================================
+
+aplicabilidad:
+
+  tiposContrato:
+
+    - servicios
+    - suministros
+    - obras
+    - concesion_servicios
+    - concesion_obras
+    - mixto
+
+  procedimientos:
+
+    - abierto
+    - abierto_simplificado
+    - abierto_simplificado_abreviado
+    - negociado
+    - menor
+
+# ==========================================================
+# ESTRUCTURA DEL DOCUMENTO
+# ==========================================================
+
+estructura:
+
+  titulo: ""
+
+  descripcion: ""
+
+  secciones:
+
+    []
+
+# ==========================================================
+# SECCIONES
+# ==========================================================
+
+# Cada sección contendrá:
+#
+# id:
+# titulo:
+# obligatoria:
+# orden:
+# activos:
+#
+# Ejemplo:
+#
+# secciones:
+#
+#   - id: NECESIDAD
+#     titulo: Necesidad del contrato
+#     obligatoria: true
+#     orden: 10
+#     activos:
+#       - MEM.NEC.001
+#       - MEM.NEC.002
+#
+
+# ==========================================================
+# ACTIVOS DOCUMENTALES
+# ==========================================================
+
+activos:
+
+  obligatorios:
+
+    []
+
+  opcionales:
+
+    []
+
+# ==========================================================
+# REGLAS DE COMPOSICIÓN
+# ==========================================================
+
+composicion:
+
+  incluirIndice: true
+
+  numeracionAutomatica: true
+
+  generarTOC: true
+
+  incluirReferenciasNormativas: false
+
+  incluirPiePagina: false
+
+# ==========================================================
+# FORMATO
+# ==========================================================
+
+formato:
+
+  tipo: docx
+
+  idioma: es
+
+  codificacion: utf-8
+
+  estilo:
+
+    fuente: Calibri
+
+    tamano: 11
+
+    interlineado: 1.15
+
+# ==========================================================
+# DEPENDENCIAS
+# ==========================================================
+
+dependencias:
+
+  requiere:
+
+    []
+
+  incompatibleCon:
+
+    []
+
+# ==========================================================
+# SALIDA
+# ==========================================================
+
+salida:
+
+  editable: true
+
+  generarPDF: false
+
+  generarDOCX: true
+
+  generarHTML: false
+
+# ==========================================================
+# TRAZABILIDAD
+# ==========================================================
+
+trazabilidad:
+
+  registrarActivosUtilizados: true
+
+  registrarVersiones: true
+
+  registrarNormativa: true
+
+# ==========================================================
+# VALIDACIÓN
+# ==========================================================
+
+validacion:
+
+  comprobarActivos: true
+
+  comprobarReglas: true
+
+  comprobarDependencias: true
+
+# ==========================================================
+# METADATOS
+# ==========================================================
+
+metadatos:
+
+  etiquetas:
+
+    []
+
+  observaciones: ""
+
+# ==========================================================
+# FIN DEL ESQUEMA
+# ==========================================================
