@@ -1,0 +1,7688 @@
+# ============================================================================
+# CONTRATA-IA
+# MOTOR DE REGLAS
+# EXTINCIÓN DEL CONTRATO
+# Ley 9/2017 de Contratos del Sector Público
+# ============================================================================
+#
+# Archivo:
+# knowledge/rules/extincion.rules.yaml
+#
+# Versión:
+# 1.0
+#
+# Finalidad:
+#
+# Regular todas las actuaciones relativas a la extinción del contrato,
+# tanto por cumplimiento como por resolución, renuncia,
+# desistimiento u otras causas previstas legalmente.
+#
+# Este módulo constituye el cierre jurídico del ciclo contractual.
+#
+# ============================================================================
+
+version: 1.0
+
+modulo: EXTINCION
+
+descripcion: >
+
+  Motor de reglas encargado de controlar el procedimiento de
+  extinción del contrato administrativo conforme a la LCSP.
+
+estado: ACTIVO
+
+autor: CONTRATA-IA
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuracion:
+
+  verificarLCSP: true
+
+  verificarPCAP: true
+
+  verificarPPT: true
+
+  registrarAuditoria: true
+
+  registrarEventos: true
+
+  registrarTrazabilidad: true
+
+  actualizarWorkflow: true
+
+  actualizarExpediente: true
+
+# ============================================================================
+# EVENTOS DE ENTRADA
+# ============================================================================
+
+eventosEntrada:
+
+  - contrato.cumplido
+
+  - contrato.resuelto
+
+  - contrato.renunciado
+
+  - contrato.desistido
+
+  - contrato.imposible
+
+  - contrato.finalizado
+
+  - garantia.finalizada
+
+  - expediente.cerrar
+
+# ============================================================================
+# ESTADOS POSIBLES
+# ============================================================================
+
+estados:
+
+  - EJECUCION
+
+  - GARANTIA
+
+  - EXTINCION
+
+  - RESOLUCION
+
+  - LIQUIDACION
+
+  - CERRADO
+
+# ============================================================================
+# BLOQUE GENERAL
+# ============================================================================
+
+extincion:
+
+  activa: true
+
+  verificarLegalidad: true
+
+  controlarProcedimiento: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-001
+# ============================================================================
+
+- id: EXT-001
+
+  nombre: Inicio del procedimiento de extinción
+
+  prioridad: maxima
+
+  condicion:
+
+    evento:
+
+      - contrato.cumplido
+
+      - contrato.resuelto
+
+      - contrato.renunciado
+
+      - contrato.desistido
+
+      - contrato.imposible
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EXTINCION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda causa legal de terminación iniciará el procedimiento de
+    extinción del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-002
+# ----------------------------------------------------------------------------
+
+- id: EXT-002
+
+  nombre: Clasificación de la causa
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: EXTINCION
+
+  accion:
+
+    clasificar:
+
+      causaExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La causa jurídica determinará el procedimiento aplicable.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-003
+# ----------------------------------------------------------------------------
+
+- id: EXT-003
+
+  nombre: Registro de inicio
+
+  prioridad: alta
+
+  condicion:
+
+    causaExtincionClasificada: true
+
+  accion:
+
+    registrar:
+
+      inicioProcedimientoExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente registrará el inicio del procedimiento.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-004
+# ----------------------------------------------------------------------------
+
+- id: EXT-004
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    inicioProcedimientoExtincionRegistrado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: extincion.iniciada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine iniciará el flujo correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+inicioExtincion:
+
+  clasificarCausa: true
+
+  registrarInicio: true
+
+  actualizarWorkflow: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 1 DE 20
+# ============================================================================
+
+# ============================================================================
+# EXTINCIÓN POR CUMPLIMIENTO DEL CONTRATO
+# Artículos 209 y 210 LCSP
+# ============================================================================
+
+cumplimientoContrato:
+
+  activo: true
+
+  comprobarPrestaciones: true
+
+  comprobarRecepcion: true
+
+  comprobarLiquidacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-005
+# ============================================================================
+
+- id: EXT-005
+
+  nombre: Inicio del procedimiento por cumplimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    causaExtincion: CUMPLIMIENTO
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CUMPLIMIENTO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando la causa de extinción sea el cumplimiento íntegro del contrato se iniciará el procedimiento ordinario de terminación.
+
+  referencia:
+
+    LCSP_209
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-006
+# ----------------------------------------------------------------------------
+
+- id: EXT-006
+
+  nombre: Verificación de ejecución completa
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: CUMPLIMIENTO
+
+  accion:
+
+    verificar:
+
+      prestacionesCompletadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que todas las prestaciones previstas han sido ejecutadas.
+
+  referencia:
+
+    LCSP_209
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-007
+# ----------------------------------------------------------------------------
+
+- id: EXT-007
+
+  nombre: Comprobación de recepción definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    prestacionesCompletadas: true
+
+  accion:
+
+    verificar:
+
+      recepcionDefinitivaRealizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La recepción definitiva constituye un requisito previo para la extinción ordinaria.
+
+  referencia:
+
+    LCSP_210
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-008
+# ----------------------------------------------------------------------------
+
+- id: EXT-008
+
+  nombre: Verificación de liquidación
+
+  prioridad: maxima
+
+  condicion:
+
+    recepcionDefinitivaRealizada: true
+
+  accion:
+
+    verificar:
+
+      liquidacionFinalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de extinguir el contrato deberá encontrarse finalizada la liquidación económica.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-009
+# ----------------------------------------------------------------------------
+
+- id: EXT-009
+
+  nombre: Comprobación del plazo de garantía
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionFinalizada: true
+
+  accion:
+
+    verificar:
+
+      garantiaFinalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que el plazo de garantía haya concluido cuando resulte exigible.
+
+  referencia:
+
+    LCSP_111
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-010
+# ----------------------------------------------------------------------------
+
+- id: EXT-010
+
+  nombre: Verificación de obligaciones pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    garantiaFinalizada: true
+
+  accion:
+
+    verificar:
+
+      obligacionesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El contrato no podrá extinguirse mientras existan obligaciones pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-011
+# ----------------------------------------------------------------------------
+
+- id: EXT-011
+
+  nombre: Confirmación del cumplimiento íntegro
+
+  prioridad: maxima
+
+  condicion:
+
+    obligacionesPendientes: false
+
+  accion:
+
+    confirmar:
+
+      cumplimientoIntegro
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente confirmará el cumplimiento íntegro del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-012
+# ----------------------------------------------------------------------------
+
+- id: EXT-012
+
+  nombre: Registro del cumplimiento
+
+  prioridad: alta
+
+  condicion:
+
+    cumplimientoIntegroConfirmado: true
+
+  accion:
+
+    registrar:
+
+      cumplimientoContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cumplimiento íntegro quedará incorporado al expediente electrónico.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-013
+# ----------------------------------------------------------------------------
+
+- id: EXT-013
+
+  nombre: Actualización del historial
+
+  prioridad: media
+
+  condicion:
+
+    cumplimientoContratoRegistrado: true
+
+  accion:
+
+    actualizar:
+
+      historialContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El historial del contrato reflejará su correcta finalización.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-014
+# ----------------------------------------------------------------------------
+
+- id: EXT-014
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    historialContratoActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: contrato.cumplimiento.confirmado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará el procedimiento de cierre definitivo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+cumplimiento:
+
+  verificarPrestaciones: true
+
+  verificarRecepcion: true
+
+  verificarLiquidacion: true
+
+  verificarGarantia: true
+
+  registrarCumplimiento: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 2 DE 20
+# ============================================================================
+
+# ============================================================================
+# EXTINCIÓN POR RESOLUCIÓN DEL CONTRATO
+# Artículos 211 a 213 LCSP
+# ============================================================================
+
+resolucionExtincion:
+
+  activa: true
+
+  verificarCausas: true
+
+  controlarProcedimiento: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-015
+# ============================================================================
+
+- id: EXT-015
+
+  nombre: Inicio de resolución contractual
+
+  prioridad: maxima
+
+  condicion:
+
+    causaExtincion: RESOLUCION
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RESOLUCION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando la causa de extinción sea la resolución contractual se iniciará el procedimiento específico.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-016
+# ----------------------------------------------------------------------------
+
+- id: EXT-016
+
+  nombre: Identificación de la causa legal
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: RESOLUCION
+
+  accion:
+
+    clasificar:
+
+      causaResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará la causa legal concreta que fundamenta la resolución.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-017
+# ----------------------------------------------------------------------------
+
+- id: EXT-017
+
+  nombre: Validación jurídica
+
+  prioridad: maxima
+
+  condicion:
+
+    causaResolucionClasificada: true
+
+  accion:
+
+    verificar:
+
+      causaLegalResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo procederá la resolución cuando concurra una causa prevista legalmente.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-018
+# ----------------------------------------------------------------------------
+
+- id: EXT-018
+
+  nombre: Determinación del responsable
+
+  prioridad: alta
+
+  condicion:
+
+    causaLegalResolucion: true
+
+  accion:
+
+    identificar:
+
+      responsableResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema determinará si la causa resulta imputable al contratista, a la Administración o a circunstancias ajenas.
+
+  referencia:
+
+    LCSP_213
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-019
+# ----------------------------------------------------------------------------
+
+- id: EXT-019
+
+  nombre: Solicitud de informes
+
+  prioridad: alta
+
+  condicion:
+
+    responsableResolucionIdentificado: true
+
+  accion:
+
+    solicitar:
+
+      informesResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se incorporarán los informes técnicos y jurídicos exigibles.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-020
+# ----------------------------------------------------------------------------
+
+- id: EXT-020
+
+  nombre: Inicio del trámite de audiencia
+
+  prioridad: maxima
+
+  condicion:
+
+    informesResolucionEmitidos: true
+
+  accion:
+
+    iniciar:
+
+      audienciaContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se concederá audiencia al contratista cuando proceda.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-021
+# ----------------------------------------------------------------------------
+
+- id: EXT-021
+
+  nombre: Registro de alegaciones
+
+  prioridad: alta
+
+  condicion:
+
+    audienciaContratistaFinalizada: true
+
+  accion:
+
+    registrar:
+
+      alegacionesResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alegaciones formuladas quedarán incorporadas al expediente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-022
+# ----------------------------------------------------------------------------
+
+- id: EXT-022
+
+  nombre: Evaluación de alegaciones
+
+  prioridad: alta
+
+  condicion:
+
+    alegacionesResolucionRegistradas: true
+
+  accion:
+
+    evaluar:
+
+      alegacionesResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alegaciones serán valoradas antes de la resolución definitiva.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-023
+# ----------------------------------------------------------------------------
+
+- id: EXT-023
+
+  nombre: Resolución definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    alegacionesResolucionEvaluadas: true
+
+  accion:
+
+    resolver:
+
+      resolucionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación resolverá motivadamente el procedimiento.
+
+  referencia:
+
+    LCSP_212
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-024
+# ----------------------------------------------------------------------------
+
+- id: EXT-024
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    resolucionContratoEmitida: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: resolucion.extincion.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el procedimiento continuará la fase de determinación de efectos económicos.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+resolucion:
+
+  verificarCausas: true
+
+  identificarResponsable: true
+
+  solicitarInformes: true
+
+  tramitarAudiencia: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 3 DE 20
+# ============================================================================
+
+# ============================================================================
+# EFECTOS DE LA RESOLUCIÓN DEL CONTRATO
+# Artículo 213 LCSP
+# ============================================================================
+
+efectosResolucion:
+
+  activa: true
+
+  calcularConsecuencias: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-025
+# ============================================================================
+
+- id: EXT-025
+
+  nombre: Inicio del cálculo de efectos
+
+  prioridad: maxima
+
+  condicion:
+
+    resolucionContratoEmitida: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EFECTOS_RESOLUCION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Una vez resuelto el contrato comenzará la determinación de sus efectos jurídicos y económicos.
+
+  referencia:
+
+    LCSP_213
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-026
+# ----------------------------------------------------------------------------
+
+- id: EXT-026
+
+  nombre: Determinación del responsable
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: EFECTOS_RESOLUCION
+
+  accion:
+
+    identificar:
+
+      responsableIncumplimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará la parte responsable de la resolución contractual.
+
+  referencia:
+
+    LCSP_213
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-027
+# ----------------------------------------------------------------------------
+
+- id: EXT-027
+
+  nombre: Cálculo de indemnizaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    responsableIncumplimientoIdentificado: true
+
+  accion:
+
+    calcular:
+
+      indemnizacionesProcedentes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán las indemnizaciones que correspondan conforme a la legislación vigente.
+
+  referencia:
+
+    LCSP_213
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-028
+# ----------------------------------------------------------------------------
+
+- id: EXT-028
+
+  nombre: Determinación de prestaciones ejecutadas
+
+  prioridad: alta
+
+  condicion:
+
+    indemnizacionesProcedentesCalculadas: true
+
+  accion:
+
+    calcular:
+
+      prestacionesAceptadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se determinarán las prestaciones correctamente ejecutadas antes de la resolución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-029
+# ----------------------------------------------------------------------------
+
+- id: EXT-029
+
+  nombre: Liquidación económica
+
+  prioridad: maxima
+
+  condicion:
+
+    prestacionesAceptadasCalculadas: true
+
+  accion:
+
+    generar:
+
+      liquidacionResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará la liquidación económica derivada de la resolución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-030
+# ----------------------------------------------------------------------------
+
+- id: EXT-030
+
+  nombre: Valoración de la garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    liquidacionResolucionGenerada: true
+
+  accion:
+
+    evaluar:
+
+      garantiaDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se evaluará la devolución o incautación de la garantía definitiva.
+
+  referencia:
+
+    LCSP_110
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-031
+# ----------------------------------------------------------------------------
+
+- id: EXT-031
+
+  nombre: Compensaciones económicas
+
+  prioridad: alta
+
+  condicion:
+
+    garantiaDefinitivaEvaluada: true
+
+  accion:
+
+    calcular:
+
+      compensacionesEconomicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán las compensaciones económicas derivadas de la resolución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-032
+# ----------------------------------------------------------------------------
+
+- id: EXT-032
+
+  nombre: Actualización contable
+
+  prioridad: alta
+
+  condicion:
+
+    compensacionesEconomicasCalculadas: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: contabilidad.actualizar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico actualizará la situación contable del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-033
+# ----------------------------------------------------------------------------
+
+- id: EXT-033
+
+  nombre: Incorporación al expediente
+
+  prioridad: alta
+
+  condicion:
+
+    contabilidadActualizada: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación derivada de la resolución quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-034
+# ----------------------------------------------------------------------------
+
+- id: EXT-034
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaEfectosResolucion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los efectos jurídicos y económicos quedarán registrados para auditoría.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-035
+# ----------------------------------------------------------------------------
+
+- id: EXT-035
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    expedienteElectronicoActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: efectos.resolucion.finalizados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la determinación de efectos continuará el procedimiento de cierre.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+efectos:
+
+  calcularIndemnizaciones: true
+
+  calcularLiquidacion: true
+
+  evaluarGarantia: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 4 DE 20
+# ============================================================================
+
+# ============================================================================
+# RENUNCIA Y DESISTIMIENTO
+# Artículos 152 y concordantes LCSP
+# ============================================================================
+
+renunciaDesistimiento:
+
+  activa: true
+
+  verificarMotivacion: true
+
+  calcularIndemnizaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-036
+# ============================================================================
+
+- id: EXT-036
+
+  nombre: Inicio del procedimiento de renuncia
+
+  prioridad: maxima
+
+  condicion:
+
+    causaExtincion: RENUNCIA
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: RENUNCIA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una renuncia del órgano de contratación se iniciará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_152
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-037
+# ----------------------------------------------------------------------------
+
+- id: EXT-037
+
+  nombre: Inicio del procedimiento de desistimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    causaExtincion: DESISTIMIENTO
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: DESISTIMIENTO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectado un desistimiento comenzará el procedimiento específico.
+
+  referencia:
+
+    LCSP_152
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-038
+# ----------------------------------------------------------------------------
+
+- id: EXT-038
+
+  nombre: Verificación de motivación
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual:
+
+      - RENUNCIA
+
+      - DESISTIMIENTO
+
+  accion:
+
+    verificar:
+
+      motivacionSuficiente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda renuncia o desistimiento deberá estar suficientemente motivado.
+
+  referencia:
+
+    LCSP_152
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-039
+# ----------------------------------------------------------------------------
+
+- id: EXT-039
+
+  nombre: Comprobación de interés público
+
+  prioridad: maxima
+
+  condicion:
+
+    motivacionSuficiente: true
+
+  accion:
+
+    verificar:
+
+      interesPublico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará la concurrencia del interés público cuando resulte exigible.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-040
+# ----------------------------------------------------------------------------
+
+- id: EXT-040
+
+  nombre: Solicitud de informes
+
+  prioridad: alta
+
+  condicion:
+
+    interesPublicoVerificado: true
+
+  accion:
+
+    solicitar:
+
+      informesRenuncia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se incorporarán los informes preceptivos antes de resolver.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-041
+# ----------------------------------------------------------------------------
+
+- id: EXT-041
+
+  nombre: Resolución de renuncia o desistimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    informesRenunciaEmitidos: true
+
+  accion:
+
+    resolver:
+
+      renunciaDesistimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación resolverá el procedimiento.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-042
+# ----------------------------------------------------------------------------
+
+- id: EXT-042
+
+  nombre: Cálculo de indemnizaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    renunciaDesistimientoResuelto: true
+
+  accion:
+
+    calcular:
+
+      indemnizacionContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán las indemnizaciones que legalmente correspondan.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-043
+# ----------------------------------------------------------------------------
+
+- id: EXT-043
+
+  nombre: Elaboración de liquidación
+
+  prioridad: alta
+
+  condicion:
+
+    indemnizacionContratistaCalculada: true
+
+  accion:
+
+    generar:
+
+      liquidacionRenuncia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente la liquidación correspondiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-044
+# ----------------------------------------------------------------------------
+
+- id: EXT-044
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionRenunciaGenerada: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación quedará incorporada al expediente electrónico.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-045
+# ----------------------------------------------------------------------------
+
+- id: EXT-045
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: renuncia.liquidacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico iniciará la tramitación correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-046
+# ----------------------------------------------------------------------------
+
+- id: EXT-046
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaRenunciaDesistimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todo el procedimiento quedará registrado para auditoría.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+renuncia:
+
+  verificarMotivacion: true
+
+  solicitarInformes: true
+
+  calcularIndemnizaciones: true
+
+  generarLiquidacion: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 5 DE 20
+# ============================================================================
+
+# ============================================================================
+# IMPOSIBILIDAD SOBREVENIDA DE EJECUCIÓN DEL CONTRATO
+# LCSP - Imposibilidad objetiva de continuar la ejecución
+# ============================================================================
+
+imposibilidadSobrevenida:
+
+  activa: true
+
+  verificarCausa: true
+
+  verificarAlternativas: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-047
+# ============================================================================
+
+- id: EXT-047
+
+  nombre: Inicio del procedimiento por imposibilidad sobrevenida
+
+  prioridad: maxima
+
+  condicion:
+
+    causaExtincion: IMPOSIBILIDAD
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: IMPOSIBILIDAD_SOBREVENIDA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando resulte imposible continuar la ejecución del contrato se iniciará el procedimiento específico.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-048
+# ----------------------------------------------------------------------------
+
+- id: EXT-048
+
+  nombre: Verificación de la causa objetiva
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: IMPOSIBILIDAD_SOBREVENIDA
+
+  accion:
+
+    verificar:
+
+      imposibilidadObjetiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que la imposibilidad sea objetiva, real y debidamente acreditada.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-049
+# ----------------------------------------------------------------------------
+
+- id: EXT-049
+
+  nombre: Clasificación de la causa
+
+  prioridad: alta
+
+  condicion:
+
+    imposibilidadObjetiva: true
+
+  accion:
+
+    clasificar:
+
+      tipoImposibilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La causa será clasificada para determinar el régimen jurídico aplicable.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-050
+# ----------------------------------------------------------------------------
+
+- id: EXT-050
+
+  nombre: Evaluación de alternativas
+
+  prioridad: maxima
+
+  condicion:
+
+    tipoImposibilidadClasificado: true
+
+  accion:
+
+    evaluar:
+
+      alternativasViables
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes de extinguir el contrato se analizarán posibles alternativas legales y técnicas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-051
+# ----------------------------------------------------------------------------
+
+- id: EXT-051
+
+  nombre: Comprobación de modificación posible
+
+  prioridad: alta
+
+  condicion:
+
+    alternativasViablesEvaluadas: true
+
+  accion:
+
+    verificar:
+
+      modificacionPosible
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará si la situación puede resolverse mediante una modificación contractual legalmente admisible.
+
+  referencia:
+
+    LCSP_204
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-052
+# ----------------------------------------------------------------------------
+
+- id: EXT-052
+
+  nombre: Confirmación de imposibilidad definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    modificacionPosible: false
+
+  accion:
+
+    confirmar:
+
+      imposibilidadDefinitiva
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo cuando no exista alternativa viable podrá confirmarse la imposibilidad definitiva.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-053
+# ----------------------------------------------------------------------------
+
+- id: EXT-053
+
+  nombre: Elaboración de informe técnico
+
+  prioridad: alta
+
+  condicion:
+
+    imposibilidadDefinitivaConfirmada: true
+
+  accion:
+
+    generar:
+
+      informeTecnicoImposibilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará el informe técnico justificativo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-054
+# ----------------------------------------------------------------------------
+
+- id: EXT-054
+
+  nombre: Resolución del procedimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    informeTecnicoImposibilidadGenerado: true
+
+  accion:
+
+    resolver:
+
+      imposibilidadSobrevenida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente resolverá motivadamente el procedimiento.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-055
+# ----------------------------------------------------------------------------
+
+- id: EXT-055
+
+  nombre: Liquidación económica
+
+  prioridad: alta
+
+  condicion:
+
+    imposibilidadSobrevenidaResuelta: true
+
+  accion:
+
+    generar:
+
+      liquidacionImposibilidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán automáticamente los efectos económicos derivados de la imposibilidad.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-056
+# ----------------------------------------------------------------------------
+
+- id: EXT-056
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionImposibilidadGenerada: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación generada quedará incorporada al expediente electrónico.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-057
+# ----------------------------------------------------------------------------
+
+- id: EXT-057
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    expedienteElectronicoActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: imposibilidad.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará la tramitación del cierre del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+imposibilidad:
+
+  verificarCausa: true
+
+  evaluarAlternativas: true
+
+  comprobarModificacion: true
+
+  generarInforme: true
+
+  generarLiquidacion: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 6 DE 20
+# ============================================================================
+
+# ============================================================================
+# EXTINCIÓN POR MUTUO ACUERDO
+# Artículo 211 LCSP y normativa concordante
+# ============================================================================
+
+mutuoAcuerdo:
+
+  activa: true
+
+  verificarInteresPublico: true
+
+  verificarConveniencia: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-058
+# ============================================================================
+
+- id: EXT-058
+
+  nombre: Inicio del procedimiento por mutuo acuerdo
+
+  prioridad: maxima
+
+  condicion:
+
+    causaExtincion: MUTUO_ACUERDO
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: MUTUO_ACUERDO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando ambas partes manifiesten su voluntad de extinguir el contrato se iniciará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-059
+# ----------------------------------------------------------------------------
+
+- id: EXT-059
+
+  nombre: Verificación de procedencia
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: MUTUO_ACUERDO
+
+  accion:
+
+    verificar:
+
+      mutuoAcuerdoLegalmenteProcedente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que la extinción por mutuo acuerdo resulta legalmente admisible.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-060
+# ----------------------------------------------------------------------------
+
+- id: EXT-060
+
+  nombre: Comprobación del interés público
+
+  prioridad: maxima
+
+  condicion:
+
+    mutuoAcuerdoLegalmenteProcedente: true
+
+  accion:
+
+    verificar:
+
+      interesPublicoProtegido
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La extinción por mutuo acuerdo no podrá perjudicar el interés público.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-061
+# ----------------------------------------------------------------------------
+
+- id: EXT-061
+
+  nombre: Verificación de inexistencia de causa imputable
+
+  prioridad: alta
+
+  condicion:
+
+    interesPublicoProtegido: true
+
+  accion:
+
+    verificar:
+
+      ausenciaIncumplimientoContratista
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El mutuo acuerdo no procederá cuando exista una causa de resolución imputable al contratista.
+
+  referencia:
+
+    LCSP_211
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-062
+# ----------------------------------------------------------------------------
+
+- id: EXT-062
+
+  nombre: Elaboración del acuerdo
+
+  prioridad: alta
+
+  condicion:
+
+    ausenciaIncumplimientoContratista: true
+
+  accion:
+
+    generar:
+
+      documentoMutuoAcuerdo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará el documento administrativo de mutuo acuerdo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-063
+# ----------------------------------------------------------------------------
+
+- id: EXT-063
+
+  nombre: Informe jurídico
+
+  prioridad: alta
+
+  condicion:
+
+    documentoMutuoAcuerdoGenerado: true
+
+  accion:
+
+    solicitar:
+
+      informeJuridico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se incorporará el informe jurídico previo a la aprobación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-064
+# ----------------------------------------------------------------------------
+
+- id: EXT-064
+
+  nombre: Aprobación del acuerdo
+
+  prioridad: maxima
+
+  condicion:
+
+    informeJuridicoEmitido: true
+
+  accion:
+
+    aprobar:
+
+      mutuoAcuerdo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano de contratación aprobará formalmente el acuerdo alcanzado.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-065
+# ----------------------------------------------------------------------------
+
+- id: EXT-065
+
+  nombre: Liquidación económica
+
+  prioridad: maxima
+
+  condicion:
+
+    mutuoAcuerdoAprobado: true
+
+  accion:
+
+    generar:
+
+      liquidacionMutuoAcuerdo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará la liquidación económica derivada del acuerdo.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-066
+# ----------------------------------------------------------------------------
+
+- id: EXT-066
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionMutuoAcuerdoGenerada: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación será incorporada al expediente electrónico.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-067
+# ----------------------------------------------------------------------------
+
+- id: EXT-067
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaMutuoAcuerdo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones quedarán registradas para garantizar la trazabilidad.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-068
+# ----------------------------------------------------------------------------
+
+- id: EXT-068
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    expedienteElectronicoActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: mutuo.acuerdo.finalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará automáticamente con la fase siguiente del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+mutuoAcuerdoConfig:
+
+  verificarLegalidad: true
+
+  verificarInteresPublico: true
+
+  solicitarInformeJuridico: true
+
+  generarLiquidacion: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 7 DE 20
+# ============================================================================
+
+# ============================================================================
+# FALLECIMIENTO, INCAPACIDAD Y SUCESIÓN DEL CONTRATISTA
+# Artículos 98, 69, 211 y concordantes LCSP
+# ============================================================================
+
+sucesionContratista:
+
+  activa: true
+
+  verificarSucesion: true
+
+  verificarCapacidad: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-069
+# ============================================================================
+
+- id: EXT-069
+
+  nombre: Inicio del procedimiento por causa personal
+
+  prioridad: maxima
+
+  condicion:
+
+    evento:
+
+      - contratista.fallecido
+
+      - contratista.incapacidad
+
+      - contratista.disolucion
+
+      - contratista.sucesion
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: SUCESION_CONTRATISTA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Detectada una circunstancia personal del contratista comenzará el procedimiento correspondiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-070
+# ----------------------------------------------------------------------------
+
+- id: EXT-070
+
+  nombre: Clasificación de la incidencia
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: SUCESION_CONTRATISTA
+
+  accion:
+
+    clasificar:
+
+      causaPersonal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema clasificará automáticamente la causa que afecta al contratista.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-071
+# ----------------------------------------------------------------------------
+
+- id: EXT-071
+
+  nombre: Verificación de sucesión empresarial
+
+  prioridad: maxima
+
+  condicion:
+
+    causaPersonal: SUCESION_EMPRESARIAL
+
+  accion:
+
+    verificar:
+
+      sucesionLegalValida
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará que exista sucesión empresarial conforme a la legislación aplicable.
+
+  referencia:
+
+    LCSP_98
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-072
+# ----------------------------------------------------------------------------
+
+- id: EXT-072
+
+  nombre: Comprobación de capacidad del sucesor
+
+  prioridad: maxima
+
+  condicion:
+
+    sucesionLegalValida: true
+
+  accion:
+
+    verificar:
+
+      capacidadSucesor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sucesor deberá reunir todos los requisitos para contratar con el sector público.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-073
+# ----------------------------------------------------------------------------
+
+- id: EXT-073
+
+  nombre: Verificación de solvencia
+
+  prioridad: alta
+
+  condicion:
+
+    capacidadSucesor: true
+
+  accion:
+
+    verificar:
+
+      solvenciaSucesor
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará la solvencia económica, financiera y técnica del sucesor.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-074
+# ----------------------------------------------------------------------------
+
+- id: EXT-074
+
+  nombre: Decisión sobre continuidad
+
+  prioridad: maxima
+
+  condicion:
+
+    solvenciaSucesor: true
+
+  accion:
+
+    decidir:
+
+      continuidadContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El órgano competente decidirá la continuidad o extinción del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-075
+# ----------------------------------------------------------------------------
+
+- id: EXT-075
+
+  nombre: Continuación del contrato
+
+  prioridad: alta
+
+  condicion:
+
+    continuidadContrato: APROBADA
+
+  accion:
+
+    publicarEvento:
+
+      nombre: contrato.continua
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El contrato continuará con el nuevo contratista.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-076
+# ----------------------------------------------------------------------------
+
+- id: EXT-076
+
+  nombre: Extinción del contrato
+
+  prioridad: maxima
+
+  condicion:
+
+    continuidadContrato: DENEGADA
+
+  accion:
+
+    iniciar:
+
+      procedimientoExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando no resulte posible la sucesión continuará el procedimiento de extinción.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-077
+# ----------------------------------------------------------------------------
+
+- id: EXT-077
+
+  nombre: Actualización del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    actualizar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación relativa a la sucesión quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-078
+# ----------------------------------------------------------------------------
+
+- id: EXT-078
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaSucesion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones quedarán registradas para auditoría.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-079
+# ----------------------------------------------------------------------------
+
+- id: EXT-079
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    expedienteElectronicoActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: sucesion.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará automáticamente con el flujo correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+sucesion:
+
+  verificarCapacidad: true
+
+  verificarSolvencia: true
+
+  decidirContinuidad: true
+
+  actualizarExpediente: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 8 DE 20
+# ============================================================================
+
+# ============================================================================
+# LIQUIDACIÓN FINAL DEL CONTRATO
+# Artículos 210 y concordantes LCSP
+# ============================================================================
+
+liquidacionFinal:
+
+  activa: true
+
+  verificarObligaciones: true
+
+  calcularSaldo: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-080
+# ============================================================================
+
+- id: EXT-080
+
+  nombre: Inicio de la liquidación final
+
+  prioridad: maxima
+
+  condicion:
+
+    evento:
+
+      - contrato.finalizado
+
+      - contrato.resuelto
+
+      - contrato.extinguido
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: LIQUIDACION_FINAL
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el contrato comenzará el procedimiento de liquidación definitiva.
+
+  referencia:
+
+    LCSP_210
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-081
+# ----------------------------------------------------------------------------
+
+- id: EXT-081
+
+  nombre: Recopilación de obligaciones económicas
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: LIQUIDACION_FINAL
+
+  accion:
+
+    recopilar:
+
+      obligacionesEconomicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema recopilará todas las obligaciones económicas pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-082
+# ----------------------------------------------------------------------------
+
+- id: EXT-082
+
+  nombre: Comprobación de pagos efectuados
+
+  prioridad: alta
+
+  condicion:
+
+    obligacionesEconomicasRecopiladas: true
+
+  accion:
+
+    verificar:
+
+      pagosRealizados
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobarán todos los pagos efectuados durante la vida del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-083
+# ----------------------------------------------------------------------------
+
+- id: EXT-083
+
+  nombre: Comprobación de penalidades
+
+  prioridad: alta
+
+  condicion:
+
+    pagosRealizadosVerificados: true
+
+  accion:
+
+    verificar:
+
+      penalidadesAplicadas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema incorporará las penalidades aplicadas durante la ejecución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-084
+# ----------------------------------------------------------------------------
+
+- id: EXT-084
+
+  nombre: Cálculo del saldo definitivo
+
+  prioridad: maxima
+
+  condicion:
+
+    penalidadesAplicadasVerificadas: true
+
+  accion:
+
+    calcular:
+
+      saldoFinalContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calculará el saldo económico definitivo del contrato.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-085
+# ----------------------------------------------------------------------------
+
+- id: EXT-085
+
+  nombre: Compensación automática
+
+  prioridad: alta
+
+  condicion:
+
+    saldoFinalContratoCalculado: true
+
+  accion:
+
+    calcular:
+
+      compensacionesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará las compensaciones económicas procedentes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-086
+# ----------------------------------------------------------------------------
+
+- id: EXT-086
+
+  nombre: Elaboración de propuesta de liquidación
+
+  prioridad: maxima
+
+  condicion:
+
+    compensacionesPendientesCalculadas: true
+
+  accion:
+
+    generar:
+
+      propuestaLiquidacionFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará automáticamente la propuesta de liquidación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-087
+# ----------------------------------------------------------------------------
+
+- id: EXT-087
+
+  nombre: Validación por el órgano competente
+
+  prioridad: maxima
+
+  condicion:
+
+    propuestaLiquidacionFinalGenerada: true
+
+  accion:
+
+    validar:
+
+      liquidacionFinal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La liquidación deberá ser validada por el órgano competente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-088
+# ----------------------------------------------------------------------------
+
+- id: EXT-088
+
+  nombre: Registro de la liquidación
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionFinalValidada: true
+
+  accion:
+
+    registrar:
+
+      liquidacionContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La liquidación definitiva quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-089
+# ----------------------------------------------------------------------------
+
+- id: EXT-089
+
+  nombre: Actualización económica
+
+  prioridad: alta
+
+  condicion:
+
+    liquidacionContratoRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: economia.actualizar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se actualizará la situación económica definitiva del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-090
+# ----------------------------------------------------------------------------
+
+- id: EXT-090
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    economiaActualizada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: liquidacion.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la liquidación continuará el procedimiento de cierre administrativo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+liquidacion:
+
+  recopilarObligaciones: true
+
+  verificarPagos: true
+
+  calcularSaldo: true
+
+  generarLiquidacion: true
+
+  registrarLiquidacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 9 DE 20
+# ============================================================================
+
+# ============================================================================
+# GARANTÍA DEFINITIVA TRAS LA EXTINCIÓN DEL CONTRATO
+# Artículos 110 y 111 LCSP
+# ============================================================================
+
+garantiaDefinitiva:
+
+  activa: true
+
+  verificarResponsabilidades: true
+
+  verificarPlazoGarantia: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-091
+# ============================================================================
+
+- id: EXT-091
+
+  nombre: Inicio del procedimiento sobre garantía definitiva
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: liquidacion.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: GARANTIA_DEFINITIVA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la liquidación comenzará la revisión de la garantía definitiva.
+
+  referencia:
+
+    LCSP_110
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-092
+# ----------------------------------------------------------------------------
+
+- id: EXT-092
+
+  nombre: Comprobación del plazo de garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: GARANTIA_DEFINITIVA
+
+  accion:
+
+    verificar:
+
+      plazoGarantiaFinalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que haya finalizado el plazo de garantía cuando resulte exigible.
+
+  referencia:
+
+    LCSP_111
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-093
+# ----------------------------------------------------------------------------
+
+- id: EXT-093
+
+  nombre: Verificación de responsabilidades pendientes
+
+  prioridad: maxima
+
+  condicion:
+
+    plazoGarantiaFinalizado: true
+
+  accion:
+
+    verificar:
+
+      responsabilidadesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará la existencia de responsabilidades que afecten a la garantía.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-094
+# ----------------------------------------------------------------------------
+
+- id: EXT-094
+
+  nombre: Comprobación de daños pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    responsabilidadesPendientesVerificadas: true
+
+  accion:
+
+    verificar:
+
+      danosPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema verificará la existencia de daños o defectos pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-095
+# ----------------------------------------------------------------------------
+
+- id: EXT-095
+
+  nombre: Evaluación de penalidades pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    danosPendientesVerificados: true
+
+  accion:
+
+    verificar:
+
+      penalidadesPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará si existen penalidades aún no satisfechas.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-096
+# ----------------------------------------------------------------------------
+
+- id: EXT-096
+
+  nombre: Determinación del destino de la garantía
+
+  prioridad: maxima
+
+  condicion:
+
+    penalidadesPendientesVerificadas: true
+
+  accion:
+
+    decidir:
+
+      destinoGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema determinará si procede la devolución total, parcial o la incautación.
+
+  referencia:
+
+    LCSP_110
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-097
+# ----------------------------------------------------------------------------
+
+- id: EXT-097
+
+  nombre: Devolución de garantía
+
+  prioridad: alta
+
+  condicion:
+
+    destinoGarantia: DEVOLVER
+
+  accion:
+
+    generar:
+
+      acuerdoDevolucionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará el acuerdo administrativo de devolución.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-098
+# ----------------------------------------------------------------------------
+
+- id: EXT-098
+
+  nombre: Incautación de garantía
+
+  prioridad: alta
+
+  condicion:
+
+    destinoGarantia: INCAUTAR
+
+  accion:
+
+    generar:
+
+      acuerdoIncautacionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará el acuerdo administrativo de incautación.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-099
+# ----------------------------------------------------------------------------
+
+- id: EXT-099
+
+  nombre: Registro de la resolución
+
+  prioridad: alta
+
+  condicion:
+
+    destinoGarantiaDeterminado: true
+
+  accion:
+
+    registrar:
+
+      resolucionGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La resolución sobre la garantía quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-100
+# ----------------------------------------------------------------------------
+
+- id: EXT-100
+
+  nombre: Comunicación al módulo económico
+
+  prioridad: media
+
+  condicion:
+
+    resolucionGarantiaRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: garantia.resuelta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El módulo económico ejecutará la devolución o la incautación correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-101
+# ----------------------------------------------------------------------------
+
+- id: EXT-101
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaGarantia
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones relativas a la garantía quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-102
+# ----------------------------------------------------------------------------
+
+- id: EXT-102
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    auditoriaGarantiaRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: garantia.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la gestión de la garantía continuará el procedimiento de cierre definitivo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+garantia:
+
+  verificarPlazo: true
+
+  verificarResponsabilidades: true
+
+  verificarPenalidades: true
+
+  devolverGarantia: true
+
+  incautarGarantia: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 10 DE 20
+# ============================================================================
+
+# ============================================================================
+# REVERSIÓN DE BIENES Y OBLIGACIONES POSTERIORES A LA EXTINCIÓN
+# LCSP - Concesiones y contratos con bienes reversibles
+# ============================================================================
+
+reversionBienes:
+
+  activa: true
+
+  verificarInventario: true
+
+  verificarEstadoConservacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-103
+# ============================================================================
+
+- id: EXT-103
+
+  nombre: Inicio del procedimiento de reversión
+
+  prioridad: maxima
+
+  condicion:
+
+    contratoIncluyeReversion: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: REVERSION
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando el contrato contemple bienes reversibles se iniciará el procedimiento de reversión.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-104
+# ----------------------------------------------------------------------------
+
+- id: EXT-104
+
+  nombre: Elaboración del inventario de bienes
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: REVERSION
+
+  accion:
+
+    generar:
+
+      inventarioBienes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará el inventario completo de bienes objeto de reversión.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-105
+# ----------------------------------------------------------------------------
+
+- id: EXT-105
+
+  nombre: Comprobación del estado de conservación
+
+  prioridad: maxima
+
+  condicion:
+
+    inventarioBienesGenerado: true
+
+  accion:
+
+    inspeccionar:
+
+      estadoConservacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema verificará el estado de conservación de los bienes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-106
+# ----------------------------------------------------------------------------
+
+- id: EXT-106
+
+  nombre: Identificación de deterioros
+
+  prioridad: alta
+
+  condicion:
+
+    estadoConservacionInspeccionado: true
+
+  accion:
+
+    detectar:
+
+      deterioros
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se identificarán deterioros no derivados del uso normal.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-107
+# ----------------------------------------------------------------------------
+
+- id: EXT-107
+
+  nombre: Valoración económica de deterioros
+
+  prioridad: alta
+
+  condicion:
+
+    deteriorosDetectados: true
+
+  accion:
+
+    calcular:
+
+      valorDeterioros
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará el coste económico asociado a los deterioros detectados.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-108
+# ----------------------------------------------------------------------------
+
+- id: EXT-108
+
+  nombre: Entrega de documentación técnica
+
+  prioridad: maxima
+
+  condicion:
+
+    inventarioBienesGenerado: true
+
+  accion:
+
+    verificar:
+
+      documentacionTecnicaEntregada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará la entrega de toda la documentación técnica exigible.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-109
+# ----------------------------------------------------------------------------
+
+- id: EXT-109
+
+  nombre: Entrega de documentación administrativa
+
+  prioridad: alta
+
+  condicion:
+
+    documentacionTecnicaEntregada: true
+
+  accion:
+
+    verificar:
+
+      documentacionAdministrativaEntregada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará la entrega de toda la documentación administrativa pendiente.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-110
+# ----------------------------------------------------------------------------
+
+- id: EXT-110
+
+  nombre: Formalización del acta de reversión
+
+  prioridad: maxima
+
+  condicion:
+
+    documentacionAdministrativaEntregada: true
+
+  accion:
+
+    generar:
+
+      actaReversion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema elaborará el acta administrativa de reversión.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-111
+# ----------------------------------------------------------------------------
+
+- id: EXT-111
+
+  nombre: Actualización del inventario patrimonial
+
+  prioridad: alta
+
+  condicion:
+
+    actaReversionGenerada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: patrimonio.actualizar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El inventario patrimonial será actualizado automáticamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-112
+# ----------------------------------------------------------------------------
+
+- id: EXT-112
+
+  nombre: Registro de la reversión
+
+  prioridad: alta
+
+  condicion:
+
+    patrimonioActualizado: true
+
+  accion:
+
+    registrar:
+
+      expedienteReversion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda la documentación de la reversión quedará incorporada al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-113
+# ----------------------------------------------------------------------------
+
+- id: EXT-113
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaReversion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones serán registradas para garantizar la trazabilidad.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+reversion:
+
+  elaborarInventario: true
+
+  inspeccionarEstado: true
+
+  valorarDeterioros: true
+
+  generarActa: true
+
+  actualizarPatrimonio: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 11 DE 20
+# ============================================================================
+
+# ============================================================================
+# ARCHIVO, CONSERVACIÓN Y CIERRE DOCUMENTAL DEL EXPEDIENTE
+# ENI - ENS - Ley 39/2015 - LCSP
+# ============================================================================
+
+archivoExpediente:
+
+  activa: true
+
+  verificarIntegridad: true
+
+  generarIndice: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-114
+# ============================================================================
+
+- id: EXT-114
+
+  nombre: Inicio del procedimiento de archivo
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: garantia.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: ARCHIVO_EXPEDIENTE
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizadas todas las actuaciones comenzará el procedimiento de archivo.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-115
+# ----------------------------------------------------------------------------
+
+- id: EXT-115
+
+  nombre: Verificación documental completa
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: ARCHIVO_EXPEDIENTE
+
+  accion:
+
+    verificar:
+
+      expedienteCompleto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente deberá contener toda la documentación exigible.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-116
+# ----------------------------------------------------------------------------
+
+- id: EXT-116
+
+  nombre: Comprobación de firmas electrónicas
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteCompleto: true
+
+  accion:
+
+    verificar:
+
+      firmasValidas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las firmas electrónicas deberán ser válidas.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-117
+# ----------------------------------------------------------------------------
+
+- id: EXT-117
+
+  nombre: Verificación de metadatos
+
+  prioridad: alta
+
+  condicion:
+
+    firmasValidas: true
+
+  accion:
+
+    verificar:
+
+      metadatosCompletos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente deberá contener todos los metadatos obligatorios.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-118
+# ----------------------------------------------------------------------------
+
+- id: EXT-118
+
+  nombre: Generación del índice electrónico
+
+  prioridad: maxima
+
+  condicion:
+
+    metadatosCompletos: true
+
+  accion:
+
+    generar:
+
+      indiceElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se generará el índice electrónico del expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-119
+# ----------------------------------------------------------------------------
+
+- id: EXT-119
+
+  nombre: Comprobación de integridad
+
+  prioridad: maxima
+
+  condicion:
+
+    indiceElectronicoGenerado: true
+
+  accion:
+
+    verificar:
+
+      integridadDocumental
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se garantizará la integridad documental antes del archivo.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-120
+# ----------------------------------------------------------------------------
+
+- id: EXT-120
+
+  nombre: Sellado temporal
+
+  prioridad: alta
+
+  condicion:
+
+    integridadDocumental: true
+
+  accion:
+
+    aplicar:
+
+      selloTemporal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente quedará sellado electrónicamente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-121
+# ----------------------------------------------------------------------------
+
+- id: EXT-121
+
+  nombre: Clasificación archivística
+
+  prioridad: alta
+
+  condicion:
+
+    selloTemporalAplicado: true
+
+  accion:
+
+    clasificar:
+
+      serieDocumental
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente será clasificado conforme al cuadro documental.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-122
+# ----------------------------------------------------------------------------
+
+- id: EXT-122
+
+  nombre: Determinación del plazo de conservación
+
+  prioridad: alta
+
+  condicion:
+
+    serieDocumentalClasificada: true
+
+  accion:
+
+    calcular:
+
+      plazoConservacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se determinará el plazo legal de conservación.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-123
+# ----------------------------------------------------------------------------
+
+- id: EXT-123
+
+  nombre: Archivo electrónico definitivo
+
+  prioridad: maxima
+
+  condicion:
+
+    plazoConservacionCalculado: true
+
+  accion:
+
+    archivar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente será archivado definitivamente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-124
+# ----------------------------------------------------------------------------
+
+- id: EXT-124
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoArchivado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaArchivo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones de archivo quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-125
+# ----------------------------------------------------------------------------
+
+- id: EXT-125
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    auditoriaArchivoRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: archivo.finalizado
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine continuará con el cierre administrativo definitivo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+archivo:
+
+  verificarIntegridad: true
+
+  verificarFirmas: true
+
+  generarIndice: true
+
+  aplicarSellado: true
+
+  clasificarSerie: true
+
+  calcularConservacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 12 DE 20
+# ============================================================================
+
+# ============================================================================
+# CIERRE ADMINISTRATIVO DEFINITIVO DEL EXPEDIENTE
+# LCSP - Ley 39/2015 - ENI - ENS
+# ============================================================================
+
+cierreAdministrativo:
+
+  activa: true
+
+  validarIntegridadFinal: true
+
+  generarEstadisticas: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-126
+# ============================================================================
+
+- id: EXT-126
+
+  nombre: Inicio del cierre administrativo
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: archivo.finalizado
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CIERRE_ADMINISTRATIVO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Archivado el expediente comenzará el procedimiento de cierre administrativo definitivo.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-127
+# ----------------------------------------------------------------------------
+
+- id: EXT-127
+
+  nombre: Validación final del expediente
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: CIERRE_ADMINISTRATIVO
+
+  accion:
+
+    verificar:
+
+      expedienteIntegro
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema realizará una comprobación final de integridad del expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-128
+# ----------------------------------------------------------------------------
+
+- id: EXT-128
+
+  nombre: Verificación de incidencias pendientes
+
+  prioridad: maxima
+
+  condicion:
+
+    expedienteIntegro: true
+
+  accion:
+
+    verificar:
+
+      incidenciasPendientes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente únicamente podrá cerrarse cuando no existan incidencias pendientes.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-129
+# ----------------------------------------------------------------------------
+
+- id: EXT-129
+
+  nombre: Cierre de tareas pendientes
+
+  prioridad: alta
+
+  condicion:
+
+    incidenciasPendientes: false
+
+  accion:
+
+    cerrar:
+
+      tareasWorkflow
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las tareas del Workflow deberán encontrarse finalizadas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-130
+# ----------------------------------------------------------------------------
+
+- id: EXT-130
+
+  nombre: Consolidación de estadísticas
+
+  prioridad: alta
+
+  condicion:
+
+    tareasWorkflowCerradas: true
+
+  accion:
+
+    generar:
+
+      estadisticasContrato
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema consolidará los indicadores estadísticos del contrato.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-131
+# ----------------------------------------------------------------------------
+
+- id: EXT-131
+
+  nombre: Actualización del histórico
+
+  prioridad: alta
+
+  condicion:
+
+    estadisticasContratoGeneradas: true
+
+  accion:
+
+    actualizar:
+
+      historicoContratacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El histórico corporativo será actualizado automáticamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-132
+# ----------------------------------------------------------------------------
+
+- id: EXT-132
+
+  nombre: Comunicación a registros corporativos
+
+  prioridad: media
+
+  condicion:
+
+    historicoContratacionActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: registros.actualizar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los registros corporativos serán sincronizados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-133
+# ----------------------------------------------------------------------------
+
+- id: EXT-133
+
+  nombre: Declaración de expediente cerrado
+
+  prioridad: maxima
+
+  condicion:
+
+    registrosActualizados: true
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: EXPEDIENTE_CERRADO
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente quedará oficialmente cerrado.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-134
+# ----------------------------------------------------------------------------
+
+- id: EXT-134
+
+  nombre: Registro del cierre
+
+  prioridad: alta
+
+  condicion:
+
+    estadoActual: EXPEDIENTE_CERRADO
+
+  accion:
+
+    registrar:
+
+      cierreExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El cierre administrativo quedará registrado.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-135
+# ----------------------------------------------------------------------------
+
+- id: EXT-135
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    cierreExpedienteRegistrado: true
+
+  accion:
+
+    registrar:
+
+      auditoriaCierre
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones finales serán registradas para auditoría.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-136
+# ----------------------------------------------------------------------------
+
+- id: EXT-136
+
+  nombre: Comunicación al Workflow Engine
+
+  prioridad: media
+
+  condicion:
+
+    auditoriaCierreRegistrada: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: expediente.cerrado
+
+  resultado:
+
+    finalizar
+
+  justificar:
+
+    El Workflow Engine marcará el expediente como completamente finalizado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+cierre:
+
+  validarIntegridad: true
+
+  cerrarWorkflow: true
+
+  generarEstadisticas: true
+
+  actualizarHistorico: true
+
+  sincronizarRegistros: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 13 DE 20
+# ============================================================================
+
+# ============================================================================
+# CONTROL DE PLAZOS POSTERIORES A LA EXTINCIÓN
+# LCSP - Ley 39/2015 - ENI
+# ============================================================================
+
+controlPosterior:
+
+  activa: true
+
+  controlarPrescripcion: true
+
+  controlarConservacion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-137
+# ============================================================================
+
+- id: EXT-137
+
+  nombre: Inicio del control posterior
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: EXPEDIENTE_CERRADO
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: CONTROL_POSTERIOR
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Tras el cierre administrativo comenzará el periodo de control posterior.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-138
+# ----------------------------------------------------------------------------
+
+- id: EXT-138
+
+  nombre: Cálculo de plazos de prescripción
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: CONTROL_POSTERIOR
+
+  accion:
+
+    calcular:
+
+      plazosPrescripcion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará automáticamente los distintos plazos legales de prescripción.
+
+  referencia:
+
+    CodigoCivil
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-139
+# ----------------------------------------------------------------------------
+
+- id: EXT-139
+
+  nombre: Programación de revisiones
+
+  prioridad: alta
+
+  condicion:
+
+    plazosPrescripcionCalculados: true
+
+  accion:
+
+    programar:
+
+      revisionesPeriodicas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se programarán revisiones automáticas durante el periodo de conservación.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-140
+# ----------------------------------------------------------------------------
+
+- id: EXT-140
+
+  nombre: Supervisión de conservación documental
+
+  prioridad: alta
+
+  condicion:
+
+    revisionesPeriodicasProgramadas: true
+
+  accion:
+
+    verificar:
+
+      conservacionDocumental
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará periódicamente la correcta conservación documental.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-141
+# ----------------------------------------------------------------------------
+
+- id: EXT-141
+
+  nombre: Verificación de integridad electrónica
+
+  prioridad: alta
+
+  condicion:
+
+    conservacionDocumentalVerificada: true
+
+  accion:
+
+    verificar:
+
+      integridadElectronica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que no exista alteración documental.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-142
+# ----------------------------------------------------------------------------
+
+- id: EXT-142
+
+  nombre: Renovación de sellos temporales
+
+  prioridad: media
+
+  condicion:
+
+    integridadElectronicaVerificada: true
+
+  accion:
+
+    renovar:
+
+      sellosTemporales
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando proceda se renovarán los sellos temporales para garantizar la validez a largo plazo.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-143
+# ----------------------------------------------------------------------------
+
+- id: EXT-143
+
+  nombre: Verificación de formatos electrónicos
+
+  prioridad: media
+
+  condicion:
+
+    sellosTemporalesRenovados: true
+
+  accion:
+
+    verificar:
+
+      formatosLargaDuracion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará la adecuación de los formatos electrónicos de conservación.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-144
+# ----------------------------------------------------------------------------
+
+- id: EXT-144
+
+  nombre: Actualización tecnológica
+
+  prioridad: media
+
+  condicion:
+
+    formatosLargaDuracionVerificados: true
+
+  accion:
+
+    evaluar:
+
+      migracionTecnologica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se evaluará la necesidad de migración tecnológica de la documentación.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-145
+# ----------------------------------------------------------------------------
+
+- id: EXT-145
+
+  nombre: Registro de controles
+
+  prioridad: alta
+
+  condicion:
+
+    migracionTecnologicaEvaluada: true
+
+  accion:
+
+    registrar:
+
+      controlesPosteriores
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los controles posteriores quedarán registrados.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-146
+# ----------------------------------------------------------------------------
+
+- id: EXT-146
+
+  nombre: Comunicación al sistema archivístico
+
+  prioridad: media
+
+  condicion:
+
+    controlesPosterioresRegistrados: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: archivo.control.periodico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema archivístico recibirá la actualización correspondiente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-147
+# ----------------------------------------------------------------------------
+
+- id: EXT-147
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaControlPosterior
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todos los controles posteriores serán registrados para auditoría.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+controlPosteriorConfig:
+
+  calcularPrescripcion: true
+
+  controlarConservacion: true
+
+  verificarIntegridad: true
+
+  renovarSellos: true
+
+  verificarFormatos: true
+
+  evaluarMigracion: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 14 DE 20
+# ============================================================================
+
+# ============================================================================
+# REAPERTURA EXCEPCIONAL DEL EXPEDIENTE
+# LCSP - Ley 39/2015 - Revisión de oficio y resoluciones judiciales
+# ============================================================================
+
+reaperturaExpediente:
+
+  activa: true
+
+  permitirRevisionOficio: true
+
+  permitirResolucionJudicial: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-148
+# ============================================================================
+
+- id: EXT-148
+
+  nombre: Inicio de reapertura excepcional
+
+  prioridad: maxima
+
+  condicion:
+
+    evento:
+
+      - recursoEstimado
+
+      - revisionOficio
+
+      - resolucionJudicial
+
+      - nulidadDeclarada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: REAPERTURA_EXPEDIENTE
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Cuando concurra una causa legal se permitirá la reapertura excepcional del expediente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-149
+# ----------------------------------------------------------------------------
+
+- id: EXT-149
+
+  nombre: Identificación del motivo de reapertura
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: REAPERTURA_EXPEDIENTE
+
+  accion:
+
+    clasificar:
+
+      motivoReapertura
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará el motivo jurídico que fundamenta la reapertura.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-150
+# ----------------------------------------------------------------------------
+
+- id: EXT-150
+
+  nombre: Validación jurídica
+
+  prioridad: maxima
+
+  condicion:
+
+    motivoReaperturaClasificado: true
+
+  accion:
+
+    verificar:
+
+      reaperturaLegalmenteProcedente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Solo procederá la reapertura cuando exista cobertura legal suficiente.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-151
+# ----------------------------------------------------------------------------
+
+- id: EXT-151
+
+  nombre: Restauración del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    reaperturaLegalmenteProcedente: true
+
+  accion:
+
+    restaurar:
+
+      expedienteElectronico
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El expediente electrónico volverá al estado operativo.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-152
+# ----------------------------------------------------------------------------
+
+- id: EXT-152
+
+  nombre: Recuperación del historial
+
+  prioridad: alta
+
+  condicion:
+
+    expedienteElectronicoRestaurado: true
+
+  accion:
+
+    recuperar:
+
+      historialCompleto
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema recuperará todas las actuaciones anteriores.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-153
+# ----------------------------------------------------------------------------
+
+- id: EXT-153
+
+  nombre: Reactivación del Workflow
+
+  prioridad: maxima
+
+  condicion:
+
+    historialCompletoRecuperado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: workflow.reactivar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El Workflow Engine reanudará automáticamente la tramitación.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-154
+# ----------------------------------------------------------------------------
+
+- id: EXT-154
+
+  nombre: Revisión de actuaciones anteriores
+
+  prioridad: alta
+
+  condicion:
+
+    workflowReactivado: true
+
+  accion:
+
+    revisar:
+
+      actuacionesPrevias
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se revisarán todas las actuaciones ya practicadas.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-155
+# ----------------------------------------------------------------------------
+
+- id: EXT-155
+
+  nombre: Determinación de actuaciones anuladas
+
+  prioridad: alta
+
+  condicion:
+
+    actuacionesPreviasRevisadas: true
+
+  accion:
+
+    identificar:
+
+      actuacionesInvalidas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará las actuaciones que deban dejarse sin efecto.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-156
+# ----------------------------------------------------------------------------
+
+- id: EXT-156
+
+  nombre: Reprogramación del expediente
+
+  prioridad: alta
+
+  condicion:
+
+    actuacionesInvalidasIdentificadas: true
+
+  accion:
+
+    generar:
+
+      nuevoCalendario
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se recalcularán automáticamente los nuevos hitos temporales.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-157
+# ----------------------------------------------------------------------------
+
+- id: EXT-157
+
+  nombre: Registro de reapertura
+
+  prioridad: alta
+
+  condicion:
+
+    nuevoCalendarioGenerado: true
+
+  accion:
+
+    registrar:
+
+      reaperturaExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La reapertura quedará registrada en el expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-158
+# ----------------------------------------------------------------------------
+
+- id: EXT-158
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaReapertura
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones derivadas de la reapertura quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+reapertura:
+
+  validarMotivo: true
+
+  restaurarExpediente: true
+
+  recuperarHistorial: true
+
+  reactivarWorkflow: true
+
+  recalcularCalendario: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 15 DE 20
+# ============================================================================
+
+# ============================================================================
+# INDICADORES, MÉTRICAS Y EXPLOTACIÓN DEL CICLO DE VIDA DE LA EXTINCIÓN
+# Business Intelligence - CONTRATA IA
+# ============================================================================
+
+metricasExtincion:
+
+  activa: true
+
+  generarKPIs: true
+
+  alimentarBI: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-159
+# ============================================================================
+
+- id: EXT-159
+
+  nombre: Inicio del cálculo de indicadores
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual:
+
+      - EXPEDIENTE_CERRADO
+
+      - CONTROL_POSTERIOR
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: ANALISIS_INDICADORES
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizada la tramitación comenzará el cálculo de indicadores del expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-160
+# ----------------------------------------------------------------------------
+
+- id: EXT-160
+
+  nombre: Cálculo de duración total
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: ANALISIS_INDICADORES
+
+  accion:
+
+    calcular:
+
+      duracionCompletaExpediente
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calculará la duración total desde el inicio hasta la extinción.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-161
+# ----------------------------------------------------------------------------
+
+- id: EXT-161
+
+  nombre: Clasificación de la causa de extinción
+
+  prioridad: alta
+
+  condicion:
+
+    duracionCompletaExpedienteCalculada: true
+
+  accion:
+
+    clasificar:
+
+      causaEstadistica
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La causa de extinción se clasificará para explotación estadística.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-162
+# ----------------------------------------------------------------------------
+
+- id: EXT-162
+
+  nombre: Cálculo de costes asociados
+
+  prioridad: alta
+
+  condicion:
+
+    causaEstadisticaClasificada: true
+
+  accion:
+
+    calcular:
+
+      costesExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se calcularán los costes administrativos derivados del procedimiento.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-163
+# ----------------------------------------------------------------------------
+
+- id: EXT-163
+
+  nombre: Cálculo de incidencias
+
+  prioridad: alta
+
+  condicion:
+
+    costesExtincionCalculados: true
+
+  accion:
+
+    calcular:
+
+      numeroIncidencias
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará el número de incidencias producidas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-164
+# ----------------------------------------------------------------------------
+
+- id: EXT-164
+
+  nombre: Cálculo de penalidades
+
+  prioridad: alta
+
+  condicion:
+
+    numeroIncidenciasCalculado: true
+
+  accion:
+
+    calcular:
+
+      estadisticasPenalidades
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se consolidarán las estadísticas de penalidades.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-165
+# ----------------------------------------------------------------------------
+
+- id: EXT-165
+
+  nombre: Generación de KPIs
+
+  prioridad: maxima
+
+  condicion:
+
+    estadisticasPenalidadesCalculadas: true
+
+  accion:
+
+    generar:
+
+      indicadoresGestion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema generará automáticamente los indicadores de gestión.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-166
+# ----------------------------------------------------------------------------
+
+- id: EXT-166
+
+  nombre: Publicación en Business Intelligence
+
+  prioridad: alta
+
+  condicion:
+
+    indicadoresGestionGenerados: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: bi.actualizar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Los indicadores serán enviados al sistema BI corporativo.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-167
+# ----------------------------------------------------------------------------
+
+- id: EXT-167
+
+  nombre: Actualización del histórico estadístico
+
+  prioridad: alta
+
+  condicion:
+
+    biActualizado: true
+
+  accion:
+
+    actualizar:
+
+      historicoIndicadores
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se actualizará el histórico de indicadores del sistema.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-168
+# ----------------------------------------------------------------------------
+
+- id: EXT-168
+
+  nombre: Registro de métricas
+
+  prioridad: alta
+
+  condicion:
+
+    historicoIndicadoresActualizado: true
+
+  accion:
+
+    registrar:
+
+      metricasExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las métricas quedarán registradas para análisis posteriores.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-169
+# ----------------------------------------------------------------------------
+
+- id: EXT-169
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaMetricas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las operaciones de explotación estadística serán auditadas.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+metricas:
+
+  calcularDuracion: true
+
+  calcularCostes: true
+
+  calcularIncidencias: true
+
+  generarKPIs: true
+
+  actualizarBI: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 16 DE 20
+# ============================================================================
+
+# ============================================================================
+# MOTOR DE ALERTAS Y DETECCIÓN DE ANOMALÍAS EN LA EXTINCIÓN
+# Business Rules - CONTRATA IA
+# ============================================================================
+
+motorAlertas:
+
+  activo: true
+
+  generarAlertas: true
+
+  detectarPatrones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-170
+# ============================================================================
+
+- id: EXT-170
+
+  nombre: Inicio del análisis de anomalías
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual:
+
+      - ANALISIS_INDICADORES
+
+      - CONTROL_POSTERIOR
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: ANALISIS_ANOMALIAS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el análisis estadístico comenzará la detección automática de anomalías.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-171
+# ----------------------------------------------------------------------------
+
+- id: EXT-171
+
+  nombre: Detección de resoluciones repetidas
+
+  prioridad: alta
+
+  condicion:
+
+    estadoActual: ANALISIS_ANOMALIAS
+
+  accion:
+
+    detectar:
+
+      resolucionesFrecuentes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará órganos con un número elevado de resoluciones contractuales.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-172
+# ----------------------------------------------------------------------------
+
+- id: EXT-172
+
+  nombre: Detección de contratistas reincidentes
+
+  prioridad: maxima
+
+  condicion:
+
+    resolucionesFrecuentesDetectadas: true
+
+  accion:
+
+    detectar:
+
+      contratistasReincidentes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se localizarán contratistas con un elevado número de incidencias o resoluciones.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-173
+# ----------------------------------------------------------------------------
+
+- id: EXT-173
+
+  nombre: Detección de penalidades reiteradas
+
+  prioridad: alta
+
+  condicion:
+
+    contratistasReincidentesDetectados: true
+
+  accion:
+
+    detectar:
+
+      penalidadesReiteradas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará patrones repetitivos de penalización.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-174
+# ----------------------------------------------------------------------------
+
+- id: EXT-174
+
+  nombre: Detección de incumplimientos recurrentes
+
+  prioridad: alta
+
+  condicion:
+
+    penalidadesReiteradasDetectadas: true
+
+  accion:
+
+    detectar:
+
+      incumplimientosRecurrentes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se identificarán incumplimientos que puedan indicar riesgos estructurales.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-175
+# ----------------------------------------------------------------------------
+
+- id: EXT-175
+
+  nombre: Cálculo del nivel de riesgo
+
+  prioridad: maxima
+
+  condicion:
+
+    incumplimientosRecurrentesDetectados: true
+
+  accion:
+
+    calcular:
+
+      indiceRiesgoExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema calculará un índice global de riesgo para el expediente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-176
+# ----------------------------------------------------------------------------
+
+- id: EXT-176
+
+  nombre: Generación de alertas preventivas
+
+  prioridad: maxima
+
+  condicion:
+
+    indiceRiesgoExtincionCalculado: true
+
+  accion:
+
+    generar:
+
+      alertasPreventivas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se emitirán alertas cuando el riesgo supere los umbrales establecidos.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-177
+# ----------------------------------------------------------------------------
+
+- id: EXT-177
+
+  nombre: Clasificación de criticidad
+
+  prioridad: alta
+
+  condicion:
+
+    alertasPreventivasGeneradas: true
+
+  accion:
+
+    clasificar:
+
+      nivelCriticidad
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alertas serán clasificadas según su criticidad.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-178
+# ----------------------------------------------------------------------------
+
+- id: EXT-178
+
+  nombre: Comunicación a supervisión
+
+  prioridad: alta
+
+  condicion:
+
+    nivelCriticidadClasificado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: supervision.alerta
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las alertas críticas serán comunicadas automáticamente a los responsables.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-179
+# ----------------------------------------------------------------------------
+
+- id: EXT-179
+
+  nombre: Registro histórico de alertas
+
+  prioridad: alta
+
+  condicion:
+
+    supervisionAlertaPublicada: true
+
+  accion:
+
+    registrar:
+
+      historicoAlertas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema conservará el histórico de alertas generadas.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-180
+# ----------------------------------------------------------------------------
+
+- id: EXT-180
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaAlertas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las alertas y anomalías detectadas quedarán registradas para auditoría.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+alertas:
+
+  detectarResoluciones: true
+
+  detectarReincidencias: true
+
+  detectarIncumplimientos: true
+
+  calcularIndiceRiesgo: true
+
+  generarAlertas: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 17 DE 20
+# ============================================================================
+
+# ============================================================================
+# MOTOR DE APRENDIZAJE Y MEJORA CONTINUA
+# Inteligencia de conocimiento - CONTRATA IA
+# ============================================================================
+
+aprendizajeContinuo:
+
+  activo: true
+
+  actualizarModelos: true
+
+  generarRecomendaciones: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-181
+# ============================================================================
+
+- id: EXT-181
+
+  nombre: Inicio del proceso de aprendizaje
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: ANALISIS_ANOMALIAS
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: APRENDIZAJE
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Finalizado el análisis de anomalías comenzará el proceso de aprendizaje del sistema.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-182
+# ----------------------------------------------------------------------------
+
+- id: EXT-182
+
+  nombre: Extracción de conocimiento
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: APRENDIZAJE
+
+  accion:
+
+    analizar:
+
+      expedientesHistoricos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema analizará el histórico de expedientes para detectar patrones útiles.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-183
+# ----------------------------------------------------------------------------
+
+- id: EXT-183
+
+  nombre: Identificación de buenas prácticas
+
+  prioridad: alta
+
+  condicion:
+
+    expedientesHistoricosAnalizados: true
+
+  accion:
+
+    detectar:
+
+      buenasPracticas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se identificarán procedimientos con mejores resultados.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-184
+# ----------------------------------------------------------------------------
+
+- id: EXT-184
+
+  nombre: Identificación de errores recurrentes
+
+  prioridad: alta
+
+  condicion:
+
+    buenasPracticasDetectadas: true
+
+  accion:
+
+    detectar:
+
+      erroresFrecuentes
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema localizará errores repetitivos durante la extinción contractual.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-185
+# ----------------------------------------------------------------------------
+
+- id: EXT-185
+
+  nombre: Elaboración de recomendaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    erroresFrecuentesDetectados: true
+
+  accion:
+
+    generar:
+
+      recomendacionesMejora
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se generarán recomendaciones para mejorar futuros expedientes.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-186
+# ----------------------------------------------------------------------------
+
+- id: EXT-186
+
+  nombre: Actualización de reglas internas
+
+  prioridad: alta
+
+  condicion:
+
+    recomendacionesMejoraGeneradas: true
+
+  accion:
+
+    proponer:
+
+      actualizacionReglas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema propondrá modificaciones de las reglas internas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-187
+# ----------------------------------------------------------------------------
+
+- id: EXT-187
+
+  nombre: Actualización del modelo de riesgo
+
+  prioridad: alta
+
+  condicion:
+
+    actualizacionReglasPropuesta: true
+
+  accion:
+
+    recalcular:
+
+      modeloRiesgo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El modelo predictivo de riesgo será recalibrado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-188
+# ----------------------------------------------------------------------------
+
+- id: EXT-188
+
+  nombre: Actualización del conocimiento
+
+  prioridad: alta
+
+  condicion:
+
+    modeloRiesgoRecalculado: true
+
+  accion:
+
+    actualizar:
+
+      baseConocimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se actualizará la base de conocimiento del sistema.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-189
+# ----------------------------------------------------------------------------
+
+- id: EXT-189
+
+  nombre: Versionado del conocimiento
+
+  prioridad: alta
+
+  condicion:
+
+    baseConocimientoActualizada: true
+
+  accion:
+
+    generar:
+
+      nuevaVersionConocimiento
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Toda modificación del conocimiento quedará versionada.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-190
+# ----------------------------------------------------------------------------
+
+- id: EXT-190
+
+  nombre: Registro del aprendizaje
+
+  prioridad: alta
+
+  condicion:
+
+    nuevaVersionConocimientoGenerada: true
+
+  accion:
+
+    registrar:
+
+      aprendizajeSistema
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se conservará el histórico de aprendizaje del sistema.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-191
+# ----------------------------------------------------------------------------
+
+- id: EXT-191
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaAprendizaje
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las actuaciones del proceso de aprendizaje quedarán registradas.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+aprendizaje:
+
+  analizarHistorico: true
+
+  detectarBuenasPracticas: true
+
+  detectarErrores: true
+
+  generarRecomendaciones: true
+
+  actualizarConocimiento: true
+
+  versionarConocimiento: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 18 DE 20
+# ============================================================================
+
+# ============================================================================
+# MOTOR DE VALIDACIÓN NORMATIVA
+# LCSP - Ley 39/2015 - ENI - ENS - RGPD
+# ============================================================================
+
+validacionNormativa:
+
+  activa: true
+
+  validarLCSP: true
+
+  validarLey39: true
+
+  validarENI: true
+
+  validarENS: true
+
+  validarRGPD: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# REGLA EXT-192
+# ============================================================================
+
+- id: EXT-192
+
+  nombre: Inicio de validación normativa
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: APRENDIZAJE
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: VALIDACION_NORMATIVA
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes del cierre definitivo se verificará el cumplimiento íntegro de la normativa aplicable.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-193
+# ----------------------------------------------------------------------------
+
+- id: EXT-193
+
+  nombre: Validación LCSP
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: VALIDACION_NORMATIVA
+
+  accion:
+
+    verificar:
+
+      cumplimientoLCSP
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que todas las actuaciones cumplen la Ley de Contratos del Sector Público.
+
+  referencia:
+
+    LCSP
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-194
+# ----------------------------------------------------------------------------
+
+- id: EXT-194
+
+  nombre: Validación Ley 39/2015
+
+  prioridad: maxima
+
+  condicion:
+
+    cumplimientoLCSP: true
+
+  accion:
+
+    verificar:
+
+      cumplimientoLey39
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará el cumplimiento del procedimiento administrativo común.
+
+  referencia:
+
+    Ley39_2015
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-195
+# ----------------------------------------------------------------------------
+
+- id: EXT-195
+
+  nombre: Validación ENI
+
+  prioridad: alta
+
+  condicion:
+
+    cumplimientoLey39: true
+
+  accion:
+
+    verificar:
+
+      cumplimientoENI
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se comprobará la interoperabilidad documental del expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-196
+# ----------------------------------------------------------------------------
+
+- id: EXT-196
+
+  nombre: Validación ENS
+
+  prioridad: alta
+
+  condicion:
+
+    cumplimientoENI: true
+
+  accion:
+
+    verificar:
+
+      cumplimientoENS
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará el cumplimiento de los requisitos de seguridad.
+
+  referencia:
+
+    ENS
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-197
+# ----------------------------------------------------------------------------
+
+- id: EXT-197
+
+  nombre: Validación RGPD
+
+  prioridad: alta
+
+  condicion:
+
+    cumplimientoENS: true
+
+  accion:
+
+    verificar:
+
+      cumplimientoRGPD
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se verificará el tratamiento adecuado de los datos personales.
+
+  referencia:
+
+    RGPD
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-198
+# ----------------------------------------------------------------------------
+
+- id: EXT-198
+
+  nombre: Consolidación de validaciones
+
+  prioridad: maxima
+
+  condicion:
+
+    cumplimientoRGPD: true
+
+  accion:
+
+    consolidar:
+
+      informeValidacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se consolidarán todas las comprobaciones en un único informe.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-199
+# ----------------------------------------------------------------------------
+
+- id: EXT-199
+
+  nombre: Detección de incumplimientos
+
+  prioridad: maxima
+
+  condicion:
+
+    informeValidacionGenerado: true
+
+  accion:
+
+    detectar:
+
+      incumplimientosNormativos
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema identificará cualquier incumplimiento detectado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-200
+# ----------------------------------------------------------------------------
+
+- id: EXT-200
+
+  nombre: Propuesta automática de subsanación
+
+  prioridad: alta
+
+  condicion:
+
+    incumplimientosNormativosDetectados: true
+
+  accion:
+
+    generar:
+
+      propuestasSubsanacion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se propondrán automáticamente las actuaciones necesarias para subsanar las incidencias.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-201
+# ----------------------------------------------------------------------------
+
+- id: EXT-201
+
+  nombre: Registro del informe normativo
+
+  prioridad: alta
+
+  condicion:
+
+    propuestasSubsanacionGeneradas: true
+
+  accion:
+
+    registrar:
+
+      informeCumplimientoNormativo
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El informe de cumplimiento normativo quedará incorporado al expediente.
+
+  referencia:
+
+    ENI
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-202
+# ----------------------------------------------------------------------------
+
+- id: EXT-202
+
+  nombre: Registro de auditoría
+
+  prioridad: alta
+
+  condicion:
+
+    siempre: true
+
+  accion:
+
+    registrar:
+
+      auditoriaValidacionNormativa
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Todas las comprobaciones normativas quedarán registradas para auditoría.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN DEL BLOQUE
+# ============================================================================
+
+validacion:
+
+  validarLCSP: true
+
+  validarLey39: true
+
+  validarENI: true
+
+  validarENS: true
+
+  validarRGPD: true
+
+  generarInforme: true
+
+  registrarAuditoria: true
+
+# ============================================================================
+# FIN PARTE 19 DE 20
+# ============================================================================
+
+# ============================================================================
+# CIERRE GLOBAL DEL MOTOR DE EXTINCIÓN
+# CONTRATA IA
+# ============================================================================
+
+motorExtincion:
+
+  version: "1.0.0"
+
+  estado: ACTIVO
+
+  modulo: EXTINCION
+
+  compatible:
+
+    - workflow
+
+    - expediente
+
+    - conocimiento
+
+    - auditoria
+
+    - documentos
+
+    - notificaciones
+
+    - estadisticas
+
+    - ia
+
+# ============================================================================
+# REGLA EXT-203
+# ============================================================================
+
+- id: EXT-203
+
+  nombre: Verificación completa del módulo
+
+  prioridad: maxima
+
+  condicion:
+
+    evento: validacionNormativa.finalizada
+
+  accion:
+
+    verificar:
+
+      integridadModuloExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Antes del cierre definitivo se comprobará la integridad completa del motor de extinción.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-204
+# ----------------------------------------------------------------------------
+
+- id: EXT-204
+
+  nombre: Validación de dependencias
+
+  prioridad: maxima
+
+  condicion:
+
+    integridadModuloExtincion: true
+
+  accion:
+
+    verificar:
+
+      dependenciasInternas
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El sistema comprobará que todas las dependencias internas estén correctamente satisfechas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-205
+# ----------------------------------------------------------------------------
+
+- id: EXT-205
+
+  nombre: Publicación del resumen ejecutivo
+
+  prioridad: alta
+
+  condicion:
+
+    dependenciasInternas: true
+
+  accion:
+
+    generar:
+
+      resumenEjecutivoExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Se elaborará automáticamente un resumen ejecutivo del procedimiento de extinción.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-206
+# ----------------------------------------------------------------------------
+
+- id: EXT-206
+
+  nombre: Exportación de métricas
+
+  prioridad: alta
+
+  condicion:
+
+    resumenEjecutivoExtincionGenerado: true
+
+  accion:
+
+    exportar:
+
+      metricasExtincion
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    Las métricas serán exportadas al sistema corporativo de análisis.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-207
+# ----------------------------------------------------------------------------
+
+- id: EXT-207
+
+  nombre: Sincronización del conocimiento
+
+  prioridad: alta
+
+  condicion:
+
+    metricasExtincionExportadas: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: conocimiento.sincronizar
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    La base de conocimiento será sincronizada con las mejoras aprendidas.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-208
+# ----------------------------------------------------------------------------
+
+- id: EXT-208
+
+  nombre: Actualización del histórico global
+
+  prioridad: alta
+
+  condicion:
+
+    conocimientoSincronizado: true
+
+  accion:
+
+    actualizar:
+
+      historicoGlobal
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El histórico global del sistema será actualizado.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-209
+# ----------------------------------------------------------------------------
+
+- id: EXT-209
+
+  nombre: Publicación del evento final
+
+  prioridad: maxima
+
+  condicion:
+
+    historicoGlobalActualizado: true
+
+  accion:
+
+    publicarEvento:
+
+      nombre: extincion.finalizada
+
+  resultado:
+
+    continuar
+
+  justificar:
+
+    El resto de módulos conocerá que la extinción ha finalizado completamente.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-210
+# ----------------------------------------------------------------------------
+
+- id: EXT-210
+
+  nombre: Cierre definitivo del motor
+
+  prioridad: maxima
+
+  condicion:
+
+    eventoPublicado: extincion.finalizada
+
+  accion:
+
+    cambiarEstado:
+
+      nuevoEstado: FINALIZADO
+
+  resultado:
+
+    finalizar
+
+  justificar:
+
+    El motor de extinción queda finalizado y preparado para futuras reutilizaciones.
+
+  referencia:
+
+    CONTRATA_IA
+
+# ----------------------------------------------------------------------------
+# REGLA EXT-211
+# ----------------------------------------------------------------------------
+
+- id: EXT-211
+
+  nombre: Registro final de auditoría
+
+  prioridad: maxima
+
+  condicion:
+
+    estadoActual: FINALIZADO
+
+  accion:
+
+    registrar:
+
+      auditoriaFinalModulo
+
+  resultado:
+
+    finalizar
+
+  justificar:
+
+    Se registrará el cierre definitivo del módulo de extinción.
+
+  referencia:
+
+    ENS
+
+# ============================================================================
+# CONFIGURACIÓN FINAL DEL MÓDULO
+# ============================================================================
+
+configuracionFinal:
+
+  version: "1.0.0"
+
+  exportarEventos: true
+
+  generarResumen: true
+
+  sincronizarConocimiento: true
+
+  actualizarHistorico: true
+
+  registrarAuditoria: true
+
+  compatibleWorkflow: true
+
+  compatibleIA: true
+
+  compatibleKnowledgeBase: true
+
+  compatibleAnalytics: true
+
+# ============================================================================
+# EVENTOS PUBLICADOS
+# ============================================================================
+
+eventos:
+
+  - extincion.iniciada
+
+  - extincion.resuelta
+
+  - garantia.finalizada
+
+  - archivo.finalizado
+
+  - expediente.cerrado
+
+  - control.periodico
+
+  - aprendizaje.finalizado
+
+  - validacionNormativa.finalizada
+
+  - extincion.finalizada
+
+# ============================================================================
+# FIN DEL ARCHIVO
+# knowledge/rules/extincion.rules.yaml
+# ============================================================================
