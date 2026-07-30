@@ -284,3 +284,244 @@ textos:
       La actuación proyectada responde a una necesidad vinculada al
       interés público cuya satisfacción resulta imprescindible para el
       adecuado funcionamiento del servicio.
+
+#
+# ==========================================================
+# VARIANTES DOCUMENTALES
+# ==========================================================
+
+redacciones:
+
+  generica:
+
+    titulo: Necesidad genérica
+
+    texto: |
+
+      Se ha identificado una necesidad objetiva cuya satisfacción resulta
+      imprescindible para garantizar el correcto funcionamiento de las
+      competencias atribuidas al órgano de contratación.
+
+      Dicha necesidad no puede ser atendida adecuadamente mediante los
+      recursos actualmente disponibles, siendo necesaria la celebración
+      del presente contrato.
+
+      La contratación proyectada constituye la solución más eficiente y
+      adecuada para satisfacer el interés público perseguido.
+
+  servicios:
+
+    titulo: Contrato de servicios
+
+    texto: |
+
+      El órgano gestor precisa disponer de servicios especializados para
+      asegurar el adecuado desarrollo de las funciones que tiene
+      encomendadas.
+
+      La naturaleza técnica de dichas prestaciones exige su ejecución
+      mediante contratación externa, garantizando la continuidad del
+      servicio y la calidad de las prestaciones.
+
+      La contratación permitirá alcanzar los objetivos previstos con
+      criterios de eficacia, eficiencia y racionalización del gasto
+      público.
+
+  suministros:
+
+    titulo: Contrato de suministro
+
+    texto: |
+
+      El funcionamiento ordinario de la unidad administrativa requiere el
+      suministro de bienes que actualmente no pueden obtenerse mediante
+      los recursos disponibles.
+
+      La adquisición de dichos bienes resulta imprescindible para mantener
+      la continuidad de la actividad administrativa y garantizar la
+      adecuada prestación del servicio público.
+
+  obras:
+
+    titulo: Contrato de obras
+
+    texto: |
+
+      Se ha constatado la necesidad de ejecutar actuaciones materiales
+      destinadas a conservar, mejorar o adecuar las infraestructuras
+      afectadas.
+
+      Las actuaciones previstas resultan imprescindibles para garantizar
+      las condiciones de seguridad, funcionalidad y servicio exigibles.
+
+  concesion:
+
+    titulo: Contrato de concesión
+
+    texto: |
+
+      La gestión indirecta de la prestación permitirá garantizar una mejor
+      organización de los recursos públicos manteniendo los niveles de
+      calidad exigidos.
+
+#
+# ==========================================================
+# OBJETIVOS PÚBLICOS
+# ==========================================================
+
+objetivosPublicos:
+
+  generales:
+
+    - Garantizar la continuidad del servicio público.
+
+    - Mejorar la eficiencia administrativa.
+
+    - Optimizar los recursos públicos.
+
+    - Incrementar la calidad del servicio.
+
+    - Cumplir las competencias atribuidas al órgano gestor.
+
+  especificos:
+
+    descripcion: >
+
+      Los objetivos específicos deberán adaptarse automáticamente al
+      objeto concreto del contrato.
+
+#
+# ==========================================================
+# CRITERIOS DE REDACCIÓN
+# ==========================================================
+
+criteriosRedaccion:
+
+  prohibiciones:
+
+    - Utilizar expresiones genéricas sin contenido.
+
+    - Incluir afirmaciones no justificadas.
+
+    - Repetir literalmente el objeto del contrato.
+
+    - Introducir criterios de adjudicación.
+
+    - Incorporar referencias económicas.
+
+  recomendaciones:
+
+    - Utilizar lenguaje administrativo.
+
+    - Mantener un tono objetivo.
+
+    - Fundamentar todas las afirmaciones.
+
+    - Relacionar la necesidad con el interés público.
+
+#
+# ==========================================================
+# VALIDACIONES JURÍDICAS
+# ==========================================================
+
+validaciones:
+
+  - id: VAL-NEC-001
+
+    descripcion: Debe existir necesidad pública.
+
+    severidad: critica
+
+  - id: VAL-NEC-002
+
+    descripcion: Debe existir interés público.
+
+    severidad: critica
+
+  - id: VAL-NEC-003
+
+    descripcion: Debe existir coherencia con el objeto.
+
+    severidad: critica
+
+  - id: VAL-NEC-004
+
+    descripcion: Debe justificarse la contratación.
+
+    severidad: alta
+
+  - id: VAL-NEC-005
+
+    descripcion: Debe utilizar lenguaje administrativo.
+
+    severidad: media
+
+#
+# ==========================================================
+# REGLAS PARA EL MOTOR EXPERTO
+# ==========================================================
+
+motorExperto:
+
+  seleccionAutomatica:
+
+    prioridad:
+
+      servicios: 100
+
+      suministros: 100
+
+      obras: 100
+
+      concesion_servicios: 95
+
+      concesion_obras: 95
+
+  composicion:
+
+    ordenarPor:
+
+      - introduccion
+
+      - descripcionNecesidad
+
+      - interesPublico
+
+      - conclusion
+
+  comportamiento:
+
+    combinarVariantes: true
+
+    eliminarDuplicidades: true
+
+    validarCoherencia: true
+
+    generarObservaciones: true
+
+#
+# ==========================================================
+# OBSERVACIONES
+# ==========================================================
+
+observaciones:
+
+  - >
+
+    Este módulo constituye el punto de partida para toda la Memoria
+    Justificativa.
+
+  - >
+
+    Ningún expediente podrá generarse sin superar las validaciones
+    definidas en este módulo.
+
+  - >
+
+    El contenido generado deberá ser posteriormente validado por el
+    órgano promotor del expediente.
+
+#
+# ==========================================================
+# FIN DE LA PARTE 2
+# ==========================================================
