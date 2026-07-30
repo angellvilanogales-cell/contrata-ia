@@ -1,26 +1,47 @@
 # BANCO DE CONOCIMIENTO DE CONTRATA IA
 
-## Objetivo
+**Versión:** 1.0.0
 
-Este directorio contiene todo el conocimiento jurídico utilizado por CONTRATA IA.
-
-El objetivo es separar completamente:
-
-- Código
-- Normativa
-- Reglas
-- Plantillas
-- Redacción administrativa
-
-De esta forma el conocimiento podrá evolucionar sin modificar el software.
+**Estado:** Documento Director
 
 ---
 
-# Estructura
+# Objetivo
+
+El directorio **knowledge/** constituye el núcleo de conocimiento de CONTRATA IA.
+
+Su finalidad es separar completamente el conocimiento jurídico del código fuente para permitir la evolución del sistema sin necesidad de modificar la aplicación.
+
+Toda decisión jurídica deberá estar fundamentada en el conocimiento almacenado en este directorio.
+
+El código únicamente será responsable de interpretar dicho conocimiento.
+
+---
+
+# Principios
+
+El Banco de Conocimiento se rige por los siguientes principios:
+
+- Separación absoluta entre código y conocimiento.
+- Una única fuente de verdad.
+- Reutilización máxima del conocimiento.
+- Trazabilidad completa.
+- Versionado de todos los elementos.
+- Explicabilidad de todas las decisiones.
+- Evolución independiente del software.
+
+---
+
+# Arquitectura
 
 ```
 knowledge/
 
+├── README.md
+├── VERSION.yaml
+│
+├── catalogo-maestro/
+│
 ├── cpv/
 │
 ├── normativa/
@@ -35,185 +56,302 @@ knowledge/
 │
 ├── informes/
 │
-└── guias/
+├── guias/
+│
+└── modelos/
 ```
 
 ---
 
-# Contenido de cada directorio
+# Catálogo Maestro
 
-## cpv
+El **Catálogo Maestro** constituye el núcleo documental del Banco de Conocimiento.
 
-Listado oficial de códigos CPV.
+No almacena documentos completos.
 
-Fuente:
+Almacena conocimiento reutilizable.
 
-Reglamento (CE) 213/2008.
+Su misión es suministrar toda la información necesaria para construir automáticamente documentos administrativos.
 
----
+Está formado por:
 
-## normativa
-
-Normativa consolidada.
-
-Ejemplo
-
-LCSP
-
-Ley 39/2015
-
-Ley 40/2015
-
-Reglamentos
-
-Normativa Junta de Andalucía
+- Activos Documentales
+- Reglas Jurídicas
+- Relaciones
+- Plantillas
+- Índices
+- Metadatos
 
 ---
 
-## rules
+# Activos Documentales
 
-Reglas jurídicas del sistema experto.
+Un Activo Documental representa la unidad mínima reutilizable del sistema.
 
-Ejemplo
+Ejemplos:
 
-procedimiento.rules.json
+- Justificación de la necesidad.
+- Justificación de insuficiencia de medios.
+- Objeto del contrato.
+- Justificación del procedimiento.
+- Justificación del CPV.
+- División en lotes.
+- Solvencia económica.
+- Solvencia técnica.
+- Garantías.
+- Penalidades.
+- Conclusiones.
 
-solvencia.rules.json
+Un mismo activo podrá utilizarse simultáneamente en:
 
-publicidad.rules.json
-
-plazos.rules.json
-
-...
-
----
-
-## templates
-
-Modelos completos de documentos.
-
-Ejemplo
-
-PCAP
-
-PPT
-
-Memorias
-
-Informes
-
-Resoluciones
-
-Actas
+- Memoria Justificativa.
+- PCAP.
+- PPT.
+- Informes.
+- Resoluciones.
+- Anexos.
 
 ---
 
-## snippets
+# Reglas Jurídicas
 
-Fragmentos jurídicos reutilizables.
+Las reglas contienen la lógica normativa utilizada por los motores expertos.
 
-Ejemplo
+Ejemplos:
 
-Justificación necesidad
+- Procedimiento de adjudicación.
+- Publicidad.
+- Solvencia.
+- Garantías.
+- Duración.
+- Modificaciones.
+- Penalidades.
+- Recursos.
 
-Insuficiencia medios
+Las reglas nunca contendrán texto documental.
 
-División en lotes
-
-Criterios adjudicación
-
-Solvencia económica
-
-Solvencia técnica
-
-Garantías
-
-Modificaciones
-
-Penalidades
-
-Prórrogas
+Únicamente expresarán condiciones y decisiones jurídicas.
 
 ---
 
-## jurisprudencia
+# Plantillas
 
-Sentencias y doctrina.
+Las plantillas definen exclusivamente la estructura documental.
 
-TS
+No contienen conocimiento jurídico.
 
-TJUE
+Determinan:
 
-TACRC
+- Secciones.
+- Orden.
+- Bloques.
+- Dependencias.
+- Composición del documento.
 
-Tribunales Administrativos
-
-JCCA
-
----
-
-## informes
-
-Informes de órganos consultivos.
-
-JCCA
-
-IGAE
-
-Abogacía del Estado
-
-Tribunales Administrativos
+Todo el contenido será suministrado por los Activos Documentales.
 
 ---
 
-## guias
+# Snippets
 
-Guías técnicas.
+Los snippets contienen fragmentos de redacción administrativa reutilizable.
+
+Ejemplos:
+
+- Necesidad.
+- Insuficiencia de medios.
+- División en lotes.
+- Solvencia.
+- Garantías.
+- Penalidades.
+- Modificaciones.
+- Conclusiones.
+
+Cada snippet podrá disponer de múltiples variantes según:
+
+- Tipo de contrato.
+- Procedimiento.
+- Órgano de contratación.
+- Sector.
+- Nivel de detalle.
+
+---
+
+# Normativa
+
+Contendrá toda la normativa utilizada por CONTRATA IA.
+
+Ejemplos:
+
+- Ley 9/2017 de Contratos del Sector Público.
+- Ley 39/2015.
+- Ley 40/2015.
+- Reglamentos de desarrollo.
+- Normativa de la Junta de Andalucía.
+- Instrucciones internas.
+- Circulares.
+- Guías oficiales.
+
+---
+
+# CPV
+
+Contendrá la clasificación oficial de códigos CPV.
+
+Fuente principal:
+
+Reglamento (CE) nº 213/2008.
+
+Permitirá relacionar automáticamente:
+
+- Objeto.
+- Tipo de contrato.
+- Procedimiento.
+- Solvencia.
+- Cláusulas.
+- Documentación.
+
+---
+
+# Jurisprudencia
+
+Repositorio de resoluciones y doctrina administrativa.
+
+Entre otras:
+
+- Tribunal Supremo.
+- Tribunal de Justicia de la Unión Europea.
+- TACRC.
+- Tribunales Administrativos de Recursos Contractuales.
+- Junta Consultiva de Contratación Pública.
+- Informes relevantes.
+
+---
+
+# Informes
+
+Repositorio de informes emitidos por organismos especializados.
+
+Ejemplos:
+
+- Junta Consultiva.
+- IGAE.
+- Abogacía del Estado.
+- Intervención.
+- Órganos consultivos.
+
+---
+
+# Guías
+
+Documentación técnica utilizada como apoyo.
+
+Ejemplos:
+
+- Junta de Andalucía.
+- Ministerio de Hacienda.
+- Comisión Europea.
+- Buenas prácticas.
+- Manuales.
+
+---
+
+# Modelos
+
+Repositorio de modelos documentales reales.
+
+No se utilizarán para copiar contenido.
+
+Su finalidad será:
+
+- Analizar estructuras.
+- Identificar bloques reutilizables.
+- Extraer activos documentales.
+- Homogeneizar el estilo administrativo.
+
+---
+
+# Flujo de conocimiento
+
+```
+Normativa
+        │
+        ▼
+Reglas Jurídicas
+        │
+        ▼
+Motores Expertos
+        │
+        ▼
+Expediente
+        │
+        ▼
+Plan Documental
+        │
+        ▼
+Activos Documentales
+        │
+        ▼
+Plantillas
+        │
+        ▼
+Documento Administrativo
+```
+
+---
+
+# Filosofía de desarrollo
+
+El conocimiento debe evolucionar sin modificar el código.
+
+Nunca se codificará directamente:
+
+- una decisión jurídica;
+- una cláusula;
+- una justificación;
+- un documento administrativo.
+
+Todo deberá proceder del Banco de Conocimiento.
+
+El código únicamente interpretará dicho conocimiento.
+
+---
+
+# Versionado
+
+Todo elemento almacenado en el Banco de Conocimiento deberá disponer de:
+
+- Identificador único.
+- Versión.
+- Estado.
+- Fecha de creación.
+- Fecha de modificación.
+- Fuente.
+- Referencia normativa.
+- Nivel de confianza.
+- Dependencias.
+
+---
+
+# Objetivo de la Versión 1.0
+
+El Banco de Conocimiento deberá proporcionar toda la información necesaria para generar automáticamente:
+
+- Memoria Justificativa.
+- Informe de insuficiencia de medios.
+- Pliego de Cláusulas Administrativas Particulares.
+- Pliego de Prescripciones Técnicas.
+- Resolución de inicio.
+- Resolución de aprobación.
+
+---
+
+# Proyecto
+
+**CONTRATA IA**
+
+Asistente Inteligente para la Elaboración de Expedientes de Contratación Pública
+
+Consejería de Empleo
 
 Junta de Andalucía
-
-Ministerio de Hacienda
-
-Comisión Europea
-
-Buenas prácticas
-
----
-
-# Filosofía
-
-Todo el conocimiento debe residir aquí.
-
-El código únicamente debe interpretar este conocimiento.
-
-Nunca codificar directamente una decisión jurídica.
-
-Nunca redactar directamente un documento.
-
-Todo debe proceder del Banco de Conocimiento.
-
----
-
-# Flujo
-
-Normativa
-
-↓
-
-Reglas
-
-↓
-
-Motores
-
-↓
-
-Expediente
-
-↓
-
-Plantillas
-
-↓
-
-Documento final
