@@ -1,0 +1,8479 @@
+# =============================================================================
+# CONTRATA-IA
+# KNOWLEDGE ONTOLOGY
+# MASTER INDEX
+# =============================================================================
+
+ontology:
+
+  name: CONTRATA-IA Ontology
+
+  version: 1.0.0
+
+  language: es-ES
+
+  jurisdiction: Spain
+
+  administration: Junta de Andalucía
+
+  domain: Public Procurement
+
+# =============================================================================
+# PURPOSE
+# =============================================================================
+
+purpose:
+
+  description: >
+
+    Central semantic model used by the Expert System.
+
+    Defines every concept, relationship and legal entity used
+    during reasoning.
+
+# =============================================================================
+# KNOWLEDGE MODEL
+# =============================================================================
+
+knowledgeModel:
+
+  ontologyDriven: true
+
+  semanticReasoning: true
+
+  deterministicInference: true
+
+  explainableKnowledge: true
+
+# =============================================================================
+# ROOT DOMAINS
+# =============================================================================
+
+domains:
+
+  contracts
+
+  procedures
+
+  cpv
+
+  organizations
+
+  actors
+
+  documents
+
+  legalEntities
+
+  administrativeStates
+
+  contractExecution
+
+  legalRelationships
+
+  legalSources
+
+  jurisprudence
+
+  doctrine
+
+  reports
+
+  templates
+
+# =============================================================================
+# REPOSITORIES
+# =============================================================================
+
+repositories:
+
+  contracts:
+
+    file: contracts.yaml
+
+  procedures:
+
+    file: procedures.yaml
+
+  cpv:
+
+    file: cpv.yaml
+
+  organizations:
+
+    file: organizations.yaml
+
+  actors:
+
+    file: actors.yaml
+
+  documents:
+
+    file: documents.yaml
+
+  legalEntities:
+
+    file: legal_entities.yaml
+
+  administrativeStates:
+
+    file: administrative_states.yaml
+
+  contractExecution:
+
+    file: contract_execution.yaml
+
+  legalRelationships:
+
+    file: legal_relationships.yaml
+
+# =============================================================================
+# EXTENDED REPOSITORIES
+# =============================================================================
+
+extendedRepositories:
+
+  legislation:
+
+    file: legislation.yaml
+
+  jurisprudence:
+
+    file: jurisprudence.yaml
+
+  consultiveReports:
+
+    file: consultive_reports.yaml
+
+  doctrine:
+
+    file: doctrine.yaml
+
+  glossary:
+
+    file: glossary.yaml
+
+  taxonomy:
+
+    file: taxonomy.yaml
+
+# =============================================================================
+# LOADING ORDER
+# =============================================================================
+
+loadingSequence:
+
+  glossary
+
+  taxonomy
+
+  legalEntities
+
+  organizations
+
+  actors
+
+  contracts
+
+  procedures
+
+  cpv
+
+  documents
+
+  legalRelationships
+
+  legislation
+
+  doctrine
+
+  jurisprudence
+
+  reports
+
+  templates
+
+  # =============================================================================
+# SEMANTIC CORE
+# NÚCLEO SEMÁNTICO DE LA ONTOLOGÍA
+# =============================================================================
+
+semanticCore:
+
+  enabled: true
+
+  deterministic: true
+
+  ontologyDriven: true
+
+  semanticValidation: true
+
+  inferRelationships: true
+
+# =============================================================================
+# CORE PRINCIPLES
+# =============================================================================
+
+semanticPrinciples:
+
+  uniqueIdentity: true
+
+  explicitRelationships: true
+
+  inheritanceSupported: true
+
+  compositionSupported: true
+
+  semanticIntegrity: true
+
+  legalConsistency: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+rootEntity:
+
+  id: ENTITY
+
+  description: Root semantic object
+
+# =============================================================================
+# ENTITY CATEGORIES
+# =============================================================================
+
+entityCategories:
+
+  legal
+
+  administrative
+
+  contractual
+
+  documentary
+
+  organizational
+
+  procedural
+
+  economic
+
+  temporal
+
+  geographical
+
+# =============================================================================
+# IDENTIFICATION MODEL
+# =============================================================================
+
+identificationModel:
+
+  uniqueIdentifier: true
+
+  globallyUnique: true
+
+  immutableIdentifier: true
+
+  semanticIdentifier: true
+
+# =============================================================================
+# COMMON ATTRIBUTES
+# =============================================================================
+
+commonAttributes:
+
+  identifier
+
+  code
+
+  name
+
+  description
+
+  status
+
+  version
+
+  validFrom
+
+  validTo
+
+  createdAt
+
+  updatedAt
+
+# =============================================================================
+# SEMANTIC RELATION TYPES
+# =============================================================================
+
+relationshipTypes:
+
+  isA
+
+  partOf
+
+  dependsOn
+
+  references
+
+  requires
+
+  authorizes
+
+  prohibits
+
+  modifies
+
+  extends
+
+  replaces
+
+# =============================================================================
+# INHERITANCE
+# =============================================================================
+
+inheritance:
+
+  enabled: true
+
+  multipleInheritance: false
+
+  overrideAllowed: false
+
+  preserveParentProperties: true
+
+# =============================================================================
+# COMPOSITION
+# =============================================================================
+
+composition:
+
+  enabled: true
+
+  recursiveComposition: true
+
+  aggregateChildren: true
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+
+semanticValidation:
+
+  verifyIdentifiers: true
+
+  verifyRelationships: true
+
+  verifyInheritance: true
+
+  verifyComposition: true
+
+  verifyIntegrity: true
+
+# =============================================================================
+# DEPENDENCY GRAPH
+# =============================================================================
+
+dependencyGraph:
+
+  enabled: true
+
+  directedGraph: true
+
+  acyclicValidation: true
+
+  detectCircularDependencies: true
+
+# =============================================================================
+# KNOWLEDGE NAVIGATION
+# =============================================================================
+
+knowledgeNavigation:
+
+  parentTraversal: true
+
+  childTraversal: true
+
+  relationshipTraversal: true
+
+  dependencyTraversal: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+semanticIndexes:
+
+  entityIndex: true
+
+  relationshipIndex: true
+
+  dependencyIndex: true
+
+  inheritanceIndex: true
+
+# =============================================================================
+# PERFORMANCE
+# =============================================================================
+
+semanticPerformance:
+
+  preloadCoreEntities: true
+
+  optimizeTraversal: true
+
+  cacheRelationships: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+semanticCoreResult:
+
+  success: semanticCoreReady
+
+  failure: semanticCoreInitializationFailed
+
+# =============================================================================
+# FIN PARTE 2 DE 30
+# =============================================================================
+
+# =============================================================================
+# LEGAL ENTITY MODEL
+# MODELO DE ENTIDADES JURÍDICAS
+# =============================================================================
+
+legalEntityModel:
+
+  enabled: true
+
+  semanticModel: true
+
+  inheritanceModel: true
+
+  legalValidation: true
+
+# =============================================================================
+# ROOT LEGAL ENTITY
+# =============================================================================
+
+rootLegalEntity:
+
+  id: LEGAL_ENTITY
+
+  parent: ENTITY
+
+  description: Base legal entity
+
+# =============================================================================
+# LEGAL ENTITY TYPES
+# =============================================================================
+
+legalEntities:
+
+  publicAdministration
+
+  contractingAuthority
+
+  contractingBody
+
+  promotingUnit
+
+  administrativeUnit
+
+  economicOperator
+
+  contractor
+
+  tenderer
+
+  successfulTenderer
+
+  subcontractor
+
+  responsiblePerson
+
+# =============================================================================
+# PUBLIC ADMINISTRATION
+# =============================================================================
+
+publicAdministration:
+
+  inherits: LEGAL_ENTITY
+
+  attributes:
+
+    identifier
+
+    officialName
+
+    administrationLevel
+
+    legalNature
+
+    territory
+
+    headquarters
+
+# =============================================================================
+# CONTRACTING AUTHORITY
+# =============================================================================
+
+contractingAuthority:
+
+  inherits: LEGAL_ENTITY
+
+  attributes:
+
+    identifier
+
+    officialName
+
+    competence
+
+    legalBasis
+
+    electronicProfile
+
+# =============================================================================
+# CONTRACTING BODY
+# =============================================================================
+
+contractingBody:
+
+  inherits: LEGAL_ENTITY
+
+  attributes:
+
+    identifier
+
+    denomination
+
+    authority
+
+    dependency
+
+# =============================================================================
+# PROMOTING UNIT
+# =============================================================================
+
+promotingUnit:
+
+  inherits: LEGAL_ENTITY
+
+  attributes:
+
+    identifier
+
+    denomination
+
+    responsibleDepartment
+
+    manager
+
+# =============================================================================
+# ECONOMIC OPERATOR
+# =============================================================================
+
+economicOperator:
+
+  inherits: LEGAL_ENTITY
+
+  attributes:
+
+    identifier
+
+    legalName
+
+    vatNumber
+
+    country
+
+    legalForm
+
+# =============================================================================
+# CONTRACTOR
+# =============================================================================
+
+contractor:
+
+  inherits: economicOperator
+
+  attributes:
+
+    solvency
+
+    classification
+
+    experience
+
+    technicalCapacity
+
+# =============================================================================
+# TENDERER
+# =============================================================================
+
+tenderer:
+
+  inherits: economicOperator
+
+  attributes:
+
+    submittedOffer
+
+    electronicSubmission
+
+    admissionStatus
+
+# =============================================================================
+# SUCCESSFUL TENDERER
+# =============================================================================
+
+successfulTenderer:
+
+  inherits: contractor
+
+  attributes:
+
+    awardDate
+
+    awardedAmount
+
+    executionStatus
+
+# =============================================================================
+# SUBCONTRACTOR
+# =============================================================================
+
+subcontractor:
+
+  inherits: contractor
+
+  attributes:
+
+    subcontractedTasks
+
+    authorizationStatus
+
+# =============================================================================
+# RESPONSIBLE PERSON
+# =============================================================================
+
+responsiblePerson:
+
+  inherits: LEGAL_ENTITY
+
+  attributes:
+
+    identifier
+
+    fullName
+
+    role
+
+    appointmentDate
+
+# =============================================================================
+# COMMON LEGAL ATTRIBUTES
+# =============================================================================
+
+commonLegalAttributes:
+
+  legalCapacity
+
+  legalRepresentation
+
+  legalResponsibility
+
+  legalStatus
+
+  active
+
+# =============================================================================
+# LEGAL RELATIONSHIPS
+# =============================================================================
+
+legalRelationships:
+
+  belongsTo
+
+  dependsOn
+
+  appoints
+
+  supervises
+
+  contractsWith
+
+  authorizes
+
+  represents
+
+# =============================================================================
+# LEGAL VALIDATION
+# =============================================================================
+
+legalEntityValidation:
+
+  verifyIdentity: true
+
+  verifyCompetence: true
+
+  verifyRepresentation: true
+
+  verifyRelationships: true
+
+# =============================================================================
+# INDEXES
+# =============================================================================
+
+legalEntityIndexes:
+
+  identifierIndex: true
+
+  organizationIndex: true
+
+  roleIndex: true
+
+  dependencyIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+legalEntityResult:
+
+  success: legalEntitiesReady
+
+  failure: legalEntityInitializationFailed
+
+# =============================================================================
+# FIN PARTE 3 DE 30
+# =============================================================================
+
+# =============================================================================
+# ADMINISTRATIVE ORGANIZATION MODEL
+# MODELO DE ORGANIZACIÓN ADMINISTRATIVA
+# =============================================================================
+
+administrativeOrganizationModel:
+
+  enabled: true
+
+  hierarchicalOrganization: true
+
+  competenceInheritance: true
+
+  territorialOrganization: true
+
+  organizationalValidation: true
+
+# =============================================================================
+# ORGANIZATIONAL ROOT
+# =============================================================================
+
+organizationRoot:
+
+  id: ADMINISTRATIVE_ORGANIZATION
+
+  parent: LEGAL_ENTITY
+
+  description: Root administrative organization
+
+# =============================================================================
+# ORGANIZATIONAL LEVELS
+# =============================================================================
+
+organizationLevels:
+
+  europeanUnion
+
+  state
+
+  autonomousCommunity
+
+  province
+
+  municipality
+
+  publicEntity
+
+# =============================================================================
+# STATE ADMINISTRATION
+# =============================================================================
+
+stateAdministration:
+
+  entity:
+
+    GeneralStateAdministration
+
+  levels:
+
+    ministry
+
+    secretaryOfState
+
+    generalSecretariat
+
+    directorateGeneral
+
+    subdirectorateGeneral
+
+# =============================================================================
+# AUTONOMOUS COMMUNITY
+# =============================================================================
+
+autonomousCommunity:
+
+  entity:
+
+    JuntaDeAndalucia
+
+  institutionalLevels:
+
+    presidency
+
+    vicePresidency
+
+    consejeria
+
+    viceConsejeria
+
+    secretariaGeneral
+
+    secretariaGeneralTecnica
+
+    direccionGeneral
+
+    delegacionTerritorial
+
+    servicio
+
+    seccion
+
+    negociado
+
+# =============================================================================
+# LOCAL ADMINISTRATION
+# =============================================================================
+
+localAdministration:
+
+  municipality
+
+  provincialCouncil
+
+  metropolitanArea
+
+  localAgency
+
+# =============================================================================
+# PUBLIC ENTITIES
+# =============================================================================
+
+publicEntities:
+
+  autonomousAgency
+
+  publicBusinessAgency
+
+  publicFoundation
+
+  publicConsortium
+
+  publicCompany
+
+# =============================================================================
+# ORGANIZATIONAL ATTRIBUTES
+# =============================================================================
+
+organizationAttributes:
+
+  identifier
+
+  officialName
+
+  acronym
+
+  legalNature
+
+  territorialScope
+
+  competenceArea
+
+  headquarters
+
+  contactInformation
+
+# =============================================================================
+# COMPETENCE MODEL
+# =============================================================================
+
+competenceModel:
+
+  exclusiveCompetence
+
+  sharedCompetence
+
+  delegatedCompetence
+
+  coordinatingCompetence
+
+  executiveCompetence
+
+# =============================================================================
+# HIERARCHICAL RELATIONSHIPS
+# =============================================================================
+
+hierarchicalRelationships:
+
+  reportsTo
+
+  supervises
+
+  coordinates
+
+  delegates
+
+  dependsAdministratively
+
+  dependsFunctionally
+
+# =============================================================================
+# TERRITORIAL RELATIONSHIPS
+# =============================================================================
+
+territorialRelationships:
+
+  nationalScope
+
+  regionalScope
+
+  provincialScope
+
+  municipalScope
+
+# =============================================================================
+# ORGANIZATIONAL VALIDATION
+# =============================================================================
+
+organizationValidation:
+
+  verifyHierarchy: true
+
+  verifyCompetence: true
+
+  verifyTerritorialScope: true
+
+  verifyAdministrativeDependency: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+organizationIndexes:
+
+  organizationIndex: true
+
+  competenceIndex: true
+
+  territorialIndex: true
+
+  hierarchyIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+organizationResult:
+
+  success: organizationModelReady
+
+  failure: organizationModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 4 DE 30
+# =============================================================================
+
+# =============================================================================
+# CONTRACT MODEL
+# MODELO ONTOLÓGICO DEL CONTRATO ADMINISTRATIVO
+# =============================================================================
+
+contractModel:
+
+  enabled: true
+
+  legalClassification: true
+
+  semanticRelationships: true
+
+  lifecycleManagement: true
+
+  legalValidation: true
+
+# =============================================================================
+# ROOT CONTRACT ENTITY
+# =============================================================================
+
+contractEntity:
+
+  id: CONTRACT
+
+  parent: LEGAL_ENTITY
+
+  description: Administrative Public Contract
+
+# =============================================================================
+# CONTRACT CATEGORIES
+# =============================================================================
+
+contractCategories:
+
+  works
+
+  supplies
+
+  services
+
+  concessionWorks
+
+  concessionServices
+
+  mixedContract
+
+# =============================================================================
+# LEGAL ATTRIBUTES
+# =============================================================================
+
+contractAttributes:
+
+  identifier
+
+  contractNumber
+
+  title
+
+  description
+
+  legalNature
+
+  contractType
+
+  cpv
+
+  estimatedValue
+
+  baseBudget
+
+  vatAmount
+
+  totalBudget
+
+# =============================================================================
+# OBJECT OF THE CONTRACT
+# =============================================================================
+
+contractObject:
+
+  mainObject
+
+  complementaryObjects
+
+  technicalScope
+
+  functionalScope
+
+  geographicalScope
+
+# =============================================================================
+# ECONOMIC MODEL
+# =============================================================================
+
+economicModel:
+
+  estimatedValue
+
+  baseTenderBudget
+
+  taxes
+
+  modificationsReserve
+
+  extensionsValue
+
+  lifecycleCost
+
+# =============================================================================
+# TEMPORAL MODEL
+# =============================================================================
+
+temporalModel:
+
+  publicationDate
+
+  awardDate
+
+  formalizationDate
+
+  executionStart
+
+  executionEnd
+
+  warrantyEnd
+
+# =============================================================================
+# DURATION
+# =============================================================================
+
+durationModel:
+
+  initialDuration
+
+  maximumDuration
+
+  extensionPeriods
+
+  automaticExtensions
+
+# =============================================================================
+# LOT MODEL
+# =============================================================================
+
+lotModel:
+
+  divisionIntoLots
+
+  lotIdentifier
+
+  lotDescription
+
+  lotValue
+
+  lotCPV
+
+  lotExecution
+
+# =============================================================================
+# MODIFICATION MODEL
+# =============================================================================
+
+modificationModel:
+
+  foreseenModification
+
+  unforeseenModification
+
+  modificationLimit
+
+  modificationReason
+
+# =============================================================================
+# EXECUTION MODEL
+# =============================================================================
+
+executionModel:
+
+  executionConditions
+
+  contractManager
+
+  supervision
+
+  acceptance
+
+  penalties
+
+# =============================================================================
+# GUARANTEES
+# =============================================================================
+
+guarantees:
+
+  provisionalGuarantee
+
+  definitiveGuarantee
+
+  complementaryGuarantee
+
+# =============================================================================
+# CONTRACT STATUS
+# =============================================================================
+
+contractStatus:
+
+  draft
+
+  approved
+
+  tendering
+
+  evaluation
+
+  awarded
+
+  formalized
+
+  executing
+
+  suspended
+
+  completed
+
+  terminated
+
+# =============================================================================
+# RELATIONSHIPS
+# =============================================================================
+
+contractRelationships:
+
+  belongsToExpedient
+
+  managedByAuthority
+
+  awardedToEconomicOperator
+
+  supervisedByManager
+
+  governedByProcedure
+
+# =============================================================================
+# LEGAL VALIDATION
+# =============================================================================
+
+contractValidation:
+
+  verifyLegalQualification: true
+
+  verifyEstimatedValue: true
+
+  verifyDuration: true
+
+  verifyExecutionConditions: true
+
+  verifyGuarantees: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+contractIndexes:
+
+  contractIndex: true
+
+  cpvIndex: true
+
+  valueIndex: true
+
+  durationIndex: true
+
+  executionIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+contractModelResult:
+
+  success: contractModelReady
+
+  failure: contractModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 5 DE 30
+# =============================================================================
+
+# =============================================================================
+# PROCUREMENT PROCEDURE MODEL
+# MODELO ONTOLÓGICO DE LOS PROCEDIMIENTOS DE ADJUDICACIÓN
+# =============================================================================
+
+procurementProcedureModel:
+
+  enabled: true
+
+  ontologyDriven: true
+
+  legalClassification: true
+
+  proceduralValidation: true
+
+  lifecycleManagement: true
+
+# =============================================================================
+# ROOT PROCEDURE ENTITY
+# =============================================================================
+
+procedureEntity:
+
+  id: PROCUREMENT_PROCEDURE
+
+  parent: LEGAL_ENTITY
+
+  description: Public Procurement Procedure
+
+# =============================================================================
+# PROCEDURE TYPES
+# =============================================================================
+
+procedureTypes:
+
+  openProcedure
+
+  simplifiedOpenProcedure
+
+  supersimplifiedOpenProcedure
+
+  restrictedProcedure
+
+  negotiatedProcedure
+
+  negotiatedWithoutPublication
+
+  competitiveDialogue
+
+  innovationPartnership
+
+# =============================================================================
+# GENERAL ATTRIBUTES
+# =============================================================================
+
+procedureAttributes:
+
+  identifier
+
+  procedureCode
+
+  procedureName
+
+  legalBasis
+
+  publicationRequired
+
+  negotiationAllowed
+
+  competitionLevel
+
+# =============================================================================
+# LEGAL CONDITIONS
+# =============================================================================
+
+legalConditions:
+
+  estimatedValueThreshold
+
+  legalRequirements
+
+  applicableArticles
+
+  mandatoryPublication
+
+  justificationRequired
+
+# =============================================================================
+# PROCEDURAL PHASES
+# =============================================================================
+
+procedureLifecycle:
+
+  planning
+
+  approval
+
+  publication
+
+  submissionOfTenders
+
+  opening
+
+  evaluation
+
+  proposal
+
+  award
+
+  formalization
+
+  execution
+
+  completion
+
+# =============================================================================
+# PARTICIPATION MODEL
+# =============================================================================
+
+participationModel:
+
+  unrestrictedParticipation
+
+  restrictedParticipation
+
+  invitationRequired
+
+  negotiatedParticipation
+
+# =============================================================================
+# PUBLICITY MODEL
+# =============================================================================
+
+publicityModel:
+
+  contractingProfile
+
+  officialGazette
+
+  europeanUnionJournal
+
+  transparencyPortal
+
+# =============================================================================
+# EVALUATION MODEL
+# =============================================================================
+
+evaluationModel:
+
+  automaticCriteria
+
+  judgementCriteria
+
+  mixedCriteria
+
+  economicEvaluation
+
+  technicalEvaluation
+
+# =============================================================================
+# NEGOTIATION MODEL
+# =============================================================================
+
+negotiationModel:
+
+  negotiationAllowed
+
+  negotiationPhases
+
+  negotiationScope
+
+  negotiationLimits
+
+# =============================================================================
+# DEADLINE MODEL
+# =============================================================================
+
+deadlineModel:
+
+  publicationDeadline
+
+  submissionDeadline
+
+  clarificationDeadline
+
+  evaluationDeadline
+
+  awardDeadline
+
+  formalizationDeadline
+
+# =============================================================================
+# APPLICABILITY
+# =============================================================================
+
+applicability:
+
+  works
+
+  services
+
+  supplies
+
+  concessions
+
+  mixedContracts
+
+# =============================================================================
+# PROCEDURE RELATIONSHIPS
+# =============================================================================
+
+procedureRelationships:
+
+  appliedToContract
+
+  managedByAuthority
+
+  includesEvaluation
+
+  producesAward
+
+  governedByLCSP
+
+# =============================================================================
+# LEGAL VALIDATION
+# =============================================================================
+
+procedureValidation:
+
+  verifyProcedureType: true
+
+  verifyEstimatedValueThreshold: true
+
+  verifyApplicableArticles: true
+
+  verifyPublicationRequirements: true
+
+  verifyDeadlines: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+procedureIndexes:
+
+  procedureIndex: true
+
+  lifecycleIndex: true
+
+  publicationIndex: true
+
+  evaluationIndex: true
+
+  legalArticleIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+procedureModelResult:
+
+  success: procurementProcedureModelReady
+
+  failure: procurementProcedureModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 6 DE 30
+# =============================================================================
+
+# =============================================================================
+# CPV ONTOLOGY MODEL
+# MODELO ONTOLÓGICO DE LA CLASIFICACIÓN CPV
+# =============================================================================
+
+cpvOntologyModel:
+
+  enabled: true
+
+  semanticHierarchy: true
+
+  automaticClassification: true
+
+  ontologyValidation: true
+
+  multipleRelationships: true
+
+# =============================================================================
+# ROOT CPV ENTITY
+# =============================================================================
+
+cpvEntity:
+
+  id: CPV
+
+  parent: ENTITY
+
+  description: Common Procurement Vocabulary
+
+# =============================================================================
+# CPV HIERARCHY
+# =============================================================================
+
+cpvHierarchy:
+
+  division
+
+  group
+
+  class
+
+  category
+
+  code
+
+# =============================================================================
+# CPV ATTRIBUTES
+# =============================================================================
+
+cpvAttributes:
+
+  cpvCode
+
+  officialDescription
+
+  hierarchyLevel
+
+  parentCode
+
+  active
+
+  validFrom
+
+  validTo
+
+# =============================================================================
+# CLASSIFICATION MODEL
+# =============================================================================
+
+classificationModel:
+
+  primaryCPV
+
+  secondaryCPV
+
+  complementaryCPV
+
+  auxiliaryCPV
+
+# =============================================================================
+# SEMANTIC RELATIONSHIPS
+# =============================================================================
+
+cpvRelationships:
+
+  parentCategory
+
+  childCategory
+
+  relatedCategory
+
+  compatibleCategory
+
+  incompatibleCategory
+
+  complementaryCategory
+
+# =============================================================================
+# CONTRACT RELATIONSHIPS
+# =============================================================================
+
+contractRelationships:
+
+  applicableToWorks
+
+  applicableToServices
+
+  applicableToSupplies
+
+  applicableToConcessions
+
+  applicableToMixedContracts
+
+# =============================================================================
+# AUTOMATIC SELECTION
+# =============================================================================
+
+automaticSelection:
+
+  enabled: true
+
+  analyseContractObject: true
+
+  analyseKeywords: true
+
+  analyseTechnicalScope: true
+
+  proposePrimaryCPV: true
+
+  proposeSecondaryCPV: true
+
+# =============================================================================
+# SELECTION VALIDATION
+# =============================================================================
+
+selectionValidation:
+
+  verifyHierarchy: true
+
+  verifyCompatibility: true
+
+  verifyConsistency: true
+
+  justifySelection: true
+
+# =============================================================================
+# SEARCH MODEL
+# =============================================================================
+
+searchCapabilities:
+
+  searchByCode
+
+  searchByDescription
+
+  searchByKeyword
+
+  searchByHierarchy
+
+  semanticSearch
+
+# =============================================================================
+# KNOWLEDGE LINKS
+# =============================================================================
+
+knowledgeLinks:
+
+  linkedRules
+
+  linkedTemplates
+
+  linkedProcedures
+
+  linkedDocuments
+
+  linkedContracts
+
+# =============================================================================
+# SYNONYMS
+# =============================================================================
+
+semanticSynonyms:
+
+  enabled: true
+
+  recogniseEquivalentTerms: true
+
+  recogniseAdministrativeTerms: true
+
+  recogniseTechnicalTerms: true
+
+# =============================================================================
+# CPV QUALITY CONTROL
+# =============================================================================
+
+cpvQuality:
+
+  verifyOfficialCode: true
+
+  verifyHierarchyIntegrity: true
+
+  verifyDuplicates: true
+
+  verifyDeprecatedCodes: true
+
+# =============================================================================
+# INDEXES
+# =============================================================================
+
+cpvIndexes:
+
+  codeIndex: true
+
+  hierarchyIndex: true
+
+  keywordIndex: true
+
+  semanticIndex: true
+
+  relationshipIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+cpvOntologyResult:
+
+  success: cpvOntologyReady
+
+  failure: cpvOntologyInitializationFailed
+
+# =============================================================================
+# FIN PARTE 7 DE 30
+# =============================================================================
+
+# =============================================================================
+# ADMINISTRATIVE DOCUMENT MODEL
+# MODELO ONTOLÓGICO DE DOCUMENTOS ADMINISTRATIVOS
+# =============================================================================
+
+administrativeDocumentModel:
+
+  enabled: true
+
+  semanticClassification: true
+
+  documentLifecycle: true
+
+  dependencyManagement: true
+
+  documentaryValidation: true
+
+# =============================================================================
+# ROOT DOCUMENT ENTITY
+# =============================================================================
+
+documentEntity:
+
+  id: ADMINISTRATIVE_DOCUMENT
+
+  parent: ENTITY
+
+  description: Administrative Procurement Document
+
+# =============================================================================
+# DOCUMENT FAMILIES
+# =============================================================================
+
+documentFamilies:
+
+  planningDocuments
+
+  justificationDocuments
+
+  legalDocuments
+
+  technicalDocuments
+
+  economicDocuments
+
+  procurementDocuments
+
+  executionDocuments
+
+  closingDocuments
+
+# =============================================================================
+# PLANNING DOCUMENTS
+# =============================================================================
+
+planningDocuments:
+
+  procurementPlan
+
+  annualPlanning
+
+  marketConsultation
+
+  preliminaryStudies
+
+# =============================================================================
+# JUSTIFICATION DOCUMENTS
+# =============================================================================
+
+justificationDocuments:
+
+  necessityReport
+
+  insufficiencyOfMeansReport
+
+  opportunityReport
+
+  efficiencyReport
+
+  justificationMemo
+
+# =============================================================================
+# LEGAL DOCUMENTS
+# =============================================================================
+
+legalDocuments:
+
+  administrativeSpecifications
+
+  legalReport
+
+  approvalResolution
+
+  awardResolution
+
+  formalizationDocument
+
+# =============================================================================
+# TECHNICAL DOCUMENTS
+# =============================================================================
+
+technicalDocuments:
+
+  technicalSpecifications
+
+  technicalReport
+
+  technicalEvaluation
+
+  acceptanceCertificate
+
+# =============================================================================
+# ECONOMIC DOCUMENTS
+# =============================================================================
+
+economicDocuments:
+
+  estimatedValueCalculation
+
+  budgetCertificate
+
+  accountingRetention
+
+  financialReport
+
+# =============================================================================
+# PROCUREMENT DOCUMENTS
+# =============================================================================
+
+procurementDocuments:
+
+  contractNotice
+
+  invitationLetter
+
+  clarificationResponse
+
+  evaluationMinutes
+
+  awardProposal
+
+# =============================================================================
+# EXECUTION DOCUMENTS
+# =============================================================================
+
+executionDocuments:
+
+  executionReport
+
+  modificationAgreement
+
+  extensionAgreement
+
+  penaltyResolution
+
+  completionCertificate
+
+# =============================================================================
+# CLOSING DOCUMENTS
+# =============================================================================
+
+closingDocuments:
+
+  liquidationReport
+
+  finalAcceptance
+
+  archiveRecord
+
+  lessonsLearnedReport
+
+# =============================================================================
+# COMMON DOCUMENT ATTRIBUTES
+# =============================================================================
+
+documentAttributes:
+
+  identifier
+
+  documentCode
+
+  title
+
+  version
+
+  author
+
+  creationDate
+
+  approvalDate
+
+  status
+
+  confidentialityLevel
+
+# =============================================================================
+# DOCUMENT STATUS
+# =============================================================================
+
+documentStatus:
+
+  draft
+
+  underReview
+
+  validated
+
+  approved
+
+  published
+
+  archived
+
+# =============================================================================
+# DOCUMENT RELATIONSHIPS
+# =============================================================================
+
+documentRelationships:
+
+  requires
+
+  generates
+
+  references
+
+  supersedes
+
+  complements
+
+  annexes
+
+# =============================================================================
+# DOCUMENT DEPENDENCIES
+# =============================================================================
+
+documentDependencies:
+
+  verifyMandatoryDependencies: true
+
+  verifyLogicalSequence: true
+
+  verifyApprovalOrder: true
+
+  verifyPublicationOrder: true
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+documentValidation:
+
+  verifyCompleteness: true
+
+  verifyMandatorySections: true
+
+  verifyReferencedDocuments: true
+
+  verifyAdministrativeConsistency: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+documentIndexes:
+
+  documentTypeIndex: true
+
+  lifecycleIndex: true
+
+  dependencyIndex: true
+
+  authorIndex: true
+
+  referenceIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+documentOntologyResult:
+
+  success: administrativeDocumentsReady
+
+  failure: administrativeDocumentInitializationFailed
+
+# =============================================================================
+# FIN PARTE 8 DE 30
+# =============================================================================
+
+# =============================================================================
+# ADMINISTRATIVE PROCEDURE LIFECYCLE MODEL
+# MODELO DEL CICLO DE VIDA DEL EXPEDIENTE ADMINISTRATIVO
+# =============================================================================
+
+administrativeLifecycleModel:
+
+  enabled: true
+
+  lifecycleManagement: true
+
+  stateMachine: true
+
+  integrityControl: true
+
+  proceduralTraceability: true
+
+# =============================================================================
+# ROOT LIFECYCLE ENTITY
+# =============================================================================
+
+lifecycleEntity:
+
+  id: ADMINISTRATIVE_LIFECYCLE
+
+  parent: ENTITY
+
+  description: Administrative Procurement Lifecycle
+
+# =============================================================================
+# GLOBAL LIFECYCLE
+# =============================================================================
+
+globalLifecycle:
+
+  planning
+
+  initiation
+
+  preparation
+
+  approval
+
+  publication
+
+  tendering
+
+  evaluation
+
+  award
+
+  formalization
+
+  execution
+
+  monitoring
+
+  modification
+
+  completion
+
+  liquidation
+
+  archive
+
+# =============================================================================
+# PLANNING STAGE
+# =============================================================================
+
+planningStage:
+
+  identifyNeed
+
+  analyseNeed
+
+  defineObjectives
+
+  verifyBudget
+
+  verifyPlanning
+
+# =============================================================================
+# PREPARATION STAGE
+# =============================================================================
+
+preparationStage:
+
+  prepareTechnicalDocumentation
+
+  prepareAdministrativeDocumentation
+
+  determineProcedure
+
+  determineCPV
+
+  determineEstimatedValue
+
+# =============================================================================
+# APPROVAL STAGE
+# =============================================================================
+
+approvalStage:
+
+  technicalApproval
+
+  legalApproval
+
+  economicApproval
+
+  contractingApproval
+
+# =============================================================================
+# PUBLICATION STAGE
+# =============================================================================
+
+publicationStage:
+
+  contractingProfile
+
+  officialPublication
+
+  europeanPublication
+
+  transparencyPublication
+
+# =============================================================================
+# TENDER STAGE
+# =============================================================================
+
+tenderStage:
+
+  receiveQuestions
+
+  publishClarifications
+
+  receiveOffers
+
+  closeSubmission
+
+# =============================================================================
+# EVALUATION STAGE
+# =============================================================================
+
+evaluationStage:
+
+  administrativeVerification
+
+  technicalEvaluation
+
+  economicEvaluation
+
+  rankingGeneration
+
+# =============================================================================
+# AWARD STAGE
+# =============================================================================
+
+awardStage:
+
+  proposal
+
+  awardResolution
+
+  notifications
+
+  waitingPeriod
+
+# =============================================================================
+# FORMALIZATION STAGE
+# =============================================================================
+
+formalizationStage:
+
+  contractSignature
+
+  publicationOfFormalization
+
+  executionAuthorization
+
+# =============================================================================
+# EXECUTION STAGE
+# =============================================================================
+
+executionStage:
+
+  executionMonitoring
+
+  milestones
+
+  certifications
+
+  payments
+
+  incidents
+
+# =============================================================================
+# COMPLETION STAGE
+# =============================================================================
+
+completionStage:
+
+  finalAcceptance
+
+  liquidation
+
+  guarantees
+
+  archivePreparation
+
+# =============================================================================
+# STATE TRANSITIONS
+# =============================================================================
+
+stateTransitions:
+
+  validateTransition: true
+
+  forbidInvalidTransitions: true
+
+  preserveHistory: true
+
+  allowRollbackWhenLegal: true
+
+# =============================================================================
+# CONTROL POINTS
+# =============================================================================
+
+controlPoints:
+
+  legalControl
+
+  technicalControl
+
+  economicControl
+
+  documentaryControl
+
+  proceduralControl
+
+# =============================================================================
+# MILESTONES
+# =============================================================================
+
+milestones:
+
+  expedienteCreated
+
+  documentationCompleted
+
+  publicationCompleted
+
+  evaluationCompleted
+
+  contractAwarded
+
+  contractFormalized
+
+  executionCompleted
+
+  expedienteArchived
+
+# =============================================================================
+# EVENT MODEL
+# =============================================================================
+
+eventModel:
+
+  administrativeEvent
+
+  legalEvent
+
+  proceduralEvent
+
+  economicEvent
+
+  technicalEvent
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+lifecycleValidation:
+
+  verifyStateConsistency: true
+
+  verifyTransitionLegality: true
+
+  verifyMandatoryMilestones: true
+
+  verifyCompletionCriteria: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+lifecycleIndexes:
+
+  stageIndex: true
+
+  milestoneIndex: true
+
+  transitionIndex: true
+
+  eventIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+lifecycleResult:
+
+  success: lifecycleModelReady
+
+  failure: lifecycleInitializationFailed
+
+# =============================================================================
+# FIN PARTE 9 DE 30
+# =============================================================================
+
+# =============================================================================
+# ECONOMIC MODEL
+# MODELO ONTOLÓGICO ECONÓMICO DE LA CONTRATACIÓN PÚBLICA
+# =============================================================================
+
+economicModel:
+
+  enabled: true
+
+  semanticAccounting: true
+
+  budgetControl: true
+
+  financialValidation: true
+
+  economicTraceability: true
+
+# =============================================================================
+# ROOT ECONOMIC ENTITY
+# =============================================================================
+
+economicEntity:
+
+  id: ECONOMIC_ENTITY
+
+  parent: ENTITY
+
+  description: Procurement Economic Model
+
+# =============================================================================
+# ECONOMIC COMPONENTS
+# =============================================================================
+
+economicComponents:
+
+  estimatedValue
+
+  baseTenderBudget
+
+  taxes
+
+  modifications
+
+  guarantees
+
+  payments
+
+  revisions
+
+  financing
+
+# =============================================================================
+# ESTIMATED VALUE
+# =============================================================================
+
+estimatedValueModel:
+
+  estimatedValue
+
+  extensionsIncluded
+
+  modificationsIncluded
+
+  premiumsIncluded
+
+  optionsIncluded
+
+  lifecycleCost
+
+# =============================================================================
+# BASE TENDER BUDGET
+# =============================================================================
+
+baseTenderBudget:
+
+  executionCost
+
+  indirectCosts
+
+  industrialProfit
+
+  taxesExcluded
+
+# =============================================================================
+# TAX MODEL
+# =============================================================================
+
+taxModel:
+
+  vatRate
+
+  vatAmount
+
+  exemptOperation
+
+  reducedRate
+
+  specialRegime
+
+# =============================================================================
+# FINANCING MODEL
+# =============================================================================
+
+financingModel:
+
+  ownBudget
+
+  europeanFunds
+
+  stateFunds
+
+  autonomousFunds
+
+  mixedFinancing
+
+# =============================================================================
+# BUDGETARY CONTROL
+# =============================================================================
+
+budgetControl:
+
+  budgetAvailability
+
+  accountingRetention
+
+  budgetCommitment
+
+  expenditureAuthorization
+
+  paymentAuthorization
+
+# =============================================================================
+# GUARANTEE MODEL
+# =============================================================================
+
+guaranteeModel:
+
+  provisionalGuarantee
+
+  definitiveGuarantee
+
+  complementaryGuarantee
+
+  guaranteeRelease
+
+# =============================================================================
+# PRICE REVISION
+# =============================================================================
+
+priceRevision:
+
+  revisionAllowed
+
+  revisionFormula
+
+  revisionPeriod
+
+  revisionLimit
+
+# =============================================================================
+# ECONOMIC MODIFICATIONS
+# =============================================================================
+
+economicModifications:
+
+  foreseenModification
+
+  unforeseenModification
+
+  economicLimit
+
+  accumulatedModification
+
+# =============================================================================
+# PAYMENT MODEL
+# =============================================================================
+
+paymentModel:
+
+  advancePayment
+
+  partialCertification
+
+  milestonePayment
+
+  finalPayment
+
+# =============================================================================
+# ECONOMIC INDICATORS
+# =============================================================================
+
+economicIndicators:
+
+  budgetExecution
+
+  remainingBudget
+
+  paymentPercentage
+
+  modificationPercentage
+
+  financialDeviation
+
+# =============================================================================
+# ECONOMIC RELATIONSHIPS
+# =============================================================================
+
+economicRelationships:
+
+  belongsToContract
+
+  linkedToBudget
+
+  linkedToGuarantee
+
+  linkedToPayment
+
+  linkedToModification
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+economicValidation:
+
+  verifyEstimatedValue: true
+
+  verifyBudgetConsistency: true
+
+  verifyVATCalculation: true
+
+  verifyGuarantees: true
+
+  verifyPaymentLimits: true
+
+  verifyBudgetAvailability: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+economicIndexes:
+
+  estimatedValueIndex: true
+
+  budgetIndex: true
+
+  financingIndex: true
+
+  guaranteeIndex: true
+
+  paymentIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+economicModelResult:
+
+  success: economicModelReady
+
+  failure: economicModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 10 DE 30
+# =============================================================================
+
+# =============================================================================
+# AWARD CRITERIA MODEL
+# MODELO ONTOLÓGICO DE LOS CRITERIOS DE ADJUDICACIÓN
+# =============================================================================
+
+awardCriteriaModel:
+
+  enabled: true
+
+  legalCompliance: true
+
+  semanticEvaluation: true
+
+  explainableScoring: true
+
+  automaticValidation: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+awardCriteriaEntity:
+
+  id: AWARD_CRITERIA
+
+  parent: ENTITY
+
+  description: Contract Award Criteria
+
+# =============================================================================
+# CRITERIA CATEGORIES
+# =============================================================================
+
+criteriaCategories:
+
+  automaticCriteria
+
+  subjectiveCriteria
+
+  mixedCriteria
+
+# =============================================================================
+# AUTOMATIC CRITERIA
+# =============================================================================
+
+automaticCriteria:
+
+  price
+
+  deliveryTime
+
+  warrantyExtension
+
+  maintenancePeriod
+
+  environmentalPerformance
+
+  energyEfficiency
+
+  executionTime
+
+# =============================================================================
+# SUBJECTIVE CRITERIA
+# =============================================================================
+
+subjectiveCriteria:
+
+  technicalQuality
+
+  methodology
+
+  workPlan
+
+  innovation
+
+  organisation
+
+  improvements
+
+  sustainabilityPlan
+
+# =============================================================================
+# MIXED CRITERIA
+# =============================================================================
+
+mixedCriteria:
+
+  technicalEconomicBalance
+
+  qualityPriceRatio
+
+  lifecycleCost
+
+# =============================================================================
+# WEIGHTING MODEL
+# =============================================================================
+
+weightingModel:
+
+  minimumWeight
+
+  maximumWeight
+
+  totalWeight
+
+  normalizedWeight
+
+  percentageWeight
+
+# =============================================================================
+# SCORING MODEL
+# =============================================================================
+
+scoringModel:
+
+  maximumScore
+
+  minimumScore
+
+  decimalPrecision
+
+  normalizedScore
+
+# =============================================================================
+# FORMULAS
+# =============================================================================
+
+evaluationFormulas:
+
+  proportionalFormula
+
+  inverseProportionalFormula
+
+  linearFormula
+
+  logarithmicFormula
+
+  polynomialFormula
+
+  customFormula
+
+# =============================================================================
+# ECONOMIC EVALUATION
+# =============================================================================
+
+economicEvaluation:
+
+  priceFormula
+
+  abnormalOfferDetection
+
+  lowBidAnalysis
+
+  priceDeviation
+
+# =============================================================================
+# TECHNICAL EVALUATION
+# =============================================================================
+
+technicalEvaluation:
+
+  evaluationCommittee
+
+  expertReport
+
+  motivationRequired
+
+  justificationRequired
+
+# =============================================================================
+# THRESHOLDS
+# =============================================================================
+
+thresholds:
+
+  minimumTechnicalScore
+
+  minimumEconomicScore
+
+  exclusionThreshold
+
+  qualityThreshold
+
+# =============================================================================
+# TIE BREAKING RULES
+# =============================================================================
+
+tieBreakingRules:
+
+  socialCriteria
+
+  environmentalCriteria
+
+  equalityCriteria
+
+  lottery
+
+# =============================================================================
+# LEGAL REQUIREMENTS
+# =============================================================================
+
+legalRequirements:
+
+  linkedToContractObject
+
+  objectiveEvaluation
+
+  transparency
+
+  proportionality
+
+  equalTreatment
+
+# =============================================================================
+# RELATIONSHIPS
+# =============================================================================
+
+criteriaRelationships:
+
+  belongsToContract
+
+  belongsToProcedure
+
+  evaluatedByCommittee
+
+  producesRanking
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+awardCriteriaValidation:
+
+  verifyWeighting: true
+
+  verifyFormula: true
+
+  verifyTransparency: true
+
+  verifyObjectivity: true
+
+  verifyLegalCompliance: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+awardCriteriaIndexes:
+
+  criteriaIndex: true
+
+  weightingIndex: true
+
+  formulaIndex: true
+
+  evaluationIndex: true
+
+  legalIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+awardCriteriaResult:
+
+  success: awardCriteriaModelReady
+
+  failure: awardCriteriaModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 11 DE 30
+# =============================================================================
+
+# =============================================================================
+# SOLVENCY MODEL
+# MODELO ONTOLÓGICO DE LA SOLVENCIA DEL LICITADOR
+# =============================================================================
+
+solvencyModel:
+
+  enabled: true
+
+  ontologyDriven: true
+
+  legalValidation: true
+
+  automaticAssessment: true
+
+  explainableDecision: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+solvencyEntity:
+
+  id: SOLVENCY
+
+  parent: ENTITY
+
+  description: Economic, Financial and Technical Solvency
+
+# =============================================================================
+# SOLVENCY TYPES
+# =============================================================================
+
+solvencyTypes:
+
+  economicFinancial
+
+  technicalProfessional
+
+  businessClassification
+
+  externalIntegration
+
+# =============================================================================
+# ECONOMIC AND FINANCIAL SOLVENCY
+# =============================================================================
+
+economicFinancialSolvency:
+
+  annualTurnover
+
+  specificTurnover
+
+  professionalRiskInsurance
+
+  financialStatements
+
+  equityRatio
+
+  liquidityRatio
+
+  financialCapacity
+
+# =============================================================================
+# TECHNICAL AND PROFESSIONAL SOLVENCY
+# =============================================================================
+
+technicalProfessionalSolvency:
+
+  previousContracts
+
+  executionCertificates
+
+  technicalPersonnel
+
+  qualityManagement
+
+  environmentalManagement
+
+  technicalEquipment
+
+  facilities
+
+# =============================================================================
+# BUSINESS CLASSIFICATION
+# =============================================================================
+
+businessClassification:
+
+  classificationRequired
+
+  classificationGroup
+
+  classificationSubgroup
+
+  classificationCategory
+
+  classificationValidity
+
+# =============================================================================
+# SUPPORTING ENTITY
+# =============================================================================
+
+externalIntegration:
+
+  supportingEntity
+
+  commitmentDocument
+
+  sharedResources
+
+  technicalResources
+
+  economicResources
+
+# =============================================================================
+# SUPPORTING DOCUMENTATION
+# =============================================================================
+
+supportingDocumentation:
+
+  responsibleDeclaration
+
+  solvencyCertificates
+
+  taxCertificates
+
+  socialSecurityCertificates
+
+  classificationCertificate
+
+  insuranceCertificate
+
+# =============================================================================
+# EXEMPTIONS
+# =============================================================================
+
+solvencyExemptions:
+
+  minorContract
+
+  simplifiedProcedure
+
+  legalException
+
+  justifiedWaiver
+
+# =============================================================================
+# MINIMUM REQUIREMENTS
+# =============================================================================
+
+minimumRequirements:
+
+  economicThreshold
+
+  technicalThreshold
+
+  classificationThreshold
+
+  experienceThreshold
+
+# =============================================================================
+# EVALUATION MODEL
+# =============================================================================
+
+evaluationModel:
+
+  automaticVerification
+
+  documentaryVerification
+
+  manualVerification
+
+  expertAssessment
+
+# =============================================================================
+# LEGAL REQUIREMENTS
+# =============================================================================
+
+legalRequirements:
+
+  proportionality
+
+  nonDiscrimination
+
+  linkToContractObject
+
+  equalTreatment
+
+  transparency
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+
+solvencyValidation:
+
+  verifyEconomicCapacity: true
+
+  verifyTechnicalCapacity: true
+
+  verifyClassification: true
+
+  verifySupportingEntity: true
+
+  verifyDocumentation: true
+
+# =============================================================================
+# RELATIONSHIPS
+# =============================================================================
+
+solvencyRelationships:
+
+  belongsToTenderer
+
+  linkedToContract
+
+  linkedToProcedure
+
+  verifiedByContractingAuthority
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+solvencyIndexes:
+
+  economicIndex: true
+
+  technicalIndex: true
+
+  classificationIndex: true
+
+  documentationIndex: true
+
+  exemptionIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+solvencyResult:
+
+  success: solvencyModelReady
+
+  failure: solvencyModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 12 DE 30
+# =============================================================================
+
+# =============================================================================
+# CONTRACT EXECUTION MODEL
+# MODELO ONTOLÓGICO DE LA EJECUCIÓN DEL CONTRATO
+# =============================================================================
+
+contractExecutionModel:
+
+  enabled: true
+
+  lifecycleDriven: true
+
+  legalCompliance: true
+
+  executionMonitoring: true
+
+  traceability: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+executionEntity:
+
+  id: CONTRACT_EXECUTION
+
+  parent: ENTITY
+
+  description: Administrative Contract Execution
+
+# =============================================================================
+# EXECUTION PHASES
+# =============================================================================
+
+executionPhases:
+
+  executionStart
+
+  ordinaryExecution
+
+  milestoneExecution
+
+  executionControl
+
+  reception
+
+  guaranteePeriod
+
+  liquidation
+
+  completion
+
+# =============================================================================
+# EXECUTION ATTRIBUTES
+# =============================================================================
+
+executionAttributes:
+
+  executionIdentifier
+
+  executionStatus
+
+  startDate
+
+  plannedEndDate
+
+  actualEndDate
+
+  executionPercentage
+
+# =============================================================================
+# CONTRACT MANAGER
+# =============================================================================
+
+contractManager:
+
+  appointment
+
+  legalCompetence
+
+  supervisionFunctions
+
+  monitoringResponsibilities
+
+  certificationAuthority
+
+  incidentManagement
+
+# =============================================================================
+# EXECUTION MILESTONES
+# =============================================================================
+
+executionMilestones:
+
+  executionStart
+
+  intermediateMilestone
+
+  technicalMilestone
+
+  economicMilestone
+
+  finalMilestone
+
+# =============================================================================
+# MONITORING MODEL
+# =============================================================================
+
+executionMonitoring:
+
+  periodicMonitoring
+
+  milestoneMonitoring
+
+  qualityMonitoring
+
+  complianceMonitoring
+
+  riskMonitoring
+
+# =============================================================================
+# CERTIFICATIONS
+# =============================================================================
+
+certificationModel:
+
+  partialCertification
+
+  finalCertification
+
+  acceptanceCertification
+
+  technicalCertification
+
+# =============================================================================
+# INCIDENT MANAGEMENT
+# =============================================================================
+
+incidentManagement:
+
+  technicalIncident
+
+  legalIncident
+
+  economicIncident
+
+  administrativeIncident
+
+  forceMajeure
+
+# =============================================================================
+# PENALTIES
+# =============================================================================
+
+penaltyModel:
+
+  delayPenalty
+
+  qualityPenalty
+
+  contractualBreach
+
+  partialExecution
+
+  totalBreach
+
+# =============================================================================
+# MODIFICATIONS
+# =============================================================================
+
+executionModification:
+
+  foreseenModification
+
+  unforeseenModification
+
+  legalModification
+
+  technicalModification
+
+  economicModification
+
+# =============================================================================
+# SUSPENSION
+# =============================================================================
+
+suspensionModel:
+
+  temporarySuspension
+
+  partialSuspension
+
+  totalSuspension
+
+  suspensionReason
+
+# =============================================================================
+# RECEPTION
+# =============================================================================
+
+receptionModel:
+
+  provisionalReception
+
+  definitiveReception
+
+  observations
+
+  defects
+
+  acceptanceReport
+
+# =============================================================================
+# GUARANTEE PERIOD
+# =============================================================================
+
+guaranteePeriod:
+
+  guaranteeStart
+
+  guaranteeEnd
+
+  pendingDefects
+
+  guaranteeRelease
+
+# =============================================================================
+# LIQUIDATION
+# =============================================================================
+
+liquidationModel:
+
+  economicLiquidation
+
+  technicalLiquidation
+
+  contractualLiquidation
+
+  administrativeClosure
+
+# =============================================================================
+# EXECUTION STATES
+# =============================================================================
+
+executionStates:
+
+  pending
+
+  running
+
+  suspended
+
+  modified
+
+  completed
+
+  liquidated
+
+  archived
+
+# =============================================================================
+# EXECUTION RELATIONSHIPS
+# =============================================================================
+
+executionRelationships:
+
+  belongsToContract
+
+  supervisedByManager
+
+  producesCertification
+
+  generatesIncidents
+
+  generatesPayments
+
+# =============================================================================
+# LEGAL VALIDATION
+# =============================================================================
+
+executionValidation:
+
+  verifyExecutionStatus: true
+
+  verifyMilestones: true
+
+  verifyReception: true
+
+  verifyGuaranteePeriod: true
+
+  verifyLiquidation: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+executionIndexes:
+
+  executionIndex: true
+
+  milestoneIndex: true
+
+  certificationIndex: true
+
+  incidentIndex: true
+
+  liquidationIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+executionResult:
+
+  success: contractExecutionModelReady
+
+  failure: contractExecutionInitializationFailed
+
+# =============================================================================
+# FIN PARTE 13 DE 30
+# =============================================================================
+
+# =============================================================================
+# ADMINISTRATIVE ACTS MODEL
+# MODELO ONTOLÓGICO DE LOS ACTOS ADMINISTRATIVOS
+# =============================================================================
+
+administrativeActsModel:
+
+  enabled: true
+
+  legalNature: true
+
+  semanticRelationships: true
+
+  legalValidation: true
+
+  traceability: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+administrativeActEntity:
+
+  id: ADMINISTRATIVE_ACT
+
+  parent: LEGAL_ENTITY
+
+  description: Administrative Act
+
+# =============================================================================
+# ADMINISTRATIVE ACT TYPES
+# =============================================================================
+
+administrativeActTypes:
+
+  resolution
+
+  agreement
+
+  decree
+
+  proposal
+
+  report
+
+  certificate
+
+  notification
+
+  publication
+
+  instruction
+
+  requirement
+
+# =============================================================================
+# RESOLUTIONS
+# =============================================================================
+
+resolutionTypes:
+
+  approvalResolution
+
+  awardResolution
+
+  exclusionResolution
+
+  modificationResolution
+
+  terminationResolution
+
+# =============================================================================
+# AGREEMENTS
+# =============================================================================
+
+agreementTypes:
+
+  contractingAgreement
+
+  modificationAgreement
+
+  extensionAgreement
+
+  suspensionAgreement
+
+# =============================================================================
+# REPORTS
+# =============================================================================
+
+reportTypes:
+
+  legalReport
+
+  technicalReport
+
+  economicReport
+
+  interventionReport
+
+  advisoryReport
+
+# =============================================================================
+# NOTIFICATIONS
+# =============================================================================
+
+notificationTypes:
+
+  electronicNotification
+
+  personalNotification
+
+  publicationNotification
+
+  edictNotification
+
+# =============================================================================
+# PUBLICATIONS
+# =============================================================================
+
+publicationTypes:
+
+  contractingProfile
+
+  officialGazette
+
+  europeanJournal
+
+  transparencyPortal
+
+# =============================================================================
+# LEGAL EFFECTS
+# =============================================================================
+
+legalEffects:
+
+  constitutive
+
+  declarative
+
+  authorizing
+
+  approving
+
+  modifying
+
+  extinguishing
+
+# =============================================================================
+# COMMON ATTRIBUTES
+# =============================================================================
+
+administrativeActAttributes:
+
+  identifier
+
+  actNumber
+
+  title
+
+  issuingAuthority
+
+  issuingBody
+
+  issueDate
+
+  effectivenessDate
+
+  legalBasis
+
+  motivation
+
+# =============================================================================
+# VALIDITY REQUIREMENTS
+# =============================================================================
+
+validityRequirements:
+
+  competence
+
+  legalPurpose
+
+  motivation
+
+  procedureCompliance
+
+  properForm
+
+  electronicSignature
+
+# =============================================================================
+# EFFECTIVENESS
+# =============================================================================
+
+effectivenessModel:
+
+  immediateEffect
+
+  deferredEffect
+
+  conditionalEffect
+
+  suspendedEffect
+
+# =============================================================================
+# ADMINISTRATIVE RELATIONSHIPS
+# =============================================================================
+
+administrativeRelationships:
+
+  issuedBy
+
+  approvedBy
+
+  notifiedTo
+
+  publishedIn
+
+  linkedToExpedient
+
+  linkedToContract
+
+# =============================================================================
+# NULLITY AND ANNULABILITY
+# =============================================================================
+
+legalDefects:
+
+  nullity
+
+  annulability
+
+  materialError
+
+  formalDefect
+
+  proceduralDefect
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+administrativeActValidation:
+
+  verifyCompetence: true
+
+  verifyLegalBasis: true
+
+  verifyMotivation: true
+
+  verifySignature: true
+
+  verifyPublication: true
+
+  verifyNotification: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+administrativeActIndexes:
+
+  actIndex: true
+
+  authorityIndex: true
+
+  publicationIndex: true
+
+  notificationIndex: true
+
+  legalEffectIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+administrativeActsResult:
+
+  success: administrativeActsModelReady
+
+  failure: administrativeActsInitializationFailed
+
+# =============================================================================
+# FIN PARTE 14 DE 30
+# =============================================================================
+
+# =============================================================================
+# LEGAL SOURCES MODEL
+# MODELO ONTOLÓGICO DE LAS FUENTES DEL DERECHO
+# =============================================================================
+
+legalSourcesModel:
+
+  enabled: true
+
+  hierarchicalNormativeSystem: true
+
+  legalInterpretation: true
+
+  precedenceRules: true
+
+  semanticReferences: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+legalSourceEntity:
+
+  id: LEGAL_SOURCE
+
+  parent: ENTITY
+
+  description: Legal Source
+
+# =============================================================================
+# LEGAL SOURCE HIERARCHY
+# =============================================================================
+
+legalSourceHierarchy:
+
+  europeanUnionLaw
+
+  constitution
+
+  internationalTreaties
+
+  organicLaw
+
+  ordinaryLaw
+
+  royalLegislativeDecree
+
+  royalDecreeLaw
+
+  royalDecree
+
+  ministerialOrder
+
+  autonomousRegulation
+
+  instruction
+
+  circular
+
+  technicalGuideline
+
+# =============================================================================
+# EUROPEAN UNION LAW
+# =============================================================================
+
+europeanUnionLaw:
+
+  treaties
+
+  regulations
+
+  directives
+
+  decisions
+
+  delegatedActs
+
+  implementingActs
+
+# =============================================================================
+# SPANISH LEGAL SOURCES
+# =============================================================================
+
+spanishLegalSources:
+
+  spanishConstitution
+
+  lcsp
+
+  law392015
+
+  law402015
+
+  generalBudgetLaw
+
+  publicSectorRegulations
+
+# =============================================================================
+# AUTONOMOUS COMMUNITY SOURCES
+# =============================================================================
+
+autonomousSources:
+
+  autonomousLaw
+
+  autonomousDecree
+
+  autonomousOrder
+
+  autonomousInstruction
+
+# =============================================================================
+# CONSULTATIVE SOURCES
+# =============================================================================
+
+consultativeSources:
+
+  advisoryBoardReports
+
+  stateAttorneyReports
+
+  interventionReports
+
+  consultiveBoardOpinions
+
+# =============================================================================
+# JURISPRUDENCE
+# =============================================================================
+
+jurisprudenceSources:
+
+  constitutionalCourt
+
+  supremeCourt
+
+  nationalHighCourt
+
+  highCourtsJustice
+
+  courtJusticeEuropeanUnion
+
+# =============================================================================
+# DOCTRINE
+# =============================================================================
+
+doctrineSources:
+
+  scientificDoctrine
+
+  administrativeDoctrine
+
+  universityDoctrine
+
+  institutionalDoctrine
+
+# =============================================================================
+# COMMON ATTRIBUTES
+# =============================================================================
+
+legalSourceAttributes:
+
+  identifier
+
+  title
+
+  publicationDate
+
+  effectiveDate
+
+  issuingAuthority
+
+  jurisdiction
+
+  normativeRank
+
+  officialPublication
+
+# =============================================================================
+# LEGAL RELATIONSHIPS
+# =============================================================================
+
+legalRelationships:
+
+  develops
+
+  modifies
+
+  repeals
+
+  complements
+
+  interprets
+
+  references
+
+  prevailsOver
+
+# =============================================================================
+# NORMATIVE PRECEDENCE
+# =============================================================================
+
+precedenceRules:
+
+  europeanUnionPrimacy
+
+  constitutionalSupremacy
+
+  hierarchyPrinciple
+
+  specialityPrinciple
+
+  chronologyPrinciple
+
+# =============================================================================
+# APPLICABILITY
+# =============================================================================
+
+applicabilityModel:
+
+  mandatoryApplication
+
+  supplementaryApplication
+
+  interpretativeApplication
+
+  exceptionalApplication
+
+# =============================================================================
+# VERSION CONTROL
+# =============================================================================
+
+normativeVersionControl:
+
+  currentVersion
+
+  previousVersion
+
+  consolidatedVersion
+
+  historicalVersion
+
+# =============================================================================
+# LEGAL VALIDATION
+# =============================================================================
+
+legalSourceValidation:
+
+  verifyNormativeHierarchy: true
+
+  verifyValidity: true
+
+  verifyCurrentVersion: true
+
+  verifyOfficialPublication: true
+
+  verifyNormativeConsistency: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+legalSourceIndexes:
+
+  hierarchyIndex: true
+
+  jurisdictionIndex: true
+
+  publicationIndex: true
+
+  validityIndex: true
+
+  relationshipIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+legalSourcesResult:
+
+  success: legalSourcesModelReady
+
+  failure: legalSourcesInitializationFailed
+
+# =============================================================================
+# FIN PARTE 15 DE 30
+# =============================================================================
+
+# =============================================================================
+# JURISPRUDENCE & DOCTRINE KNOWLEDGE MODEL
+# MODELO ONTOLÓGICO DE JURISPRUDENCIA Y DOCTRINA
+# =============================================================================
+
+jurisprudenceDoctrineModel:
+
+  enabled: true
+
+  semanticInterpretation: true
+
+  legalReasoning: true
+
+  precedentAnalysis: true
+
+  doctrineManagement: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+jurisprudenceEntity:
+
+  id: JURISPRUDENCE
+
+  parent: LEGAL_SOURCE
+
+  description: Jurisprudential and Doctrinal Knowledge
+
+# =============================================================================
+# JURISPRUDENCE TYPES
+# =============================================================================
+
+jurisprudenceTypes:
+
+  constitutionalCourt
+
+  supremeCourt
+
+  nationalHighCourt
+
+  highCourtJustice
+
+  europeanCourtJustice
+
+# =============================================================================
+# ADMINISTRATIVE DOCTRINE
+# =============================================================================
+
+administrativeDoctrine:
+
+  centralConsultiveBoard
+
+  autonomousConsultiveBoard
+
+  stateAttorney
+
+  interventionDoctrine
+
+  contractingAuthoritiesDoctrine
+
+# =============================================================================
+# PROCUREMENT TRIBUNALS
+# =============================================================================
+
+procurementTribunals:
+
+  centralAdministrativeTribunal
+
+  autonomousAdministrativeTribunal
+
+  regionalAdministrativeTribunal
+
+  localAdministrativeTribunal
+
+# =============================================================================
+# INTERPRETATIVE DOCUMENTS
+# =============================================================================
+
+interpretativeDocuments:
+
+  recommendations
+
+  instructions
+
+  interpretativeCriteria
+
+  technicalNotes
+
+  legalOpinions
+
+# =============================================================================
+# PRECEDENT MODEL
+# =============================================================================
+
+precedentModel:
+
+  bindingPrecedent
+
+  persuasivePrecedent
+
+  administrativeCriterion
+
+  judicialCriterion
+
+# =============================================================================
+# KNOWLEDGE ATTRIBUTES
+# =============================================================================
+
+knowledgeAttributes:
+
+  identifier
+
+  title
+
+  issuingInstitution
+
+  publicationDate
+
+  legalMatter
+
+  summary
+
+  keywords
+
+  legalEffects
+
+# =============================================================================
+# CLASSIFICATION
+# =============================================================================
+
+classification:
+
+  procurementPreparation
+
+  procurementProcedure
+
+  award
+
+  execution
+
+  modification
+
+  termination
+
+  litigation
+
+# =============================================================================
+# LEGAL RELATIONSHIPS
+# =============================================================================
+
+jurisprudenceRelationships:
+
+  interpretsRule
+
+  complementsRule
+
+  clarifiesConcept
+
+  modifiesCriterion
+
+  overrulesDecision
+
+  citesDecision
+
+# =============================================================================
+# INTERPRETATIVE VALUE
+# =============================================================================
+
+interpretativeValue:
+
+  binding
+
+  highlyRelevant
+
+  relevant
+
+  complementary
+
+  informative
+
+# =============================================================================
+# REASONING SUPPORT
+# =============================================================================
+
+reasoningSupport:
+
+  explainDecision
+
+  justifyRecommendation
+
+  compareCriteria
+
+  detectConflicts
+
+  proposeBestInterpretation
+
+# =============================================================================
+# KNOWLEDGE EVOLUTION
+# =============================================================================
+
+knowledgeEvolution:
+
+  currentCriterion
+
+  historicalCriterion
+
+  supersededCriterion
+
+  consolidatedCriterion
+
+# =============================================================================
+# CONFLICT DETECTION
+# =============================================================================
+
+conflictDetection:
+
+  contradictoryDoctrine
+
+  contradictoryJudgment
+
+  obsoleteCriterion
+
+  legalConflict
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+jurisprudenceValidation:
+
+  verifyInstitution: true
+
+  verifyPublication: true
+
+  verifyCurrentCriterion: true
+
+  verifyLegalConsistency: true
+
+  verifySemanticIntegrity: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+jurisprudenceIndexes:
+
+  institutionIndex: true
+
+  matterIndex: true
+
+  precedentIndex: true
+
+  doctrineIndex: true
+
+  keywordIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+jurisprudenceResult:
+
+  success: jurisprudenceKnowledgeReady
+
+  failure: jurisprudenceKnowledgeInitializationFailed
+
+# =============================================================================
+# FIN PARTE 16 DE 30
+# =============================================================================
+
+# =============================================================================
+# KNOWLEDGE REASONING MODEL
+# MODELO ONTOLÓGICO DEL RAZONAMIENTO JURÍDICO
+# =============================================================================
+
+knowledgeReasoningModel:
+
+  enabled: true
+
+  deterministicReasoning: true
+
+  explainableReasoning: true
+
+  legalInference: true
+
+  traceableInference: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+reasoningEntity:
+
+  id: LEGAL_REASONING
+
+  parent: ENTITY
+
+  description: Legal Knowledge Reasoning Engine
+
+# =============================================================================
+# REASONING MODES
+# =============================================================================
+
+reasoningModes:
+
+  deductive
+
+  inductive
+
+  abductive
+
+  ruleBased
+
+  ontologyBased
+
+  hybridReasoning
+
+# =============================================================================
+# INFERENCE TYPES
+# =============================================================================
+
+inferenceTypes:
+
+  directInference
+
+  chainedInference
+
+  conditionalInference
+
+  contextualInference
+
+  legalInference
+
+# =============================================================================
+# LEGAL REASONING
+# =============================================================================
+
+legalReasoning:
+
+  normativeInterpretation
+
+  legalQualification
+
+  proceduralQualification
+
+  competenceDetermination
+
+  applicableProcedureSelection
+
+  applicableRuleSelection
+
+# =============================================================================
+# DECISION MODEL
+# =============================================================================
+
+decisionModel:
+
+  deterministicDecision
+
+  conditionalDecision
+
+  assistedDecision
+
+  humanValidatedDecision
+
+# =============================================================================
+# DECISION FACTORS
+# =============================================================================
+
+decisionFactors:
+
+  applicableNorm
+
+  contractType
+
+  estimatedValue
+
+  contractingAuthority
+
+  contractObject
+
+  proceduralSituation
+
+  applicableDoctrine
+
+  applicableJurisprudence
+
+# =============================================================================
+# RULE CHAINING
+# =============================================================================
+
+ruleChaining:
+
+  forwardChaining
+
+  backwardChaining
+
+  mixedChaining
+
+  recursiveInference
+
+# =============================================================================
+# CONFLICT RESOLUTION
+# =============================================================================
+
+conflictResolution:
+
+  normativeHierarchy
+
+  specialityPrinciple
+
+  chronologyPrinciple
+
+  competencePriority
+
+  humanReview
+
+# =============================================================================
+# CONFIDENCE MODEL
+# =============================================================================
+
+confidenceModel:
+
+  absoluteConfidence
+
+  highConfidence
+
+  mediumConfidence
+
+  lowConfidence
+
+  uncertainConclusion
+
+# =============================================================================
+# EXPLANATION MODEL
+# =============================================================================
+
+explanationModel:
+
+  explainAppliedNorms
+
+  explainAppliedRules
+
+  explainInferenceChain
+
+  explainDecisionFactors
+
+  explainAlternativeSolutions
+
+# =============================================================================
+# TRACEABILITY
+# =============================================================================
+
+traceabilityModel:
+
+  inferenceTrace
+
+  ruleExecutionTrace
+
+  legalReferenceTrace
+
+  ontologyTrace
+
+  decisionTrace
+
+# =============================================================================
+# KNOWLEDGE CONSISTENCY
+# =============================================================================
+
+knowledgeConsistency:
+
+  detectContradictions
+
+  detectCircularReasoning
+
+  detectMissingKnowledge
+
+  detectConflictingRules
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+reasoningValidation:
+
+  verifyInferenceIntegrity: true
+
+  verifyLegalConsistency: true
+
+  verifyDecisionTraceability: true
+
+  verifyConflictResolution: true
+
+  verifyExplanationCompleteness: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+reasoningIndexes:
+
+  inferenceIndex: true
+
+  ruleIndex: true
+
+  explanationIndex: true
+
+  confidenceIndex: true
+
+  traceabilityIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+reasoningResult:
+
+  success: reasoningModelReady
+
+  failure: reasoningModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 17 DE 30
+# =============================================================================
+
+# =============================================================================
+# KNOWLEDGE GOVERNANCE MODEL
+# MODELO DE GOBIERNO DEL CONOCIMIENTO
+# =============================================================================
+
+knowledgeGovernanceModel:
+
+  enabled: true
+
+  governanceFramework: true
+
+  knowledgeLifecycle: true
+
+  versionControl: true
+
+  qualityManagement: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+knowledgeGovernanceEntity:
+
+  id: KNOWLEDGE_GOVERNANCE
+
+  parent: ENTITY
+
+  description: Knowledge Governance Framework
+
+# =============================================================================
+# GOVERNANCE PRINCIPLES
+# =============================================================================
+
+governancePrinciples:
+
+  legality
+
+  consistency
+
+  traceability
+
+  explainability
+
+  maintainability
+
+  reproducibility
+
+  transparency
+
+# =============================================================================
+# KNOWLEDGE LIFECYCLE
+# =============================================================================
+
+knowledgeLifecycle:
+
+  proposal
+
+  drafting
+
+  technicalReview
+
+  legalReview
+
+  approval
+
+  publication
+
+  maintenance
+
+  revision
+
+  replacement
+
+  retirement
+
+# =============================================================================
+# VERSION MANAGEMENT
+# =============================================================================
+
+versionManagement:
+
+  semanticVersioning
+
+  majorVersion
+
+  minorVersion
+
+  patchVersion
+
+  compatibilityControl
+
+  versionHistory
+
+# =============================================================================
+# CHANGE MANAGEMENT
+# =============================================================================
+
+changeManagement:
+
+  changeProposal
+
+  impactAnalysis
+
+  dependencyAnalysis
+
+  legalAssessment
+
+  technicalAssessment
+
+  approvalWorkflow
+
+# =============================================================================
+# REVIEW MODEL
+# =============================================================================
+
+reviewModel:
+
+  technicalReview
+
+  legalReview
+
+  functionalReview
+
+  semanticReview
+
+  qualityReview
+
+# =============================================================================
+# APPROVAL MODEL
+# =============================================================================
+
+approvalModel:
+
+  expertApproval
+
+  legalApproval
+
+  administrativeApproval
+
+  publicationAuthorization
+
+# =============================================================================
+# KNOWLEDGE OWNERSHIP
+# =============================================================================
+
+knowledgeOwnership:
+
+  knowledgeOwner
+
+  legalOwner
+
+  technicalOwner
+
+  functionalOwner
+
+  reviewer
+
+# =============================================================================
+# QUALITY MANAGEMENT
+# =============================================================================
+
+qualityManagement:
+
+  completenessCheck
+
+  consistencyCheck
+
+  redundancyCheck
+
+  dependencyCheck
+
+  legalValidityCheck
+
+# =============================================================================
+# EVOLUTION MANAGEMENT
+# =============================================================================
+
+evolutionManagement:
+
+  normativeUpdate
+
+  jurisprudentialUpdate
+
+  doctrinalUpdate
+
+  ontologyEvolution
+
+  ruleEvolution
+
+# =============================================================================
+# DEPRECATION MODEL
+# =============================================================================
+
+deprecationModel:
+
+  deprecatedKnowledge
+
+  obsoleteKnowledge
+
+  replacedKnowledge
+
+  archivedKnowledge
+
+# =============================================================================
+# PUBLICATION MODEL
+# =============================================================================
+
+publicationModel:
+
+  internalPublication
+
+  productionPublication
+
+  emergencyPublication
+
+  scheduledPublication
+
+# =============================================================================
+# GOVERNANCE EVENTS
+# =============================================================================
+
+governanceEvents:
+
+  newVersion
+
+  updatePublished
+
+  rollbackPerformed
+
+  emergencyCorrection
+
+  legalUpdate
+
+# =============================================================================
+# AUDIT REQUIREMENTS
+# =============================================================================
+
+governanceAudit:
+
+  registerChanges
+
+  registerApprovals
+
+  registerReviews
+
+  registerPublications
+
+  preserveHistory
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+governanceValidation:
+
+  verifyIntegrity: true
+
+  verifyVersionConsistency: true
+
+  verifyApprovalChain: true
+
+  verifyPublicationState: true
+
+  verifyAuditCompleteness: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+governanceIndexes:
+
+  versionIndex: true
+
+  reviewIndex: true
+
+  approvalIndex: true
+
+  lifecycleIndex: true
+
+  auditIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+governanceResult:
+
+  success: governanceModelReady
+
+  failure: governanceModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 18 DE 30
+# =============================================================================
+
+# =============================================================================
+# KNOWLEDGE ANALYTICS MODEL
+# MODELO ONTOLÓGICO DE ANALÍTICA DEL CONOCIMIENTO
+# =============================================================================
+
+knowledgeAnalyticsModel:
+
+  enabled: true
+
+  analyticsEngine: true
+
+  qualityIndicators: true
+
+  predictiveAnalysis: true
+
+  continuousImprovement: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+knowledgeAnalyticsEntity:
+
+  id: KNOWLEDGE_ANALYTICS
+
+  parent: ENTITY
+
+  description: Knowledge Analytics Framework
+
+# =============================================================================
+# ANALYTICS DOMAINS
+# =============================================================================
+
+analyticsDomains:
+
+  ontologyQuality
+
+  ruleQuality
+
+  legalCoverage
+
+  inferencePerformance
+
+  documentGeneration
+
+  userInteraction
+
+  recommendationEngine
+
+  maintenanceMetrics
+
+# =============================================================================
+# KNOWLEDGE COVERAGE
+# =============================================================================
+
+knowledgeCoverage:
+
+  normativeCoverage
+
+  jurisprudentialCoverage
+
+  doctrinalCoverage
+
+  proceduralCoverage
+
+  documentCoverage
+
+  cpvCoverage
+
+# =============================================================================
+# QUALITY INDICATORS
+# =============================================================================
+
+qualityIndicators:
+
+  completeness
+
+  consistency
+
+  redundancy
+
+  traceability
+
+  explainability
+
+  maintainability
+
+  legalAccuracy
+
+# =============================================================================
+# PERFORMANCE METRICS
+# =============================================================================
+
+performanceMetrics:
+
+  averageInferenceTime
+
+  ruleExecutionTime
+
+  ontologyTraversalTime
+
+  documentGenerationTime
+
+  recommendationLatency
+
+# =============================================================================
+# RULE METRICS
+# =============================================================================
+
+ruleMetrics:
+
+  executedRules
+
+  successfulRules
+
+  failedRules
+
+  conflictingRules
+
+  deprecatedRules
+
+  orphanRules
+
+# =============================================================================
+# ONTOLOGY METRICS
+# =============================================================================
+
+ontologyMetrics:
+
+  entitiesCount
+
+  relationshipsCount
+
+  semanticDepth
+
+  hierarchyComplexity
+
+  ontologyConsistency
+
+# =============================================================================
+# USER INTERACTION METRICS
+# =============================================================================
+
+userMetrics:
+
+  consultations
+
+  generatedDocuments
+
+  validatedRecommendations
+
+  overriddenRecommendations
+
+  acceptedRecommendations
+
+# =============================================================================
+# KNOWLEDGE GAP DETECTION
+# =============================================================================
+
+knowledgeGapDetection:
+
+  missingRules
+
+  missingOntology
+
+  missingTemplates
+
+  missingNormativeSupport
+
+  missingRelationships
+
+# =============================================================================
+# CONTINUOUS IMPROVEMENT
+# =============================================================================
+
+continuousImprovement:
+
+  detectWeakAreas
+
+  recommendKnowledgeExpansion
+
+  recommendRuleOptimization
+
+  recommendOntologyOptimization
+
+  recommendPerformanceOptimization
+
+# =============================================================================
+# PREDICTIVE ANALYTICS
+# =============================================================================
+
+predictiveAnalytics:
+
+  predictKnowledgeNeeds
+
+  predictLegalUpdates
+
+  predictRuleEvolution
+
+  predictOntologyGrowth
+
+# =============================================================================
+# ALERT MODEL
+# =============================================================================
+
+analyticsAlerts:
+
+  obsoleteKnowledge
+
+  lowCoverage
+
+  inconsistentKnowledge
+
+  excessiveComplexity
+
+  performanceDegradation
+
+# =============================================================================
+# REPORTING MODEL
+# =============================================================================
+
+analyticsReports:
+
+  dailyReport
+
+  weeklyReport
+
+  monthlyReport
+
+  legalCoverageReport
+
+  ontologyQualityReport
+
+  reasoningPerformanceReport
+
+# =============================================================================
+# DASHBOARD MODEL
+# =============================================================================
+
+dashboardIndicators:
+
+  knowledgeHealth
+
+  legalCoveragePercentage
+
+  ontologyConsistencyScore
+
+  reasoningAccuracy
+
+  recommendationAcceptanceRate
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+analyticsValidation:
+
+  verifyMetricsIntegrity: true
+
+  verifyCoverageCalculation: true
+
+  verifyQualityIndicators: true
+
+  verifyReportConsistency: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+analyticsIndexes:
+
+  metricsIndex: true
+
+  qualityIndex: true
+
+  performanceIndex: true
+
+  coverageIndex: true
+
+  reportingIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+analyticsResult:
+
+  success: analyticsModelReady
+
+  failure: analyticsModelInitializationFailed
+
+# =============================================================================
+# FIN PARTE 19 DE 30
+# =============================================================================
+
+# =============================================================================
+# ARTIFICIAL INTELLIGENCE COORDINATION MODEL
+# MODELO DE COORDINACIÓN ENTRE IA Y SISTEMA EXPERTO
+# =============================================================================
+
+artificialIntelligenceCoordinationModel:
+
+  enabled: true
+
+  expertSystemPriority: true
+
+  humanValidationRequired: true
+
+  explainableAI: true
+
+  legalSafety: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+aiCoordinationEntity:
+
+  id: AI_COORDINATION
+
+  parent: ENTITY
+
+  description: Coordination between AI and Expert System
+
+# =============================================================================
+# AI COMPONENTS
+# =============================================================================
+
+aiComponents:
+
+  expertSystem
+
+  generativeAI
+
+  ruleEngine
+
+  inferenceEngine
+
+  ontologyEngine
+
+  documentGenerator
+
+  recommendationEngine
+
+  validationEngine
+
+# =============================================================================
+# RESPONSIBILITY MODEL
+# =============================================================================
+
+responsibilityModel:
+
+  expertSystem:
+
+    responsibilities:
+
+      legalReasoning
+
+      deterministicInference
+
+      normativeValidation
+
+      consistencyChecking
+
+      decisionSupport
+
+  generativeAI:
+
+    responsibilities:
+
+      naturalLanguageGeneration
+
+      documentDrafting
+
+      textExplanation
+
+      summarization
+
+      linguisticImprovement
+
+# =============================================================================
+# DECISION AUTHORITY
+# =============================================================================
+
+decisionAuthority:
+
+  legalDecision:
+
+    owner: expertSystem
+
+  linguisticGeneration:
+
+    owner: generativeAI
+
+  finalApproval:
+
+    owner: humanOperator
+
+# =============================================================================
+# AI LIMITATIONS
+# =============================================================================
+
+aiLimitations:
+
+  cannotOverrideRules: true
+
+  cannotIgnoreOntology: true
+
+  cannotInventNorms: true
+
+  cannotModifyLegalReasoning: true
+
+  cannotSkipValidation: true
+
+# =============================================================================
+# EXPERT SYSTEM PRIORITY
+# =============================================================================
+
+expertSystemPriority:
+
+  legalOntology
+
+  inferenceRules
+
+  legalSources
+
+  deterministicLogic
+
+  proceduralValidation
+
+# =============================================================================
+# GENERATIVE AI FUNCTIONS
+# =============================================================================
+
+generativeFunctions:
+
+  improveWriting
+
+  generateDrafts
+
+  explainConclusions
+
+  adaptLanguage
+
+  createSummaries
+
+# =============================================================================
+# VALIDATION PIPELINE
+# =============================================================================
+
+validationPipeline:
+
+  ontologyValidation
+
+  ruleValidation
+
+  inferenceValidation
+
+  aiGeneration
+
+  humanValidation
+
+# =============================================================================
+# HUMAN SUPERVISION
+# =============================================================================
+
+humanSupervision:
+
+  mandatoryValidation
+
+  decisionConfirmation
+
+  legalApproval
+
+  publicationAuthorization
+
+# =============================================================================
+# CONFLICT MANAGEMENT
+# =============================================================================
+
+conflictManagement:
+
+  aiExpertConflict
+
+  ontologyConflict
+
+  legalConflict
+
+  humanResolution
+
+# =============================================================================
+# CONFIDENCE MODEL
+# =============================================================================
+
+confidenceModel:
+
+  ontologyConfidence
+
+  ruleConfidence
+
+  inferenceConfidence
+
+  aiConfidence
+
+  finalConfidence
+
+# =============================================================================
+# TRACEABILITY
+# =============================================================================
+
+traceability:
+
+  expertDecisionTrace
+
+  aiGenerationTrace
+
+  validationTrace
+
+  humanDecisionTrace
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+
+securityModel:
+
+  protectOntology
+
+  protectRules
+
+  immutableLegalKnowledge
+
+  auditAllChanges
+
+# =============================================================================
+# QUALITY CONTROL
+# =============================================================================
+
+qualityControl:
+
+  verifyGeneratedTexts
+
+  verifyLegalConsistency
+
+  verifyReferences
+
+  verifyNormativeSupport
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+coordinationIndexes:
+
+  aiIndex: true
+
+  expertIndex: true
+
+  validationIndex: true
+
+  securityIndex: true
+
+  traceabilityIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+coordinationResult:
+
+  success: aiCoordinationReady
+
+  failure: aiCoordinationInitializationFailed
+
+# =============================================================================
+# FIN PARTE 20 DE 30
+# =============================================================================
+
+# =============================================================================
+# CONTRACT INTELLIGENCE MODEL
+# MODELO DE INTELIGENCIA CONTRACTUAL
+# =============================================================================
+
+contractIntelligenceModel:
+
+  enabled: true
+
+  intelligentMonitoring: true
+
+  proactiveRecommendations: true
+
+  predictiveAnalysis: true
+
+  explainableRecommendations: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+contractIntelligenceEntity:
+
+  id: CONTRACT_INTELLIGENCE
+
+  parent: ENTITY
+
+  description: Contract Intelligence Model
+
+# =============================================================================
+# INTELLIGENCE DOMAINS
+# =============================================================================
+
+intelligenceDomains:
+
+  legalRiskAnalysis
+
+  economicRiskAnalysis
+
+  proceduralRiskAnalysis
+
+  executionRiskAnalysis
+
+  complianceMonitoring
+
+  opportunityDetection
+
+  optimisationRecommendations
+
+# =============================================================================
+# LEGAL RISK ANALYSIS
+# =============================================================================
+
+legalRiskAnalysis:
+
+  missingMandatoryClause
+
+  inconsistentClause
+
+  obsoleteLegalReference
+
+  incorrectProcedure
+
+  competenceConflict
+
+  publicationRisk
+
+  legalDeadlineRisk
+
+# =============================================================================
+# ECONOMIC RISK ANALYSIS
+# =============================================================================
+
+economicRiskAnalysis:
+
+  underestimatedBudget
+
+  excessiveEstimatedValue
+
+  modificationRisk
+
+  guaranteeRisk
+
+  financingRisk
+
+  paymentRisk
+
+# =============================================================================
+# PROCEDURAL RISK ANALYSIS
+# =============================================================================
+
+proceduralRiskAnalysis:
+
+  missingDocument
+
+  invalidSequence
+
+  incompleteApproval
+
+  publicationFailure
+
+  evaluationRisk
+
+  awardRisk
+
+# =============================================================================
+# EXECUTION RISK ANALYSIS
+# =============================================================================
+
+executionRiskAnalysis:
+
+  executionDelay
+
+  milestoneDeviation
+
+  certificationDelay
+
+  guaranteeExpiration
+
+  modificationAccumulation
+
+  contractualNonCompliance
+
+# =============================================================================
+# COMPLIANCE MONITORING
+# =============================================================================
+
+complianceMonitoring:
+
+  lcspCompliance
+
+  law392015Compliance
+
+  law402015Compliance
+
+  transparencyCompliance
+
+  electronicAdministrationCompliance
+
+# =============================================================================
+# OPPORTUNITY DETECTION
+# =============================================================================
+
+opportunityDetection:
+
+  simplifyProcedure
+
+  optimiseCriteria
+
+  improvePlanning
+
+  improveDocumentation
+
+  reduceAdministrativeBurden
+
+# =============================================================================
+# SMART RECOMMENDATIONS
+# =============================================================================
+
+smartRecommendations:
+
+  recommendProcedure
+
+  recommendClauses
+
+  recommendCriteria
+
+  recommendCPV
+
+  recommendDeadlines
+
+  recommendSolvency
+
+  recommendExecutionControls
+
+# =============================================================================
+# PREDICTIVE ANALYSIS
+# =============================================================================
+
+predictiveAnalysis:
+
+  predictExecutionProblems
+
+  predictModifications
+
+  predictAppeals
+
+  predictBudgetDeviation
+
+  predictDeadlineDeviation
+
+# =============================================================================
+# ALERT MODEL
+# =============================================================================
+
+intelligenceAlerts:
+
+  criticalAlert
+
+  highAlert
+
+  mediumAlert
+
+  lowAlert
+
+  informativeAlert
+
+# =============================================================================
+# PRIORITY MODEL
+# =============================================================================
+
+priorityModel:
+
+  immediateAction
+
+  urgentAction
+
+  plannedAction
+
+  monitoringOnly
+
+# =============================================================================
+# RECOMMENDATION EXPLANATION
+# =============================================================================
+
+recommendationExplanation:
+
+  explainLegalBasis
+
+  explainReasoning
+
+  explainExpectedBenefit
+
+  explainAssociatedRisk
+
+  explainAlternatives
+
+# =============================================================================
+# CONTINUOUS LEARNING
+# =============================================================================
+
+continuousLearning:
+
+  captureValidatedDecisions
+
+  improveRecommendations
+
+  detectRecurringProblems
+
+  identifyBestPractices
+
+# =============================================================================
+# RELATIONSHIPS
+# =============================================================================
+
+intelligenceRelationships:
+
+  linkedToContract
+
+  linkedToProcedure
+
+  linkedToExecution
+
+  linkedToRisk
+
+  linkedToRecommendation
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+intelligenceValidation:
+
+  verifyRecommendationConsistency: true
+
+  verifyLegalSupport: true
+
+  verifyRiskAssessment: true
+
+  verifyPredictionIntegrity: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+intelligenceIndexes:
+
+  riskIndex: true
+
+  recommendationIndex: true
+
+  complianceIndex: true
+
+  predictionIndex: true
+
+  alertIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+contractIntelligenceResult:
+
+  success: contractIntelligenceModelReady
+
+  failure: contractIntelligenceInitializationFailed
+
+# =============================================================================
+# FIN PARTE 21 DE 30
+# =============================================================================
+
+# =============================================================================
+# COMPLIANCE & AUDIT MODEL
+# MODELO ONTOLÓGICO DE CUMPLIMIENTO NORMATIVO Y AUDITORÍA
+# =============================================================================
+
+complianceAuditModel:
+
+  enabled: true
+
+  complianceControl: true
+
+  auditManagement: true
+
+  evidenceTraceability: true
+
+  accountability: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+complianceEntity:
+
+  id: COMPLIANCE_AUDIT
+
+  parent: ENTITY
+
+  description: Compliance and Audit Framework
+
+# =============================================================================
+# COMPLIANCE DOMAINS
+# =============================================================================
+
+complianceDomains:
+
+  legalCompliance
+
+  proceduralCompliance
+
+  documentaryCompliance
+
+  financialCompliance
+
+  technicalCompliance
+
+  electronicCompliance
+
+# =============================================================================
+# LEGAL COMPLIANCE
+# =============================================================================
+
+legalCompliance:
+
+  lcsp
+
+  law392015
+
+  law402015
+
+  transparencyLaw
+
+  publicSectorRegulations
+
+  europeanUnionRegulations
+
+# =============================================================================
+# PROCEDURAL COMPLIANCE
+# =============================================================================
+
+proceduralCompliance:
+
+  mandatoryDeadlines
+
+  publicationRequirements
+
+  proceduralSequence
+
+  approvals
+
+  notifications
+
+# =============================================================================
+# DOCUMENTARY COMPLIANCE
+# =============================================================================
+
+documentaryCompliance:
+
+  mandatoryDocuments
+
+  mandatoryReports
+
+  documentIntegrity
+
+  documentVersions
+
+  electronicSignature
+
+# =============================================================================
+# FINANCIAL COMPLIANCE
+# =============================================================================
+
+financialCompliance:
+
+  budgetAvailability
+
+  accountingReservation
+
+  expenditureAuthorization
+
+  paymentAuthorization
+
+  financialControl
+
+# =============================================================================
+# TECHNICAL COMPLIANCE
+# =============================================================================
+
+technicalCompliance:
+
+  technicalSpecifications
+
+  executionControl
+
+  acceptanceRequirements
+
+  qualityVerification
+
+# =============================================================================
+# AUDIT TYPES
+# =============================================================================
+
+auditTypes:
+
+  internalAudit
+
+  externalAudit
+
+  legalAudit
+
+  financialAudit
+
+  proceduralAudit
+
+  technicalAudit
+
+# =============================================================================
+# AUDIT PHASES
+# =============================================================================
+
+auditLifecycle:
+
+  planning
+
+  preparation
+
+  evidenceCollection
+
+  verification
+
+  findings
+
+  recommendations
+
+  correctiveActions
+
+  closure
+
+# =============================================================================
+# EVIDENCE MODEL
+# =============================================================================
+
+evidenceModel:
+
+  documentaryEvidence
+
+  electronicEvidence
+
+  proceduralEvidence
+
+  financialEvidence
+
+  technicalEvidence
+
+# =============================================================================
+# TRACEABILITY
+# =============================================================================
+
+auditTraceability:
+
+  actionTrace
+
+  decisionTrace
+
+  documentTrace
+
+  ruleTrace
+
+  legalReferenceTrace
+
+  userTrace
+
+# =============================================================================
+# FINDINGS
+# =============================================================================
+
+auditFindings:
+
+  conformity
+
+  observation
+
+  minorNonConformity
+
+  majorNonConformity
+
+  criticalNonConformity
+
+# =============================================================================
+# CORRECTIVE ACTIONS
+# =============================================================================
+
+correctiveActions:
+
+  immediateCorrection
+
+  correctivePlan
+
+  preventiveAction
+
+  followUpReview
+
+# =============================================================================
+# ACCOUNTABILITY
+# =============================================================================
+
+accountabilityModel:
+
+  responsibleAuthority
+
+  responsibleUnit
+
+  responsiblePerson
+
+  approvalChain
+
+  evidenceRepository
+
+# =============================================================================
+# COMPLIANCE ALERTS
+# =============================================================================
+
+complianceAlerts:
+
+  legalAlert
+
+  proceduralAlert
+
+  documentaryAlert
+
+  financialAlert
+
+  auditAlert
+
+# =============================================================================
+# REPORTING
+# =============================================================================
+
+auditReports:
+
+  complianceReport
+
+  auditReport
+
+  findingsReport
+
+  correctiveActionReport
+
+  executiveSummary
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+complianceValidation:
+
+  verifyLegalCompliance: true
+
+  verifyProceduralCompliance: true
+
+  verifyEvidenceIntegrity: true
+
+  verifyAuditTraceability: true
+
+  verifyCorrectiveActions: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+complianceIndexes:
+
+  complianceIndex: true
+
+  auditIndex: true
+
+  evidenceIndex: true
+
+  findingsIndex: true
+
+  traceabilityIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+complianceAuditResult:
+
+  success: complianceAuditModelReady
+
+  failure: complianceAuditInitializationFailed
+
+# =============================================================================
+# FIN PARTE 22 DE 30
+# =============================================================================
+
+# =============================================================================
+# KNOWLEDGE INTEGRATION MODEL
+# MODELO ONTOLÓGICO DE INTEGRACIÓN DEL CONOCIMIENTO
+# =============================================================================
+
+knowledgeIntegrationModel:
+
+  enabled: true
+
+  unifiedKnowledgeGraph: true
+
+  semanticIntegration: true
+
+  crossModelNavigation: true
+
+  consistencyManagement: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+knowledgeIntegrationEntity:
+
+  id: KNOWLEDGE_INTEGRATION
+
+  parent: ENTITY
+
+  description: Unified Knowledge Integration Layer
+
+# =============================================================================
+# INTEGRATED DOMAINS
+# =============================================================================
+
+integratedDomains:
+
+  ontologyModel
+
+  legalModel
+
+  contractModel
+
+  procedureModel
+
+  cpvModel
+
+  documentModel
+
+  executionModel
+
+  reasoningModel
+
+  aiCoordinationModel
+
+  governanceModel
+
+  analyticsModel
+
+  complianceModel
+
+# =============================================================================
+# KNOWLEDGE GRAPH
+# =============================================================================
+
+knowledgeGraph:
+
+  entities
+
+  relationships
+
+  semanticNodes
+
+  semanticEdges
+
+  inferenceLinks
+
+  traceabilityLinks
+
+# =============================================================================
+# CROSS DOMAIN RELATIONSHIPS
+# =============================================================================
+
+crossDomainRelationships:
+
+  legalToProcedure
+
+  procedureToContract
+
+  contractToExecution
+
+  executionToDocuments
+
+  documentsToOntology
+
+  ontologyToRules
+
+  rulesToReasoning
+
+  reasoningToRecommendations
+
+  recommendationsToValidation
+
+# =============================================================================
+# SEMANTIC NAVIGATION
+# =============================================================================
+
+semanticNavigation:
+
+  navigateByEntity
+
+  navigateByNorm
+
+  navigateByProcedure
+
+  navigateByContract
+
+  navigateByDocument
+
+  navigateByRule
+
+# =============================================================================
+# KNOWLEDGE SYNCHRONIZATION
+# =============================================================================
+
+knowledgeSynchronization:
+
+  ontologySynchronization
+
+  ruleSynchronization
+
+  documentSynchronization
+
+  legalSynchronization
+
+  analyticsSynchronization
+
+# =============================================================================
+# DEPENDENCY MANAGEMENT
+# =============================================================================
+
+dependencyManagement:
+
+  dependencyTree
+
+  dependencyValidation
+
+  dependencyPropagation
+
+  dependencyImpactAnalysis
+
+# =============================================================================
+# KNOWLEDGE CONSOLIDATION
+# =============================================================================
+
+knowledgeConsolidation:
+
+  removeDuplications
+
+  mergeEquivalentKnowledge
+
+  normalizeConcepts
+
+  consolidateRelationships
+
+# =============================================================================
+# KNOWLEDGE CONSISTENCY
+# =============================================================================
+
+knowledgeConsistency:
+
+  semanticConsistency
+
+  legalConsistency
+
+  proceduralConsistency
+
+  documentaryConsistency
+
+  ontologicalConsistency
+
+# =============================================================================
+# KNOWLEDGE QUERY MODEL
+# =============================================================================
+
+knowledgeQueries:
+
+  semanticQuery
+
+  legalQuery
+
+  ontologyQuery
+
+  proceduralQuery
+
+  documentQuery
+
+  graphTraversal
+
+# =============================================================================
+# KNOWLEDGE SERVICES
+# =============================================================================
+
+knowledgeServices:
+
+  recommendationService
+
+  validationService
+
+  reasoningService
+
+  explanationService
+
+  analyticsService
+
+  auditService
+
+# =============================================================================
+# INTEROPERABILITY
+# =============================================================================
+
+interoperability:
+
+  internalModels
+
+  externalRepositories
+
+  legalDatabases
+
+  ontologyRepositories
+
+  documentRepositories
+
+# =============================================================================
+# INTEGRATION EVENTS
+# =============================================================================
+
+integrationEvents:
+
+  ontologyUpdated
+
+  legalKnowledgeUpdated
+
+  documentGenerated
+
+  ruleModified
+
+  graphRebuilt
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+integrationValidation:
+
+  verifySemanticIntegrity: true
+
+  verifyRelationshipConsistency: true
+
+  verifyKnowledgeSynchronization: true
+
+  verifyDependencyIntegrity: true
+
+  verifyGraphConsistency: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+integrationIndexes:
+
+  graphIndex: true
+
+  relationshipIndex: true
+
+  dependencyIndex: true
+
+  synchronizationIndex: true
+
+  serviceIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+integrationResult:
+
+  success: knowledgeIntegrationReady
+
+  failure: knowledgeIntegrationInitializationFailed
+
+# =============================================================================
+# FIN PARTE 23 DE 30
+# =============================================================================
+
+# =============================================================================
+# EXPERT DECISION SUPPORT MODEL
+# MODELO ONTOLÓGICO DE APOYO A LA DECISIÓN DEL EXPERTO
+# =============================================================================
+
+expertDecisionSupportModel:
+
+  enabled: true
+
+  decisionSupport: true
+
+  explainableRecommendations: true
+
+  humanCentricValidation: true
+
+  assistedDecisionMaking: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+expertDecisionEntity:
+
+  id: EXPERT_DECISION_SUPPORT
+
+  parent: ENTITY
+
+  description: Expert Decision Support Framework
+
+# =============================================================================
+# DECISION DOMAINS
+# =============================================================================
+
+decisionDomains:
+
+  contractPreparation
+
+  procedureSelection
+
+  cpvSelection
+
+  solvencyDefinition
+
+  awardCriteriaDefinition
+
+  documentGeneration
+
+  executionControl
+
+  contractClosure
+
+# =============================================================================
+# DECISION TYPES
+# =============================================================================
+
+decisionTypes:
+
+  mandatoryDecision
+
+  recommendedDecision
+
+  optionalDecision
+
+  strategicDecision
+
+  exceptionalDecision
+
+# =============================================================================
+# DECISION PROPOSALS
+# =============================================================================
+
+decisionProposals:
+
+  primaryProposal
+
+  alternativeProposal
+
+  conservativeProposal
+
+  innovativeProposal
+
+  expertProposal
+
+# =============================================================================
+# JUSTIFICATION MODEL
+# =============================================================================
+
+decisionJustification:
+
+  legalJustification
+
+  proceduralJustification
+
+  technicalJustification
+
+  economicJustification
+
+  organisationalJustification
+
+# =============================================================================
+# ALTERNATIVE ANALYSIS
+# =============================================================================
+
+alternativeAnalysis:
+
+  alternativeOne
+
+  alternativeTwo
+
+  alternativeThree
+
+  comparativeAssessment
+
+  recommendationRanking
+
+# =============================================================================
+# IMPACT ANALYSIS
+# =============================================================================
+
+impactAnalysis:
+
+  legalImpact
+
+  economicImpact
+
+  proceduralImpact
+
+  organisationalImpact
+
+  executionImpact
+
+# =============================================================================
+# RISK ANALYSIS
+# =============================================================================
+
+decisionRiskAnalysis:
+
+  legalRisk
+
+  financialRisk
+
+  operationalRisk
+
+  proceduralRisk
+
+  reputationalRisk
+
+# =============================================================================
+# CONFIDENCE MODEL
+# =============================================================================
+
+decisionConfidence:
+
+  veryHigh
+
+  high
+
+  medium
+
+  low
+
+  manualAssessmentRequired
+
+# =============================================================================
+# HUMAN VALIDATION
+# =============================================================================
+
+humanValidation:
+
+  validationRequired
+
+  validationCompleted
+
+  validationRejected
+
+  validationAccepted
+
+  validationWithObservations
+
+# =============================================================================
+# DECISION HISTORY
+# =============================================================================
+
+decisionHistory:
+
+  proposedDecision
+
+  validatedDecision
+
+  modifiedDecision
+
+  rejectedDecision
+
+  finalDecision
+
+# =============================================================================
+# WARNINGS
+# =============================================================================
+
+decisionWarnings:
+
+  legalWarning
+
+  proceduralWarning
+
+  financialWarning
+
+  executionWarning
+
+  complianceWarning
+
+# =============================================================================
+# DECISION TRACEABILITY
+# =============================================================================
+
+decisionTraceability:
+
+  proposalTrace
+
+  validationTrace
+
+  modificationTrace
+
+  approvalTrace
+
+  implementationTrace
+
+# =============================================================================
+# USER INTERACTION
+# =============================================================================
+
+userInteraction:
+
+  acceptsRecommendation
+
+  rejectsRecommendation
+
+  requestsAlternative
+
+  requestsExplanation
+
+  modifiesProposal
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+decisionValidation:
+
+  verifyLegalSupport: true
+
+  verifyRecommendationConsistency: true
+
+  verifyImpactAssessment: true
+
+  verifyHumanValidation: true
+
+  verifyDecisionTraceability: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+decisionIndexes:
+
+  proposalIndex: true
+
+  justificationIndex: true
+
+  confidenceIndex: true
+
+  validationIndex: true
+
+  traceabilityIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+expertDecisionSupportResult:
+
+  success: expertDecisionSupportReady
+
+  failure: expertDecisionSupportInitializationFailed
+
+# =============================================================================
+# FIN PARTE 24 DE 30
+# =============================================================================
+
+# =============================================================================
+# KNOWLEDGE EVOLUTION & SELF-IMPROVEMENT MODEL
+# MODELO DE EVOLUCIÓN Y MEJORA CONTINUA DEL CONOCIMIENTO
+# =============================================================================
+
+knowledgeEvolutionModel:
+
+  enabled: true
+
+  controlledEvolution: true
+
+  continuousImprovement: true
+
+  expertValidation: true
+
+  legalStability: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+knowledgeEvolutionEntity:
+
+  id: KNOWLEDGE_EVOLUTION
+
+  parent: ENTITY
+
+  description: Controlled Knowledge Evolution Framework
+
+# =============================================================================
+# EVOLUTION SOURCES
+# =============================================================================
+
+evolutionSources:
+
+  legislativeChanges
+
+  regulatoryChanges
+
+  jurisprudentialEvolution
+
+  doctrinalEvolution
+
+  newTemplates
+
+  expertContributions
+
+  organisationalNeeds
+
+# =============================================================================
+# KNOWLEDGE UPDATE TYPES
+# =============================================================================
+
+knowledgeUpdates:
+
+  ontologyUpdate
+
+  ruleUpdate
+
+  legalUpdate
+
+  documentUpdate
+
+  cpvUpdate
+
+  workflowUpdate
+
+  recommendationUpdate
+
+# =============================================================================
+# CHANGE DETECTION
+# =============================================================================
+
+changeDetection:
+
+  legalMonitoring
+
+  jurisprudenceMonitoring
+
+  doctrineMonitoring
+
+  regulatoryMonitoring
+
+  templateMonitoring
+
+# =============================================================================
+# IMPACT ANALYSIS
+# =============================================================================
+
+impactAnalysis:
+
+  ontologyImpact
+
+  rulesImpact
+
+  documentImpact
+
+  procedureImpact
+
+  contractImpact
+
+  reasoningImpact
+
+# =============================================================================
+# KNOWLEDGE VALIDATION
+# =============================================================================
+
+knowledgeValidation:
+
+  legalValidation
+
+  technicalValidation
+
+  semanticValidation
+
+  consistencyValidation
+
+  regressionValidation
+
+# =============================================================================
+# KNOWLEDGE MIGRATION
+# =============================================================================
+
+knowledgeMigration:
+
+  migrateOntology
+
+  migrateRules
+
+  migrateDocuments
+
+  migrateRelationships
+
+  preserveCompatibility
+
+# =============================================================================
+# LEARNING SOURCES
+# =============================================================================
+
+learningSources:
+
+  validatedExpedients
+
+  expertCorrections
+
+  acceptedRecommendations
+
+  auditResults
+
+  bestPractices
+
+# =============================================================================
+# IMPROVEMENT CATALOG
+# =============================================================================
+
+improvementCatalog:
+
+  optimiseOntology
+
+  optimiseRules
+
+  optimiseRecommendations
+
+  optimisePerformance
+
+  optimiseNavigation
+
+# =============================================================================
+# STABILITY CONTROL
+# =============================================================================
+
+stabilityControl:
+
+  freezeCriticalKnowledge
+
+  protectValidatedRules
+
+  preserveCompatibility
+
+  maintainTraceability
+
+# =============================================================================
+# REGRESSION CONTROL
+# =============================================================================
+
+regressionControl:
+
+  executeRegressionTests
+
+  comparePreviousBehaviour
+
+  detectUnexpectedChanges
+
+  verifyKnowledgeIntegrity
+
+# =============================================================================
+# KNOWLEDGE MATURITY
+# =============================================================================
+
+knowledgeMaturity:
+
+  experimental
+
+  reviewed
+
+  validated
+
+  consolidated
+
+  deprecated
+
+# =============================================================================
+# APPROVAL WORKFLOW
+# =============================================================================
+
+approvalWorkflow:
+
+  proposal
+
+  expertReview
+
+  legalReview
+
+  approval
+
+  publication
+
+  monitoring
+
+# =============================================================================
+# EVOLUTION METRICS
+# =============================================================================
+
+evolutionMetrics:
+
+  knowledgeGrowth
+
+  ruleGrowth
+
+  ontologyGrowth
+
+  legalCoverageGrowth
+
+  recommendationAccuracy
+
+# =============================================================================
+# EVOLUTION EVENTS
+# =============================================================================
+
+evolutionEvents:
+
+  newKnowledge
+
+  updatedKnowledge
+
+  deprecatedKnowledge
+
+  restoredKnowledge
+
+  emergencyCorrection
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+knowledgeEvolutionValidation:
+
+  verifyCompatibility: true
+
+  verifyLegalConsistency: true
+
+  verifyRegression: true
+
+  verifyExpertApproval: true
+
+  verifySemanticIntegrity: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+knowledgeEvolutionIndexes:
+
+  evolutionIndex: true
+
+  maturityIndex: true
+
+  learningIndex: true
+
+  compatibilityIndex: true
+
+  regressionIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+knowledgeEvolutionResult:
+
+  success: knowledgeEvolutionReady
+
+  failure: knowledgeEvolutionInitializationFailed
+
+# =============================================================================
+# FIN PARTE 25 DE 30
+# =============================================================================
+
+# =============================================================================
+# GLOBAL KNOWLEDGE ORCHESTRATION MODEL
+# MODELO GLOBAL DE ORQUESTACIÓN DEL CONOCIMIENTO
+# =============================================================================
+
+globalKnowledgeOrchestrationModel:
+
+  enabled: true
+
+  orchestrationEngine: true
+
+  semanticCoordination: true
+
+  distributedReasoning: true
+
+  globalConsistency: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+knowledgeOrchestrationEntity:
+
+  id: KNOWLEDGE_ORCHESTRATION
+
+  parent: ENTITY
+
+  description: Global Knowledge Orchestration Framework
+
+# =============================================================================
+# ORCHESTRATED DOMAINS
+# =============================================================================
+
+orchestratedDomains:
+
+  legalKnowledge
+
+  ontologyKnowledge
+
+  proceduralKnowledge
+
+  contractualKnowledge
+
+  documentaryKnowledge
+
+  executionKnowledge
+
+  analyticalKnowledge
+
+  governanceKnowledge
+
+  auditKnowledge
+
+  aiKnowledge
+
+  reasoningKnowledge
+
+  recommendationKnowledge
+
+# =============================================================================
+# ORCHESTRATION LAYERS
+# =============================================================================
+
+orchestrationLayers:
+
+  presentationLayer
+
+  interactionLayer
+
+  reasoningLayer
+
+  ontologyLayer
+
+  rulesLayer
+
+  legalLayer
+
+  persistenceLayer
+
+# =============================================================================
+# GLOBAL COORDINATION
+# =============================================================================
+
+globalCoordination:
+
+  synchronizeKnowledge
+
+  synchronizeRules
+
+  synchronizeDocuments
+
+  synchronizeOntology
+
+  synchronizeRecommendations
+
+# =============================================================================
+# KNOWLEDGE FLOWS
+# =============================================================================
+
+knowledgeFlows:
+
+  userRequest
+
+  legalInterpretation
+
+  ontologyNavigation
+
+  ruleExecution
+
+  recommendationGeneration
+
+  documentGeneration
+
+  humanValidation
+
+# =============================================================================
+# GLOBAL EVENTS
+# =============================================================================
+
+globalEvents:
+
+  ontologyLoaded
+
+  rulesLoaded
+
+  legislationUpdated
+
+  documentGenerated
+
+  recommendationValidated
+
+  auditCompleted
+
+# =============================================================================
+# SERVICE ORCHESTRATION
+# =============================================================================
+
+serviceOrchestration:
+
+  reasoningService
+
+  validationService
+
+  recommendationService
+
+  documentService
+
+  analyticsService
+
+  governanceService
+
+  auditService
+
+# =============================================================================
+# COORDINATION POLICIES
+# =============================================================================
+
+coordinationPolicies:
+
+  expertSystemPriority
+
+  legalConsistencyPriority
+
+  ontologyConsistencyPriority
+
+  traceabilityPriority
+
+  humanValidationPriority
+
+# =============================================================================
+# EXECUTION PIPELINE
+# =============================================================================
+
+executionPipeline:
+
+  receiveRequest
+
+  identifyContext
+
+  identifyApplicableNorms
+
+  executeInference
+
+  validateConsistency
+
+  generateRecommendation
+
+  generateDocuments
+
+  humanApproval
+
+# =============================================================================
+# GLOBAL DEPENDENCIES
+# =============================================================================
+
+globalDependencies:
+
+  ontologyDependencies
+
+  legalDependencies
+
+  proceduralDependencies
+
+  documentaryDependencies
+
+  reasoningDependencies
+
+# =============================================================================
+# SYSTEM HEALTH
+# =============================================================================
+
+systemHealth:
+
+  ontologyHealth
+
+  ruleHealth
+
+  legalHealth
+
+  reasoningHealth
+
+  recommendationHealth
+
+# =============================================================================
+# AVAILABILITY MODEL
+# =============================================================================
+
+availabilityModel:
+
+  highAvailability
+
+  faultTolerance
+
+  gracefulDegradation
+
+  recoveryMechanisms
+
+# =============================================================================
+# KNOWLEDGE SECURITY
+# =============================================================================
+
+knowledgeSecurity:
+
+  readProtection
+
+  writeProtection
+
+  versionProtection
+
+  auditProtection
+
+  integrityProtection
+
+# =============================================================================
+# GLOBAL VALIDATION
+# =============================================================================
+
+orchestrationValidation:
+
+  verifyGlobalConsistency: true
+
+  verifySynchronization: true
+
+  verifyDependencies: true
+
+  verifyExecutionPipeline: true
+
+  verifyKnowledgeIntegrity: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+orchestrationIndexes:
+
+  orchestrationIndex: true
+
+  coordinationIndex: true
+
+  executionIndex: true
+
+  dependencyIndex: true
+
+  healthIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+orchestrationResult:
+
+  success: globalKnowledgeOrchestrationReady
+
+  failure: globalKnowledgeOrchestrationInitializationFailed
+
+# =============================================================================
+# FIN PARTE 26 DE 30
+# =============================================================================
+
+# =============================================================================
+# ENTERPRISE KNOWLEDGE ARCHITECTURE MODEL
+# MODELO DE ARQUITECTURA EMPRESARIAL DEL CONOCIMIENTO
+# =============================================================================
+
+enterpriseKnowledgeArchitectureModel:
+
+  enabled: true
+
+  enterpriseArchitecture: true
+
+  serviceOrientedArchitecture: true
+
+  modularKnowledge: true
+
+  interoperability: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+enterpriseArchitectureEntity:
+
+  id: ENTERPRISE_KNOWLEDGE_ARCHITECTURE
+
+  parent: ENTITY
+
+  description: Enterprise Knowledge Architecture
+
+# =============================================================================
+# ENTERPRISE DOMAINS
+# =============================================================================
+
+enterpriseDomains:
+
+  legalDomain
+
+  procurementDomain
+
+  documentDomain
+
+  ontologyDomain
+
+  reasoningDomain
+
+  analyticsDomain
+
+  governanceDomain
+
+  auditDomain
+
+  integrationDomain
+
+  aiDomain
+
+# =============================================================================
+# BUSINESS CAPABILITIES
+# =============================================================================
+
+businessCapabilities:
+
+  legalAssessment
+
+  procurementPreparation
+
+  documentGeneration
+
+  contractManagement
+
+  executionMonitoring
+
+  complianceVerification
+
+  auditSupport
+
+  knowledgeManagement
+
+# =============================================================================
+# ENTERPRISE SERVICES
+# =============================================================================
+
+enterpriseServices:
+
+  legalService
+
+  reasoningService
+
+  recommendationService
+
+  documentService
+
+  ontologyService
+
+  governanceService
+
+  analyticsService
+
+  auditService
+
+  notificationService
+
+# =============================================================================
+# SHARED COMPONENTS
+# =============================================================================
+
+sharedComponents:
+
+  semanticRepository
+
+  ruleRepository
+
+  documentRepository
+
+  ontologyRepository
+
+  knowledgeRepository
+
+  evidenceRepository
+
+# =============================================================================
+# INTEROPERABILITY
+# =============================================================================
+
+interoperability:
+
+  internalAPI
+
+  externalAPI
+
+  semanticExchange
+
+  metadataExchange
+
+  documentExchange
+
+  ontologyExchange
+
+# =============================================================================
+# DATA GOVERNANCE
+# =============================================================================
+
+dataGovernance:
+
+  masterData
+
+  metadataManagement
+
+  semanticNormalization
+
+  dataQuality
+
+  dataLineage
+
+# =============================================================================
+# ENTERPRISE WORKFLOWS
+# =============================================================================
+
+enterpriseWorkflows:
+
+  contractPreparationWorkflow
+
+  validationWorkflow
+
+  approvalWorkflow
+
+  executionWorkflow
+
+  auditWorkflow
+
+  publicationWorkflow
+
+# =============================================================================
+# ENTERPRISE EVENTS
+# =============================================================================
+
+enterpriseEvents:
+
+  expedienteCreated
+
+  documentValidated
+
+  recommendationAccepted
+
+  legalUpdated
+
+  ontologyUpdated
+
+  auditCompleted
+
+# =============================================================================
+# SCALABILITY
+# =============================================================================
+
+scalability:
+
+  horizontalScaling
+
+  verticalScaling
+
+  modularDeployment
+
+  distributedKnowledge
+
+  distributedInference
+
+# =============================================================================
+# RESILIENCE
+# =============================================================================
+
+resilience:
+
+  redundancy
+
+  backup
+
+  recovery
+
+  faultIsolation
+
+  disasterRecovery
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+
+enterpriseSecurity:
+
+  authentication
+
+  authorization
+
+  encryption
+
+  auditLogging
+
+  integrityVerification
+
+# =============================================================================
+# ENTERPRISE MONITORING
+# =============================================================================
+
+enterpriseMonitoring:
+
+  performanceMonitoring
+
+  availabilityMonitoring
+
+  securityMonitoring
+
+  legalMonitoring
+
+  knowledgeMonitoring
+
+# =============================================================================
+# GOVERNANCE
+# =============================================================================
+
+enterpriseGovernance:
+
+  architectureBoard
+
+  legalCommittee
+
+  technicalCommittee
+
+  changeCommittee
+
+  qualityCommittee
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+enterpriseArchitectureValidation:
+
+  verifyArchitectureIntegrity: true
+
+  verifyInteroperability: true
+
+  verifyScalability: true
+
+  verifyGovernance: true
+
+  verifyEnterpriseConsistency: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+enterpriseArchitectureIndexes:
+
+  enterpriseIndex: true
+
+  capabilityIndex: true
+
+  serviceIndex: true
+
+  governanceIndex: true
+
+  interoperabilityIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+enterpriseArchitectureResult:
+
+  success: enterpriseArchitectureReady
+
+  failure: enterpriseArchitectureInitializationFailed
+
+# =============================================================================
+# FIN PARTE 27 DE 30
+# =============================================================================
+
+# =============================================================================
+# STRATEGIC KNOWLEDGE ECOSYSTEM MODEL
+# MODELO ESTRATÉGICO DEL ECOSISTEMA DEL CONOCIMIENTO
+# =============================================================================
+
+strategicKnowledgeEcosystemModel:
+
+  enabled: true
+
+  strategicManagement: true
+
+  enterpriseVision: true
+
+  longTermEvolution: true
+
+  continuousOptimization: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+strategicKnowledgeEntity:
+
+  id: STRATEGIC_KNOWLEDGE_ECOSYSTEM
+
+  parent: ENTITY
+
+  description: Strategic Knowledge Ecosystem
+
+# =============================================================================
+# STRATEGIC DOMAINS
+# =============================================================================
+
+strategicDomains:
+
+  legalStrategy
+
+  technologicalStrategy
+
+  organisationalStrategy
+
+  governanceStrategy
+
+  innovationStrategy
+
+  knowledgeStrategy
+
+  interoperabilityStrategy
+
+  sustainabilityStrategy
+
+# =============================================================================
+# STRATEGIC OBJECTIVES
+# =============================================================================
+
+strategicObjectives:
+
+  improveLegalSecurity
+
+  reduceAdministrativeBurden
+
+  increaseAutomation
+
+  improveDecisionQuality
+
+  maximizeKnowledgeReuse
+
+  improveTransparency
+
+  improveTraceability
+
+  improveInteroperability
+
+# =============================================================================
+# STRATEGIC CAPABILITIES
+# =============================================================================
+
+strategicCapabilities:
+
+  adaptiveKnowledge
+
+  intelligentReasoning
+
+  semanticIntegration
+
+  predictiveSupport
+
+  continuousLearning
+
+  expertAssistance
+
+# =============================================================================
+# ENTERPRISE KPIs
+# =============================================================================
+
+enterpriseKPIs:
+
+  legalAccuracy
+
+  recommendationAcceptance
+
+  documentGenerationTime
+
+  reasoningPerformance
+
+  ontologyCoverage
+
+  regulatoryCoverage
+
+  auditCompliance
+
+  userSatisfaction
+
+# =============================================================================
+# MATURITY MODEL
+# =============================================================================
+
+knowledgeMaturityModel:
+
+  initial
+
+  managed
+
+  defined
+
+  quantitativelyManaged
+
+  optimized
+
+# =============================================================================
+# EVOLUTION ROADMAP
+# =============================================================================
+
+evolutionRoadmap:
+
+  shortTerm
+
+  mediumTerm
+
+  longTerm
+
+  strategicMilestones
+
+  innovationMilestones
+
+# =============================================================================
+# INNOVATION MODEL
+# =============================================================================
+
+innovationModel:
+
+  identifyInnovations
+
+  evaluateInnovations
+
+  validateInnovations
+
+  deployInnovations
+
+  monitorInnovations
+
+# =============================================================================
+# ECOSYSTEM ACTORS
+# =============================================================================
+
+ecosystemActors:
+
+  contractingAuthorities
+
+  procurementOfficers
+
+  legalExperts
+
+  technicalExperts
+
+  auditors
+
+  citizens
+
+  externalSystems
+
+# =============================================================================
+# COLLABORATION MODEL
+# =============================================================================
+
+collaborationModel:
+
+  knowledgeSharing
+
+  collaborativeValidation
+
+  collaborativeImprovement
+
+  institutionalCooperation
+
+# =============================================================================
+# SUSTAINABILITY MODEL
+# =============================================================================
+
+sustainabilityModel:
+
+  maintainKnowledge
+
+  preserveKnowledge
+
+  optimizeResources
+
+  minimizeRedundancy
+
+  longTermSupport
+
+# =============================================================================
+# STRATEGIC MONITORING
+# =============================================================================
+
+strategicMonitoring:
+
+  strategicDashboard
+
+  kpiMonitoring
+
+  maturityAssessment
+
+  roadmapTracking
+
+  ecosystemHealth
+
+# =============================================================================
+# DECISION SUPPORT
+# =============================================================================
+
+strategicDecisionSupport:
+
+  identifyPriorities
+
+  recommendInvestments
+
+  recommendEvolution
+
+  recommendImprovements
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+strategicValidation:
+
+  verifyStrategicAlignment: true
+
+  verifyKPIs: true
+
+  verifyRoadmapConsistency: true
+
+  verifyMaturityAssessment: true
+
+  verifySustainability: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+strategicIndexes:
+
+  strategyIndex: true
+
+  maturityIndex: true
+
+  ecosystemIndex: true
+
+  roadmapIndex: true
+
+  innovationIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+strategicKnowledgeResult:
+
+  success: strategicKnowledgeEcosystemReady
+
+  failure: strategicKnowledgeEcosystemInitializationFailed
+
+# =============================================================================
+# FIN PARTE 28 DE 30
+# =============================================================================
+
+# =============================================================================
+# UNIFIED SEMANTIC KNOWLEDGE NETWORK
+# RED SEMÁNTICA UNIFICADA DEL CONOCIMIENTO
+# =============================================================================
+
+unifiedSemanticKnowledgeNetwork:
+
+  enabled: true
+
+  semanticNetwork: true
+
+  globalKnowledgeGraph: true
+
+  intelligentNavigation: true
+
+  enterpriseSemanticModel: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+semanticNetworkEntity:
+
+  id: UNIFIED_SEMANTIC_NETWORK
+
+  parent: ENTITY
+
+  description: Unified Semantic Knowledge Network
+
+# =============================================================================
+# GLOBAL SEMANTIC DOMAINS
+# =============================================================================
+
+semanticDomains:
+
+  legalDomain
+
+  proceduralDomain
+
+  contractualDomain
+
+  documentaryDomain
+
+  organisationalDomain
+
+  reasoningDomain
+
+  ontologyDomain
+
+  governanceDomain
+
+  analyticsDomain
+
+  intelligenceDomain
+
+  auditDomain
+
+  interoperabilityDomain
+
+# =============================================================================
+# GLOBAL NODES
+# =============================================================================
+
+semanticNodes:
+
+  legalNodes
+
+  contractNodes
+
+  procedureNodes
+
+  documentNodes
+
+  ontologyNodes
+
+  ruleNodes
+
+  inferenceNodes
+
+  recommendationNodes
+
+  auditNodes
+
+  governanceNodes
+
+# =============================================================================
+# SEMANTIC RELATIONSHIPS
+# =============================================================================
+
+semanticRelationships:
+
+  dependsOn
+
+  references
+
+  derivesFrom
+
+  validates
+
+  generates
+
+  requires
+
+  complements
+
+  replaces
+
+  extends
+
+  contradicts
+
+# =============================================================================
+# KNOWLEDGE GRAPH STRUCTURE
+# =============================================================================
+
+knowledgeGraphStructure:
+
+  rootGraph
+
+  semanticClusters
+
+  inferenceClusters
+
+  legalClusters
+
+  documentClusters
+
+  executionClusters
+
+# =============================================================================
+# GRAPH NAVIGATION
+# =============================================================================
+
+graphNavigation:
+
+  navigateParents
+
+  navigateChildren
+
+  navigateDependencies
+
+  navigateReferences
+
+  navigateInferenceChain
+
+  navigateLegalChain
+
+# =============================================================================
+# GLOBAL SEMANTIC SEARCH
+# =============================================================================
+
+semanticSearch:
+
+  entitySearch
+
+  legalSearch
+
+  documentSearch
+
+  ontologySearch
+
+  graphSearch
+
+  contextualSearch
+
+# =============================================================================
+# CROSS MODEL LINKS
+# =============================================================================
+
+crossModelLinks:
+
+  ontologyToLegal
+
+  legalToRules
+
+  rulesToInference
+
+  inferenceToRecommendations
+
+  recommendationsToDocuments
+
+  documentsToAudit
+
+  auditToGovernance
+
+# =============================================================================
+# KNOWLEDGE CLUSTERS
+# =============================================================================
+
+knowledgeClusters:
+
+  procurementCluster
+
+  legalCluster
+
+  executionCluster
+
+  documentCluster
+
+  governanceCluster
+
+  analyticsCluster
+
+  intelligenceCluster
+
+# =============================================================================
+# GLOBAL SEMANTIC INDEX
+# =============================================================================
+
+globalSemanticIndex:
+
+  entityRegistry
+
+  relationshipRegistry
+
+  ontologyRegistry
+
+  legalRegistry
+
+  documentRegistry
+
+  inferenceRegistry
+
+# =============================================================================
+# KNOWLEDGE DISCOVERY
+# =============================================================================
+
+knowledgeDiscovery:
+
+  detectHiddenRelationships
+
+  identifyKnowledgePatterns
+
+  discoverNewDependencies
+
+  detectSemanticCommunities
+
+# =============================================================================
+# KNOWLEDGE OPTIMIZATION
+# =============================================================================
+
+knowledgeOptimization:
+
+  optimizeGraph
+
+  optimizeRelationships
+
+  eliminateRedundancy
+
+  normalizeSemantics
+
+  improveConnectivity
+
+# =============================================================================
+# ENTERPRISE SEMANTIC SERVICES
+# =============================================================================
+
+enterpriseSemanticServices:
+
+  semanticNavigationService
+
+  semanticRecommendationService
+
+  semanticReasoningService
+
+  semanticValidationService
+
+  semanticAnalyticsService
+
+# =============================================================================
+# GLOBAL COHERENCE
+# =============================================================================
+
+globalCoherence:
+
+  semanticConsistency
+
+  legalConsistency
+
+  documentaryConsistency
+
+  proceduralConsistency
+
+  enterpriseConsistency
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+semanticNetworkValidation:
+
+  verifyGraphIntegrity: true
+
+  verifyRelationshipIntegrity: true
+
+  verifySemanticConsistency: true
+
+  verifyNavigationIntegrity: true
+
+  verifyGlobalKnowledgeIntegrity: true
+
+# =============================================================================
+# SEMANTIC INDEXES
+# =============================================================================
+
+semanticNetworkIndexes:
+
+  graphIndex: true
+
+  semanticIndex: true
+
+  clusterIndex: true
+
+  navigationIndex: true
+
+  discoveryIndex: true
+
+# =============================================================================
+# RESULT
+# =============================================================================
+
+semanticNetworkResult:
+
+  success: unifiedSemanticKnowledgeNetworkReady
+
+  failure: unifiedSemanticKnowledgeNetworkInitializationFailed
+
+# =============================================================================
+# FIN PARTE 29 DE 30
+# =============================================================================
+
+# =============================================================================
+# MASTER KNOWLEDGE ONTOLOGY
+# ONTOLOGÍA MAESTRA DEL SISTEMA CONTRATA-IA
+# =============================================================================
+
+masterKnowledgeOntology:
+
+  enabled: true
+
+  ontologyVersion: "1.0.0"
+
+  semanticEngine: true
+
+  expertSystemReady: true
+
+  enterpriseReady: true
+
+# =============================================================================
+# ROOT ENTITY
+# =============================================================================
+
+masterOntology:
+
+  id: MASTER_ONTOLOGY
+
+  description: Global Master Ontology for CONTRATA-IA
+
+# =============================================================================
+# REGISTERED KNOWLEDGE MODELS
+# =============================================================================
+
+registeredModels:
+
+  legalModel
+
+  contractModel
+
+  procedureModel
+
+  cpvModel
+
+  documentModel
+
+  templateModel
+
+  clauseModel
+
+  solvencyModel
+
+  executionModel
+
+  administrativeActsModel
+
+  legalSourcesModel
+
+  jurisprudenceDoctrineModel
+
+  reasoningModel
+
+  governanceModel
+
+  analyticsModel
+
+  aiCoordinationModel
+
+  contractIntelligenceModel
+
+  complianceAuditModel
+
+  knowledgeIntegrationModel
+
+  expertDecisionSupportModel
+
+  knowledgeEvolutionModel
+
+  globalKnowledgeOrchestrationModel
+
+  enterpriseKnowledgeArchitectureModel
+
+  strategicKnowledgeEcosystemModel
+
+  unifiedSemanticKnowledgeNetwork
+
+# =============================================================================
+# MASTER SERVICES
+# =============================================================================
+
+masterServices:
+
+  semanticReasoning
+
+  legalInference
+
+  recommendationEngine
+
+  ontologyNavigation
+
+  documentGeneration
+
+  complianceVerification
+
+  auditSupport
+
+  analyticsEngine
+
+# =============================================================================
+# GLOBAL DEPENDENCIES
+# =============================================================================
+
+globalDependencies:
+
+  ontologyEngine
+
+  ruleEngine
+
+  inferenceEngine
+
+  semanticRepository
+
+  legalRepository
+
+  documentRepository
+
+# =============================================================================
+# GLOBAL POLICIES
+# =============================================================================
+
+globalPolicies:
+
+  expertSystemPriority
+
+  humanValidationRequired
+
+  explainableAI
+
+  semanticConsistency
+
+  legalConsistency
+
+  auditability
+
+# =============================================================================
+# KNOWLEDGE METADATA
+# =============================================================================
+
+knowledgeMetadata:
+
+  owner: CONTRATA_IA
+
+  language: es
+
+  jurisdiction: Spain
+
+  specialization: PublicProcurement
+
+  normativeBase:
+
+    - LCSP
+
+    - Ley39_2015
+
+    - Ley40_2015
+
+# =============================================================================
+# ONTOLOGY ENTRY POINT
+# =============================================================================
+
+entryPoint:
+
+  ontologyLoader
+
+  semanticRegistry
+
+  knowledgeGraph
+
+  inferenceManager
+
+  recommendationManager
+
+# =============================================================================
+# GLOBAL VALIDATION
+# =============================================================================
+
+masterValidation:
+
+  verifyOntology: true
+
+  verifyKnowledgeGraph: true
+
+  verifySemanticConsistency: true
+
+  verifyLegalConsistency: true
+
+  verifyRegisteredModels: true
+
+# =============================================================================
+# MASTER INDEXES
+# =============================================================================
+
+masterIndexes:
+
+  ontologyRegistry: true
+
+  modelRegistry: true
+
+  dependencyRegistry: true
+
+  semanticRegistry: true
+
+  legalRegistry: true
+
+# =============================================================================
+# SYSTEM STATUS
+# =============================================================================
+
+systemStatus:
+
+  ontologyReady: true
+
+  expertSystemReady: true
+
+  semanticNetworkReady: true
+
+  reasoningReady: true
+
+  governanceReady: true
+
+# =============================================================================
+# FINAL RESULT
+# =============================================================================
+
+masterOntologyResult:
+
+  success: masterOntologyInitialized
+
+  failure: masterOntologyInitializationFailed
+
+# =============================================================================
+# END OF FILE
+# =============================================================================
