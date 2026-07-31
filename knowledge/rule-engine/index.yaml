@@ -1,0 +1,6666 @@
+# ============================================================================
+# CONTRATA-IA
+# RULE ENGINE INDEX
+# MASTER BOOTSTRAP
+# ============================================================================
+#
+# Archivo:
+# knowledge/rule-engine/index.yaml
+#
+# Función:
+#
+# Punto único de entrada del Sistema Experto.
+#
+# Registra todos los motores.
+#
+# Controla el orden de carga.
+#
+# Gestiona dependencias.
+#
+# Coordina la inicialización completa.
+#
+# ============================================================================
+
+system:
+
+  name: CONTRATA-IA
+
+  version: "1.0.0"
+
+  codename: "Contrata Intelligent Expert System"
+
+  description: >
+
+    Sistema Experto para la gestión integral de expedientes de contratación
+    pública conforme a la LCSP, Ley 39/2015, Ley 40/2015 y normativa
+    complementaria.
+
+  organization: Junta de Andalucía
+
+  domain: Contratación Pública
+
+  architecture: Expert System
+
+  status: production
+
+# ============================================================================
+# INFORMACIÓN GENERAL
+# ============================================================================
+
+information:
+
+  expertSystem: true
+
+  explainableAI: true
+
+  deterministicReasoning: true
+
+  ruleBasedSystem: true
+
+  inferenceBasedSystem: true
+
+  legalReasoning: true
+
+  documentGeneration: true
+
+  electronicFileGeneration: true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+configuration:
+
+  language: es-ES
+
+  timezone: Europe/Madrid
+
+  encoding: UTF-8
+
+  dateFormat: dd/MM/yyyy
+
+  decimalSeparator: ","
+
+  thousandsSeparator: "."
+
+# ============================================================================
+# MODO DE EJECUCIÓN
+# ============================================================================
+
+execution:
+
+  mode: production
+
+  safeMode: true
+
+  debugMode: false
+
+  simulationMode: false
+
+  verboseLogs: true
+
+# ============================================================================
+# CARGA DEL SISTEMA
+# ============================================================================
+
+bootstrap:
+
+  automaticInitialization: true
+
+  verifyIntegrity: true
+
+  verifyDependencies: true
+
+  verifyVersions: true
+
+  verifyKnowledgeBase: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL NÚCLEO
+# ============================================================================
+
+kernel:
+
+  enabled: true
+
+  initializeAutomatically: true
+
+  centralizedControl: true
+
+  dependencyInjection: true
+
+  lifecycleManagement: true
+
+# ============================================================================
+# VERSIONADO
+# ============================================================================
+
+versioning:
+
+  semanticVersioning: true
+
+  compatibilityValidation: true
+
+  minimumCompatibleVersion: "1.0.0"
+
+# ============================================================================
+# METADATOS
+# ============================================================================
+
+metadata:
+
+  author: CONTRATA-IA
+
+  owner: Junta de Andalucía
+
+  repository: knowledge/rule-engine
+
+  createdAutomatically: true
+
+# ============================================================================
+# FIN PARTE 1 DE 25
+# ============================================================================
+
+# ============================================================================
+# REGISTRO MAESTRO DE MOTORES
+# MASTER ENGINE REGISTRY
+# ============================================================================
+
+engineRegistry:
+
+  enabled: true
+
+  autoDiscovery: false
+
+  verifyRegistration: true
+
+  uniqueIdentifiers: true
+
+  dependencyValidation: true
+
+# ============================================================================
+# MOTORES PRINCIPALES
+# ============================================================================
+
+registeredEngines:
+
+  - id: RULE_ENGINE
+
+    file: 00-core.rules.yaml
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 10
+
+    mandatory: true
+
+  - id: INFERENCE_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 20
+
+    mandatory: true
+
+  - id: LEGAL_DECISION_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 30
+
+    mandatory: true
+
+  - id: LEGAL_INTERPRETATION_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 40
+
+    mandatory: true
+
+  - id: DECISION_PLANNER
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 50
+
+    mandatory: true
+
+  - id: EXPLAINABILITY_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 60
+
+    mandatory: true
+
+  - id: OPTIMIZATION_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 70
+
+    mandatory: true
+
+  - id: SIMULATION_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 80
+
+    mandatory: true
+
+  - id: RISK_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 90
+
+    mandatory: true
+
+  - id: COMPLIANCE_ENGINE
+
+    version: "1.0.0"
+
+    enabled: true
+
+    priority: 100
+
+    mandatory: true
+
+# ============================================================================
+# MOTORES DOCUMENTALES
+# ============================================================================
+
+documentEngines:
+
+  - id: DOCUMENT_VALIDATION_ENGINE
+
+    priority: 110
+
+    enabled: true
+
+  - id: DOCUMENT_GENERATION_ENGINE
+
+    priority: 120
+
+    enabled: true
+
+  - id: ELECTRONIC_EXPEDIENT_ENGINE
+
+    priority: 130
+
+    enabled: true
+
+# ============================================================================
+# MOTORES DE SOPORTE
+# ============================================================================
+
+supportEngines:
+
+  - id: INTEROPERABILITY_ENGINE
+
+    priority: 140
+
+    enabled: true
+
+  - id: CONTRACT_INTELLIGENCE_ENGINE
+
+    priority: 150
+
+    enabled: true
+
+  - id: KNOWLEDGE_GOVERNANCE_ENGINE
+
+    priority: 160
+
+    enabled: true
+
+  - id: SUPERVISION_ENGINE
+
+    priority: 170
+
+    enabled: true
+
+# ============================================================================
+# MOTOR DIRECTOR
+# ============================================================================
+
+masterEngine:
+
+  id: CONTRATA_IA_MASTER
+
+  priority: 1000
+
+  enabled: true
+
+  mandatory: true
+
+  singleton: true
+
+# ============================================================================
+# POLÍTICAS DE REGISTRO
+# ============================================================================
+
+registrationPolicies:
+
+  duplicatedIdentifiers: forbidden
+
+  duplicatedPriorities: allowed
+
+  disabledMandatoryEngine: forbidden
+
+  missingDependencies: forbidden
+
+# ============================================================================
+# FIN PARTE 2 DE 25
+# ============================================================================
+
+# ============================================================================
+# ÁRBOL OFICIAL DE DEPENDENCIAS
+# ENGINE DEPENDENCY GRAPH
+# ============================================================================
+
+dependencyGraph:
+
+  validationMode: strict
+
+  detectCircularDependencies: true
+
+  automaticResolution: true
+
+  stopOnDependencyError: true
+
+# ============================================================================
+# DEPENDENCIAS DEL NÚCLEO
+# ============================================================================
+
+dependencies:
+
+  RULE_ENGINE:
+
+    dependsOn: []
+
+    required: true
+
+  INFERENCE_ENGINE:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+    required: true
+
+  LEGAL_DECISION_ENGINE:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+      - INFERENCE_ENGINE
+
+    required: true
+
+  LEGAL_INTERPRETATION_ENGINE:
+
+    dependsOn:
+
+      - LEGAL_DECISION_ENGINE
+
+    required: true
+
+  DECISION_PLANNER:
+
+    dependsOn:
+
+      - LEGAL_INTERPRETATION_ENGINE
+
+    required: true
+
+# ============================================================================
+# DEPENDENCIAS DE APOYO
+# ============================================================================
+
+  EXPLAINABILITY_ENGINE:
+
+    dependsOn:
+
+      - LEGAL_DECISION_ENGINE
+
+      - LEGAL_INTERPRETATION_ENGINE
+
+    required: true
+
+  OPTIMIZATION_ENGINE:
+
+    dependsOn:
+
+      - DECISION_PLANNER
+
+    required: true
+
+  SIMULATION_ENGINE:
+
+    dependsOn:
+
+      - OPTIMIZATION_ENGINE
+
+    required: true
+
+  RISK_ENGINE:
+
+    dependsOn:
+
+      - LEGAL_DECISION_ENGINE
+
+      - SIMULATION_ENGINE
+
+    required: true
+
+  COMPLIANCE_ENGINE:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+      - LEGAL_DECISION_ENGINE
+
+      - RISK_ENGINE
+
+    required: true
+
+# ============================================================================
+# DEPENDENCIAS DOCUMENTALES
+# ============================================================================
+
+  DOCUMENT_VALIDATION_ENGINE:
+
+    dependsOn:
+
+      - COMPLIANCE_ENGINE
+
+    required: true
+
+  DOCUMENT_GENERATION_ENGINE:
+
+    dependsOn:
+
+      - DOCUMENT_VALIDATION_ENGINE
+
+      - EXPLAINABILITY_ENGINE
+
+    required: true
+
+  ELECTRONIC_EXPEDIENT_ENGINE:
+
+    dependsOn:
+
+      - DOCUMENT_GENERATION_ENGINE
+
+      - DOCUMENT_VALIDATION_ENGINE
+
+    required: true
+
+# ============================================================================
+# DEPENDENCIAS DE SERVICIO
+# ============================================================================
+
+  INTEROPERABILITY_ENGINE:
+
+    dependsOn:
+
+      - ELECTRONIC_EXPEDIENT_ENGINE
+
+    required: true
+
+  CONTRACT_INTELLIGENCE_ENGINE:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+      - INFERENCE_ENGINE
+
+      - COMPLIANCE_ENGINE
+
+      - DOCUMENT_GENERATION_ENGINE
+
+    required: true
+
+  KNOWLEDGE_GOVERNANCE_ENGINE:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+      - CONTRACT_INTELLIGENCE_ENGINE
+
+    required: true
+
+  SUPERVISION_ENGINE:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+      - INFERENCE_ENGINE
+
+      - LEGAL_DECISION_ENGINE
+
+      - DOCUMENT_GENERATION_ENGINE
+
+      - INTEROPERABILITY_ENGINE
+
+      - CONTRACT_INTELLIGENCE_ENGINE
+
+    required: true
+
+# ============================================================================
+# MOTOR DIRECTOR
+# ============================================================================
+
+  CONTRATA_IA_MASTER:
+
+    dependsOn:
+
+      - RULE_ENGINE
+
+      - INFERENCE_ENGINE
+
+      - LEGAL_DECISION_ENGINE
+
+      - LEGAL_INTERPRETATION_ENGINE
+
+      - DECISION_PLANNER
+
+      - EXPLAINABILITY_ENGINE
+
+      - OPTIMIZATION_ENGINE
+
+      - SIMULATION_ENGINE
+
+      - RISK_ENGINE
+
+      - COMPLIANCE_ENGINE
+
+      - DOCUMENT_VALIDATION_ENGINE
+
+      - DOCUMENT_GENERATION_ENGINE
+
+      - ELECTRONIC_EXPEDIENT_ENGINE
+
+      - INTEROPERABILITY_ENGINE
+
+      - CONTRACT_INTELLIGENCE_ENGINE
+
+      - KNOWLEDGE_GOVERNANCE_ENGINE
+
+      - SUPERVISION_ENGINE
+
+    required: true
+
+# ============================================================================
+# POLÍTICAS
+# ============================================================================
+
+dependencyPolicies:
+
+  missingDependency: error
+
+  circularDependency: critical
+
+  duplicatedDependency: warning
+
+  orphanEngine: warning
+
+  disabledRequiredDependency: critical
+
+# ============================================================================
+# FIN PARTE 3 DE 25
+# ============================================================================
+
+# ============================================================================
+# BOOTSTRAP PIPELINE
+# SECUENCIA OFICIAL DE INICIALIZACIÓN
+# ============================================================================
+
+bootstrapPipeline:
+
+  enabled: true
+
+  sequentialExecution: true
+
+  stopOnCriticalError: true
+
+  rollbackEnabled: true
+
+  auditInitialization: true
+
+# ============================================================================
+# FASE 1
+# CARGA DEL SISTEMA
+# ============================================================================
+
+phase01:
+
+  id: SYSTEM_LOADING
+
+  priority: 10
+
+  description: Load system configuration
+
+  tasks:
+
+    - loadConfiguration
+
+    - verifyEnvironment
+
+    - verifyRepository
+
+    - verifyVersion
+
+    - initializeKernel
+
+# ============================================================================
+# FASE 2
+# VERIFICACIÓN
+# ============================================================================
+
+phase02:
+
+  id: SYSTEM_VALIDATION
+
+  priority: 20
+
+  description: Validate installation
+
+  tasks:
+
+    - verifyFolders
+
+    - verifyFiles
+
+    - verifyIntegrity
+
+    - verifyChecksums
+
+    - verifySchemas
+
+# ============================================================================
+# FASE 3
+# CARGA DEL CONOCIMIENTO
+# ============================================================================
+
+phase03:
+
+  id: KNOWLEDGE_LOADING
+
+  priority: 30
+
+  description: Load knowledge repository
+
+  tasks:
+
+    - loadOntology
+
+    - loadTaxonomy
+
+    - loadLegalRules
+
+    - loadDoctrine
+
+    - loadJurisprudence
+
+    - loadConsultiveReports
+
+# ============================================================================
+# FASE 4
+# REGISTRO DE MOTORES
+# ============================================================================
+
+phase04:
+
+  id: ENGINE_REGISTRATION
+
+  priority: 40
+
+  description: Register engines
+
+  tasks:
+
+    - registerRuleEngine
+
+    - registerInferenceEngine
+
+    - registerDecisionEngine
+
+    - registerDocumentEngines
+
+    - registerSupportEngines
+
+# ============================================================================
+# FASE 5
+# RESOLUCIÓN DE DEPENDENCIAS
+# ============================================================================
+
+phase05:
+
+  id: DEPENDENCY_RESOLUTION
+
+  priority: 50
+
+  description: Resolve dependencies
+
+  tasks:
+
+    - analyseDependencies
+
+    - detectCycles
+
+    - verifyMandatoryDependencies
+
+    - buildDependencyGraph
+
+# ============================================================================
+# FASE 6
+# INICIALIZACIÓN
+# ============================================================================
+
+phase06:
+
+  id: ENGINE_INITIALIZATION
+
+  priority: 60
+
+  description: Initialize engines
+
+  tasks:
+
+    - initializeRuleEngine
+
+    - initializeInferenceEngine
+
+    - initializeDecisionEngine
+
+    - initializeDocumentEngine
+
+    - initializeSupportEngines
+
+# ============================================================================
+# FASE 7
+# VALIDACIÓN
+# ============================================================================
+
+phase07:
+
+  id: INITIALIZATION_VALIDATION
+
+  priority: 70
+
+  description: Validate initialized system
+
+  tasks:
+
+    - validateKnowledge
+
+    - validateRules
+
+    - validateReasoner
+
+    - validateDocuments
+
+    - validateConfiguration
+
+# ============================================================================
+# FASE 8
+# ACTIVACIÓN
+# ============================================================================
+
+phase08:
+
+  id: SYSTEM_ACTIVATION
+
+  priority: 80
+
+  description: Activate master engine
+
+  tasks:
+
+    - activateMasterEngine
+
+    - activateMonitoring
+
+    - activateAudit
+
+    - activateInteroperability
+
+# ============================================================================
+# FASE 9
+# COMPROBACIÓN FINAL
+# ============================================================================
+
+phase09:
+
+  id: FINAL_CHECK
+
+  priority: 90
+
+  description: Final system verification
+
+  tasks:
+
+    - executeSelfTest
+
+    - executeHealthCheck
+
+    - executePerformanceCheck
+
+    - generateStartupReport
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+startupResult:
+
+  success: systemReady
+
+  failure: initializationFailed
+
+# ============================================================================
+# FIN PARTE 4 DE 25
+# ============================================================================
+
+# ============================================================================
+# LIFECYCLE MANAGER
+# GESTIÓN DEL CICLO DE VIDA DEL SISTEMA EXPERTO
+# ============================================================================
+
+lifecycleManager:
+
+  enabled: true
+
+  centralizedLifecycle: true
+
+  automaticTransitions: true
+
+  validateTransitions: true
+
+# ============================================================================
+# ESTADOS DEL SISTEMA
+# ============================================================================
+
+systemStates:
+
+  CREATED
+
+  CONFIGURED
+
+  INITIALIZED
+
+  STARTING
+
+  RUNNING
+
+  PAUSED
+
+  MAINTENANCE
+
+  DEGRADED
+
+  RECOVERING
+
+  STOPPING
+
+  STOPPED
+
+  FAILED
+
+# ============================================================================
+# ESTADOS DE LOS MOTORES
+# ============================================================================
+
+engineStates:
+
+  REGISTERED
+
+  LOADED
+
+  INITIALIZED
+
+  READY
+
+  RUNNING
+
+  PAUSED
+
+  RESTARTING
+
+  STOPPED
+
+  FAILED
+
+  DISABLED
+
+# ============================================================================
+# TRANSICIONES PERMITIDAS
+# ============================================================================
+
+allowedTransitions:
+
+  CREATED:
+
+    - CONFIGURED
+
+  CONFIGURED:
+
+    - INITIALIZED
+
+  INITIALIZED:
+
+    - STARTING
+
+  STARTING:
+
+    - RUNNING
+
+    - FAILED
+
+  RUNNING:
+
+    - PAUSED
+
+    - MAINTENANCE
+
+    - STOPPING
+
+    - DEGRADED
+
+  PAUSED:
+
+    - RUNNING
+
+    - STOPPING
+
+  MAINTENANCE:
+
+    - RUNNING
+
+    - STOPPING
+
+  DEGRADED:
+
+    - RECOVERING
+
+    - FAILED
+
+  RECOVERING:
+
+    - RUNNING
+
+    - FAILED
+
+  STOPPING:
+
+    - STOPPED
+
+# ============================================================================
+# OPERACIONES
+# ============================================================================
+
+operations:
+
+  start
+
+  initialize
+
+  pause
+
+  resume
+
+  restart
+
+  reload
+
+  stop
+
+  recover
+
+  shutdown
+
+# ============================================================================
+# ARRANQUE
+# ============================================================================
+
+startupPolicy:
+
+  initializeSequentially: true
+
+  waitDependencies: true
+
+  validateInitialization: true
+
+  abortOnCriticalFailure: true
+
+# ============================================================================
+# PARADA
+# ============================================================================
+
+shutdownPolicy:
+
+  gracefulShutdown: true
+
+  saveExecutionContext: true
+
+  flushAuditLogs: true
+
+  closeConnections: true
+
+  releaseResources: true
+
+# ============================================================================
+# REINICIO
+# ============================================================================
+
+restartPolicy:
+
+  enabled: true
+
+  preserveState: true
+
+  restoreContext: true
+
+  validateRecovery: true
+
+# ============================================================================
+# RECUPERACIÓN
+# ============================================================================
+
+recoveryPolicy:
+
+  enabled: true
+
+  automaticRecovery: true
+
+  maximumAttempts: 3
+
+  rollbackIfRecoveryFails: true
+
+# ============================================================================
+# GESTIÓN DE CONTEXTO
+# ============================================================================
+
+executionContext:
+
+  preserveKnowledge: true
+
+  preserveSessions: true
+
+  preserveCache: true
+
+  preserveTransactions: true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+lifecycleValidation:
+
+  verifyDependencies: true
+
+  verifyStateConsistency: true
+
+  verifyPendingOperations: true
+
+  verifyAuditStatus: true
+
+# ============================================================================
+# EVENTOS
+# ============================================================================
+
+lifecycleEvents:
+
+  onStartup
+
+  onInitialization
+
+  onReady
+
+  onPause
+
+  onResume
+
+  onRestart
+
+  onRecovery
+
+  onShutdown
+
+  onFailure
+
+# ============================================================================
+# NOTIFICACIONES
+# ============================================================================
+
+notifications:
+
+  notifyStartup: true
+
+  notifyShutdown: true
+
+  notifyFailures: true
+
+  notifyRecovery: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+lifecycleMetrics:
+
+  totalStarts: true
+
+  totalRestarts: true
+
+  totalFailures: true
+
+  totalRecoveries: true
+
+  uptime: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+lifecycleAudit:
+
+  enabled: true
+
+  registerTransitions: true
+
+  registerOperations: true
+
+  registerFailures: true
+
+  registerRecoveries: true
+
+  registerExecutionTimes: true
+
+# ============================================================================
+# FIN PARTE 5 DE 25
+# ============================================================================
+
+# ============================================================================
+# CONFIGURATION MANAGER
+# GESTIÓN CENTRALIZADA DE LA CONFIGURACIÓN
+# ============================================================================
+
+configurationManager:
+
+  enabled: true
+
+  centralizedConfiguration: true
+
+  dynamicConfiguration: true
+
+  validateConfiguration: true
+
+  hotReload: true
+
+# ============================================================================
+# CONFIGURACIÓN GENERAL
+# ============================================================================
+
+globalConfiguration:
+
+  language: es-ES
+
+  timezone: Europe/Madrid
+
+  locale: es_ES
+
+  encoding: UTF-8
+
+  environment: production
+
+  profile: default
+
+# ============================================================================
+# ENTORNOS
+# ============================================================================
+
+environments:
+
+  development:
+
+    debug: true
+
+    verboseLogs: true
+
+    cache: false
+
+  testing:
+
+    debug: false
+
+    verboseLogs: true
+
+    cache: true
+
+  preproduction:
+
+    debug: false
+
+    verboseLogs: false
+
+    cache: true
+
+  production:
+
+    debug: false
+
+    verboseLogs: false
+
+    cache: true
+
+# ============================================================================
+# PERFILES
+# ============================================================================
+
+profiles:
+
+  default
+
+  administrator
+
+  legal
+
+  technical
+
+  auditor
+
+  developer
+
+# ============================================================================
+# CONFIGURACIÓN DINÁMICA
+# ============================================================================
+
+dynamicConfiguration:
+
+  allowReload: true
+
+  reloadWithoutRestart: true
+
+  validateBeforeReload: true
+
+  rollbackOnFailure: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR DE REGLAS
+# ============================================================================
+
+ruleEngineConfiguration:
+
+  strictMode: true
+
+  deterministicExecution: true
+
+  stopOnCriticalError: true
+
+  enableOptimization: true
+
+  explainExecution: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL RAZONADOR
+# ============================================================================
+
+inferenceConfiguration:
+
+  forwardChaining: true
+
+  backwardChaining: true
+
+  mixedReasoning: true
+
+  priorityResolution: true
+
+# ============================================================================
+# CONFIGURACIÓN DOCUMENTAL
+# ============================================================================
+
+documentConfiguration:
+
+  automaticGeneration: true
+
+  validateOutput: true
+
+  preserveVersions: true
+
+  useOfficialTemplates: true
+
+# ============================================================================
+# CONFIGURACIÓN DE SEGURIDAD
+# ============================================================================
+
+securityConfiguration:
+
+  encryptionEnabled: true
+
+  roleBasedAccess: true
+
+  auditEnabled: true
+
+  integrityVerification: true
+
+# ============================================================================
+# CONFIGURACIÓN DE RENDIMIENTO
+# ============================================================================
+
+performanceConfiguration:
+
+  cacheEnabled: true
+
+  preloadKnowledge: true
+
+  lazyInitialization: false
+
+  optimizeQueries: true
+
+# ============================================================================
+# CONFIGURACIÓN DE AUDITORÍA
+# ============================================================================
+
+auditConfiguration:
+
+  enabled: true
+
+  persistentAudit: true
+
+  detailedLogs: true
+
+  immutableAudit: true
+
+# ============================================================================
+# CONFIGURACIÓN DE INTEROPERABILIDAD
+# ============================================================================
+
+interoperabilityConfiguration:
+
+  asynchronousMode: true
+
+  retryFailedOperations: true
+
+  validateResponses: true
+
+  secureConnections: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL CONOCIMIENTO
+# ============================================================================
+
+knowledgeConfiguration:
+
+  preloadOntology: true
+
+  preloadTaxonomy: true
+
+  preloadRules: true
+
+  preloadDoctrine: true
+
+  preloadJurisprudence: true
+
+# ============================================================================
+# CONFIGURACIÓN DE VALIDACIÓN
+# ============================================================================
+
+validationConfiguration:
+
+  validateSchemas: true
+
+  validateKnowledge: true
+
+  validateRules: true
+
+  validateDependencies: true
+
+# ============================================================================
+# ORIGEN DE CONFIGURACIÓN
+# ============================================================================
+
+configurationSources:
+
+  internalConfiguration
+
+  environmentVariables
+
+  configurationFiles
+
+  secureSecrets
+
+# ============================================================================
+# POLÍTICAS
+# ============================================================================
+
+configurationPolicies:
+
+  unknownParameter: error
+
+  duplicatedParameter: warning
+
+  invalidValue: error
+
+  missingMandatoryValue: critical
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+configurationMetrics:
+
+  loadedConfigurations: true
+
+  configurationReloads: true
+
+  configurationErrors: true
+
+  rollbackOperations: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+configurationAudit:
+
+  enabled: true
+
+  registerConfigurationChanges: true
+
+  registerReloads: true
+
+  registerValidation: true
+
+  registerErrors: true
+
+# ============================================================================
+# FIN PARTE 6 DE 25
+# ============================================================================
+
+# ============================================================================
+# KNOWLEDGE LOADER
+# CARGA DE LA BASE DE CONOCIMIENTO
+# ============================================================================
+
+knowledgeLoader:
+
+  enabled: true
+
+  preloadKnowledge: true
+
+  validateKnowledge: true
+
+  buildIndexes: true
+
+  failOnCriticalError: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+knowledgeObjectives:
+
+  loadOntology: true
+
+  loadTaxonomy: true
+
+  loadRules: true
+
+  loadDoctrine: true
+
+  loadJurisprudence: true
+
+  loadConsultiveReports: true
+
+  guaranteeConsistency: true
+
+# ============================================================================
+# ORDEN DE CARGA
+# ============================================================================
+
+loadingSequence:
+
+  - ontology
+
+  - taxonomy
+
+  - glossary
+
+  - cpv
+
+  - legalRules
+
+  - doctrine
+
+  - jurisprudence
+
+  - consultiveReports
+
+  - indexes
+
+# ============================================================================
+# REPOSITORIOS
+# ============================================================================
+
+repositories:
+
+  ontology:
+
+    path: knowledge/ontology
+
+    mandatory: true
+
+  taxonomy:
+
+    path: knowledge/taxonomy
+
+    mandatory: true
+
+  glossary:
+
+    path: knowledge/glossary
+
+    mandatory: true
+
+  rules:
+
+    path: knowledge/rules
+
+    mandatory: true
+
+  doctrine:
+
+    path: knowledge/doctrine
+
+    mandatory: false
+
+  jurisprudence:
+
+    path: knowledge/jurisprudence
+
+    mandatory: false
+
+  consultiveReports:
+
+    path: knowledge/consultive-reports
+
+    mandatory: false
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+knowledgeValidation:
+
+  verifySchemas: true
+
+  verifyIdentifiers: true
+
+  verifyReferences: true
+
+  verifyRelationships: true
+
+  verifyDuplicates: true
+
+  verifyMandatoryFields: true
+
+# ============================================================================
+# INDEXACIÓN
+# ============================================================================
+
+indexBuilder:
+
+  enabled: true
+
+  buildOntologyIndex: true
+
+  buildRuleIndex: true
+
+  buildArticleIndex: true
+
+  buildCPVIndex: true
+
+  buildConceptIndex: true
+
+  buildReferenceIndex: true
+
+# ============================================================================
+# CACHÉ
+# ============================================================================
+
+knowledgeCache:
+
+  enabled: true
+
+  preloadMostUsedRules: true
+
+  preloadOntology: true
+
+  preloadTaxonomy: true
+
+  preloadCPV: true
+
+  preloadLegalArticles: true
+
+# ============================================================================
+# RESOLUCIÓN DE REFERENCIAS
+# ============================================================================
+
+referenceResolver:
+
+  enabled: true
+
+  resolveInternalReferences: true
+
+  resolveLegalReferences: true
+
+  resolveCrossReferences: true
+
+  detectBrokenReferences: true
+
+# ============================================================================
+# CONTROL DE VERSIONES
+# ============================================================================
+
+knowledgeVersionControl:
+
+  enabled: true
+
+  verifyCompatibility: true
+
+  rejectUnsupportedVersion: true
+
+  preservePreviousVersion: true
+
+# ============================================================================
+# CONTROL DE CALIDAD
+# ============================================================================
+
+qualityControl:
+
+  enabled: true
+
+  validateSemanticConsistency: true
+
+  validateLegalConsistency: true
+
+  validateCrossRelations: true
+
+  generateQualityReport: true
+
+# ============================================================================
+# ESTADÍSTICAS
+# ============================================================================
+
+knowledgeStatistics:
+
+  countConcepts: true
+
+  countRules: true
+
+  countArticles: true
+
+  countDoctrine: true
+
+  countJurisprudence: true
+
+  countReports: true
+
+# ============================================================================
+# POLÍTICAS
+# ============================================================================
+
+knowledgePolicies:
+
+  duplicatedIdentifier: error
+
+  missingReference: error
+
+  invalidSchema: critical
+
+  orphanConcept: warning
+
+  obsoleteRule: warning
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+knowledgeAudit:
+
+  enabled: true
+
+  registerLoadedRepositories: true
+
+  registerValidationResults: true
+
+  registerIndexes: true
+
+  registerErrors: true
+
+  registerStatistics: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+knowledgeResult:
+
+  success: knowledgeReady
+
+  failure: knowledgeLoadFailed
+
+# ============================================================================
+# FIN PARTE 7 DE 25
+# ============================================================================
+
+# ============================================================================
+# REASONING MANAGER
+# GESTOR CENTRAL DE RAZONAMIENTO
+# ============================================================================
+
+reasoningManager:
+
+  enabled: true
+
+  centralizedReasoning: true
+
+  deterministicExecution: true
+
+  explainEveryConclusion: true
+
+  preserveTraceability: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+reasoningObjectives:
+
+  legalReasoning: true
+
+  proceduralReasoning: true
+
+  documentaryReasoning: true
+
+  predictiveReasoning: true
+
+  optimizationReasoning: true
+
+# ============================================================================
+# TIPOS DE RAZONAMIENTO
+# ============================================================================
+
+reasoningModes:
+
+  deterministic
+
+  forwardChaining
+
+  backwardChaining
+
+  hybridReasoning
+
+  legalInterpretation
+
+  simulation
+
+  optimization
+
+# ============================================================================
+# RAZONAMIENTO JURÍDICO
+# ============================================================================
+
+legalReasoning:
+
+  enabled: true
+
+  applyNormativeHierarchy: true
+
+  resolveConflicts: true
+
+  evaluateExceptions: true
+
+  justifyConclusions: true
+
+# ============================================================================
+# RAZONAMIENTO PROCEDIMENTAL
+# ============================================================================
+
+proceduralReasoning:
+
+  enabled: true
+
+  analyseWorkflow: true
+
+  detectMissingSteps: true
+
+  detectIncorrectSequence: true
+
+  proposeCorrections: true
+
+# ============================================================================
+# RAZONAMIENTO DOCUMENTAL
+# ============================================================================
+
+documentReasoning:
+
+  enabled: true
+
+  verifyRequiredDocuments: true
+
+  detectMissingDocuments: true
+
+  verifyConsistency: true
+
+  validateDocumentRelations: true
+
+# ============================================================================
+# RAZONAMIENTO PREDICTIVO
+# ============================================================================
+
+predictiveReasoning:
+
+  enabled: true
+
+  estimateExecutionTime: true
+
+  estimateAdministrativeLoad: true
+
+  estimateRisk: true
+
+  estimateComplexity: true
+
+# ============================================================================
+# RAZONAMIENTO DE OPTIMIZACIÓN
+# ============================================================================
+
+optimizationReasoning:
+
+  enabled: true
+
+  minimiseAdministrativeWork: true
+
+  minimiseRisk: true
+
+  maximiseLegalCompliance: true
+
+  maximiseReuse: true
+
+# ============================================================================
+# RESOLUCIÓN DE CONFLICTOS
+# ============================================================================
+
+conflictResolution:
+
+  enabled: true
+
+  detectConflicts: true
+
+  classifyConflicts: true
+
+  resolveAutomatically: false
+
+  requestHumanValidation: true
+
+# ============================================================================
+# PRIORIDAD DE RAZONAMIENTO
+# ============================================================================
+
+reasoningPriority:
+
+  legalCompliance: 100
+
+  mandatoryRules: 95
+
+  proceduralRules: 90
+
+  optimization: 70
+
+  recommendations: 50
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+reasoningValidation:
+
+  verifyInputData: true
+
+  verifyKnowledgeConsistency: true
+
+  verifyInferenceConsistency: true
+
+  verifyFinalDecision: true
+
+# ============================================================================
+# EXPLICABILIDAD
+# ============================================================================
+
+reasoningExplanation:
+
+  generateDecisionTree: true
+
+  generateInferenceTrace: true
+
+  generateLegalJustification: true
+
+  identifyAppliedRules: true
+
+# ============================================================================
+# HISTÓRICO
+# ============================================================================
+
+reasoningHistory:
+
+  preserveInferenceHistory: true
+
+  preserveDecisionHistory: true
+
+  preserveConflictHistory: true
+
+  preserveRecommendations: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+reasoningMetrics:
+
+  executedReasonings: true
+
+  generatedInferences: true
+
+  resolvedConflicts: true
+
+  humanValidations: true
+
+  averageReasoningTime: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+reasoningAudit:
+
+  enabled: true
+
+  registerReasoningSteps: true
+
+  registerAppliedRules: true
+
+  registerGeneratedConclusions: true
+
+  registerExecutionTime: true
+
+  registerConfidence: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+reasoningResult:
+
+  success: reasoningCompleted
+
+  failure: reasoningFailed
+
+# ============================================================================
+# FIN PARTE 8 DE 25
+# ============================================================================
+
+# ============================================================================
+# EXECUTION MANAGER
+# GESTOR CENTRAL DE EJECUCIÓN
+# ============================================================================
+
+executionManager:
+
+  enabled: true
+
+  centralizedExecution: true
+
+  transactionalExecution: true
+
+  deterministicExecution: true
+
+  rollbackSupported: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+executionObjectives:
+
+  coordinateEngines: true
+
+  guaranteeExecutionOrder: true
+
+  preserveConsistency: true
+
+  optimizeExecutionTime: true
+
+  guaranteeRecoverability: true
+
+# ============================================================================
+# MODOS DE EJECUCIÓN
+# ============================================================================
+
+executionModes:
+
+  sequential
+
+  controlledParallel
+
+  eventDriven
+
+  scheduled
+
+  manual
+
+# ============================================================================
+# PLANIFICADOR
+# ============================================================================
+
+scheduler:
+
+  enabled: true
+
+  priorityBasedScheduling: true
+
+  dependencyAware: true
+
+  dynamicScheduling: true
+
+  preventDeadlocks: true
+
+# ============================================================================
+# COLA DE EJECUCIÓN
+# ============================================================================
+
+executionQueue:
+
+  enabled: true
+
+  priorityQueue: true
+
+  preserveInsertionOrder: true
+
+  automaticRetry: true
+
+  maximumRetries: 3
+
+# ============================================================================
+# GESTIÓN DE TAREAS
+# ============================================================================
+
+taskManager:
+
+  createTasks: true
+
+  executeTasks: true
+
+  suspendTasks: true
+
+  resumeTasks: true
+
+  cancelTasks: true
+
+# ============================================================================
+# TRANSACCIONES
+# ============================================================================
+
+transactionManager:
+
+  enabled: true
+
+  atomicExecution: true
+
+  consistencyCheck: true
+
+  isolationControl: true
+
+  durabilityGuarantee: true
+
+# ============================================================================
+# ROLLBACK
+# ============================================================================
+
+rollbackManager:
+
+  enabled: true
+
+  automaticRollback: true
+
+  rollbackOnCriticalFailure: true
+
+  restorePreviousState: true
+
+  preserveAuditTrail: true
+
+# ============================================================================
+# SINCRONIZACIÓN
+# ============================================================================
+
+synchronization:
+
+  synchronizeKnowledge: true
+
+  synchronizeDocuments: true
+
+  synchronizeAudit: true
+
+  synchronizeRepositories: true
+
+# ============================================================================
+# CONTROL DE CONCURRENCIA
+# ============================================================================
+
+concurrencyControl:
+
+  enabled: true
+
+  optimisticLocking: true
+
+  preventDuplicateExecution: true
+
+  preventRaceConditions: true
+
+# ============================================================================
+# GESTIÓN DE EVENTOS
+# ============================================================================
+
+eventManager:
+
+  enabled: true
+
+  publishEvents: true
+
+  subscribeEvents: true
+
+  asynchronousNotifications: true
+
+  preserveEventHistory: true
+
+# ============================================================================
+# CONTROL DE TIEMPO
+# ============================================================================
+
+timeManagement:
+
+  executionTimeout: 300
+
+  warningThreshold: 240
+
+  criticalThreshold: 290
+
+  automaticCancellation: true
+
+# ============================================================================
+# VALIDACIONES
+# ============================================================================
+
+executionValidation:
+
+  validateInput: true
+
+  validateDependencies: true
+
+  validateExecutionPlan: true
+
+  validateOutput: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+executionMetrics:
+
+  executedTasks: true
+
+  failedTasks: true
+
+  cancelledTasks: true
+
+  averageExecutionTime: true
+
+  rollbackOperations: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+executionAudit:
+
+  enabled: true
+
+  registerExecutionPlan: true
+
+  registerExecutedTasks: true
+
+  registerFailures: true
+
+  registerRollbacks: true
+
+  registerExecutionTimes: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+executionResult:
+
+  success: executionCompleted
+
+  failure: executionFailed
+
+# ============================================================================
+# FIN PARTE 9 DE 25
+# ============================================================================
+
+# ============================================================================
+# DOCUMENT ORCHESTRATOR
+# ORQUESTADOR DOCUMENTAL DEL SISTEMA EXPERTO
+# ============================================================================
+
+documentOrchestrator:
+
+  enabled: true
+
+  centralizedDocumentManagement: true
+
+  automaticGeneration: true
+
+  automaticValidation: true
+
+  automaticVersioning: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+documentObjectives:
+
+  generateDocuments: true
+
+  validateDocuments: true
+
+  assembleExpedient: true
+
+  preserveConsistency: true
+
+  preserveTraceability: true
+
+# ============================================================================
+# CICLO DOCUMENTAL
+# ============================================================================
+
+documentLifecycle:
+
+  create
+
+  validate
+
+  enrich
+
+  review
+
+  approve
+
+  version
+
+  archive
+
+# ============================================================================
+# TIPOS DOCUMENTALES
+# ============================================================================
+
+documentTypes:
+
+  memory
+
+  technicalReport
+
+  legalReport
+
+  economicReport
+
+  administrativeSpecifications
+
+  technicalSpecifications
+
+  awardProposal
+
+  contract
+
+  modification
+
+  extension
+
+  receptionCertificate
+
+  liquidation
+
+# ============================================================================
+# GENERACIÓN
+# ============================================================================
+
+documentGeneration:
+
+  useOfficialTemplates: true
+
+  generateMetadata: true
+
+  generateIdentifiers: true
+
+  generateIndex: true
+
+  generateAuditInformation: true
+
+# ============================================================================
+# VALIDACIÓN
+# ============================================================================
+
+documentValidation:
+
+  structuralValidation: true
+
+  legalValidation: true
+
+  semanticValidation: true
+
+  consistencyValidation: true
+
+  completenessValidation: true
+
+# ============================================================================
+# ENSAMBLADO DEL EXPEDIENTE
+# ============================================================================
+
+expedientAssembly:
+
+  enabled: true
+
+  automaticOrdering: true
+
+  verifyMandatoryDocuments: true
+
+  generateTableOfContents: true
+
+  verifyCompleteness: true
+
+# ============================================================================
+# VERSIONADO
+# ============================================================================
+
+documentVersioning:
+
+  enabled: true
+
+  semanticVersioning: true
+
+  preserveHistory: true
+
+  preservePreviousVersions: true
+
+  compareVersions: true
+
+# ============================================================================
+# TRAZABILIDAD
+# ============================================================================
+
+documentTraceability:
+
+  enabled: true
+
+  identifyOrigin: true
+
+  identifyAuthor: true
+
+  identifyReasoning: true
+
+  identifyAppliedRules: true
+
+# ============================================================================
+# INTEGRIDAD
+# ============================================================================
+
+documentIntegrity:
+
+  verifyIntegrity: true
+
+  detectCorruption: true
+
+  verifyReferences: true
+
+  verifyCrossLinks: true
+
+# ============================================================================
+# EXPORTACIÓN
+# ============================================================================
+
+documentExport:
+
+  pdf: true
+
+  docx: true
+
+  odt: true
+
+  xml: true
+
+  json: true
+
+# ============================================================================
+# INTEROPERABILIDAD
+# ============================================================================
+
+documentInteroperability:
+
+  eniCompatible: true
+
+  electronicSignatureReady: true
+
+  metadataCompatible: true
+
+  interoperableIdentifiers: true
+
+# ============================================================================
+# CONTROL DE CALIDAD
+# ============================================================================
+
+documentQuality:
+
+  verifyFormatting: true
+
+  verifyTemplates: true
+
+  verifyLegalStructure: true
+
+  verifyReferences: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+documentMetrics:
+
+  generatedDocuments: true
+
+  validatedDocuments: true
+
+  rejectedDocuments: true
+
+  generatedExpedients: true
+
+  exportedDocuments: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+documentAudit:
+
+  enabled: true
+
+  registerGeneration: true
+
+  registerValidation: true
+
+  registerVersioning: true
+
+  registerExports: true
+
+  registerAssembly: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+documentResult:
+
+  success: documentsReady
+
+  failure: documentGenerationFailed
+
+# ============================================================================
+# FIN PARTE 10 DE 25
+# ============================================================================
+
+# ============================================================================
+# SECURITY MANAGER
+# GESTIÓN INTEGRAL DE SEGURIDAD
+# ============================================================================
+
+securityManager:
+
+  enabled: true
+
+  zeroTrustArchitecture: true
+
+  centralizedSecurity: true
+
+  continuousValidation: true
+
+  securityByDefault: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+securityObjectives:
+
+  confidentiality: true
+
+  integrity: true
+
+  availability: true
+
+  authenticity: true
+
+  traceability: true
+
+  nonRepudiation: true
+
+# ============================================================================
+# AUTENTICACIÓN
+# ============================================================================
+
+authentication:
+
+  enabled: true
+
+  mandatoryAuthentication: true
+
+  sessionManagement: true
+
+  sessionTimeoutMinutes: 30
+
+  multiFactorAuthentication: true
+
+# ============================================================================
+# AUTORIZACIÓN
+# ============================================================================
+
+authorization:
+
+  enabled: true
+
+  roleBasedAccessControl: true
+
+  leastPrivilegePrinciple: true
+
+  denyByDefault: true
+
+# ============================================================================
+# ROLES
+# ============================================================================
+
+roles:
+
+  administrator
+
+  contractingAuthority
+
+  technicalOfficer
+
+  legalAdvisor
+
+  financialOfficer
+
+  auditor
+
+  externalConsultant
+
+  readOnly
+
+# ============================================================================
+# PERMISOS
+# ============================================================================
+
+permissions:
+
+  createExpedient
+
+  modifyExpedient
+
+  approveExpedient
+
+  validateDocuments
+
+  generateDocuments
+
+  publishContract
+
+  manageKnowledge
+
+  administerSystem
+
+# ============================================================================
+# CIFRADO
+# ============================================================================
+
+encryption:
+
+  encryptStoredInformation: true
+
+  encryptCommunications: true
+
+  encryptAuditLogs: true
+
+  encryptBackups: true
+
+# ============================================================================
+# INTEGRIDAD
+# ============================================================================
+
+integrity:
+
+  verifyIntegrityAtStartup: true
+
+  verifyIntegrityDuringExecution: true
+
+  verifyKnowledgeIntegrity: true
+
+  verifyDocumentIntegrity: true
+
+# ============================================================================
+# CONTROL DE ACCESO
+# ============================================================================
+
+accessControl:
+
+  verifyUserIdentity: true
+
+  verifyPermissions: true
+
+  verifyResourceAccess: true
+
+  logAccessAttempts: true
+
+# ============================================================================
+# SESIONES
+# ============================================================================
+
+sessionManagement:
+
+  uniqueSessionPerUser: false
+
+  automaticExpiration: true
+
+  inactivityTimeout: true
+
+  invalidateOnLogout: true
+
+# ============================================================================
+# DETECCIÓN
+# ============================================================================
+
+threatDetection:
+
+  detectUnauthorizedAccess: true
+
+  detectPrivilegeEscalation: true
+
+  detectSuspiciousActivity: true
+
+  detectRepeatedFailures: true
+
+# ============================================================================
+# RESPUESTA
+# ============================================================================
+
+incidentResponse:
+
+  blockUnauthorizedUser: true
+
+  notifyAdministrator: true
+
+  preserveEvidence: true
+
+  registerIncident: true
+
+# ============================================================================
+# CUMPLIMIENTO
+# ============================================================================
+
+compliance:
+
+  ENS: true
+
+  ENI: true
+
+  RGPD: true
+
+  LOPDGDD: true
+
+  LCSP: true
+
+# ============================================================================
+# COPIAS DE SEGURIDAD
+# ============================================================================
+
+backupSecurity:
+
+  encryptedBackups: true
+
+  integrityVerification: true
+
+  automaticRecoveryTest: true
+
+  preserveAuditTrail: true
+
+# ============================================================================
+# MONITORIZACIÓN
+# ============================================================================
+
+securityMonitoring:
+
+  realtimeMonitoring: true
+
+  anomalyDetection: true
+
+  continuousAudit: true
+
+  generateSecurityMetrics: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+securityMetrics:
+
+  successfulLogins: true
+
+  failedLogins: true
+
+  blockedUsers: true
+
+  detectedIncidents: true
+
+  recoveredIncidents: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+securityAudit:
+
+  enabled: true
+
+  registerAuthentication: true
+
+  registerAuthorization: true
+
+  registerAccessControl: true
+
+  registerSecurityEvents: true
+
+  registerIncidents: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+securityResult:
+
+  success: secureEnvironmentReady
+
+  failure: securityInitializationFailed
+
+# ============================================================================
+# FIN PARTE 11 DE 25
+# =========================================================================###
+
+# ============================================================================
+# INTEROPERABILITY MANAGER
+# GESTIÓN DE INTEROPERABILIDAD
+# ============================================================================
+
+interoperabilityManager:
+
+  enabled: true
+
+  centralizedInteroperability: true
+
+  standardsBased: true
+
+  secureCommunications: true
+
+  asynchronousOperations: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+interoperabilityObjectives:
+
+  connectPublicPlatforms: true
+
+  exchangeStructuredInformation: true
+
+  preserveTraceability: true
+
+  guaranteeCompatibility: true
+
+  avoidVendorLockIn: true
+
+# ============================================================================
+# NORMAS DE INTEROPERABILIDAD
+# ============================================================================
+
+interoperabilityStandards:
+
+  ENI: true
+
+  ENS: true
+
+  XML: true
+
+  JSON: true
+
+  CSV: true
+
+  PDF_A: true
+
+  XAdES: true
+
+  CAdES: true
+
+# ============================================================================
+# PLATAFORMAS EXTERNAS
+# ============================================================================
+
+externalPlatforms:
+
+  PLACE:
+
+    enabled: true
+
+    mandatory: true
+
+  PlataformaContratacionEstado:
+
+    enabled: true
+
+    mandatory: true
+
+  RegistroElectronico:
+
+    enabled: true
+
+    mandatory: true
+
+  Portafirmas:
+
+    enabled: true
+
+    mandatory: true
+
+  ArchivoElectronico:
+
+    enabled: true
+
+    mandatory: true
+
+  NotificacionesElectronicas:
+
+    enabled: true
+
+    mandatory: true
+
+# ============================================================================
+# SISTEMAS CORPORATIVOS
+# ============================================================================
+
+corporateSystems:
+
+  gestionDocumental: true
+
+  gestionEconomica: true
+
+  gestionPresupuestaria: true
+
+  gestionPersonal: true
+
+  directorioCorporativo: true
+
+# ============================================================================
+# SERVICIOS
+# ============================================================================
+
+services:
+
+  synchronousServices: true
+
+  asynchronousServices: true
+
+  batchServices: true
+
+  scheduledServices: true
+
+# ============================================================================
+# MENSAJERÍA
+# ============================================================================
+
+messaging:
+
+  messageQueue: true
+
+  retryFailedMessages: true
+
+  deadLetterQueue: true
+
+  orderedDelivery: true
+
+# ============================================================================
+# INTERCAMBIO DOCUMENTAL
+# ============================================================================
+
+documentExchange:
+
+  electronicDocuments: true
+
+  metadataExchange: true
+
+  digitalSignature: true
+
+  hashVerification: true
+
+# ============================================================================
+# IDENTIFICADORES
+# ============================================================================
+
+identifiers:
+
+  universalIdentifiers: true
+
+  interoperableIdentifiers: true
+
+  persistentIdentifiers: true
+
+# ============================================================================
+# VALIDACIÓN
+# ============================================================================
+
+interoperabilityValidation:
+
+  validateSchema: true
+
+  validateMetadata: true
+
+  validateSignature: true
+
+  validateIntegrity: true
+
+# ============================================================================
+# CONTROL DE ERRORES
+# ============================================================================
+
+errorHandling:
+
+  retryFailedOperations: true
+
+  rollbackOnFailure: true
+
+  notifyAdministrator: true
+
+  preserveEvidence: true
+
+# ============================================================================
+# MONITORIZACIÓN
+# ============================================================================
+
+interoperabilityMonitoring:
+
+  monitorConnections: true
+
+  monitorAvailability: true
+
+  monitorPerformance: true
+
+  monitorErrors: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+interoperabilityMetrics:
+
+  successfulConnections: true
+
+  failedConnections: true
+
+  exchangedDocuments: true
+
+  exchangedMessages: true
+
+  averageResponseTime: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+interoperabilityAudit:
+
+  enabled: true
+
+  registerConnections: true
+
+  registerTransfers: true
+
+  registerFailures: true
+
+  registerRecoveries: true
+
+  registerExecutionTime: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+interoperabilityResult:
+
+  success: interoperabilityReady
+
+  failure: interoperabilityFailed
+
+# ============================================================================
+# FIN PARTE 12 DE 25
+# ============================================================================
+
+# ============================================================================
+# AUDIT & TRACEABILITY MANAGER
+# GESTIÓN DE AUDITORÍA Y TRAZABILIDAD
+# ============================================================================
+
+auditManager:
+
+  enabled: true
+
+  centralizedAudit: true
+
+  immutableAudit: true
+
+  continuousTraceability: true
+
+  preserveEvidence: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+auditObjectives:
+
+  traceEveryDecision: true
+
+  identifyEveryAction: true
+
+  preserveLegalEvidence: true
+
+  reconstructExecution: true
+
+  supportInspection: true
+
+# ============================================================================
+# TRAZABILIDAD
+# ============================================================================
+
+traceability:
+
+  enabled: true
+
+  traceRules: true
+
+  traceInference: true
+
+  traceDocuments: true
+
+  traceUsers: true
+
+  traceProcesses: true
+
+# ============================================================================
+# CADENA DE DECISIONES
+# ============================================================================
+
+decisionChain:
+
+  preserveDecisionTree: true
+
+  preserveAppliedRules: true
+
+  preserveLegalReasoning: true
+
+  preserveAlternatives: true
+
+  preserveRejectedOptions: true
+
+# ============================================================================
+# REGISTRO DE EVENTOS
+# ============================================================================
+
+eventLog:
+
+  systemStartup: true
+
+  systemShutdown: true
+
+  userAuthentication: true
+
+  ruleExecution: true
+
+  inferenceExecution: true
+
+  documentGeneration: true
+
+  documentValidation: true
+
+  expedientGeneration: true
+
+  interoperabilityEvents: true
+
+  securityEvents: true
+
+# ============================================================================
+# REGISTRO DE USUARIO
+# ============================================================================
+
+userAudit:
+
+  identifyUser: true
+
+  identifyRole: true
+
+  identifySession: true
+
+  identifyIPAddress: true
+
+  identifyWorkstation: true
+
+# ============================================================================
+# REGISTRO TEMPORAL
+# ============================================================================
+
+timestamps:
+
+  creationTime: true
+
+  executionTime: true
+
+  completionTime: true
+
+  duration: true
+
+  timezone: Europe/Madrid
+
+# ============================================================================
+# EVIDENCIAS
+# ============================================================================
+
+evidenceManagement:
+
+  preserveEvidence: true
+
+  digitalEvidence: true
+
+  hashEvidence: true
+
+  verifyEvidenceIntegrity: true
+
+# ============================================================================
+# TRAZABILIDAD DOCUMENTAL
+# ============================================================================
+
+documentTraceability:
+
+  preserveVersions: true
+
+  preserveAuthor: true
+
+  preserveChanges: true
+
+  preserveReasoning: true
+
+# ============================================================================
+# TRAZABILIDAD JURÍDICA
+# ============================================================================
+
+legalTraceability:
+
+  identifyLaw: true
+
+  identifyArticle: true
+
+  identifyRule: true
+
+  identifyDoctrine: true
+
+  identifyJurisprudence: true
+
+# ============================================================================
+# CONSERVACIÓN
+# ============================================================================
+
+retention:
+
+  preserveAuditLogs: true
+
+  preserveExecutionHistory: true
+
+  preserveEvidence: true
+
+  preserveDecisionHistory: true
+
+# ============================================================================
+# EXPORTACIÓN
+# ============================================================================
+
+auditExport:
+
+  json: true
+
+  xml: true
+
+  pdf: true
+
+  csv: true
+
+# ============================================================================
+# CONSULTAS
+# ============================================================================
+
+auditQueries:
+
+  searchByUser: true
+
+  searchByExpedient: true
+
+  searchByRule: true
+
+  searchByArticle: true
+
+  searchByDate: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+auditMetrics:
+
+  totalEvents: true
+
+  totalDecisions: true
+
+  totalGeneratedDocuments: true
+
+  totalGeneratedExpedients: true
+
+  averageExecutionTime: true
+
+# ============================================================================
+# SEGURIDAD
+# ============================================================================
+
+auditSecurity:
+
+  immutableStorage: true
+
+  encryptedStorage: true
+
+  integrityVerification: true
+
+  tamperDetection: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+auditResult:
+
+  success: auditReady
+
+  failure: auditInitializationFailed
+
+# ============================================================================
+# FIN PARTE 13 DE 25
+# ============================================================================
+
+# ============================================================================
+# MONITORING & HEALTH MANAGER
+# SUPERVISIÓN, SALUD Y AUTODIAGNÓSTICO DEL SISTEMA
+# ============================================================================
+
+monitoringManager:
+
+  enabled: true
+
+  continuousMonitoring: true
+
+  selfDiagnosis: true
+
+  predictiveMonitoring: true
+
+  centralizedMetrics: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+monitoringObjectives:
+
+  monitorSystem: true
+
+  monitorKnowledge: true
+
+  monitorEngines: true
+
+  monitorDocuments: true
+
+  detectAnomalies: true
+
+  predictFailures: true
+
+# ============================================================================
+# HEALTH CHECK
+# ============================================================================
+
+healthCheck:
+
+  enabled: true
+
+  automaticExecution: true
+
+  startupVerification: true
+
+  periodicVerification: true
+
+  verifyRecovery: true
+
+# ============================================================================
+# COMPONENTES SUPERVISADOS
+# ============================================================================
+
+components:
+
+  kernel
+
+  ruleEngine
+
+  inferenceEngine
+
+  documentEngine
+
+  auditEngine
+
+  interoperabilityEngine
+
+  knowledgeRepository
+
+  cache
+
+  scheduler
+
+  securityManager
+
+# ============================================================================
+# INDICADORES DE SALUD
+# ============================================================================
+
+healthIndicators:
+
+  cpuUsage
+
+  memoryUsage
+
+  repositoryAvailability
+
+  ruleExecutionTime
+
+  inferenceTime
+
+  documentGenerationTime
+
+  cacheEfficiency
+
+  interoperabilityLatency
+
+# ============================================================================
+# UMBRALES
+# ============================================================================
+
+thresholds:
+
+  cpu:
+
+    warning: 70
+
+    critical: 90
+
+  memory:
+
+    warning: 75
+
+    critical: 90
+
+  executionTime:
+
+    warning: 200
+
+    critical: 500
+
+  latency:
+
+    warning: 1000
+
+    critical: 3000
+
+# ============================================================================
+# DETECCIÓN DE ANOMALÍAS
+# ============================================================================
+
+anomalyDetection:
+
+  enabled: true
+
+  detectPerformanceDrop: true
+
+  detectExecutionLoops: true
+
+  detectKnowledgeCorruption: true
+
+  detectUnavailableServices: true
+
+# ============================================================================
+# AUTODIAGNÓSTICO
+# ============================================================================
+
+selfDiagnosis:
+
+  enabled: true
+
+  verifyConfiguration: true
+
+  verifyKnowledge: true
+
+  verifyRepositories: true
+
+  verifyDependencies: true
+
+  verifyExecutionState: true
+
+# ============================================================================
+# AUTORRECUPERACIÓN
+# ============================================================================
+
+selfHealing:
+
+  enabled: true
+
+  restartFailedComponents: true
+
+  clearCorruptedCache: true
+
+  rebuildIndexes: true
+
+  reloadKnowledge: true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+alerts:
+
+  enabled: true
+
+  warningNotifications: true
+
+  criticalNotifications: true
+
+  administratorNotifications: true
+
+  preserveAlertHistory: true
+
+# ============================================================================
+# DASHBOARD
+# ============================================================================
+
+dashboard:
+
+  enabled: true
+
+  realtimeMetrics: true
+
+  historicalMetrics: true
+
+  executionStatistics: true
+
+  healthIndicators: true
+
+# ============================================================================
+# DISPONIBILIDAD
+# ============================================================================
+
+availability:
+
+  monitorAvailability: true
+
+  calculateUptime: true
+
+  calculateDowntime: true
+
+  detectInterruptions: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+monitoringMetrics:
+
+  executedHealthChecks: true
+
+  detectedIncidents: true
+
+  automaticRecoveries: true
+
+  generatedAlerts: true
+
+  averageAvailability: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+monitoringAudit:
+
+  enabled: true
+
+  registerHealthChecks: true
+
+  registerRecoveries: true
+
+  registerAlerts: true
+
+  registerFailures: true
+
+  registerAvailability: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+monitoringResult:
+
+  success: monitoringReady
+
+  failure: monitoringInitializationFailed
+
+# ============================================================================
+# FIN PARTE 14 DE 25
+# ============================================================================
+
+# ============================================================================
+# KNOWLEDGE GOVERNANCE MANAGER
+# GOBIERNO DE LA BASE DE CONOCIMIENTO
+# ============================================================================
+
+knowledgeGovernanceManager:
+
+  enabled: true
+
+  centralizedGovernance: true
+
+  versionControlled: true
+
+  approvalWorkflow: true
+
+  preserveHistory: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+governanceObjectives:
+
+  preserveLegalValidity: true
+
+  preserveKnowledgeQuality: true
+
+  preserveConsistency: true
+
+  guaranteeTraceability: true
+
+  preventKnowledgeCorruption: true
+
+# ============================================================================
+# ÁMBITOS DE GOBIERNO
+# ============================================================================
+
+governedRepositories:
+
+  ontology
+
+  taxonomy
+
+  glossary
+
+  rules
+
+  doctrine
+
+  jurisprudence
+
+  consultiveReports
+
+  templates
+
+# ============================================================================
+# CONTROL DE VERSIONES
+# ============================================================================
+
+versionControl:
+
+  enabled: true
+
+  semanticVersioning: true
+
+  preserveAllVersions: true
+
+  immutablePublishedVersions: true
+
+  automaticVersionIncrement: true
+
+# ============================================================================
+# CICLO DE VIDA DEL CONOCIMIENTO
+# ============================================================================
+
+knowledgeLifecycle:
+
+  draft
+
+  underReview
+
+  approved
+
+  published
+
+  deprecated
+
+  archived
+
+# ============================================================================
+# FLUJO DE APROBACIÓN
+# ============================================================================
+
+approvalWorkflow:
+
+  mandatoryReview: true
+
+  legalValidation: true
+
+  technicalValidation: true
+
+  administrativeValidation: true
+
+  publicationApproval: true
+
+# ============================================================================
+# CONTROL DE VIGENCIA
+# ============================================================================
+
+validityControl:
+
+  enabled: true
+
+  effectiveDate: true
+
+  expirationDate: true
+
+  automaticExpiration: true
+
+  notifyUpcomingExpiration: true
+
+# ============================================================================
+# OBSOLESCENCIA
+# ============================================================================
+
+obsolescenceManagement:
+
+  detectObsoleteRules: true
+
+  detectObsoleteDoctrine: true
+
+  detectObsoleteJurisprudence: true
+
+  preserveHistoricalKnowledge: true
+
+# ============================================================================
+# CONSISTENCIA
+# ============================================================================
+
+consistencyControl:
+
+  verifyOntologyConsistency: true
+
+  verifyTaxonomyConsistency: true
+
+  verifyRuleConsistency: true
+
+  verifyCrossReferences: true
+
+# ============================================================================
+# CONTROL NORMATIVO
+# ============================================================================
+
+normativeControl:
+
+  detectLegalChanges: true
+
+  identifyAffectedRules: true
+
+  identifyAffectedTemplates: true
+
+  requireReviewAfterLegalChange: true
+
+# ============================================================================
+# PUBLICACIÓN
+# ============================================================================
+
+publication:
+
+  controlledPublication: true
+
+  publishOnlyApprovedKnowledge: true
+
+  preservePublicationHistory: true
+
+  registerPublisher: true
+
+# ============================================================================
+# RESPONSABILIDADES
+# ============================================================================
+
+knowledgeRoles:
+
+  knowledgeAdministrator
+
+  legalReviewer
+
+  technicalReviewer
+
+  publisher
+
+  auditor
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+governanceMetrics:
+
+  publishedVersions: true
+
+  deprecatedRules: true
+
+  reviewedKnowledge: true
+
+  pendingReviews: true
+
+  rejectedChanges: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+governanceAudit:
+
+  enabled: true
+
+  registerChanges: true
+
+  registerApprovals: true
+
+  registerPublications: true
+
+  registerDeprecations: true
+
+  registerReviews: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+governanceResult:
+
+  success: governanceReady
+
+  failure: governanceInitializationFailed
+
+# ============================================================================
+# FIN PARTE 15 DE 25
+# ============================================================================
+
+# ============================================================================
+# LEGAL UPDATE MANAGER
+# GESTIÓN DE ACTUALIZACIONES NORMATIVAS
+# ============================================================================
+
+legalUpdateManager:
+
+  enabled: true
+
+  automaticMonitoring: true
+
+  assistedValidation: true
+
+  preservePreviousKnowledge: true
+
+  generateImpactAnalysis: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+legalUpdateObjectives:
+
+  detectNormativeChanges: true
+
+  analyseImpact: true
+
+  identifyAffectedKnowledge: true
+
+  preserveLegalValidity: true
+
+  minimiseManualWork: true
+
+# ============================================================================
+# FUENTES NORMATIVAS
+# ============================================================================
+
+legalSources:
+
+  europeanUnion:
+
+    enabled: true
+
+    priority: high
+
+  stateLegislation:
+
+    enabled: true
+
+    priority: critical
+
+  autonomousCommunity:
+
+    enabled: true
+
+    priority: critical
+
+  localRegulations:
+
+    enabled: true
+
+    priority: medium
+
+# ============================================================================
+# NORMATIVA CONTROLADA
+# ============================================================================
+
+controlledNorms:
+
+  LCSP
+
+  Ley39_2015
+
+  Ley40_2015
+
+  ReglamentoGeneralLCSP
+
+  ENS
+
+  ENI
+
+  RGPD
+
+  LOPDGDD
+
+  LPGE
+
+  NormativaAutonomica
+
+# ============================================================================
+# FUENTES JURÍDICAS
+# ============================================================================
+
+legalRepositories:
+
+  legislation
+
+  jurisprudence
+
+  consultiveReports
+
+  instructions
+
+  recommendations
+
+  internalCriteria
+
+# ============================================================================
+# DETECCIÓN DE CAMBIOS
+# ============================================================================
+
+changeDetection:
+
+  monitorNewLaws: true
+
+  monitorLawModifications: true
+
+  monitorRepealedRules: true
+
+  monitorCorrections: true
+
+  monitorConsolidatedTexts: true
+
+# ============================================================================
+# CLASIFICACIÓN
+# ============================================================================
+
+changeClassification:
+
+  critical
+
+  major
+
+  medium
+
+  minor
+
+  editorial
+
+# ============================================================================
+# ANÁLISIS DE IMPACTO
+# ============================================================================
+
+impactAnalysis:
+
+  analyseRules: true
+
+  analyseOntology: true
+
+  analyseTaxonomy: true
+
+  analyseTemplates: true
+
+  analyseDecisionEngine: true
+
+# ============================================================================
+# ELEMENTOS AFECTADOS
+# ============================================================================
+
+affectedElements:
+
+  rules
+
+  ontology
+
+  taxonomy
+
+  glossary
+
+  templates
+
+  cpvMappings
+
+  proceduralFlows
+
+# ============================================================================
+# PROPAGACIÓN
+# ============================================================================
+
+propagation:
+
+  automaticDependencyAnalysis: true
+
+  updateReferences: true
+
+  updateRelationships: true
+
+  updateIndexes: true
+
+# ============================================================================
+# VALIDACIÓN
+# ============================================================================
+
+updateValidation:
+
+  legalReviewRequired: true
+
+  technicalReviewRequired: true
+
+  consistencyVerification: true
+
+  regressionVerification: true
+
+# ============================================================================
+# PUBLICACIÓN
+# ============================================================================
+
+publicationPolicy:
+
+  publishOnlyValidatedChanges: true
+
+  preservePreviousVersion: true
+
+  allowRollback: true
+
+# ============================================================================
+# ALERTAS
+# ============================================================================
+
+notifications:
+
+  notifyLegalTeam: true
+
+  notifyAdministrators: true
+
+  notifyKnowledgeManagers: true
+
+  notifyPendingValidation: true
+
+# ============================================================================
+# HISTÓRICO
+# ============================================================================
+
+changeHistory:
+
+  preserveHistory: true
+
+  preserveAffectedKnowledge: true
+
+  preserveReviewProcess: true
+
+  preserveRollbackHistory: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+legalUpdateMetrics:
+
+  detectedChanges: true
+
+  analysedChanges: true
+
+  publishedUpdates: true
+
+  pendingValidations: true
+
+  averageUpdateTime: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+legalUpdateAudit:
+
+  enabled: true
+
+  registerDetectedChanges: true
+
+  registerImpactAnalysis: true
+
+  registerApprovals: true
+
+  registerPublications: true
+
+  registerRollbacks: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+legalUpdateResult:
+
+  success: legalKnowledgeUpdated
+
+  failure: legalUpdateFailed
+
+# ============================================================================
+# FIN PARTE 16 DE 25
+# ============================================================================
+
+# ============================================================================
+# PERFORMANCE & OPTIMIZATION MANAGER
+# GESTIÓN DEL RENDIMIENTO Y OPTIMIZACIÓN
+# ============================================================================
+
+performanceManager:
+
+  enabled: true
+
+  automaticOptimization: true
+
+  adaptivePerformance: true
+
+  predictiveOptimization: true
+
+  continuousAnalysis: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+performanceObjectives:
+
+  minimiseExecutionTime: true
+
+  optimiseResourceConsumption: true
+
+  maximiseReuse: true
+
+  improveScalability: true
+
+  reduceLatency: true
+
+# ============================================================================
+# GESTIÓN DE CACHÉ
+# ============================================================================
+
+cacheManager:
+
+  enabled: true
+
+  preloadKnowledge: true
+
+  preloadFrequentlyUsedRules: true
+
+  intelligentEviction: true
+
+  automaticRefresh: true
+
+# ============================================================================
+# TIPOS DE CACHÉ
+# ============================================================================
+
+cacheLayers:
+
+  ontologyCache
+
+  taxonomyCache
+
+  ruleCache
+
+  inferenceCache
+
+  documentCache
+
+  templateCache
+
+  cpvCache
+
+# ============================================================================
+# INDEXACIÓN
+# ============================================================================
+
+indexOptimization:
+
+  automaticIndexGeneration: true
+
+  rebuildIndexesAutomatically: true
+
+  optimiseSearchIndexes: true
+
+  optimiseReferenceIndexes: true
+
+# ============================================================================
+# REUTILIZACIÓN
+# ============================================================================
+
+reuseManager:
+
+  reuseInferenceResults: true
+
+  reuseValidatedDocuments: true
+
+  reuseKnowledgeFragments: true
+
+  reuseExecutionPlans: true
+
+# ============================================================================
+# PLANIFICACIÓN
+# ============================================================================
+
+executionOptimization:
+
+  optimiseExecutionOrder: true
+
+  prioritiseCriticalTasks: true
+
+  mergeCompatibleTasks: true
+
+  eliminateDuplicatedExecution: true
+
+# ============================================================================
+# MEMORIA
+# ============================================================================
+
+memoryManagement:
+
+  monitorMemory: true
+
+  automaticGarbageCollection: true
+
+  releaseUnusedResources: true
+
+  optimiseMemoryAllocation: true
+
+# ============================================================================
+# ESCALABILIDAD
+# ============================================================================
+
+scalability:
+
+  horizontalScalability: true
+
+  verticalScalability: true
+
+  modularExecution: true
+
+  adaptiveLoadDistribution: true
+
+# ============================================================================
+# BALANCEO
+# ============================================================================
+
+loadBalancing:
+
+  enabled: true
+
+  distributeWorkload: true
+
+  prioritiseCriticalOperations: true
+
+  preventOverload: true
+
+# ============================================================================
+# OPTIMIZACIÓN DOCUMENTAL
+# ============================================================================
+
+documentOptimization:
+
+  parallelValidation: true
+
+  optimiseTemplateLoading: true
+
+  minimiseDocumentRegeneration: true
+
+  optimiseExports: true
+
+# ============================================================================
+# OPTIMIZACIÓN DEL CONOCIMIENTO
+# ============================================================================
+
+knowledgeOptimization:
+
+  preloadCriticalKnowledge: true
+
+  optimiseRuleEvaluation: true
+
+  optimiseInferenceTree: true
+
+  optimiseReferenceResolution: true
+
+# ============================================================================
+# LATENCIA
+# ============================================================================
+
+latencyManagement:
+
+  measureLatency: true
+
+  detectBottlenecks: true
+
+  optimiseCriticalPaths: true
+
+  reduceResponseTime: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+performanceMetrics:
+
+  averageExecutionTime: true
+
+  averageInferenceTime: true
+
+  cacheHitRatio: true
+
+  memoryConsumption: true
+
+  cpuConsumption: true
+
+  optimisationOperations: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+performanceAudit:
+
+  enabled: true
+
+  registerOptimisations: true
+
+  registerCacheOperations: true
+
+  registerExecutionStatistics: true
+
+  registerDetectedBottlenecks: true
+
+  registerScalabilityEvents: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+performanceResult:
+
+  success: performanceOptimized
+
+  failure: optimizationFailed
+
+# ============================================================================
+# FIN PARTE 17 DE 25
+# ============================================================================
+
+# ============================================================================
+# ARTIFICIAL INTELLIGENCE COORDINATION MANAGER
+# COORDINACIÓN ENTRE IA GENERATIVA Y SISTEMA EXPERTO
+# ============================================================================
+
+aiCoordinationManager:
+
+  enabled: true
+
+  expertSystemHasPriority: true
+
+  humanValidationSupported: true
+
+  explainableAI: true
+
+  deterministicControl: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+aiObjectives:
+
+  assistDecisionMaking: true
+
+  accelerateDrafting: true
+
+  preserveLegalSecurity: true
+
+  preserveTraceability: true
+
+  neverReplaceLegalRules: true
+
+# ============================================================================
+# PRINCIPIOS
+# ============================================================================
+
+governancePrinciples:
+
+  ruleEngineIsAuthoritative: true
+
+  aiIsAssistant: true
+
+  legalComplianceIsMandatory: true
+
+  humanDecisionPrevails: true
+
+# ============================================================================
+# MODOS DE IA
+# ============================================================================
+
+aiModes:
+
+  drafting
+
+  summarization
+
+  classification
+
+  recommendation
+
+  explanation
+
+  comparison
+
+  completion
+
+# ============================================================================
+# FUNCIONES PERMITIDAS
+# ============================================================================
+
+allowedFunctions:
+
+  generateDrafts
+
+  improveWriting
+
+  summarizeReports
+
+  classifyDocuments
+
+  explainRules
+
+  compareAlternatives
+
+  proposeOptions
+
+# ============================================================================
+# FUNCIONES PROHIBIDAS
+# ============================================================================
+
+forbiddenFunctions:
+
+  modifyLegalRules
+
+  overrideRuleEngine
+
+  suppressMandatoryRequirements
+
+  ignoreNormativeHierarchy
+
+  approveExpedients
+
+# ============================================================================
+# FLUJO DE COORDINACIÓN
+# ============================================================================
+
+coordinationFlow:
+
+  obtainKnowledge
+
+  executeRuleEngine
+
+  generateAIProposal
+
+  validateProposal
+
+  justifyProposal
+
+  requireHumanApproval
+
+# ============================================================================
+# VALIDACIÓN
+# ============================================================================
+
+aiValidation:
+
+  validateAgainstRules: true
+
+  validateAgainstOntology: true
+
+  validateAgainstTemplates: true
+
+  rejectUnsupportedOutput: true
+
+# ============================================================================
+# CONTROL DE ALUCINACIONES
+# ============================================================================
+
+hallucinationControl:
+
+  enabled: true
+
+  requireKnowledgeReference: true
+
+  rejectUnsupportedAssertions: true
+
+  detectInventedNorms: true
+
+  detectInventedArticles: true
+
+# ============================================================================
+# CONFIANZA
+# ============================================================================
+
+confidenceEvaluation:
+
+  calculateConfidence: true
+
+  minimumConfidence: 0.85
+
+  requireHumanValidationBelowThreshold: true
+
+# ============================================================================
+# EXPLICABILIDAD
+# ============================================================================
+
+aiExplainability:
+
+  explainReasoning: true
+
+  identifyKnowledgeSources: true
+
+  identifyAppliedRules: true
+
+  identifyAssumptions: true
+
+# ============================================================================
+# INTERACCIÓN CON EL MOTOR DE REGLAS
+# ============================================================================
+
+expertSystemInteraction:
+
+  consultRuleEngineFirst: true
+
+  preserveInferenceTree: true
+
+  preserveDecisionTree: true
+
+  preserveRulePriority: true
+
+# ============================================================================
+# SEGURIDAD
+# ============================================================================
+
+aiSecurity:
+
+  blockPromptInjection: true
+
+  validateInput: true
+
+  sanitizeOutput: true
+
+  preserveConfidentiality: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+aiMetrics:
+
+  generatedSuggestions: true
+
+  acceptedSuggestions: true
+
+  rejectedSuggestions: true
+
+  humanCorrections: true
+
+  confidenceDistribution: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+aiAudit:
+
+  enabled: true
+
+  registerPrompts: true
+
+  registerResponses: true
+
+  registerValidations: true
+
+  registerHumanApprovals: true
+
+  registerRejectedOutputs: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+aiCoordinationResult:
+
+  success: aiCoordinatorReady
+
+  failure: aiCoordinatorInitializationFailed
+
+# ============================================================================
+# FIN PARTE 18 DE 25
+# ============================================================================
+
+# ============================================================================
+# CONTRACT INTELLIGENCE MANAGER
+# MOTOR ESPECIALIZADO EN CONTRATACIÓN PÚBLICA (LCSP)
+# ============================================================================
+
+contractIntelligenceManager:
+
+  enabled: true
+
+  expertMode: true
+
+  deterministicReasoning: true
+
+  automaticLegalQualification: true
+
+  explainEveryDecision: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+contractObjectives:
+
+  determineContractType: true
+
+  determineProcedure: true
+
+  determineCPV: true
+
+  determineDeadlines: true
+
+  determinePublication: true
+
+  generateCompleteExpedient: true
+
+# ============================================================================
+# IDENTIFICACIÓN DEL CONTRATO
+# ============================================================================
+
+contractIdentification:
+
+  classifyObject: true
+
+  detectMixedContracts: true
+
+  detectLots: true
+
+  identifyPrincipalBenefit: true
+
+  verifyLegalQualification: true
+
+# ============================================================================
+# TIPOS DE CONTRATO
+# ============================================================================
+
+contractTypes:
+
+  works
+
+  services
+
+  supplies
+
+  concessionsWorks
+
+  concessionsServices
+
+  mixedContract
+
+# ============================================================================
+# CPV
+# ============================================================================
+
+cpvManager:
+
+  enabled: true
+
+  identifyPrimaryCPV: true
+
+  identifySecondaryCPV: true
+
+  validateHierarchy: true
+
+  justifySelection: true
+
+# ============================================================================
+# PROCEDIMIENTOS
+# ============================================================================
+
+procurementProcedures:
+
+  open
+
+  simplifiedOpen
+
+  supersimplifiedOpen
+
+  restricted
+
+  negotiated
+
+  competitiveDialogue
+
+  innovationPartnership
+
+# ============================================================================
+# ELECCIÓN DEL PROCEDIMIENTO
+# ============================================================================
+
+procedureSelection:
+
+  analyseEstimatedValue: true
+
+  analyseContractType: true
+
+  analyseLegalThresholds: true
+
+  justifyProcedure: true
+
+# ============================================================================
+# VALOR ESTIMADO
+# ============================================================================
+
+estimatedValue:
+
+  calculateAutomatically: true
+
+  includeExtensions: true
+
+  includeModifications: true
+
+  verifyThresholds: true
+
+# ============================================================================
+# DIVISIÓN EN LOTES
+# ============================================================================
+
+lotsAnalysis:
+
+  analyseConvenience: true
+
+  justifyDivision: true
+
+  justifyNonDivision: true
+
+  evaluateSMEParticipation: true
+
+# ============================================================================
+# SOLVENCIA
+# ============================================================================
+
+solvencyManager:
+
+  determineEconomicSolvency: true
+
+  determineTechnicalSolvency: true
+
+  determineProfessionalSolvency: true
+
+  verifyMandatoryRequirements: true
+
+# ============================================================================
+# CRITERIOS DE ADJUDICACIÓN
+# ============================================================================
+
+awardCriteria:
+
+  quality
+
+  price
+
+  environmental
+
+  social
+
+  innovation
+
+  lifeCycleCost
+
+# ============================================================================
+# PONDERACIÓN
+# ============================================================================
+
+criteriaWeighting:
+
+  verifyBalance: true
+
+  justifyWeights: true
+
+  detectDiscriminatoryCriteria: true
+
+# ============================================================================
+# PUBLICIDAD
+# ============================================================================
+
+publicationManager:
+
+  determinePublicationRequirements: true
+
+  determineOfficialPlatforms: true
+
+  calculatePublicationPeriods: true
+
+# ============================================================================
+# PLAZOS
+# ============================================================================
+
+deadlines:
+
+  calculateSubmissionDeadline: true
+
+  calculateEvaluationDeadline: true
+
+  calculateAwardDeadline: true
+
+  calculateFormalizationDeadline: true
+
+# ============================================================================
+# MODIFICACIONES
+# ============================================================================
+
+contractModification:
+
+  analysePossibility: true
+
+  determineLegalLimits: true
+
+  justifyModification: true
+
+# ============================================================================
+# PRÓRROGAS
+# ============================================================================
+
+extensions:
+
+  verifyPossibility: true
+
+  verifyMaximumDuration: true
+
+  justifyExtension: true
+
+# ============================================================================
+# EJECUCIÓN
+# ============================================================================
+
+execution:
+
+  determineGuarantees: true
+
+  determinePenalties: true
+
+  determineControlMeasures: true
+
+# ============================================================================
+# CUMPLIMIENTO LCSP
+# ============================================================================
+
+lcspCompliance:
+
+  verifyMandatoryArticles: true
+
+  verifyThresholds: true
+
+  verifyProcedure: true
+
+  verifyPublication: true
+
+  verifyDeadlines: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+contractMetrics:
+
+  analysedContracts: true
+
+  generatedCPV: true
+
+  selectedProcedures: true
+
+  calculatedDeadlines: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+contractAudit:
+
+  enabled: true
+
+  registerProcedureSelection: true
+
+  registerCPVSelection: true
+
+  registerThresholdAnalysis: true
+
+  registerAppliedArticles: true
+
+  registerGeneratedJustifications: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+contractResult:
+
+  success: contractAnalysisCompleted
+
+  failure: contractAnalysisFailed
+
+# ============================================================================
+# FIN PARTE 19 DE 25
+# ============================================================================
+
+# ============================================================================
+# ADMINISTRATIVE FILE MANAGER
+# GESTIÓN INTEGRAL DEL EXPEDIENTE ADMINISTRATIVO
+# ============================================================================
+
+administrativeFileManager:
+
+  enabled: true
+
+  centralizedManagement: true
+
+  deterministicWorkflow: true
+
+  completeTraceability: true
+
+  automaticValidation: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+administrativeObjectives:
+
+  manageAdministrativeFile: true
+
+  guaranteeAdministrativeCompleteness: true
+
+  validateAdministrativeProcedure: true
+
+  preserveAdministrativeIntegrity: true
+
+  facilitateAdministrativeControl: true
+
+# ============================================================================
+# CICLO DE VIDA DEL EXPEDIENTE
+# ============================================================================
+
+administrativeLifecycle:
+
+  created
+
+  initialized
+
+  underPreparation
+
+  underReview
+
+  validated
+
+  approved
+
+  published
+
+  awarded
+
+  formalized
+
+  execution
+
+  completed
+
+  archived
+
+# ============================================================================
+# FASES DEL EXPEDIENTE
+# ============================================================================
+
+administrativeStages:
+
+  planning
+
+  justification
+
+  preparation
+
+  approval
+
+  publication
+
+  tender
+
+  evaluation
+
+  award
+
+  formalization
+
+  execution
+
+  liquidation
+
+  archive
+
+# ============================================================================
+# DOCUMENTOS OBLIGATORIOS
+# ============================================================================
+
+mandatoryDocuments:
+
+  necessityReport
+
+  insufficiencyOfMeans
+
+  technicalSpecifications
+
+  administrativeSpecifications
+
+  budgetAvailabilityCertificate
+
+  legalReport
+
+  technicalReport
+
+  approvalResolution
+
+# ============================================================================
+# DOCUMENTOS CONDICIONALES
+# ============================================================================
+
+conditionalDocuments:
+
+  environmentalReport
+
+  socialImpactReport
+
+  genderImpactReport
+
+  dataProtectionImpactReport
+
+  securityReport
+
+  interoperabilityReport
+
+# ============================================================================
+# VALIDACIONES ADMINISTRATIVAS
+# ============================================================================
+
+administrativeValidation:
+
+  verifyMandatoryDocuments: true
+
+  verifyAdministrativeSequence: true
+
+  verifyElectronicSignature: true
+
+  verifyApprovals: true
+
+  verifyDeadlines: true
+
+# ============================================================================
+# ESTADOS DEL EXPEDIENTE
+# ============================================================================
+
+administrativeStatus:
+
+  draft
+
+  pendingValidation
+
+  pendingApproval
+
+  approved
+
+  published
+
+  suspended
+
+  cancelled
+
+  finalized
+
+  archived
+
+# ============================================================================
+# CONTROL DEL PROCEDIMIENTO
+# ============================================================================
+
+procedureControl:
+
+  verifyAdministrativeFlow: true
+
+  detectMissingSteps: true
+
+  detectIncorrectOrder: true
+
+  detectExpiredDeadlines: true
+
+# ============================================================================
+# CONTROL DOCUMENTAL
+# ============================================================================
+
+administrativeDocumentation:
+
+  automaticDocumentCheck: true
+
+  verifyCompleteness: true
+
+  verifyVersions: true
+
+  verifyReferences: true
+
+# ============================================================================
+# CONTROL TEMPORAL
+# ============================================================================
+
+administrativeDeadlines:
+
+  monitorDeadlines: true
+
+  notifyUpcomingDeadlines: true
+
+  detectExpiredDeadlines: true
+
+  generateCalendar: true
+
+# ============================================================================
+# INCIDENCIAS
+# ============================================================================
+
+incidentManagement:
+
+  registerIncidents: true
+
+  classifyIncidents: true
+
+  proposeCorrectiveActions: true
+
+  preserveIncidentHistory: true
+
+# ============================================================================
+# RESPONSABLES
+# ============================================================================
+
+responsibilityManagement:
+
+  contractingAuthority
+
+  promotingUnit
+
+  contractManager
+
+  legalAdvisor
+
+  technicalAdvisor
+
+  economicController
+
+# ============================================================================
+# CONTROL DE CALIDAD
+# ============================================================================
+
+administrativeQuality:
+
+  verifyAdministrativeCompleteness: true
+
+  verifyProceduralConsistency: true
+
+  verifyLegalConsistency: true
+
+  verifyAdministrativeIntegrity: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+administrativeMetrics:
+
+  createdFiles: true
+
+  validatedFiles: true
+
+  approvedFiles: true
+
+  archivedFiles: true
+
+  detectedIncidents: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+administrativeAudit:
+
+  enabled: true
+
+  registerAdministrativeActions: true
+
+  registerStatusChanges: true
+
+  registerApprovals: true
+
+  registerIncidents: true
+
+  registerAdministrativeValidation: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+administrativeResult:
+
+  success: administrativeFileReady
+
+  failure: administrativeFileFailed
+
+# ============================================================================
+# FIN PARTE 20 DE 25
+# ============================================================================
+
+# ============================================================================
+# DECISION SUPPORT MANAGER
+# SISTEMA DE APOYO A LA TOMA DE DECISIONES
+# ============================================================================
+
+decisionSupportManager:
+
+  enabled: true
+
+  assistedDecisionMaking: true
+
+  humanCentric: true
+
+  explainableRecommendations: true
+
+  preserveDecisionFreedom: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+decisionObjectives:
+
+  assistContractOfficer: true
+
+  proposeBestAlternatives: true
+
+  justifyRecommendations: true
+
+  identifyRisks: true
+
+  supportHumanValidation: true
+
+# ============================================================================
+# PRINCIPIOS
+# ============================================================================
+
+decisionPrinciples:
+
+  legalComplianceFirst: true
+
+  transparency: true
+
+  neutrality: true
+
+  objectivity: true
+
+  proportionality: true
+
+# ============================================================================
+# TIPOS DE DECISIONES
+# ============================================================================
+
+decisionDomains:
+
+  contractQualification
+
+  cpvSelection
+
+  procedureSelection
+
+  lotDivision
+
+  solvencyRequirements
+
+  awardCriteria
+
+  publicationRequirements
+
+  executionConditions
+
+  contractModification
+
+# ============================================================================
+# GENERACIÓN DE ALTERNATIVAS
+# ============================================================================
+
+alternativeGeneration:
+
+  enabled: true
+
+  generatePrimaryAlternative: true
+
+  generateSecondaryAlternatives: true
+
+  compareAlternatives: true
+
+  rankAlternatives: true
+
+# ============================================================================
+# JUSTIFICACIÓN
+# ============================================================================
+
+decisionJustification:
+
+  legalBasis: true
+
+  appliedArticles: true
+
+  appliedDoctrine: true
+
+  appliedReports: true
+
+  appliedJurisprudence: true
+
+# ============================================================================
+# ANÁLISIS DE RIESGO
+# ============================================================================
+
+riskAssessment:
+
+  enabled: true
+
+  legalRisk: true
+
+  proceduralRisk: true
+
+  economicRisk: true
+
+  operationalRisk: true
+
+  reputationalRisk: true
+
+# ============================================================================
+# MATRIZ DE DECISIÓN
+# ============================================================================
+
+decisionMatrix:
+
+  legalityWeight: 100
+
+  proceduralWeight: 90
+
+  technicalWeight: 80
+
+  economicWeight: 70
+
+  optimisationWeight: 60
+
+# ============================================================================
+# VALIDACIÓN HUMANA
+# ============================================================================
+
+humanValidation:
+
+  mandatory: true
+
+  validateEveryRecommendation: true
+
+  allowModification: true
+
+  requireConfirmation: true
+
+# ============================================================================
+# RECOMENDACIONES
+# ============================================================================
+
+recommendations:
+
+  provideReasoning: true
+
+  explainAdvantages: true
+
+  explainDisadvantages: true
+
+  identifyLegalImplications: true
+
+# ============================================================================
+# ESCENARIOS
+# ============================================================================
+
+scenarioAnalysis:
+
+  enabled: true
+
+  compareScenarios: true
+
+  estimateConsequences: true
+
+  estimateAdministrativeImpact: true
+
+  estimateEconomicImpact: true
+
+# ============================================================================
+# CONSISTENCIA
+# ============================================================================
+
+decisionConsistency:
+
+  verifyConsistencyWithKnowledge: true
+
+  verifyConsistencyWithRules: true
+
+  verifyConsistencyWithPreviousDecisions: true
+
+# ============================================================================
+# APRENDIZAJE
+# ============================================================================
+
+decisionLearning:
+
+  preserveValidatedDecisions: true
+
+  preserveRejectedRecommendations: true
+
+  improveFutureSuggestions: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+decisionMetrics:
+
+  generatedRecommendations: true
+
+  acceptedRecommendations: true
+
+  rejectedRecommendations: true
+
+  modifiedRecommendations: true
+
+  averageDecisionTime: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+decisionAudit:
+
+  enabled: true
+
+  registerAlternatives: true
+
+  registerRecommendations: true
+
+  registerHumanValidation: true
+
+  registerFinalDecision: true
+
+  registerDecisionJustification: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+decisionResult:
+
+  success: decisionSupportReady
+
+  failure: decisionSupportFailed
+
+# ============================================================================
+# FIN PARTE 21 DE 25
+# ============================================================================
+
+# ============================================================================
+# QUALITY ASSURANCE MANAGER
+# CONTROL INTEGRAL DE CALIDAD DEL EXPEDIENTE
+# ============================================================================
+
+qualityAssuranceManager:
+
+  enabled: true
+
+  centralizedQualityControl: true
+
+  automaticVerification: true
+
+  mandatoryValidation: true
+
+  continuousImprovement: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+qualityObjectives:
+
+  guaranteeLegalQuality: true
+
+  guaranteeAdministrativeQuality: true
+
+  guaranteeTechnicalQuality: true
+
+  guaranteeDocumentaryQuality: true
+
+  detectErrorsBeforePublication: true
+
+# ============================================================================
+# DIMENSIONES DE CALIDAD
+# ============================================================================
+
+qualityDimensions:
+
+  legal
+
+  procedural
+
+  documentary
+
+  technical
+
+  semantic
+
+  structural
+
+  linguistic
+
+# ============================================================================
+# CONTROL JURÍDICO
+# ============================================================================
+
+legalQuality:
+
+  verifyApplicableLaw: true
+
+  verifyMandatoryArticles: true
+
+  verifyLegalConsistency: true
+
+  verifyLegalCompleteness: true
+
+  detectLegalContradictions: true
+
+# ============================================================================
+# CONTROL PROCEDIMENTAL
+# ============================================================================
+
+proceduralQuality:
+
+  verifyAdministrativeSequence: true
+
+  verifyMandatorySteps: true
+
+  verifyDeadlines: true
+
+  verifyRequiredApprovals: true
+
+# ============================================================================
+# CONTROL DOCUMENTAL
+# ============================================================================
+
+documentQuality:
+
+  verifyMandatoryDocuments: true
+
+  verifyDocumentConsistency: true
+
+  verifyCrossReferences: true
+
+  verifyDocumentIntegrity: true
+
+  verifyMetadata: true
+
+# ============================================================================
+# CONTROL TÉCNICO
+# ============================================================================
+
+technicalQuality:
+
+  verifyTechnicalSpecifications: true
+
+  verifyAwardCriteria: true
+
+  verifyCalculationConsistency: true
+
+  verifyEstimatedValue: true
+
+# ============================================================================
+# CONTROL SEMÁNTICO
+# ============================================================================
+
+semanticQuality:
+
+  verifyTerminology: true
+
+  verifyOntologyUsage: true
+
+  verifyGlossaryConsistency: true
+
+  verifyConceptRelations: true
+
+# ============================================================================
+# CONTROL ESTRUCTURAL
+# ============================================================================
+
+structuralQuality:
+
+  verifyTemplates: true
+
+  verifyDocumentStructure: true
+
+  verifySectionOrder: true
+
+  verifyCompleteness: true
+
+# ============================================================================
+# CONTROL LINGÜÍSTICO
+# ============================================================================
+
+linguisticQuality:
+
+  verifyGrammar: true
+
+  verifySpelling: true
+
+  verifyAdministrativeStyle: true
+
+  verifyInclusiveLanguage: true
+
+# ============================================================================
+# DETECCIÓN DE ERRORES
+# ============================================================================
+
+errorDetection:
+
+  detectDuplicatedInformation: true
+
+  detectMissingInformation: true
+
+  detectContradictions: true
+
+  detectInvalidReferences: true
+
+  detectIncompleteReasoning: true
+
+# ============================================================================
+# CORRECCIONES
+# ============================================================================
+
+correctionSupport:
+
+  proposeCorrections: true
+
+  explainCorrections: true
+
+  classifySeverity: true
+
+  prioritiseCorrections: true
+
+# ============================================================================
+# VALIDACIÓN FINAL
+# ============================================================================
+
+finalValidation:
+
+  enabled: true
+
+  requireZeroCriticalErrors: true
+
+  requireMandatoryDocuments: true
+
+  requireLegalConsistency: true
+
+  requireHumanApproval: true
+
+# ============================================================================
+# CALIFICACIÓN
+# ============================================================================
+
+qualityScore:
+
+  calculateOverallScore: true
+
+  legalScore: true
+
+  proceduralScore: true
+
+  documentaryScore: true
+
+  technicalScore: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+qualityMetrics:
+
+  validatedFiles: true
+
+  detectedErrors: true
+
+  correctedErrors: true
+
+  criticalErrors: true
+
+  qualityIndex: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+qualityAudit:
+
+  enabled: true
+
+  registerValidations: true
+
+  registerDetectedErrors: true
+
+  registerCorrections: true
+
+  registerFinalScore: true
+
+  registerHumanApproval: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+qualityResult:
+
+  success: qualityValidationCompleted
+
+  failure: qualityValidationFailed
+
+# ============================================================================
+# FIN PARTE 22 DE 25
+# ============================================================================
+
+# ============================================================================
+# KNOWLEDGE ANALYTICS MANAGER
+# ANALÍTICA AVANZADA DE LA BASE DE CONOCIMIENTO
+# ============================================================================
+
+knowledgeAnalyticsManager:
+
+  enabled: true
+
+  centralizedAnalytics: true
+
+  continuousAnalysis: true
+
+  predictiveAnalytics: true
+
+  automaticRecommendations: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+analyticsObjectives:
+
+  analyseKnowledgeUsage: true
+
+  identifyKnowledgeGaps: true
+
+  improveKnowledgeQuality: true
+
+  optimiseRules: true
+
+  supportContinuousImprovement: true
+
+# ============================================================================
+# ÁREAS ANALIZADAS
+# ============================================================================
+
+analysisDomains:
+
+  ontology
+
+  taxonomy
+
+  glossary
+
+  ruleEngine
+
+  inferenceEngine
+
+  templates
+
+  cpvMappings
+
+  proceduralFlows
+
+# ============================================================================
+# ESTADÍSTICAS DE USO
+# ============================================================================
+
+usageStatistics:
+
+  consultedRules: true
+
+  executedRules: true
+
+  executedInferences: true
+
+  generatedDocuments: true
+
+  generatedExpedients: true
+
+# ============================================================================
+# COBERTURA DEL CONOCIMIENTO
+# ============================================================================
+
+knowledgeCoverage:
+
+  analyseCoverage: true
+
+  detectKnowledgeGaps: true
+
+  detectMissingRules: true
+
+  detectIncompleteOntology: true
+
+# ============================================================================
+# COBERTURA NORMATIVA
+# ============================================================================
+
+legalCoverage:
+
+  analyseApplicableNorms: true
+
+  identifyUncoveredArticles: true
+
+  identifyUncoveredProcedures: true
+
+  identifyUncoveredContractTypes: true
+
+# ============================================================================
+# EFICACIA DE LAS REGLAS
+# ============================================================================
+
+ruleEffectiveness:
+
+  calculateExecutionFrequency: true
+
+  calculateSuccessRate: true
+
+  detectUnusedRules: true
+
+  detectConflictingRules: true
+
+# ============================================================================
+# EFICACIA DEL RAZONAMIENTO
+# ============================================================================
+
+reasoningAnalytics:
+
+  analyseInferenceTrees: true
+
+  analyseDecisionTrees: true
+
+  identifyRepeatedPatterns: true
+
+  optimiseInferenceChains: true
+
+# ============================================================================
+# IDENTIFICACIÓN DE PUNTOS DÉBILES
+# ============================================================================
+
+weaknessDetection:
+
+  detectLowCoverage: true
+
+  detectDuplicatedKnowledge: true
+
+  detectObsoleteKnowledge: true
+
+  detectLowConfidenceAreas: true
+
+# ============================================================================
+# PROPUESTAS DE MEJORA
+# ============================================================================
+
+improvementRecommendations:
+
+  recommendNewRules: true
+
+  recommendOntologyUpdates: true
+
+  recommendTaxonomyUpdates: true
+
+  recommendTemplateUpdates: true
+
+# ============================================================================
+# TENDENCIAS
+# ============================================================================
+
+trendAnalysis:
+
+  analyseKnowledgeEvolution: true
+
+  analyseUsageEvolution: true
+
+  analysePerformanceEvolution: true
+
+  predictFutureNeeds: true
+
+# ============================================================================
+# INDICADORES
+# ============================================================================
+
+knowledgeIndicators:
+
+  knowledgeCompleteness: true
+
+  legalCoverageIndex: true
+
+  ruleEfficiencyIndex: true
+
+  inferenceEfficiencyIndex: true
+
+  repositoryGrowth: true
+
+# ============================================================================
+# CUADRO DE MANDOS
+# ============================================================================
+
+analyticsDashboard:
+
+  enabled: true
+
+  realtimeIndicators: true
+
+  historicalIndicators: true
+
+  comparativeIndicators: true
+
+  predictiveIndicators: true
+
+# ============================================================================
+# EXPORTACIÓN
+# ============================================================================
+
+analyticsExport:
+
+  pdf: true
+
+  excel: true
+
+  json: true
+
+  csv: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+analyticsMetrics:
+
+  analysedRules: true
+
+  analysedNorms: true
+
+  analysedDocuments: true
+
+  generatedRecommendations: true
+
+  implementedRecommendations: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+analyticsAudit:
+
+  enabled: true
+
+  registerAnalyses: true
+
+  registerIndicators: true
+
+  registerRecommendations: true
+
+  registerPredictions: true
+
+  registerExports: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+analyticsResult:
+
+  success: analyticsReady
+
+  failure: analyticsInitializationFailed
+
+# ============================================================================
+# FIN PARTE 23 DE 25
+# ============================================================================
+
+# ============================================================================
+# CONFIGURATION & DEPLOYMENT MANAGER
+# CONFIGURACIÓN, DESPLIEGUE Y ADMINISTRACIÓN DEL SISTEMA
+# ============================================================================
+
+configurationManager:
+
+  enabled: true
+
+  centralizedConfiguration: true
+
+  environmentAware: true
+
+  dynamicConfiguration: true
+
+  safeDeployment: true
+
+# ============================================================================
+# OBJETIVOS
+# ============================================================================
+
+configurationObjectives:
+
+  simplifyAdministration: true
+
+  supportMultipleEnvironments: true
+
+  ensureSafeDeployment: true
+
+  preserveConfigurationHistory: true
+
+  allowRollback: true
+
+# ============================================================================
+# ENTORNOS
+# ============================================================================
+
+environments:
+
+  development:
+
+    enabled: true
+
+    debugMode: true
+
+    testData: true
+
+  testing:
+
+    enabled: true
+
+    validationMode: true
+
+    qualityControl: true
+
+  preproduction:
+
+    enabled: true
+
+    productionSimulation: true
+
+    fullValidation: true
+
+  production:
+
+    enabled: true
+
+    optimizedMode: true
+
+    monitoring: true
+
+# ============================================================================
+# CONFIGURACIÓN GLOBAL
+# ============================================================================
+
+globalConfiguration:
+
+  language: es-ES
+
+  timezone: Europe/Madrid
+
+  currency: EUR
+
+  dateFormat: dd/MM/yyyy
+
+  decimalSeparator: ","
+
+# ============================================================================
+# PARÁMETROS DEL SISTEMA
+# ============================================================================
+
+systemParameters:
+
+  maxConcurrentUsers: auto
+
+  maxExecutionThreads: auto
+
+  cacheSize: auto
+
+  logLevel: INFO
+
+  autoOptimization: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL MOTOR
+# ============================================================================
+
+engineConfiguration:
+
+  ruleEngine:
+
+    enabled: true
+
+  inferenceEngine:
+
+    enabled: true
+
+  ontologyEngine:
+
+    enabled: true
+
+  documentEngine:
+
+    enabled: true
+
+  aiCoordinator:
+
+    enabled: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL CONOCIMIENTO
+# ============================================================================
+
+knowledgeConfiguration:
+
+  autoReload: true
+
+  validateOnStartup: true
+
+  preloadCriticalKnowledge: true
+
+  verifyConsistency: true
+
+# ============================================================================
+# DESPLIEGUE
+# ============================================================================
+
+deployment:
+
+  automaticDeployment: false
+
+  controlledDeployment: true
+
+  deploymentValidation: true
+
+  deploymentRollback: true
+
+# ============================================================================
+# VERSIONADO
+# ============================================================================
+
+deploymentVersioning:
+
+  semanticVersioning: true
+
+  preservePreviousVersions: true
+
+  rollbackSupported: true
+
+  deploymentHistory: true
+
+# ============================================================================
+# COPIAS DE SEGURIDAD
+# ============================================================================
+
+backupConfiguration:
+
+  automaticBackups: true
+
+  incrementalBackups: true
+
+  fullBackups: true
+
+  encryptedBackups: true
+
+  verifyBackups: true
+
+# ============================================================================
+# RECUPERACIÓN
+# ============================================================================
+
+recovery:
+
+  automaticRecovery: true
+
+  disasterRecovery: true
+
+  configurationRecovery: true
+
+  knowledgeRecovery: true
+
+# ============================================================================
+# IMPORTACIÓN
+# ============================================================================
+
+importConfiguration:
+
+  importOntology: true
+
+  importRules: true
+
+  importTemplates: true
+
+  importTaxonomy: true
+
+# ============================================================================
+# EXPORTACIÓN
+# ============================================================================
+
+exportConfiguration:
+
+  exportKnowledge: true
+
+  exportConfiguration: true
+
+  exportAudit: true
+
+  exportMetrics: true
+
+# ============================================================================
+# PERSONALIZACIÓN
+# ============================================================================
+
+customization:
+
+  customProfiles: true
+
+  customTemplates: true
+
+  customRules: true
+
+  customParameters: true
+
+# ============================================================================
+# VALIDACIÓN
+# ============================================================================
+
+configurationValidation:
+
+  verifyIntegrity: true
+
+  verifyDependencies: true
+
+  verifyCompatibility: true
+
+  verifyConsistency: true
+
+# ============================================================================
+# MÉTRICAS
+# ============================================================================
+
+configurationMetrics:
+
+  deployments: true
+
+  successfulDeployments: true
+
+  failedDeployments: true
+
+  performedRollbacks: true
+
+  restoredBackups: true
+
+# ============================================================================
+# AUDITORÍA
+# ============================================================================
+
+configurationAudit:
+
+  enabled: true
+
+  registerConfigurationChanges: true
+
+  registerDeployments: true
+
+  registerRecoveries: true
+
+  registerImports: true
+
+  registerExports: true
+
+# ============================================================================
+# RESULTADO
+# ============================================================================
+
+configurationResult:
+
+  success: configurationReady
+
+  failure: configurationInitializationFailed
+
+# ============================================================================
+# FIN PARTE 24 DE 25
+# ============================================================================
+
+# ============================================================================
+# CORE SYSTEM MANIFEST
+# MANIFIESTO DEL NÚCLEO DEL SISTEMA EXPERTO CONTRATA-IA
+# ============================================================================
+
+systemManifest:
+
+  name: CONTRATA-IA
+
+  version: 1.0.0
+
+  architecture: Knowledge Driven Expert System
+
+  domain: Public Procurement
+
+  jurisdiction: Spain
+
+  specialization: Junta de Andalucía
+
+# ============================================================================
+# COMPONENTES PRINCIPALES
+# ============================================================================
+
+coreComponents:
+
+  ontologyManager: enabled
+
+  taxonomyManager: enabled
+
+  glossaryManager: enabled
+
+  ruleEngine: enabled
+
+  inferenceEngine: enabled
+
+  validationEngine: enabled
+
+  documentEngine: enabled
+
+  templateEngine: enabled
+
+  cpvEngine: enabled
+
+  workflowEngine: enabled
+
+  auditManager: enabled
+
+  monitoringManager: enabled
+
+  governanceManager: enabled
+
+  legalUpdateManager: enabled
+
+  performanceManager: enabled
+
+  aiCoordinationManager: enabled
+
+  contractIntelligenceManager: enabled
+
+  administrativeFileManager: enabled
+
+  decisionSupportManager: enabled
+
+  qualityAssuranceManager: enabled
+
+  knowledgeAnalyticsManager: enabled
+
+  configurationManager: enabled
+
+# ============================================================================
+# DEPENDENCIAS
+# ============================================================================
+
+dependencies:
+
+  ontology:
+
+    required: true
+
+  taxonomy:
+
+    required: true
+
+  glossary:
+
+    required: true
+
+  rules:
+
+    required: true
+
+  templates:
+
+    required: true
+
+  cpvRepository:
+
+    required: true
+
+# ============================================================================
+# POLÍTICAS GLOBALES
+# ============================================================================
+
+globalPolicies:
+
+  legalCompliance:
+
+    mandatory: true
+
+  explainability:
+
+    mandatory: true
+
+  traceability:
+
+    mandatory: true
+
+  humanValidation:
+
+    mandatory: true
+
+  security:
+
+    mandatory: true
+
+  interoperability:
+
+    mandatory: true
+
+# ============================================================================
+# PRINCIPIOS RECTORES
+# ============================================================================
+
+guidingPrinciples:
+
+  - legality
+
+  - transparency
+
+  - traceability
+
+  - proportionality
+
+  - objectivity
+
+  - neutrality
+
+  - reproducibility
+
+  - administrativeIntegrity
+
+# ============================================================================
+# JERARQUÍA DE DECISIONES
+# ============================================================================
+
+decisionHierarchy:
+
+  legislation
+
+  jurisprudence
+
+  doctrine
+
+  internalInstructions
+
+  expertRules
+
+  artificialIntelligence
+
+# ============================================================================
+# INICIALIZACIÓN
+# ============================================================================
+
+startupSequence:
+
+  - loadConfiguration
+
+  - validateConfiguration
+
+  - loadOntology
+
+  - loadTaxonomy
+
+  - loadGlossary
+
+  - loadRules
+
+  - validateKnowledge
+
+  - buildIndexes
+
+  - initializeInferenceEngine
+
+  - initializeRuleEngine
+
+  - initializeAudit
+
+  - initializeMonitoring
+
+  - initializeDocumentEngine
+
+  - initializeAI
+
+  - initializeWorkflow
+
+  - initializeAdministration
+
+  - initializeAnalytics
+
+  - systemReady
+
+# ============================================================================
+# VERIFICACIÓN
+# ============================================================================
+
+startupValidation:
+
+  verifyKnowledgeIntegrity: true
+
+  verifyOntologyConsistency: true
+
+  verifyRuleConsistency: true
+
+  verifyRepositories: true
+
+  verifyConfiguration: true
+
+  verifyDependencies: true
+
+# ============================================================================
+# ESTADO
+# ============================================================================
+
+systemState:
+
+  initialized: false
+
+  validated: false
+
+  ready: false
+
+# ============================================================================
+# FINALIZACIÓN
+# ============================================================================
+
+shutdownSequence:
+
+  saveAudit
+
+  saveMetrics
+
+  flushCache
+
+  closeRepositories
+
+  backupConfiguration
+
+  backupKnowledge
+
+  stopMonitoring
+
+  shutdownCompleted
+
+# ============================================================================
+# METADATOS
+# ============================================================================
+
+metadata:
+
+  author: CONTRATA-IA Project
+
+  organization: Consejería de Empleo - Junta de Andalucía
+
+  purpose: Intelligent Public Procurement Assistant
+
+  repository: knowledge/rule-engine
+
+  format: YAML
+
+# ============================================================================
+# END OF RULE ENGINE MANIFEST
+# ============================================================================
+
+systemReady:
+
+  initialized: true
+
+  validated: true
+
+  ready: true
+
+# ============================================================================
+# FIN DEL ARCHIVO
+# knowledge/rule-engine/index.yaml
+# ============================================================================
