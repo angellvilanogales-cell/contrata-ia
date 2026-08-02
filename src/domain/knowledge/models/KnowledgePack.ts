@@ -1,3 +1,4 @@
+```typescript
 /**
  * ============================================================
  * CONTRATA-IA
@@ -7,16 +8,13 @@
  * Modelo normalizado utilizado por todos los paquetes de
  * conocimiento del sistema.
  *
- * IMPORTANTE
- *
- * Este archivo únicamente define estructuras de datos.
+ * Este archivo define exclusivamente estructuras de datos.
  *
  * NO contiene:
- *
- * • reglas
- * • lógica jurídica
- * • interpretación normativa
- * • decisiones
+ * - lógica jurídica
+ * - reglas
+ * - decisiones
+ * - interpretación normativa
  *
  * ============================================================
  */
@@ -24,7 +22,7 @@
 import { KnowledgeRelationType } from "../catalogs/CoreKnowledgeConcepts";
 
 /**
- * Estado del Knowledge Pack.
+ * Estado de un Knowledge Pack.
  */
 export type KnowledgePackStatus =
     | "draft"
@@ -58,7 +56,8 @@ export interface KnowledgePackMetadata {
 }
 
 /**
- * Variable de entrada necesaria para tomar decisiones.
+ * Información que el sistema necesita conocer
+ * para poder aplicar este conocimiento.
  */
 export interface KnowledgeInput {
 
@@ -73,7 +72,7 @@ export interface KnowledgeInput {
 }
 
 /**
- * Resultado producido por el conocimiento.
+ * Información producida por este Knowledge Pack.
  */
 export interface KnowledgeOutput {
 
@@ -97,7 +96,7 @@ export interface AffectedDocument {
 }
 
 /**
- * Relación con otros conceptos.
+ * Relación semántica.
  */
 export interface KnowledgeRelation {
 
@@ -110,7 +109,7 @@ export interface KnowledgeRelation {
 }
 
 /**
- * Referencia jurídica.
+ * Referencia normativa.
  */
 export interface LegalReference {
 
@@ -136,7 +135,7 @@ export interface KnowledgeObservation {
 }
 
 /**
- * Ejemplo obtenido del banco documental.
+ * Ejemplo documental.
  */
 export interface KnowledgeExample {
 
@@ -150,8 +149,8 @@ export interface KnowledgeExample {
  * Regla jurídica.
  *
  * IMPORTANTE:
- * El RuleEngine será quien interprete posteriormente
- * estas reglas.
+ * El RuleEngine será quien posteriormente
+ * interprete estas reglas.
  */
 export interface KnowledgeRule {
 
@@ -164,7 +163,35 @@ export interface KnowledgeRule {
 }
 
 /**
- * Knowledge Pack normalizado.
+ * Pregunta que el asistente debe formular
+ * cuando este paquete sea necesario.
+ */
+export interface RequiredQuestion {
+
+    id: string;
+
+    question: string;
+
+    targetField: string;
+
+    required: boolean;
+
+}
+
+/**
+ * Conceptos que deberán recalcularse
+ * cuando cambie este Knowledge Pack.
+ */
+export interface DecisionImpact {
+
+    conceptId: string;
+
+    description: string;
+
+}
+
+/**
+ * Modelo normalizado de Knowledge Pack.
  */
 export interface KnowledgePack {
 
@@ -184,17 +211,17 @@ export interface KnowledgePack {
     purpose: string;
 
     /**
-     * Entradas necesarias.
+     * Información necesaria.
      */
     inputs: KnowledgeInput[];
 
     /**
-     * Resultados que produce.
+     * Información generada.
      */
     outputs: KnowledgeOutput[];
 
     /**
-     * Relaciones semánticas.
+     * Relaciones.
      */
     relations: KnowledgeRelation[];
 
@@ -204,7 +231,7 @@ export interface KnowledgePack {
     affectedDocuments: AffectedDocument[];
 
     /**
-     * Reglas asociadas.
+     * Reglas.
      */
     rules: KnowledgeRule[];
 
@@ -223,4 +250,17 @@ export interface KnowledgePack {
      */
     observations: KnowledgeObservation[];
 
+    /**
+     * Preguntas que deberá realizar
+     * automáticamente el QuestionFlowEngine.
+     */
+    requiredQuestions: RequiredQuestion[];
+
+    /**
+     * Conceptos afectados cuando este
+     * Knowledge Pack cambie.
+     */
+    decisionImpacts: DecisionImpact[];
+
 }
+```
