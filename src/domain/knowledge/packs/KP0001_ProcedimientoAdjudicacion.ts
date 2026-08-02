@@ -1,3 +1,4 @@
+```typescript
 /**
  * ============================================================
  * CONTRATA-IA
@@ -5,216 +6,27 @@
  * KP-0001
  * Procedimiento de Adjudicación
  * ------------------------------------------------------------
- *
  * Primer Knowledge Pack oficial del sistema.
  *
- * Este paquete representa el conocimiento asociado al
+ * Este paquete contiene conocimiento estructurado sobre el
  * procedimiento de adjudicación.
  *
- * IMPORTANTE
- *
- * Este archivo NO ejecuta reglas.
- *
- * NO interpreta la LCSP.
- *
+ * NO interpreta la normativa.
+ * NO ejecuta reglas.
  * NO toma decisiones.
  *
- * Únicamente describe conocimiento normalizado que podrá ser
- * utilizado por:
- *
- * • KnowledgeRepository
- * • RuleEngine
- * • ContractDecisionEngine
- * • DocumentComposer
- *
- * Todo el contenido deberá estar respaldado por las fuentes
+ * Todo el conocimiento deberá estar respaldado por las fuentes
  * documentales del proyecto.
- *
  * ============================================================
  */
 
 import {
+    KnowledgePack
+} from "../models/KnowledgePack";
+
+import {
     KnowledgeRelationType
 } from "../catalogs/CoreKnowledgeConcepts";
-
-/**
- * Información básica del Knowledge Pack.
- */
-export interface KnowledgePackMetadata {
-
-    /**
-     * Identificador.
-     */
-    id: string;
-
-    /**
-     * Nombre.
-     */
-    name: string;
-
-    /**
-     * Versión.
-     */
-    version: string;
-
-    /**
-     * Concepto asociado.
-     */
-    conceptId: string;
-
-    /**
-     * Dominio.
-     */
-    domain: string;
-
-    /**
-     * Estado.
-     */
-    status: "draft" | "validated";
-
-}
-
-/**
- * Variable utilizada para tomar decisiones.
- */
-export interface DecisionVariable {
-
-    /**
-     * Identificador.
-     */
-    id: string;
-
-    /**
-     * Nombre.
-     */
-    name: string;
-
-    /**
-     * Descripción.
-     */
-    description: string;
-
-    /**
-     * Obligatoria.
-     */
-    required: boolean;
-
-}
-
-/**
- * Documento afectado.
- */
-export interface AffectedDocument {
-
-    /**
-     * Nombre.
-     */
-    name: string;
-
-    /**
-     * Motivo.
-     */
-    reason: string;
-
-}
-
-/**
- * Relación semántica.
- */
-export interface KnowledgeRelation {
-
-    /**
-     * Concepto origen.
-     */
-    source: string;
-
-    /**
-     * Tipo.
-     */
-    relation: KnowledgeRelationType;
-
-    /**
-     * Concepto destino.
-     */
-    target: string;
-
-}
-
-/**
- * Referencia normativa.
- */
-export interface LegalReference {
-
-    /**
-     * Norma.
-     */
-    regulation: string;
-
-    /**
-     * Artículo.
-     */
-    article?: string;
-
-    /**
-     * Observaciones.
-     */
-    notes?: string;
-
-}
-
-/**
- * Knowledge Pack.
- */
-export interface KnowledgePack {
-
-    /**
-     * Metadatos.
-     */
-    metadata: KnowledgePackMetadata;
-
-    /**
-     * Definición.
-     */
-    definition: string;
-
-    /**
-     * Finalidad.
-     */
-    purpose: string;
-
-    /**
-     * Variables necesarias para decidir.
-     */
-    decisionVariables: DecisionVariable[];
-
-    /**
-     * Relaciones.
-     */
-    relations: KnowledgeRelation[];
-
-    /**
-     * Documentos afectados.
-     */
-    affectedDocuments: AffectedDocument[];
-
-    /**
-     * Referencias jurídicas.
-     */
-    legalReferences: LegalReference[];
-
-    /**
-     * Observaciones obtenidas de las fuentes.
-     */
-    observations: string[];
-
-}
-
-/**
- * ============================================================
- * KP-0001
- * Procedimiento de adjudicación
- * ============================================================
- */
 
 export const KP0001: KnowledgePack = {
 
@@ -224,7 +36,7 @@ export const KP0001: KnowledgePack = {
 
         name: "Procedimiento de adjudicación",
 
-        version: "1.0.0",
+        version: "1.1.0",
 
         conceptId: "CONCEPT-0009",
 
@@ -235,87 +47,68 @@ export const KP0001: KnowledgePack = {
     },
 
     definition:
-        "Pendiente de completar mediante extracción del conocimiento de las fuentes documentales.",
+        "Mecanismo jurídico mediante el cual el órgano de contratación selecciona al adjudicatario del contrato.",
 
     purpose:
-        "Centralizar el conocimiento relativo al procedimiento de adjudicación para que pueda ser utilizado por el motor de decisiones.",
+        "Centralizar el conocimiento relativo al procedimiento de adjudicación para ser utilizado por el motor de decisiones.",
 
-    decisionVariables: [
-
-    ],
-
-    relations: [
-
-    ],
-
-    affectedDocuments: [
-
-    ],
-
-    legalReferences: [
-
-    ],
-
-    observations: [
-
-    ]
-
-      decisionVariables: [
+    inputs: [
 
         {
-            id: "DV-001",
+            id: "INPUT-001",
             name: "Tipo de contrato",
-            description:
-                "Clasificación jurídica del contrato que condiciona el procedimiento aplicable.",
+            description: "Clasificación jurídica del contrato.",
             required: true
         },
 
         {
-            id: "DV-002",
+            id: "INPUT-002",
             name: "Valor estimado",
-            description:
-                "Importe utilizado para determinar el procedimiento y las obligaciones de publicidad.",
+            description: "Importe utilizado para determinar el procedimiento.",
             required: true
         },
 
         {
-            id: "DV-003",
+            id: "INPUT-003",
             name: "Código CPV",
-            description:
-                "Clasificación europea del objeto contractual.",
+            description: "Clasificación CPV del objeto contractual.",
             required: true
         },
 
         {
-            id: "DV-004",
+            id: "INPUT-004",
             name: "Objeto del contrato",
-            description:
-                "Prestación que constituye el contenido del contrato.",
+            description: "Prestación objeto del expediente.",
             required: true
         },
 
         {
-            id: "DV-005",
-            name: "División en lotes",
-            description:
-                "Existencia o no de lotes susceptibles de licitación independiente.",
+            id: "INPUT-005",
+            name: "Lotes",
+            description: "Existencia de división en lotes.",
             required: true
+        }
+
+    ],
+
+    outputs: [
+
+        {
+            id: "OUTPUT-001",
+            name: "Procedimiento aplicable",
+            description: "Procedimiento de adjudicación resultante."
         },
 
         {
-            id: "DV-006",
-            name: "Regulación armonizada",
-            description:
-                "Determina si el contrato está sujeto a regulación armonizada.",
-            required: true
+            id: "OUTPUT-002",
+            name: "Publicidad",
+            description: "Publicidad obligatoria del expediente."
         },
 
         {
-            id: "DV-007",
-            name: "Tramitación",
-            description:
-                "Tipo de tramitación administrativa del expediente.",
-            required: true
+            id: "OUTPUT-003",
+            name: "Plazos",
+            description: "Plazos administrativos asociados."
         }
 
     ],
@@ -356,30 +149,6 @@ export const KP0001: KnowledgePack = {
             source: "CONCEPT-0009",
             relation: KnowledgeRelationType.DETERMINES,
             target: "CONCEPT-0012"
-        },
-
-        {
-            source: "CONCEPT-0009",
-            relation: KnowledgeRelationType.DETERMINES,
-            target: "CONCEPT-0013"
-        },
-
-        {
-            source: "CONCEPT-0009",
-            relation: KnowledgeRelationType.DETERMINES,
-            target: "CONCEPT-0014"
-        },
-
-        {
-            source: "CONCEPT-0009",
-            relation: KnowledgeRelationType.DETERMINES,
-            target: "CONCEPT-0015"
-        },
-
-        {
-            source: "CONCEPT-0009",
-            relation: KnowledgeRelationType.PRODUCES,
-            target: "CONCEPT-0016"
         }
 
     ],
@@ -387,87 +156,243 @@ export const KP0001: KnowledgePack = {
     affectedDocuments: [
 
         {
+
             name: "Memoria Justificativa",
+
             reason:
-                "Debe justificar el procedimiento seleccionado."
+                "Debe justificar el procedimiento elegido."
+
         },
 
         {
+
             name: "PCAP",
+
             reason:
-                "Recoge íntegramente el procedimiento de adjudicación."
+                "Recoge íntegramente el procedimiento."
+
         },
 
         {
-            name: "PPT",
-            reason:
-                "Puede verse afectado por las condiciones derivadas del procedimiento."
-        },
 
-        {
             name: "Anuncio de Licitación",
+
             reason:
-                "La publicidad depende del procedimiento seleccionado."
+                "Depende del procedimiento seleccionado."
+
         },
 
         {
+
             name: "Cronograma",
+
             reason:
-                "Los plazos administrativos dependen del procedimiento."
+                "Los plazos cambian según el procedimiento."
+
         },
 
         {
-            name: "Informe de Valoración",
-            reason:
-                "El procedimiento determina la forma de evaluación de ofertas."
-        },
 
-        {
             name: "Resolución de Adjudicación",
-            reason:
-                "Es consecuencia directa del procedimiento seguido."
-        },
 
-        {
-            name: "Contrato",
             reason:
-                "La formalización depende del procedimiento utilizado."
+                "Resultado directo del procedimiento."
+
         }
 
     ],
 
-      legalReferences: [
+    rules: [
 
         {
-            regulation: "Ley 9/2017, de Contratos del Sector Público",
+
+            id: "RULE-0001",
+
+            description:
+                "Las reglas jurídicas se incorporarán tras la extracción sistemática desde las fuentes documentales.",
+
+            enabled: false
+
+        }
+
+    ],
+
+    legalReferences: [
+
+        {
+
+            regulation:
+                "Ley 9/2017, de Contratos del Sector Público",
+
             notes:
-                "Las referencias concretas se completarán tras la extracción sistemática del conocimiento de las fuentes del proyecto."
+                "Pendiente de completar mediante extracción normativa."
+
         },
 
         {
-            regulation: "Pliegos tipo de la Junta de Andalucía",
+
+            regulation:
+                "Modelos PCAP del proyecto",
+
             notes:
-                "Conocimiento obtenido de los PCAP incorporados al repositorio documental."
+                "Conocimiento obtenido de los expedientes utilizados como referencia."
+
+        }
+
+    ],
+
+    examples: [
+
+        {
+
+            source:
+                "Banco documental",
+
+            description:
+                "Procedimiento abierto."
+
+        },
+
+        {
+
+            source:
+                "Banco documental",
+
+            description:
+                "Procedimiento abierto simplificado."
+
         }
 
     ],
 
     observations: [
 
-        "El procedimiento de adjudicación condiciona la publicidad del contrato.",
+        {
 
-        "El procedimiento determina los plazos administrativos del expediente.",
+            source:
+                "PCAP",
 
-        "Los modelos PCAP analizados describen expresamente el procedimiento en el Anexo I.",
+            description:
+                "El procedimiento condiciona la publicidad."
 
-        "La licitación se desarrolla por medios electrónicos mediante SiREC-Portal en los modelos analizados.",
+        },
 
-        "La resolución de adjudicación y la formalización constituyen consecuencias directas del procedimiento.",
+        {
 
-        "Este Knowledge Pack constituye un modelo inicial y deberá enriquecerse progresivamente mediante la extracción del conocimiento de las fuentes del proyecto."
+            source:
+                "PCAP",
+
+            description:
+                "El procedimiento determina los plazos."
+
+        },
+
+        {
+
+            source:
+                "PCAP",
+
+            description:
+                "La licitación se realiza electrónicamente mediante SiREC."
+
+        }
+
+    ],
+
+    requiredQuestions: [
+
+        {
+
+            id: "QUESTION-001",
+
+            question:
+                "¿Cuál es el valor estimado del contrato?",
+
+            targetField:
+                "estimatedValue",
+
+            required: true
+
+        },
+
+        {
+
+            id: "QUESTION-002",
+
+            question:
+                "¿Cuál es el tipo de contrato?",
+
+            targetField:
+                "contractType",
+
+            required: true
+
+        },
+
+        {
+
+            id: "QUESTION-003",
+
+            question:
+                "¿Existe división en lotes?",
+
+            targetField:
+                "lots",
+
+            required: true
+
+        }
+
+    ],
+
+    decisionImpacts: [
+
+        {
+
+            conceptId: "CONCEPT-0010",
+
+            description:
+                "Publicidad"
+
+        },
+
+        {
+
+            conceptId: "CONCEPT-0011",
+
+            description:
+                "Plazos"
+
+        },
+
+        {
+
+            conceptId: "CONCEPT-0012",
+
+            description:
+                "Solvencia"
+
+        },
+
+        {
+
+            conceptId: "CONCEPT-0013",
+
+            description:
+                "Garantías"
+
+        },
+
+        {
+
+            conceptId: "CONCEPT-0014",
+
+            description:
+                "Adjudicación"
+
+        }
 
     ]
 
 };
-
-};
+```
