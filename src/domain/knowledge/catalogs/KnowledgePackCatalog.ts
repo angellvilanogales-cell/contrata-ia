@@ -1,3 +1,4 @@
+```typescript
 /**
  * ============================================================
  * CONTRATA-IA
@@ -8,31 +9,34 @@
  *
  * RESPONSABILIDAD
  *
- * Este archivo constituye el único punto de registro de los
+ * Este archivo constituye el único punto de acceso a los
  * paquetes de conocimiento disponibles.
  *
- * NO contiene:
- *
- * • reglas
- * • decisiones
- * • lógica jurídica
- * • interpretación normativa
- *
- * Únicamente centraliza el acceso a todos los Knowledge Pack.
+ * NO interpreta normativa.
+ * NO ejecuta reglas.
+ * NO toma decisiones.
  *
  * ============================================================
  */
 
-import { KnowledgePack } from "../models/KnowledgePack";
+import {
+    KnowledgePack
+} from "../models/KnowledgePack";
 
-import { KP0001 } from "../packs/KP0001_ProcedimientoAdjudicacion";
+import {
+    KP0001
+} from "../packs/KP0001_ProcedimientoAdjudicacion";
 
 /**
  * Catálogo oficial de Knowledge Packs.
+ *
+ * IMPORTANTE:
+ * Todos los nuevos paquetes deberán registrarse aquí.
  */
-export const KNOWLEDGE_PACK_CATALOG: KnowledgePack[] = [
+export const KNOWLEDGE_PACK_CATALOG: ReadonlyArray<KnowledgePack> = [
 
     /**
+     * KP-0001
      * Procedimiento de adjudicación.
      */
     KP0001
@@ -40,9 +44,9 @@ export const KNOWLEDGE_PACK_CATALOG: KnowledgePack[] = [
 ];
 
 /**
- * Devuelve todos los Knowledge Pack.
+ * Devuelve todos los paquetes registrados.
  */
-export function getKnowledgePacks(): KnowledgePack[] {
+export function getKnowledgePacks(): ReadonlyArray<KnowledgePack> {
 
     return KNOWLEDGE_PACK_CATALOG;
 
@@ -75,10 +79,47 @@ export function hasKnowledgePack(
 }
 
 /**
- * Número de paquetes registrados.
+ * Número total de paquetes registrados.
  */
 export function knowledgePackCount(): number {
 
     return KNOWLEDGE_PACK_CATALOG.length;
 
 }
+
+/**
+ * Devuelve todos los paquetes pertenecientes
+ * a un dominio concreto.
+ */
+export function getKnowledgePacksByDomain(
+    domain: string
+): KnowledgePack[] {
+
+    return KNOWLEDGE_PACK_CATALOG.filter(
+        knowledgePack => knowledgePack.metadata.domain === domain
+    );
+
+}
+
+/**
+ * Devuelve únicamente los paquetes validados.
+ */
+export function getValidatedKnowledgePacks(): KnowledgePack[] {
+
+    return KNOWLEDGE_PACK_CATALOG.filter(
+        knowledgePack => knowledgePack.metadata.status === "validated"
+    );
+
+}
+
+/**
+ * Devuelve únicamente los paquetes en borrador.
+ */
+export function getDraftKnowledgePacks(): KnowledgePack[] {
+
+    return KNOWLEDGE_PACK_CATALOG.filter(
+        knowledgePack => knowledgePack.metadata.status === "draft"
+    );
+
+}
+```
