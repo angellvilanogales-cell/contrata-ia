@@ -4,1025 +4,719 @@
  * ------------------------------------------------------------
  * ProcedureResolver
  * ------------------------------------------------------------
+ * Resolver responsable de determinar el procedimiento
+ * de adjudicación conforme a la LCSP.
  *
- * Primer motor experto jurídico.
- *
- * Determina el procedimiento de adjudicación utilizando:
- *
- *  • DecisionContext
- *  • Knowledge Packs
- *  • RuleEngine
- *  • BaseResolver
- *
- * IMPORTANTE
- *
- * Este componente NO contiene artículos LCSP escritos
- * directamente.
- *
- * Toda la normativa llegará desde los Knowledge Packs.
+ * Esta versión sustituye completamente la implementación
+ * anterior basada en KnowledgeRepository +
+ * KnowledgeRuleProvider.
  *
  * ============================================================
  */
 
-import { BaseResolver } from "./BaseResolver";
+import { BaseResolver } from "../framework/BaseResolver";
+import { ResolverContext } from "../framework/FrameworkTypes";
+import { ResolverDecision } from "../framework/FrameworkTypes";
+
+import { KnowledgeConnector } from "../framework/KnowledgeConnector";
+import { DecisionFactory } from "../framework/DecisionFactory";
+import { ValidationPipeline } from "../framework/ValidationPipeline";
+
+import { AuditService } from "../framework/AuditService";
+import { StatisticsService } from "../framework/StatisticsService";
+import { DiagnosticService } from "../framework/DiagnosticService";
+
+import { BaseCache } from "../framework/BaseCache";
+
+import { RuleExecutor } from "../framework/RuleExecutor";
 
 import {
-    ResolutionResult,
-    ResolutionConfidence
-} from "./ResolutionResult";
 
-import { DecisionContext } from "../knowledge/DecisionContext";
+    ProcedureType
 
-import { KnowledgeRepository } from "../knowledge/KnowledgeRepository";
+} from "../types/ProcedureType";
 
-import { KnowledgeRuleProvider } from "../knowledge/KnowledgeRuleProvider";
+import {
 
-import { RuleEngine } from "../knowledge/RuleEngine";
+    ProcedureReason
 
-/**
- * Procedimientos soportados.
- */
-export enum ProcedureType {
+} from "../types/ProcedureReason";
 
-    OPEN = "OPEN",
+export class ProcedureResolver extends BaseResolver<ProcedureType> {
 
-    OPEN_SIMPLIFIED = "OPEN_SIMPLIFIED",
+    /**
+     * Caché local.
+     */
+    private readonly cache =
 
-    OPEN_SIMPLIFIED_ABBREVIATED = "OPEN_SIMPLIFIED_ABBREVIATED",
-
-    RESTRICTED = "RESTRICTED",
-
-    NEGOTIATED = "NEGOTIATED",
-
-    DIALOGUE = "DIALOGUE",
-
-    INNOVATION = "INNOVATION",
-
-    MINOR = "MINOR",
-
-    UNKNOWN = "UNKNOWN"
-
-}
-
-/**
- * Resolver del procedimiento.
- */
-export class ProcedureResolver
-extends BaseResolver<ProcedureType> {
+        new BaseCache<ResolverDecision<ProcedureType>>();
 
     constructor(
 
-        private readonly repository:
-            KnowledgeRepository,
+        private readonly knowledge: KnowledgeConnector,
 
-        private readonly rules:
-            KnowledgeRuleProvider,
+        private readonly rules: RuleExecutor,
 
-        private readonly ruleEngine:
-            RuleEngine
+        private readonly audit: AuditService,
+
+        private readonly statistics: StatisticsService,
+
+        private readonly diagnostics: DiagnosticService
 
     ) {
 
-        super();
+        super(
+
+            "ProcedureResolver"
+
+        );
 
     }
 
     /**
      * =====================================================
-     * MÉTODO PRINCIPAL
+     * Punto de entrada.
      * =====================================================
      */
 
     public resolve(
 
-        context: DecisionContext
+        context: ResolverContext
 
-    ): ResolutionResult<ProcedureType> {
+    ): ResolverDecision<ProcedureType> {
 
-        this.initialize(
+        const cacheKey =
 
-            ProcedureType.UNKNOWN
+            JSON.stringify({
 
-        );
+                value:
 
-        this.loadKnowledge();
+                    context.contract.estimatedValue,
 
-        this.evaluateContext(
+                cpv:
 
-            context
+                    context.contract.cpv,
 
-        );
+                type:
 
-        this.executeRules(
+                    context.contract.type
 
-            context
+            });
 
-        );
+        const cached =
 
-        this.buildReasoning();
+            this.cache.get(
 
-        return this.build();
-
-    }
-
-    /**
-     * =====================================================
-     * CARGA DE KNOWLEDGE PACKS
-     * =====================================================
-     */
-
-    private loadKnowledge(): void {
-
-        /*
-         * Este resolver utilizará principalmente:
-         *
-         * KP-0001
-         * KP-0002
-         * KP-0003
-         * KP-0006
-         *
-         * En versiones futuras se cargarán
-         * automáticamente desde el repositorio.
-         */
-
-        this.knowledgePack(
-
-            "KP-0001"
-
-        );
-
-        this.knowledgePack(
-
-            "KP-0002"
-
-        );
-
-        this.knowledgePack(
-
-            "KP-0003"
-
-        );
-
-        this.knowledgePack(
-
-            "KP-0006"
-
-        );
-
-    }
-
-    /**
-     * =====================================================
-     * EVALUACIÓN INICIAL
-     * =====================================================
-     */
-
-    private evaluateContext(
-
-        context: DecisionContext
-
-    ): void {
-
-        const value =
-
-            context.get(
-
-                "estimatedValue"
+                cacheKey
 
             );
 
-        const contractType =
+        if (cached) {
 
-            context.get(
-
-                "contractType"
-
-            );
-
-        if (value === undefined) {
-
-            this.warning(
-
-                "No existe Valor Estimado."
-
-            );
+            return cached;
 
         }
 
-        if (contractType === undefined) {
+        this.statistics.increment(
 
-            this.warning(
+            "ProcedureResolver",
 
-                "No existe Tipo de Contrato."
+            "executions"
 
-            );
+        );
 
-        }
+        this.audit.log(
 
-    }
+            "RESOLVER",
 
-    /**
-     * =====================================================
-     * EJECUCIÓN DE REGLAS
-     * =====================================================
-     */
+            "Inicio ProcedureResolver"
 
-    private executeRules(
+        );
 
-        context: DecisionContext
+        return this.execute(
 
-    ): void {
+            context,
 
-        /*
-         * En la Parte 2 construiremos
-         * la integración completa con
-         * RuleEngine.
-         */
+            cacheKey
 
-        void context;
+        );
 
     }
-
-
-    /**
-     * =====================================================
-     * EJECUCIÓN DEL RULE ENGINE
-     * =====================================================
-     */
-
-    private executeRules(
-
-        context: DecisionContext
-
-    ): void {
 
         /**
-         * En versiones posteriores el RuleEngine
-         * cargará automáticamente las reglas
-         * procedentes de los Knowledge Packs.
+     * =====================================================
+     * Ejecución interna.
+     * =====================================================
+     */
+
+    private execute(
+
+        context: ResolverContext,
+
+        cacheKey: string
+
+    ): ResolverDecision<ProcedureType> {
+
+        /**
+         * -------------------------------------------------
+         * 1. Ejecutar reglas jurídicas
+         * -------------------------------------------------
          */
 
-        const decision =
+        const executions =
 
-            this.ruleEngine.execute(
+            this.rules.execute(
 
                 context
 
             );
 
+        this.audit.log(
+
+            "RULE_ENGINE",
+
+            "Reglas ejecutadas",
+
+            executions
+
+        );
+
         /**
-         * Si el RuleEngine ya ha propuesto un
-         * procedimiento lo aceptamos como
-         * candidato principal.
+         * -------------------------------------------------
+         * 2. Buscar conocimiento asociado
+         * -------------------------------------------------
+         */
+
+        const knowledge =
+
+            this.knowledge.hybrid(
+
+                [
+                    context.contract.type,
+
+                    context.contract.cpv,
+
+                    String(
+
+                        context.contract.estimatedValue
+
+                    )
+
+                ].join(" ")
+
+            );
+
+        this.audit.log(
+
+            "KNOWLEDGE",
+
+            "Knowledge Packs recuperados",
+
+            knowledge.map(
+
+                k => k.pack.id
+
+            )
+
+        );
+
+        /**
+         * -------------------------------------------------
+         * 3. Determinar procedimiento
+         * -------------------------------------------------
          */
 
         const procedure =
 
-            (decision as any).procedure;
+            this.determineProcedure(
 
-        if (
+                context,
 
-            procedure !== undefined
+                executions
+
+            );
+
+        /**
+         * -------------------------------------------------
+         * 4. Construir decisión
+         * -------------------------------------------------
+         */
+
+        const decision =
+
+            DecisionFactory.success(
+
+                procedure,
+
+                ProcedureReason.AUTOMATIC
+
+            );
+
+        /**
+         * -------------------------------------------------
+         * 5. Añadir justificación jurídica
+         * -------------------------------------------------
+         */
+
+        for (
+
+            const result
+
+            of knowledge
 
         ) {
 
-            this.result.value = procedure;
+            decision.reasons.push({
+
+                source:
+
+                    result.pack.id,
+
+                description:
+
+                    result.reason
+
+            });
 
         }
 
         /**
-         * Independientemente del resultado,
-         * seguimos evaluando el expediente
-         * para generar una explicación completa.
+         * -------------------------------------------------
+         * 6. Validación
+         * -------------------------------------------------
          */
 
-        this.evaluateEstimatedValue(
+        ValidationPipeline.validate(
+
+            decision,
 
             context
 
         );
 
-        this.evaluateContractType(
+        /**
+         * -------------------------------------------------
+         * 7. Auditoría
+         * -------------------------------------------------
+         */
 
-            context
+        this.audit.decision(
 
-        );
-
-        this.evaluateSpecialCases(
-
-            context
-
-        );
-
-    }
-
-    /**
-     * =====================================================
-     * VALOR ESTIMADO
-     * =====================================================
-     */
-
-    private evaluateEstimatedValue(
-
-        context: DecisionContext
-
-    ): void {
-
-        const estimatedValue =
-
-            Number(
-
-                context.get(
-
-                    "estimatedValue"
-
-                )
-
-            );
-
-        if (
-
-            Number.isNaN(
-
-                estimatedValue
-
-            )
-
-        ) {
-
-            this.warning(
-
-                "No puede evaluarse el procedimiento sin Valor Estimado."
-
-            );
-
-            return;
-
-        }
-
-        this.reasoning(
-
-            "Se evalúa el Valor Estimado como uno de los criterios principales para determinar el procedimiento."
+            decision
 
         );
 
-        this.evidence({
+        /**
+         * -------------------------------------------------
+         * 8. Estadísticas
+         * -------------------------------------------------
+         */
 
-            reference:
+        this.statistics.increment(
 
-                "estimatedValue"
+            "ProcedureResolver",
 
-        });
-
-    }
-
-    /**
-     * =====================================================
-     * TIPO DE CONTRATO
-     * =====================================================
-     */
-
-    private evaluateContractType(
-
-        context: DecisionContext
-
-    ): void {
-
-        const contractType =
-
-            context.get(
-
-                "contractType"
-
-            );
-
-        if (
-
-            contractType === undefined
-
-        ) {
-
-            this.warning(
-
-                "No existe Tipo de Contrato."
-
-            );
-
-            return;
-
-        }
-
-        this.reasoning(
-
-            "Se analiza el Tipo de Contrato para seleccionar únicamente los procedimientos compatibles."
+            "resolved"
 
         );
 
-        this.evidence({
+        /**
+         * -------------------------------------------------
+         * 9. Caché
+         * -------------------------------------------------
+         */
 
-            reference:
+        this.cache.set(
 
-                "contractType"
+            cacheKey,
 
-        });
-
-    }
-
-    /**
-     * =====================================================
-     * SUPUESTOS ESPECIALES
-     * =====================================================
-     */
-
-    private evaluateSpecialCases(
-
-        context: DecisionContext
-
-    ): void {
-
-        const urgent =
-
-            context.get(
-
-                "urgent"
-
-            );
-
-        const emergency =
-
-            context.get(
-
-                "emergency"
-
-            );
-
-        if (
-
-            urgent === true
-
-        ) {
-
-            this.reasoning(
-
-                "El expediente declara tramitación urgente."
-
-            );
-
-        }
-
-        if (
-
-            emergency === true
-
-        ) {
-
-            this.reasoning(
-
-                "El expediente declara tramitación de emergencia."
-
-            );
-
-        }
-
-    }
-
-    /**
-     * =====================================================
-     * PROPUESTA PRELIMINAR
-     * =====================================================
-     */
-
-    private proposeProcedure(
-
-        procedure: ProcedureType,
-
-        confidence: ResolutionConfidence
-
-    ): void {
-
-        this.result.value = procedure;
-
-        this.confidence(
-
-            confidence
+            decision
 
         );
 
+        return decision;
+
     }
 
-    /**
+        /**
      * =====================================================
-     * RESOLUCIÓN DEL PROCEDIMIENTO
+     * Determinación del procedimiento
      * =====================================================
      */
 
     private determineProcedure(
 
-        context: DecisionContext
+        context: ResolverContext,
+
+        executions: ReadonlyArray<any>
+
+    ): ProcedureType {
+
+        /**
+         * -------------------------------------------------
+         * 1. Si alguna regla ya determina el procedimiento,
+         *    se utiliza directamente.
+         * -------------------------------------------------
+         */
+
+        for (const execution of executions) {
+
+            if (
+
+                execution.valid &&
+                execution.value !== undefined
+
+            ) {
+
+                return execution.value as ProcedureType;
+
+            }
+
+        }
+
+        /**
+         * -------------------------------------------------
+         * 2. Cálculo por valor estimado
+         * -------------------------------------------------
+         */
+
+        const value = Number(
+
+            context.contract.estimatedValue ?? 0
+
+        );
+
+        /**
+         * Umbrales cargados desde RuleEngine
+         */
+
+        const minorThreshold =
+
+            this.rules.variable<number>(
+
+                "MINOR_THRESHOLD"
+
+            ) ?? 15000;
+
+        const simplifiedShortThreshold =
+
+            this.rules.variable<number>(
+
+                "SIMPLIFIED_SHORT_LIMIT"
+
+            ) ?? 60000;
+
+        const simplifiedThreshold =
+
+            this.rules.variable<number>(
+
+                "SIMPLIFIED_LIMIT"
+
+            ) ?? 100000;
+
+        /**
+         * -------------------------------------------------
+         * Contrato menor
+         * -------------------------------------------------
+         */
+
+        if (
+
+            value <= minorThreshold
+
+        ) {
+
+            return ProcedureType.MINOR;
+
+        }
+
+        /**
+         * -------------------------------------------------
+         * Abierto simplificado abreviado
+         * -------------------------------------------------
+         */
+
+        if (
+
+            value <= simplifiedShortThreshold
+
+        ) {
+
+            return ProcedureType.SIMPLIFIED_SHORT;
+
+        }
+
+        /**
+         * -------------------------------------------------
+         * Abierto simplificado
+         * -------------------------------------------------
+         */
+
+        if (
+
+            value <= simplifiedThreshold
+
+        ) {
+
+            return ProcedureType.SIMPLIFIED;
+
+        }
+
+        /**
+         * -------------------------------------------------
+         * Procedimientos especiales
+         * -------------------------------------------------
+         */
+
+        if (
+
+            context.flags?.competitiveDialogue
+
+        ) {
+
+            return ProcedureType.COMPETITIVE_DIALOGUE;
+
+        }
+
+        if (
+
+            context.flags?.innovationPartnership
+
+        ) {
+
+            return ProcedureType.INNOVATION_PARTNERSHIP;
+
+        }
+
+        if (
+
+            context.flags?.negotiated
+
+        ) {
+
+            return ProcedureType.NEGOTIATED;
+
+        }
+
+        if (
+
+            context.flags?.restricted
+
+        ) {
+
+            return ProcedureType.RESTRICTED;
+
+        }
+
+        /**
+         * -------------------------------------------------
+         * Procedimiento por defecto
+         * -------------------------------------------------
+         */
+
+        return ProcedureType.OPEN;
+
+    }
+
+        /**
+     * =====================================================
+     * Construcción del razonamiento jurídico.
+     * =====================================================
+     */
+
+    private buildReasoning(
+
+        context: ResolverContext,
+
+        decision: ResolverDecision<ProcedureType>
 
     ): void {
 
-        const estimatedValue = Number(
-
-            context.get(
-
-                "estimatedValue"
-
-            )
-
-        );
-
-        const contractType = String(
-
-            context.get(
-
-                "contractType"
-
-            ) ?? ""
-
-        );
-
         /**
-         * =================================================
-         * PROCEDIMIENTO MENOR
-         * =================================================
-         *
-         * La comprobación definitiva vendrá desde
-         * los Knowledge Packs.
+         * ----------------------------------------------
+         * Relaciones semánticas
+         * ----------------------------------------------
          */
 
-        if (
+        const relations =
 
-            this.isMinorCandidate(
+            this.knowledge.outgoing(
 
-                estimatedValue,
-
-                contractType
-
-            )
-
-        ) {
-
-            this.proposeProcedure(
-
-                ProcedureType.MINOR,
-
-                ResolutionConfidence.HIGH
+                "Procedimiento"
 
             );
 
-            this.rule({
+        for (
 
-                id: "PR-001",
+            const relation
 
-                name: "Minor contract candidate"
+            of relations
+
+        ) {
+
+            decision.reasons.push({
+
+                source:
+
+                    "KnowledgeGraph",
+
+                description:
+
+                    `${relation.from} ${relation.relation} ${relation.to}`
 
             });
-
-            return;
 
         }
 
         /**
-         * =================================================
-         * PROCEDIMIENTO ABIERTO SIMPLIFICADO
-         * =================================================
+         * ----------------------------------------------
+         * Packs relacionados
+         * ----------------------------------------------
          */
 
-        if (
+        const packs =
 
-            this.isSimplifiedCandidate(
+            this.knowledge.semantic(
 
-                estimatedValue
-
-            )
-
-        ) {
-
-            this.proposeProcedure(
-
-                ProcedureType.OPEN_SIMPLIFIED,
-
-                ResolutionConfidence.HIGH
+                "procedimiento adjudicación"
 
             );
 
-            this.rule({
+        for (
 
-                id: "PR-002",
+            const pack
 
-                name: "Simplified open procedure"
+            of packs
+
+        ) {
+
+            decision.reasons.push({
+
+                source:
+
+                    pack.pack.id,
+
+                description:
+
+                    pack.reason
 
             });
 
-            return;
-
-        }
-
-        /**
-         * =================================================
-         * PROCEDIMIENTO ABIERTO
-         * =================================================
-         */
-
-        this.proposeProcedure(
-
-            ProcedureType.OPEN,
-
-            ResolutionConfidence.MEDIUM
-
-        );
-
-        this.rule({
-
-            id: "PR-003",
-
-            name: "Open procedure"
-
-        });
-
-    }
-
-    /**
-     * =====================================================
-     * CONTRATO MENOR
-     * =====================================================
-     */
-
-    private isMinorCandidate(
-
-        estimatedValue: number,
-
-        contractType: string
-
-    ): boolean {
-
-        if (
-
-            Number.isNaN(
-
-                estimatedValue
-
-            )
-
-        ) {
-
-            return false;
-
-        }
-
-        /**
-         * Los umbrales definitivos serán obtenidos
-         * desde los Knowledge Packs.
-         *
-         * Este valor únicamente mantiene operativo
-         * el motor hasta incorporar el conocimiento.
-         */
-
-        switch (
-
-            contractType
-
-        ) {
-
-            case "WORKS":
-
-                return estimatedValue <= 40000;
-
-            case "SERVICES":
-
-                return estimatedValue <= 15000;
-
-            case "SUPPLIES":
-
-                return estimatedValue <= 15000;
-
-            default:
-
-                return false;
-
         }
 
     }
 
     /**
      * =====================================================
-     * PROCEDIMIENTO ABIERTO SIMPLIFICADO
+     * Validaciones específicas.
      * =====================================================
      */
 
-    private isSimplifiedCandidate(
+    private validateProcedure(
 
-        estimatedValue: number
+        context: ResolverContext,
 
-    ): boolean {
-
-        if (
-
-            Number.isNaN(
-
-                estimatedValue
-
-            )
-
-        ) {
-
-            return false;
-
-        }
-
-        /**
-         * Sustituido posteriormente por
-         * KP-0001.
-         */
-
-        return estimatedValue <= 100000;
-
-    }
-
-    /**
-     * =====================================================
-     * PROCEDIMIENTOS ESPECIALES
-     * =====================================================
-     */
-
-    private evaluateExceptionalProcedures(
-
-        context: DecisionContext
+        decision: ResolverDecision<ProcedureType>
 
     ): void {
 
-        const innovation =
-
-            context.get(
-
-                "innovation"
-
-            );
-
-        const dialogue =
-
-            context.get(
-
-                "competitiveDialogue"
-
-            );
-
-        const negotiated =
-
-            context.get(
-
-                "negotiated"
-
-            );
-
-        if (
-
-            innovation === true
-
-        ) {
-
-            this.alternative(
-
-                ProcedureType.INNOVATION,
-
-                "Expediente susceptible de Asociación para la Innovación."
-
-            );
-
-        }
-
-        if (
-
-            dialogue === true
-
-        ) {
-
-            this.alternative(
-
-                ProcedureType.DIALOGUE,
-
-                "Expediente compatible con Diálogo Competitivo."
-
-            );
-
-        }
-
-        if (
-
-            negotiated === true
-
-        ) {
-
-            this.alternative(
-
-                ProcedureType.NEGOTIATED,
-
-                "Expediente susceptible de procedimiento negociado."
-
-            );
-
-        }
-
-    }
-
-      /**
-     * =====================================================
-     * CONSTRUCCIÓN DEL RAZONAMIENTO
-     * =====================================================
-     */
-
-    private buildReasoning(): void {
-
-        switch (this.result.value) {
-
-            case ProcedureType.MINOR:
-
-                this.reasoning(
-                    "El motor propone inicialmente un contrato menor conforme a la información disponible y a las reglas actualmente cargadas."
-                );
-
-                break;
-
-            case ProcedureType.OPEN_SIMPLIFIED:
-
-                this.reasoning(
-                    "El motor considera compatible el procedimiento abierto simplificado atendiendo al contexto recibido."
-                );
-
-                break;
-
-            case ProcedureType.OPEN:
-
-                this.reasoning(
-                    "No se han detectado circunstancias que justifiquen un procedimiento especial. Se propone inicialmente el procedimiento abierto."
-                );
-
-                break;
-
-            case ProcedureType.RESTRICTED:
-
-                this.reasoning(
-                    "El expediente reúne indicios compatibles con un procedimiento restringido."
-                );
-
-                break;
-
-            case ProcedureType.NEGOTIATED:
-
-                this.reasoning(
-                    "Se detectan circunstancias susceptibles de justificar un procedimiento negociado."
-                );
-
-                break;
-
-            case ProcedureType.DIALOGUE:
-
-                this.reasoning(
-                    "El expediente presenta características compatibles con un diálogo competitivo."
-                );
-
-                break;
-
-            case ProcedureType.INNOVATION:
-
-                this.reasoning(
-                    "El expediente puede encajar en una Asociación para la Innovación."
-                );
-
-                break;
-
-            default:
-
-                this.warning(
-                    "No ha sido posible determinar un procedimiento definitivo."
-                );
-
-        }
-
-    }
-
-    /**
-     * =====================================================
-     * VALIDACIÓN FINAL
-     * =====================================================
-     */
-
-    private validateResolution(): void {
-
-        if (
-
-            this.result.value === ProcedureType.UNKNOWN
-
-        ) {
-
-            this.error(
-
-                "No existe información suficiente para determinar el procedimiento."
-
-            );
-
-        }
-
-        if (
-
-            this.result.reasoning.trim().length === 0
-
-        ) {
-
-            this.warning(
-
-                "La resolución carece de razonamiento."
-
-            );
-
-        }
-
-    }
-
-    /**
-     * =====================================================
-     * REFERENCIAS NORMATIVAS
-     * =====================================================
-     */
-
-    private appendNormativeSupport(): void {
-
         /**
-         * IMPORTANTE
-         *
-         * Aquí NO se incorporan artículos
-         * directamente.
-         *
-         * Las referencias deberán obtenerse
-         * desde el KnowledgeRepository
-         * cuando los Knowledge Packs
-         * estén completamente cargados.
+         * Valor estimado obligatorio.
          */
 
         if (
 
-            this.repository !== undefined
+            Number(
+
+                context.contract.estimatedValue
+
+            ) <= 0
 
         ) {
 
-            // Punto de integración futura.
+            decision.validation.errors.push(
+
+                "Debe existir un valor estimado válido."
+
+            );
 
         }
+
+        /**
+         * CPV obligatorio.
+         */
+
+        if (
+
+            !context.contract.cpv ||
+
+            context.contract.cpv.length === 0
+
+        ) {
+
+            decision.validation.errors.push(
+
+                "Debe seleccionarse un código CPV."
+
+            );
+
+        }
+
+        /**
+         * Tipo contractual.
+         */
+
+        if (
+
+            context.contract.type == null
+
+        ) {
+
+            decision.validation.errors.push(
+
+                "Debe definirse el tipo contractual."
+
+            );
+
+        }
+
+        /**
+         * Si existen errores, la decisión deja de ser válida.
+         */
+
+        decision.valid =
+
+            decision.validation.errors.length === 0;
 
     }
 
     /**
      * =====================================================
-     * RESOLUCIÓN COMPLETA
+     * Diagnóstico.
      * =====================================================
      */
 
-    public override resolve(
+    public diagnostics() {
 
-        context: DecisionContext
+        return {
 
-    ): ResolutionResult<ProcedureType> {
+            cache:
 
-        this.initialize(
+                this.cache.diagnostics(),
 
-            ProcedureType.UNKNOWN
+            statistics:
 
-        );
+                this.statistics.export(),
 
-        this.loadKnowledge();
+            framework:
 
-        this.evaluateContext(
+                this.diagnostics.report(),
 
-            context
+            audit:
 
-        );
+                this.audit.export()
 
-        this.executeRules(
-
-            context
-
-        );
-
-        this.determineProcedure(
-
-            context
-
-        );
-
-        this.evaluateExceptionalProcedures(
-
-            context
-
-        );
-
-        this.appendNormativeSupport();
-
-        this.buildReasoning();
-
-        this.validateResolution();
-
-        return this.build();
+        };
 
     }
 
