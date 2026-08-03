@@ -1,124 +1,120 @@
 /**
  * ============================================================
  * CONTRATA-IA
- * ------------------------------------------------------------
- * KnowledgeRepository
- * ------------------------------------------------------------
- * Punto único de acceso al conocimiento del sistema.
- *
- * IMPORTANTE
- *
- * Este componente NO interpreta la normativa.
- *
- * NO ejecuta reglas.
- *
- * NO toma decisiones.
- *
- * Su única responsabilidad consiste en proporcionar al
- * RuleEngine el conocimiento disponible.
- *
- * En futuras versiones podrá obtener información desde:
- *
- * • Normativa
- * • Ontologías
- * • Ejemplos
- * • PCAP
- * • PPT
- * • Memorias
- * • YAML
- * • JSON
- * • Base documental
- * • IA semántica
- *
+ * Knowledge Repository
  * ============================================================
  */
 
-export interface KnowledgeSource {
+import {
+    KnowledgeModule,
+    KnowledgeModuleRegistry,
+    KnowledgeModuleType
+} from "./KnowledgeModuleRegistry";
 
-    /**
-     * Identificador.
-     */
+export interface KnowledgeResource {
+
     id: string;
 
-    /**
-     * Nombre.
-     */
-    name: string;
+    module: KnowledgeModuleType;
 
-    /**
-     * Tipo.
-     */
     type: string;
 
-    /**
-     * Ubicación.
-     */
-    location?: string;
+    key: string;
 
-    /**
-     * Activa.
-     */
-    enabled: boolean;
+    value: unknown;
+
+    metadata?: Record<string, unknown>;
 
 }
 
 export class KnowledgeRepository {
 
-    /**
-     * Fuentes registradas.
-     */
-    private readonly sources: KnowledgeSource[] = [];
+    private readonly registry: KnowledgeModuleRegistry;
 
-    /**
-     * Registra una nueva fuente.
-     */
-    public register(
-        source: KnowledgeSource
+    private readonly resources = new Map<string, KnowledgeResource>();
+
+    constructor(
+        registry: KnowledgeModuleRegistry
+    ) {
+        this.registry = registry;
+    }
+
+    public registerModule(
+        module: KnowledgeModule
     ): void {
 
-        this.sources.push(source);
+        this.registry.register(module);
 
     }
 
-    /**
-     * Devuelve todas las fuentes activas.
-     */
-    public getSources(): KnowledgeSource[] {
+    public add(
+        resource: KnowledgeResource
+    ): void {
 
-        return this.sources.filter(
-            source => source.enabled
-        );
+        this.resources.set(resource.id, resource);
 
     }
 
-    /**
-     * Busca una fuente concreta.
-     */
-    public find(
+    public update(
+        resource: KnowledgeResource
+    ): void {
+
+        this.resources.set(resource.id, resource);
+
+    }
+
+    public remove(
         id: string
-    ): KnowledgeSource | undefined {
+    ): void {
 
-        return this.sources.find(
-            source => source.id === id
-        );
+        this.resources.delete(id);
 
     }
 
-    /**
-     * Número de fuentes registradas.
-     */
-    public count(): number {
+    public get(
+        id: string
+    ): KnowledgeResource | undefined {
 
-        return this.sources.length;
+        return this.resources.get(id);
 
     }
 
-    /**
-     * Elimina todas las fuentes.
-     */
+    public getAll(): KnowledgeResource[] {
+
+        return [...this.resources.values()];
+
+    }
+
+    public findByModule(
+        module: KnowledgeModuleType
+    ): KnowledgeResource[] {
+
+        return this.getAll()
+            .filter(r => r.module === module);
+
+    }
+
+    public findByType(
+        type: string
+    ): KnowledgeResource[] {
+
+        return this.getAll()
+            .filter(r => r.type === type);
+
+    }
+
+    public findByKey(
+        key: string
+    ): KnowledgeResource | undefined {
+
+        return this.getAll()
+            .find(r => r.key === key);
+
+    }
+
     public clear(): void {
 
-        this.sources.length = 0;
+        this.resources.clear();
 
     }
 
