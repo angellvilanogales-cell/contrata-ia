@@ -4,18 +4,17 @@
  * ------------------------------------------------------------
  * ProcedureRules
  * ------------------------------------------------------------
- * Registro central de las reglas de determinación del
- * procedimiento de contratación.
+ * Reglas del Procedimiento de Adjudicación.
  *
  * IMPORTANTE
  *
- * Este archivo NO implementa todavía la lógica jurídica.
+ * Estas reglas NO contienen todavía los umbrales
+ * económicos definitivos de la LCSP.
  *
- * Su finalidad es registrar todas las reglas que el
- * RuleEngine ejecutará en futuras versiones.
+ * Únicamente representan la estructura de decisión.
  *
- * Las condiciones y acciones se implementarán utilizando
- * exclusivamente la normativa y la documentación del proyecto.
+ * Posteriormente el conocimiento extraído desde las fuentes
+ * sustituirá las condiciones provisionales.
  * ============================================================
  */
 
@@ -24,110 +23,240 @@ import {
     RulePriority
 } from "../RuleEngine";
 
+import {
+    DecisionContext
+} from "../DecisionContext";
+
+import {
+    KnowledgeDecision
+} from "../models/KnowledgeDecision";
+
 /**
- * Registro de reglas del procedimiento.
+ * ------------------------------------------------------------
+ * RULE-PR-001
+ * Existe procedimiento seleccionado.
+ * ------------------------------------------------------------
  */
-export const ProcedureRules: RuleDefinition[] = [
+const procedureExists: RuleDefinition = {
 
-    /**
-     * --------------------------------------------------------
-     * PROC-0001
-     * Contrato menor
-     * --------------------------------------------------------
-     */
-    {
+    id: "RULE-PR-001",
 
-        id: "PROC-0001",
+    name: "Procedimiento informado",
 
-        name: "Contrato menor",
+    priority: RulePriority.CRITICAL,
 
-        priority: RulePriority.CRITICAL,
+    when: (
+        context: DecisionContext
+    ): boolean => {
 
-        when: () => {
+        const facts: any = context as any;
 
-            /**
-             * TODO
-             * Implementar condición.
-             */
-            return false;
-
-        },
-
-        then: (_context, decision) => {
-
-            /**
-             * TODO
-             * Implementar acción.
-             */
-
-            decision.observations.push(
-                "PROC-0001 not implemented."
-            );
-
-        },
-
-        stopProcessing: true
+        return facts?.procedure !== undefined;
 
     },
 
-    /**
-     * --------------------------------------------------------
-     * PROC-0002
-     * Procedimiento abierto
-     * --------------------------------------------------------
-     */
-    {
+    then: (
+        context: DecisionContext,
+        decision: KnowledgeDecision
+    ): void => {
 
-        id: "PROC-0002",
-
-        name: "Procedimiento abierto",
-
-        priority: RulePriority.HIGH,
-
-        when: () => {
-
-            return false;
-
-        },
-
-        then: (_context, decision) => {
-
-            decision.observations.push(
-                "PROC-0002 not implemented."
-            );
-
-        }
-
-    },
-
-    /**
-     * --------------------------------------------------------
-     * PROC-0003
-     * Procedimiento abierto simplificado
-     * --------------------------------------------------------
-     */
-    {
-
-        id: "PROC-0003",
-
-        name: "Procedimiento abierto simplificado",
-
-        priority: RulePriority.HIGH,
-
-        when: () => {
-
-            return false;
-
-        },
-
-        then: (_context, decision) => {
-
-            decision.observations.push(
-                "PROC-0003 not implemented."
-            );
-
-        }
+        decision.messages.push(
+            "El expediente dispone de procedimiento de adjudicación."
+        );
 
     }
 
+};
+
+/**
+ * ------------------------------------------------------------
+ * RULE-PR-002
+ * Procedimiento no informado.
+ * ------------------------------------------------------------
+ */
+const procedureMissing: RuleDefinition = {
+
+    id: "RULE-PR-002",
+
+    name: "Procedimiento no informado",
+
+    priority: RulePriority.CRITICAL,
+
+    stopProcessing: true,
+
+    when: (
+        context: DecisionContext
+    ): boolean => {
+
+        const facts: any = context as any;
+
+        return facts?.procedure === undefined;
+
+    },
+
+    then: (
+        context: DecisionContext,
+        decision: KnowledgeDecision
+    ): void => {
+
+        decision.errors.push(
+            "Debe determinarse el procedimiento de adjudicación."
+        );
+
+    }
+
+};
+
+/**
+ * ------------------------------------------------------------
+ * RULE-PR-003
+ * Relación con Valor Estimado.
+ * ------------------------------------------------------------
+ */
+const procedureDependsEstimatedValue: RuleDefinition = {
+
+    id: "RULE-PR-003",
+
+    name: "El procedimiento depende del Valor Estimado",
+
+    priority: RulePriority.HIGH,
+
+    when: (
+        context: DecisionContext
+    ): boolean => {
+
+        const facts: any = context as any;
+
+        return (
+            facts?.estimatedValue !== undefined &&
+            facts?.procedure !== undefined
+        );
+
+    },
+
+    then: (
+        context: DecisionContext,
+        decision: KnowledgeDecision
+    ): void => {
+
+        decision.messages.push(
+            "El procedimiento debe ser coherente con el Valor Estimado."
+        );
+
+    }
+
+};
+
+/**
+ * ------------------------------------------------------------
+ * RULE-PR-004
+ * Relación con publicidad.
+ * ------------------------------------------------------------
+ */
+const procedureGeneratesPublication: RuleDefinition = {
+
+    id: "RULE-PR-004",
+
+    name: "El procedimiento condiciona la publicidad",
+
+    priority: RulePriority.NORMAL,
+
+    when: (
+        context: DecisionContext
+    ): boolean => {
+
+        const facts: any = context as any;
+
+        return facts?.procedure !== undefined;
+
+    },
+
+    then: (
+        context: DecisionContext,
+        decision: KnowledgeDecision
+    ): void => {
+
+        decision.messages.push(
+            "El procedimiento determinará las obligaciones de publicidad."
+        );
+
+    }
+
+};
+
+/**
+ * ------------------------------------------------------------
+ * RULE-PR-005
+ * Relación con plazos.
+ * ------------------------------------------------------------
+ */
+const procedureGeneratesDeadlines: RuleDefinition = {
+
+    id: "RULE-PR-005",
+
+    name: "El procedimiento condiciona los plazos",
+
+    priority: RulePriority.NORMAL,
+
+    when: (
+        context: DecisionContext
+    ): boolean => {
+
+        const facts: any = context as any;
+
+        return facts?.procedure !== undefined;
+
+    },
+
+    then: (
+        context: DecisionContext,
+        decision: KnowledgeDecision
+    ): void => {
+
+        decision.messages.push(
+            "El procedimiento determinará los plazos mínimos de licitación."
+        );
+
+    }
+
+};
+
+/**
+ * ============================================================
+ * Exportación.
+ * ============================================================
+ */
+
+export const ProcedureRules: RuleDefinition[] = [
+
+    procedureExists,
+
+    procedureMissing,
+
+    procedureDependsEstimatedValue,
+
+    procedureGeneratesPublication,
+
+    procedureGeneratesDeadlines
+
 ];
+
+/**
+ * Registro automático.
+ */
+
+export function registerProcedureRules(
+    engine: {
+        register(
+            rule: RuleDefinition
+        ): void;
+    }
+): void {
+
+    for (const rule of ProcedureRules) {
+
+        engine.register(rule);
+
+    }
+
+}
