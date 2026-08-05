@@ -1,0 +1,99 @@
+id: solvencia
+
+nombre: Solvencia del contratista
+
+version: 1.0
+
+descripcion: >
+  Catálogo maestro de reglas relativas a la solvencia económica,
+  financiera y técnica de los licitadores conforme a la LCSP.
+
+elementos:
+
+  - id: sin_solvencia
+
+    nombre: No procede exigir solvencia
+
+    categoria: solvencia
+
+    normativa:
+
+      - LCSP
+      - articulo: 159.6
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - abierto_simplificado_abreviado
+
+    requiere:
+
+      economica: false
+
+      financiera: false
+
+      tecnica: false
+
+    estado: activo
+
+  - id: solvencia_general
+
+    nombre: Solvencia ordinaria
+
+    categoria: solvencia
+
+    normativa:
+
+      - LCSP
+      - articulos:
+
+          - 74
+          - 75
+          - 76
+          - 87
+          - 88
+          - 89
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - abierto
+
+        - abierto_simplificado
+
+    requiere:
+
+      economica: true
+
+      financiera: true
+
+      tecnica: true
+
+    admite_clasificacion_sustitutiva: true
+
+    estado: activo
+
+  - id: clasificacion_obras
+
+    nombre: Clasificación obligatoria
+
+    categoria: clasificacion
+
+    normativa:
+
+      - LCSP
+      - articulo: 77
+
+    aplica_cuando:
+
+      tipo_contrato:
+
+        - obras
+
+    requiere:
+
+      clasificacion: true
+
+    estado: activo
