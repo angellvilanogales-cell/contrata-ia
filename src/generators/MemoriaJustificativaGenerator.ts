@@ -1,29 +1,30 @@
 /**
  * ============================================================
- * CONTRATA IA
+ * CONTRATA-IA
+ * ------------------------------------------------------------
  * MemoriaJustificativaGenerator
- * ============================================================
+ * ------------------------------------------------------------
+ * ADAPTADOR DE COMPATIBILIDAD
  *
- * Generador de la Memoria Justificativa del expediente.
+ * Mantiene la API antigua mientras delega toda la generación
+ * documental en la nueva arquitectura.
  *
- * La salida generada será posteriormente utilizada
- * para crear:
- *
- *  - DOCX
- *  - PDF
- *  - HTML
+ * ESTE ARCHIVO DESAPARECERÁ CUANDO SE ELIMINE LA CARPETA
+ * src/generators
  *
  * ============================================================
  */
 
-import { BaseDocumentGenerator } from "./BaseDocumentGenerator";
-
 import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
 
-export class MemoriaJustificativaGenerator extends BaseDocumentGenerator {
+import { MemoryGenerator } from "../domain/documental/generators/MemoryGenerator";
+
+import { DocumentContext } from "../domain/documental/DocumentContext";
+
+export class MemoriaJustificativaGenerator {
 
     /**
-     * Genera la memoria justificativa.
+     * Mantiene compatibilidad con el código antiguo.
      */
     public async generar(
 
@@ -31,105 +32,23 @@ export class MemoriaJustificativaGenerator extends BaseDocumentGenerator {
 
     ): Promise<string> {
 
-        const plantilla = `
+        const documentContext =
 
-# MEMORIA JUSTIFICATIVA
+            new DocumentContext(
 
-## 1. Objeto del contrato
+                contexto
 
-{{OBJETO}}
+            );
 
-## 2. Necesidad administrativa
+        const generator =
 
-{{NECESIDAD}}
+            new MemoryGenerator(
 
-## 3. Insuficiencia de medios
+                documentContext
 
-{{INSUFICIENCIA}}
+            );
 
-## 4. Tipo de contrato
-
-{{TIPO_CONTRATO}}
-
-## 5. Código CPV
-
-{{CPV}}
-
-## 6. Valor estimado
-
-{{VALOR}}
-
-## 7. Procedimiento de adjudicación
-
-{{PROCEDIMIENTO}}
-
-## 8. Solvencia
-
-{{SOLVENCIA}}
-
-## 9. Publicidad
-
-{{PUBLICIDAD}}
-
-## 10. Duración
-
-{{DURACION}}
-
-`;
-
-        return this.limpiar(
-
-            this.reemplazarVariables(
-
-                plantilla,
-
-                {
-
-                    OBJETO:
-
-                        contexto.objeto,
-
-                    NECESIDAD:
-
-                        contexto.descripcion,
-
-                    INSUFICIENCIA:
-
-                        contexto.observaciones.join("\n"),
-
-                    TIPO_CONTRATO:
-
-                        contexto.tipoContrato,
-
-                    CPV:
-
-                        contexto.cpvPrincipal?.codigo ?? "",
-
-                    VALOR:
-
-                        contexto.valorEstimado,
-
-                    PROCEDIMIENTO:
-
-                        contexto.procedimiento ?? "",
-
-                    SOLVENCIA:
-
-                        contexto.solvencia ?? "",
-
-                    PUBLICIDAD:
-
-                        contexto.publicidad ?? "",
-
-                    DURACION:
-
-                        contexto.duracionMeses
-
-                }
-
-            )
-
-        );
+        return generator.generate();
 
     }
 
