@@ -1,401 +1,151 @@
 /**
  * ============================================================
- * CONTRATA-IA
- * ------------------------------------------------------------
+ * CONTRATA IA
  * BaseDocumentGenerator
- * ------------------------------------------------------------
- * Clase base de todos los generadores documentales.
+ * ============================================================
  *
- * Todos los documentos (Memoria, PCAP, PPT,
- * Resoluciones, Informes...)
- * heredarán de esta clase.
+ * Clase base para todos los generadores documentales.
+ *
+ * Esta versión mantiene la compatibilidad con el proyecto
+ * actual y prepara la futura refactorización.
  *
  * ============================================================
  */
 
-import { DocumentContext } from "./DocumentContext";
-
-import {
-
-    DocumentResult,
-    DocumentSection,
-    DocumentMetadata,
-    DocumentReference,
-    DocumentWarning
-
-} from "./DocumentResult";
+import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
 
 export abstract class BaseDocumentGenerator {
 
-    protected readonly context: DocumentContext;
-
-    protected readonly sections: DocumentSection[] = [];
-
-    protected readonly references: DocumentReference[] = [];
-
-    protected readonly warnings: DocumentWarning[] = [];
-
-    constructor(
-
-        context: DocumentContext
-
-    ) {
-
-        this.context = context;
-
-    }
-
     /**
-     * =====================================================
-     * Método principal.
-     * =====================================================
+     * Punto de entrada único.
      */
+    public async generar(
 
-    public generate(): DocumentResult {
+        contexto: ExpedienteContext
 
-        this.beforeGenerate();
+    ): Promise<string> {
 
-        this.build();
+        this.validar(contexto);
 
-        this.afterGenerate();
+        await this.preparar(contexto);
 
-        return this.buildResult();
+        const resultado = await this.generarDocumento(contexto);
 
-    }
+        return await this.finalizar(
 
-    /**
-     * =====================================================
-     * Implementación específica.
-     * =====================================================
-     */
+            resultado,
 
-    protected abstract build(): void;
-
-    /**
-     * =====================================================
-     * Hooks.
-     * =====================================================
-     */
-
-    protected beforeGenerate(): void {}
-
-    protected afterGenerate(): void {}
-
-    /**
-     * =====================================================
-     * Añadir sección.
-     * =====================================================
-     */
-
-    protected addSection(
-
-        id: string,
-
-        title: string,
-
-        content: string,
-
-        editable = true
-
-    ): void {
-
-        this.sections.push({
-
-            id,
-
-            title,
-
-            order: this.sections.length + 1,
-
-            content,
-
-            editable
-
-        });
-
-    }
-
-    /**
-     * =====================================================
-     * Añadir referencia normativa.
-     * =====================================================
-     */
-
-    protected addReference(
-
-        source: string,
-
-        citation: string,
-
-        article?: string
-
-    ): void {
-
-        this.references.push({
-
-            source,
-
-            citation,
-
-            article
-
-        });
-
-    }
-
-    /**
-     * =====================================================
-     * Añadir advertencia.
-     * =====================================================
-     */
-
-    protected addWarning(
-
-        severity:
-
-            "INFO"
-
-            | "WARNING"
-
-            | "ERROR",
-
-        message: string
-
-    ): void {
-
-        this.warnings.push({
-
-            severity,
-
-            message
-
-        });
-
-    }
-
-    /**
-     * =====================================================
-     * Construcción resultado.
-     * =====================================================
-     */
-
-    protected buildResult(): DocumentResult {
-
-        const metadata: DocumentMetadata = {
-
-            id:
-
-                this.generateId(),
-
-            documentType:
-
-                this.constructor.name,
-
-            title:
-
-                this.getDocumentTitle(),
-
-            version:
-
-                this.context.version,
-
-            language:
-
-                this.context.language,
-
-            generatedAt:
-
-                this.context.generatedAt,
-
-            generatedBy:
-
-                "CONTRATA-IA"
-
-        };
-
-        return {
-
-            metadata,
-
-            sections:
-
-                [...this.sections],
-
-            fullText:
-
-                this.buildFullText(),
-
-            references:
-
-                [...this.references],
-
-            warnings:
-
-                [...this.warnings],
-
-            valid:
-
-                this.isValid()
-
-        };
-
-    }
-
-    /**
-     * =====================================================
-     * Ensamblado del documento.
-     * =====================================================
-     */
-
-    protected buildFullText(): string {
-
-        return this.sections
-
-            .sort(
-
-                (a,b)=>a.order-b.order
-
-            )
-
-            .map(
-
-                section=>
-
-`# ${section.title}
-
-${section.content}
-
-`
-
-            )
-
-            .join("\n");
-
-    }
-
-    /**
-     * =====================================================
-     * Validez documental.
-     * =====================================================
-     */
-
-    protected isValid(): boolean {
-
-        return !this.warnings.some(
-
-            w=>w.severity==="ERROR"
+            contexto
 
         );
 
     }
 
     /**
-     * =====================================================
-     * Generación identificador.
-     * =====================================================
+     * Preparación opcional.
      */
+    protected async preparar(
 
-    protected generateId(): string {
+        _contexto: ExpedienteContext
 
-        return [
+    ): Promise<void> {
 
-            this.constructor.name,
-
-            Date.now(),
-
-            Math.floor(
-
-                Math.random()*100000
-
-            )
-
-        ].join("-");
+        // Vacío por defecto.
 
     }
 
     /**
-     * =====================================================
-     * Título documento.
-     * =====================================================
+     * Validación común.
      */
+    protected validar(
 
-    protected getDocumentTitle(): string {
+        contexto: ExpedienteContext
 
-        return this.constructor.name
+    ): void {
 
-            .replace(
+        if (!contexto) {
 
-                "Generator",
+            throw new Error(
 
-                ""
+                "ExpedienteContext no definido."
 
             );
 
+        }
+
+    }
+
+    /**
+     * Implementación específica.
+     */
+    protected abstract generarDocumento(
+
+        contexto: ExpedienteContext
+
+    ): Promise<string>;
+
+    /**
+     * Posprocesado.
+     */
+    protected async finalizar(
+
+        resultado: string,
+
+        _contexto: ExpedienteContext
+
+    ): Promise<string> {
+
+        return resultado;
+
     }
 
     /**
      * =====================================================
-     * Utilidades comunes
+     * Compatibilidad con la arquitectura actual.
      * =====================================================
      */
 
-    protected paragraph(
+    protected reemplazarVariables(
 
-        text:string
+        plantilla: string,
 
-    ):string{
+        variables: Record<string, unknown>
 
-        return `${text}
+    ): string {
 
-`;
+        let resultado = plantilla;
 
-    }
+        for (const [clave, valor] of Object.entries(variables)) {
 
-    protected heading(
+            resultado = resultado.replaceAll(
 
-        title:string
+                `{{${clave}}}`,
 
-    ):string{
+                valor?.toString() ?? ""
 
-        return `${title}
+            );
 
-`;
+        }
 
-    }
-
-    protected bulletList(
-
-        values:string[]
-
-    ):string{
-
-        return values
-
-            .map(
-
-                x=>`• ${x}`
-
-            )
-
-            .join("\n");
+        return resultado;
 
     }
 
-    protected table(
+    protected limpiar(
 
-        rows:string[][]
+        texto: string
 
-    ):string{
+    ): string {
 
-        return rows
+        return texto
 
-            .map(
+            .replace(/\{\{.*?\}\}/g, "")
 
-                r=>r.join(" | ")
+            .replace(/[ \t]+\n/g, "\n")
 
-            )
+            .replace(/\n{3,}/g, "\n\n")
 
-            .join("\n");
+            .trim();
 
     }
 
