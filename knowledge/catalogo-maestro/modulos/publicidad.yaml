@@ -1,0 +1,135 @@
+id: publicidad
+
+nombre: Publicidad de la licitación
+
+version: 1.0
+
+descripcion: >
+  Catálogo maestro de reglas sobre publicidad de los procedimientos
+  de contratación conforme a la Ley 9/2017, de Contratos del Sector Público.
+
+elementos:
+
+  - id: sin_publicidad
+
+    nombre: Sin publicidad
+
+    categoria: publicidad
+
+    normativa:
+
+      - LCSP
+      - articulo: 118
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - contrato_menor
+
+    publicar:
+
+      perfil_contratante: false
+
+      plateforme_contratacion: false
+
+      doue: false
+
+      boe: false
+
+      boja: false
+
+    estado: activo
+
+  - id: perfil_contratante
+
+    nombre: Publicación en Perfil de Contratante
+
+    categoria: publicidad
+
+    normativa:
+
+      - LCSP
+      - articulo: 135
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - abierto
+
+        - abierto_simplificado
+
+        - abierto_simplificado_abreviado
+
+    publicar:
+
+      perfil_contratante: true
+
+      plateforme_contratacion: true
+
+      doue: false
+
+      boe: false
+
+      boja: false
+
+    estado: activo
+
+  - id: doue
+
+    nombre: Publicación DOUE
+
+    categoria: publicidad
+
+    normativa:
+
+      - LCSP
+
+      - Directiva 2014/24/UE
+
+    aplica_cuando:
+
+      supera_umbral_europeo: true
+
+    publicar:
+
+      perfil_contratante: true
+
+      plateforme_contratacion: true
+
+      doue: true
+
+      boe: false
+
+      boja: false
+
+    estado: activo
+
+  - id: publicidad_autonomica
+
+    nombre: Publicidad autonómica
+
+    categoria: publicidad
+
+    normativa:
+
+      - Legislación autonómica
+
+    aplica_cuando:
+
+      organo_contratacion:
+
+        - junta_andalucia
+
+    publicar:
+
+      perfil_contratante: true
+
+      plateforme_contratacion: true
+
+      doue: false
+
+      boja: true
+
+    estado: activo
