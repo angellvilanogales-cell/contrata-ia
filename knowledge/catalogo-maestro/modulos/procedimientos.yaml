@@ -1,0 +1,127 @@
+id: procedimientos
+
+nombre: Procedimientos de adjudicación
+
+version: 1.0
+
+descripcion: >
+  Catálogo maestro de procedimientos de adjudicación utilizados por
+  CONTRATA-IA para determinar automáticamente el procedimiento
+  aplicable a cada expediente.
+
+elementos:
+
+  - id: contrato_menor
+
+    nombre: Contrato menor
+
+    categoria: procedimiento
+
+    normativa:
+
+      - LCSP
+      - articulo: 118
+
+    requiere_publicidad: false
+
+    requiere_pliegos: false
+
+    requiere_solvencia: false
+
+    requiere_garantia_definitiva: false
+
+    genera_documentos:
+
+      - memoria
+      - informe_necesidad
+      - resolucion
+      - documento_contable
+
+    estado: activo
+
+  - id: abierto
+
+    nombre: Procedimiento abierto
+
+    categoria: procedimiento
+
+    normativa:
+
+      - LCSP
+      - articulos:
+          - 156
+          - 157
+
+    requiere_publicidad: true
+
+    requiere_pliegos: true
+
+    requiere_solvencia: true
+
+    requiere_garantia_definitiva: true
+
+    genera_documentos:
+
+      - memoria
+      - pcap
+      - ppt
+      - informe_necesidad
+      - anuncio
+      - mesa_contratacion
+
+    estado: activo
+
+  - id: abierto_simplificado
+
+    nombre: Procedimiento abierto simplificado
+
+    categoria: procedimiento
+
+    normativa:
+
+      - LCSP
+      - articulo: 159
+
+    requiere_publicidad: true
+
+    requiere_pliegos: true
+
+    requiere_solvencia: true
+
+    requiere_garantia_definitiva: true
+
+    genera_documentos:
+
+      - memoria
+      - pcap
+      - ppt
+      - anuncio
+
+    estado: activo
+
+  - id: abierto_simplificado_abreviado
+
+    nombre: Procedimiento abierto simplificado abreviado
+
+    categoria: procedimiento
+
+    normativa:
+
+      - LCSP
+      - articulo: 159.6
+
+    requiere_publicidad: true
+
+    requiere_pliegos: true
+
+    requiere_solvencia: false
+
+    requiere_garantia_definitiva: false
+
+    genera_documentos:
+
+      - memoria
+      - pcap
+      - ppt
+
+    estado: activo
