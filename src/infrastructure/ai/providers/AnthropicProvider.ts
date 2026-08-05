@@ -1,84 +1,40 @@
 /******************************************************************************
- * ANTHROPIC PROVIDER
+ * AnthropicProvider
  *
- * Adaptador para Anthropic Claude.
+ * Implementación del proveedor Claude (Anthropic).
  ******************************************************************************/
 
 import {
     AIProvider,
-    AIRequest,
-    AIResponse,
-    AIProviderMetadata
+    AIProviderRequest,
+    AIProviderResponse
 } from "../AIProvider";
 
 export class AnthropicProvider implements AIProvider {
 
-    public readonly metadata: AIProviderMetadata = {
+    public readonly id = "anthropic";
 
-        id: "anthropic",
+    public readonly name = "Anthropic Claude";
 
-        name: "Anthropic Claude",
-
-        version: "1.0.0",
-
-        supportsStreaming: true,
-
-        supportsJsonMode: true,
-
-        supportsTools: true
-    };
-
-    private readonly apiKey: string;
-
-    private readonly model: string;
-
-    private readonly endpoint =
-        "https://api.anthropic.com/v1/messages";
+    public readonly supportsStreaming = true;
 
     constructor(
 
-        apiKey: string,
+        private readonly apiKey: string,
 
-        model = "claude-sonnet-4"
+        private readonly model: string = "claude-sonnet-4"
 
-    ) {
-
-        this.apiKey = apiKey;
-
-        this.model = model;
-
-    }
+    ) {}
 
     public async generate(
 
-        request: AIRequest
+        request: AIProviderRequest
 
-    ): Promise<AIResponse> {
-
-        const body = {
-
-            model: this.model,
-
-            max_tokens: request.maxTokens ?? 4096,
-
-            temperature: request.temperature ?? 0,
-
-            messages: [
-
-                {
-
-                    role: "user",
-
-                    content: request.prompt
-
-                }
-
-            ]
-        };
+    ): Promise<AIProviderResponse> {
 
         const response = await fetch(
 
-            this.endpoint,
+            "https://api.anthropic.com/v1/messages",
 
             {
 
@@ -94,7 +50,29 @@ export class AnthropicProvider implements AIProvider {
 
                 },
 
-                body: JSON.stringify(body)
+                body: JSON.stringify({
+
+                    model: this.model,
+
+                    max_tokens: request.maxTokens ?? 4096,
+
+                    temperature: request.temperature ?? 0.2,
+
+                    system: request.systemPrompt,
+
+                    messages: [
+
+                        {
+
+                            role: "user",
+
+                            content: request.prompt
+
+                        }
+
+                    ]
+
+                })
 
             }
 
@@ -110,13 +88,11 @@ export class AnthropicProvider implements AIProvider {
 
         }
 
-        const json: any =
-
-            await response.json();
+        const json = await response.json();
 
         return {
 
-            provider: "anthropic",
+            provider: this.id,
 
             model: this.model,
 
@@ -124,20 +100,45 @@ export class AnthropicProvider implements AIProvider {
 
                 json.content?.[0]?.text ?? "",
 
-            raw: json,
+            inputTokens:
 
-            usage: {
+                json.usage?.input_tokens ?? 0,
 
-                promptTokens:
+            outputTokens:
 
-                    json.usage?.input_tokens ?? 0,
+                json.usage?.output_tokens ?? 0,
 
-                completionTokens:
+            finishReason:
 
-                    json.usage?.output_tokens ?? 0
+                json.stop_reason ?? "stop",
 
-            }
+            raw: json
+
         };
+
+    }
+
+    public async healthCheck(): Promise<boolean> {
+
+        try {
+
+            await this.generate({
+
+                prompt: "Ping",
+
+                maxTokens: 5
+
+            });
+
+            return true;
+
+        }
+
+        catch {
+
+            return false;
+
+        }
 
     }
 
