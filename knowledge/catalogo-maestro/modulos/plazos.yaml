@@ -1,0 +1,127 @@
+id: plazos
+
+nombre: Plazos de contratación
+
+version: 1.0
+
+descripcion: >
+  Catálogo maestro de reglas sobre los plazos mínimos
+  de los procedimientos de contratación conforme a la
+  Ley 9/2017 de Contratos del Sector Público.
+
+elementos:
+
+  - id: contrato_menor
+
+    nombre: Contrato menor
+
+    categoria: plazo
+
+    normativa:
+
+      - LCSP
+      - articulo: 118
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - contrato_menor
+
+    plazo_presentacion_ofertas: 0
+
+    plazo_subsanacion: 0
+
+    plazo_adjudicacion: 0
+
+    plazo_formalizacion: 0
+
+    estado: activo
+
+  - id: abierto
+
+    nombre: Procedimiento abierto
+
+    categoria: plazo
+
+    normativa:
+
+      - LCSP
+      - articulo: 156
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - abierto
+
+    plazo_presentacion_ofertas_dias: 35
+
+    admite_reduccion: true
+
+    estado: activo
+
+  - id: abierto_simplificado
+
+    nombre: Procedimiento abierto simplificado
+
+    categoria: plazo
+
+    normativa:
+
+      - LCSP
+      - articulo: 159
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - abierto_simplificado
+
+    plazo_presentacion_ofertas_dias: 15
+
+    estado: activo
+
+  - id: abierto_simplificado_abreviado
+
+    nombre: Procedimiento abierto simplificado abreviado
+
+    categoria: plazo
+
+    normativa:
+
+      - LCSP
+      - articulo: 159.6
+
+    aplica_cuando:
+
+      procedimiento:
+
+        - abierto_simplificado_abreviado
+
+    plazo_presentacion_ofertas_dias: 10
+
+    estado: activo
+
+  - id: urgente
+
+    nombre: Tramitación urgente
+
+    categoria: reduccion
+
+    normativa:
+
+      - LCSP
+      - articulo: 119
+
+    aplica_cuando:
+
+      tramitacion:
+
+        - urgente
+
+    reduce_plazos: true
+
+    porcentaje_reduccion: 50
+
+    estado: activo
