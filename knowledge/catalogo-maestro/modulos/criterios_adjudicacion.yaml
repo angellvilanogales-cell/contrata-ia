@@ -1,0 +1,148 @@
+id: criterios_adjudicacion
+
+nombre: Criterios de adjudicación
+
+version: 1.0
+
+descripcion: >
+  Reglas maestras para determinar los criterios de adjudicación,
+  su ponderación y las limitaciones establecidas por la LCSP.
+
+criterios:
+
+  - id: precio_unico
+
+    nombre: Precio como único criterio
+
+    categoria: criterio
+
+    normativa:
+
+      - LCSP
+      - articulo: 145
+
+    aplica:
+
+      contratos:
+
+        - suministros
+
+        - servicios_estandarizados
+
+    permitido: true
+
+    requiere_justificacion: true
+
+    observaciones:
+
+      - Debe justificarse que la calidad está suficientemente definida.
+
+  - id: pluralidad_criterios
+
+    nombre: Pluralidad de criterios
+
+    categoria: criterio
+
+    normativa:
+
+      - LCSP
+      - articulo: 145
+
+    aplica:
+
+      contratos:
+
+        - servicios
+
+        - obras
+
+    obligatorio: true
+
+    requiere:
+
+      calidad: true
+
+      precio: true
+
+  - id: servicios_intelectuales
+
+    nombre: Servicios intelectuales
+
+    categoria: criterio
+
+    normativa:
+
+      - LCSP
+      - articulo: 145.4
+
+    aplica:
+
+      naturaleza:
+
+        - intelectual
+
+    precio_unico:
+
+      permitido: false
+
+    obligatorio:
+
+      criterios_cualitativos: true
+
+    observaciones:
+
+      - La calidad debe prevalecer sobre el precio.
+
+  - id: criterios_automaticos
+
+    nombre: Criterios evaluables automáticamente
+
+    categoria: evaluacion
+
+    aplica:
+
+      procedimientos:
+
+        - abierto
+
+        - abierto_simplificado
+
+    permitido: true
+
+  - id: juicio_valor
+
+    nombre: Criterios sujetos a juicio de valor
+
+    categoria: evaluacion
+
+    aplica:
+
+      procedimientos:
+
+        - abierto
+
+        - abierto_simplificado
+
+    permitido: true
+
+    requiere:
+
+      informe_tecnico: true
+
+  - id: formulas
+
+    nombre: Fórmulas de valoración
+
+    categoria: formula
+
+    permitido:
+
+      - proporcional
+
+      - lineal
+
+      - inversa
+
+      - logaritmica
+
+    requiere_justificacion: true
