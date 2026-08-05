@@ -1,0 +1,158 @@
+id: documentos
+
+nombre: Documentación del expediente
+
+version: 1.0
+
+descripcion: >
+  Catálogo maestro de documentos que pueden integrar un expediente
+  de contratación. Determina qué documentos son obligatorios,
+  opcionales o condicionados según el procedimiento, el tipo de
+  contrato y otras circunstancias.
+
+documentos:
+
+  - id: memoria
+
+    nombre: Memoria justificativa
+
+    obligatorio: true
+
+    normativa:
+
+      - LCSP
+
+    aplica:
+
+      procedimientos:
+        - "*"
+
+      tipos_contrato:
+        - "*"
+
+  - id: informe_necesidad
+
+    nombre: Informe de necesidad
+
+    obligatorio: true
+
+    normativa:
+
+      - LCSP
+      - articulo: 28
+
+    aplica:
+
+      procedimientos:
+        - "*"
+
+  - id: pcap
+
+    nombre: Pliego de Cláusulas Administrativas Particulares
+
+    obligatorio: true
+
+    aplica:
+
+      procedimientos:
+
+        - abierto
+
+        - abierto_simplificado
+
+        - abierto_simplificado_abreviado
+
+  - id: ppt
+
+    nombre: Pliego de Prescripciones Técnicas
+
+    obligatorio: true
+
+    aplica:
+
+      procedimientos:
+
+        - abierto
+
+        - abierto_simplificado
+
+        - abierto_simplificado_abreviado
+
+  - id: anuncio
+
+    nombre: Anuncio de licitación
+
+    obligatorio: true
+
+    aplica:
+
+      requiere_publicidad: true
+
+  - id: mesa
+
+    nombre: Actuaciones de la Mesa de Contratación
+
+    obligatorio: false
+
+    aplica:
+
+      procedimiento:
+
+        - abierto
+
+        - abierto_simplificado
+
+  - id: adjudicacion
+
+    nombre: Resolución de adjudicación
+
+    obligatorio: true
+
+    aplica:
+
+      procedimientos:
+
+        - "*"
+
+  - id: formalizacion
+
+    nombre: Documento de formalización
+
+    obligatorio: true
+
+    aplica:
+
+      excepto:
+
+        procedimiento:
+
+          - contrato_menor
+
+  - id: documento_contable
+
+    nombre: Documento contable
+
+    obligatorio: true
+
+    aplica:
+
+      procedimientos:
+
+        - "*"
+
+  - id: responsable_contrato
+
+    nombre: Designación del responsable del contrato
+
+    obligatorio: true
+
+    normativa:
+
+      - LCSP
+      - articulo: 62
+
+    aplica:
+
+      procedimientos:
+
+        - "*"
