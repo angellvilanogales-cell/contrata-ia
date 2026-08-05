@@ -1,0 +1,128 @@
+id: decision_expediente
+
+nombre: Motor de decisión del expediente
+
+version: 1.0
+
+descripcion: >
+  Este módulo determina automáticamente las decisiones
+  principales del expediente utilizando el resto del
+  catálogo maestro.
+
+flujo:
+
+  - paso: identificar_tipo_contrato
+
+    utiliza:
+
+      - objeto
+
+      - cpv
+
+    produce:
+
+      - tipo_contrato
+
+  - paso: determinar_procedimiento
+
+    utiliza:
+
+      - procedimientos
+
+      - valor_estimado
+
+      - tipo_contrato
+
+    produce:
+
+      - procedimiento
+
+  - paso: determinar_publicidad
+
+    utiliza:
+
+      - publicidad
+
+      - procedimiento
+
+      - valor_estimado
+
+    produce:
+
+      - publicidad
+
+  - paso: determinar_plazos
+
+    utiliza:
+
+      - plazos
+
+      - procedimiento
+
+      - tramitacion
+
+    produce:
+
+      - calendario
+
+  - paso: determinar_solvencia
+
+    utiliza:
+
+      - solvencia
+
+      - procedimiento
+
+      - tipo_contrato
+
+      - valor_estimado
+
+    produce:
+
+      - solvencia
+
+  - paso: determinar_documentacion
+
+    utiliza:
+
+      - documentos
+
+      - procedimiento
+
+      - publicidad
+
+      - solvencia
+
+    produce:
+
+      - documentos
+
+  - paso: determinar_criterios
+
+    utiliza:
+
+      - criterios_adjudicacion
+
+      - naturaleza_contrato
+
+    produce:
+
+      - criterios
+
+resultado:
+
+  genera:
+
+    - memoria
+
+    - informe_necesidad
+
+    - pcap
+
+    - ppt
+
+    - anuncio
+
+    - calendario
+
+estado: activo
