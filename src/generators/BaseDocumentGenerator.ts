@@ -1,77 +1,106 @@
 /**
  * ============================================================
- * CONTRATA IA
+ * CONTRATA-IA
+ * ------------------------------------------------------------
  * BaseDocumentGenerator
- * ============================================================
+ * ------------------------------------------------------------
+ * Clase base de todos los generadores documentales.
  *
- * Clase base para todos los generadores documentales.
+ * Su responsabilidad NO es construir documentos.
  *
- * Todos los documentos oficiales heredarán de esta
- * clase.
+ * Su responsabilidad es coordinar el ciclo de generación.
  *
  * ============================================================
  */
 
-import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
+import { DocumentGenerationContext } from "../documentModel/DocumentGenerationContext";
 
 export abstract class BaseDocumentGenerator {
 
     /**
-     * Genera el documento.
+     * =====================================================
+     * Punto único de entrada.
+     * =====================================================
      */
-    public abstract generar(
+    public async generar(
 
-        contexto: ExpedienteContext
+        context: DocumentGenerationContext
 
-    ): Promise<string>;
+    ): Promise<string> {
 
-    /**
-     * Sustituye variables en una plantilla.
-     */
-    protected reemplazarVariables(
+        await this.prepare(context);
 
-        plantilla: string,
+        this.validate(context);
 
-        variables: Record<string, unknown>
+        const result = await this.generateDocument(context);
 
-    ): string {
-
-        let resultado = plantilla;
-
-        for (const [clave, valor] of Object.entries(variables)) {
-
-            resultado = resultado.replaceAll(
-
-                `{{${clave}}}`,
-
-                valor?.toString() ?? ""
-
-            );
-
-        }
-
-        return resultado;
+        return await this.finalize(result, context);
 
     }
 
     /**
-     * Limpia etiquetas vacías.
+     * Preparación previa.
      */
-    protected limpiar(
+    protected async prepare(
 
-        texto: string
+        _context: DocumentGenerationContext
 
-    ): string {
+    ): Promise<void> {
 
-        return texto
+        // Implementación opcional
 
-            .replace(/\{\{.*?\}\}/g, "")
+    }
 
-            .replace(/[ \t]+\n/g, "\n")
+    /**
+     * Validación del contexto.
+     */
+    protected validate(
 
-            .replace(/\n{3,}/g, "\n\n")
+        context: DocumentGenerationContext
 
-            .trim();
+    ): void {
+
+        if (!context) {
+
+            throw new Error("DocumentGenerationContext no definido.");
+
+        }
+
+        if (!context.expediente) {
+
+            throw new Error("Expediente no definido.");
+
+        }
+
+        if (!context.documentType) {
+
+            throw new Error("Tipo documental no definido.");
+
+        }
+
+    }
+
+    /**
+     * Generación específica.
+     */
+    protected abstract generateDocument(
+
+        context: DocumentGenerationContext
+
+    ): Promise<string>;
+
+    /**
+     * Posprocesado.
+     */
+    protected async finalize(
+
+        result: string,
+
+        _context: DocumentGenerationContext
+
+    ): Promise<string> {
+
+        return result;
 
     }
 
