@@ -12,7 +12,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "audit:imports": "node scripts/check-relative-imports.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
