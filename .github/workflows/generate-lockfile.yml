@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout branch
+      - name: Checkout LB-1 branch
         uses: actions/checkout@v4
         with:
           ref: agent/lb1-proyecto-compilable
           fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -32,11 +32,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- package-lock.json; then
+          git add package-lock.json
+
+          if git diff --cached --quiet; then
             echo "No package-lock.json changes detected."
             exit 0
           fi
 
-          git add package-lock.json
           git commit -m "build: generate npm lockfile [skip ci]"
           git push origin agent/lb1-proyecto-compilable
