@@ -1,0 +1,31 @@
+﻿nombre;numero;rutas
+AIProvider.ts;2;src/infrastructure/ai/AIProvider.ts | src/infrastructure/ai/providers/AIProvider.ts
+ArticuloNormativo.ts;2;src/domain/conocimiento/ArticuloNormativo.ts | src/domain/normativa/ArticuloNormativo.ts
+BaseDocumentGenerator.ts;2;src/generators/BaseDocumentGenerator.ts | src/domain/documental/BaseDocumentGenerator.ts
+BaseResolver.ts;2;src/domain/resolvers/BaseResolver.ts | src/domain/legal/framework/BaseResolver.ts
+CPVEngine.ts;2;src/engines/CPVEngine.ts | src/domain/cpv/CPVEngine.ts
+CPVResolver.ts;2;src/domain/resolvers/CPVResolver.ts | src/domain/legal/modules/cpv/CPVResolver.ts
+ContractDecisionEngine.ts;2;src/domain/knowledge/ContractDecisionEngine.ts | src/domain/decision/ContractDecisionEngine.ts
+DecisionContext.ts;2;src/domain/knowledge/DecisionContext.ts | src/domain/legal/core/DecisionContext.ts
+DecisionEngine.ts;3;src/domain/knowledge/DecisionEngine.ts | src/domain/decision/DecisionEngine.ts | src/domain/legal/core/DecisionEngine.ts
+EstadoExpediente.ts;2;src/domain/expediente/EstadoExpediente.ts | src/domain/value-objects/EstadoExpediente.ts
+EventBus.ts;2;src/infrastructure/events/EventBus.ts | src/domain/events/EventBus.ts
+GuaranteeResolver.ts;3;src/domain/resolvers/GuaranteeResolver.ts | src/domain/rules/guarantees/GuaranteeResolver.ts | src/domain/legal/modules/garantias/GuaranteeResolver.ts
+GuaranteeValidator.ts;2;src/domain/rules/guarantees/GuaranteeValidator.ts | src/domain/legal/modules/garantias/GuaranteeValidator.ts
+InferenceEngine.ts;5;src/knowledge/InferenceEngine.ts | src/domain/conocimiento/InferenceEngine.ts | src/domain/legal/core/InferenceEngine.ts | src/domain/legal/reasoner/InferenceEngine.ts | knowledge/inference/InferenceEngine.ts
+KnowledgeEngine.ts;2;src/engines/KnowledgeEngine.ts | src/domain/conocimiento/KnowledgeEngine.ts
+KnowledgeQueryEngine.ts;2;src/domain/conocimiento/KnowledgeQueryEngine.ts | src/domain/knowledge/KnowledgeQueryEngine.ts
+KnowledgeRepository.ts;4;src/repositories/KnowledgeRepository.ts | src/infrastructure/persistence/KnowledgeRepository.ts | src/domain/conocimiento/KnowledgeRepository.ts | src/domain/knowledge/KnowledgeRepository.ts
+LegalReasoner.ts;3;src/domain/legal/LegalReasoner.ts | src/domain/legal/core/LegalReasoner.ts | knowledge/reasoning/LegalReasoner.ts
+MemoriaJustificativaGenerator.ts;2;src/generators/MemoriaJustificativaGenerator.ts | src/application/generation/generators/MemoriaJustificativaGenerator.ts
+ObjetoContrato.ts;2;src/domain/objeto/ObjetoContrato.ts | src/domain/expediente/ObjetoContrato.ts
+PCAPGenerator.ts;2;src/domain/documental/generators/PCAPGenerator.ts | src/application/generation/generators/PCAPGenerator.ts
+PPTGenerator.ts;2;src/domain/documental/generators/PPTGenerator.ts | src/application/generation/generators/PPTGenerator.ts
+ProcedureResolver.ts;2;src/domain/resolvers/ProcedureResolver.ts | src/domain/legal/modules/procedimiento/ProcedureResolver.ts
+QuestionFlowEngine.ts;2;src/domain/knowledge/QuestionFlowEngine.ts | src/application/workflows/QuestionFlowEngine.ts
+ReferenciaNormativa.ts;2;src/domain/conocimiento/ReferenciaNormativa.ts | src/domain/normativa/ReferenciaNormativa.ts
+RuleEngine.ts;5;src/engines/RuleEngine.ts | src/knowledge/RuleEngine.ts | src/domain/conocimiento/RuleEngine.ts | src/domain/knowledge/RuleEngine.ts | src/domain/rules/RuleEngine.ts
+RuleLoader.ts;2;src/domain/conocimiento/RuleLoader.ts | src/domain/legal/core/RuleLoader.ts
+SolvencyResolver.ts;3;src/domain/resolvers/SolvencyResolver.ts | src/domain/rules/solvency/SolvencyResolver.ts | src/domain/legal/modules/solvencia/SolvencyResolver.ts
+SolvencyValidator.ts;2;src/domain/rules/solvency/SolvencyValidator.ts | src/domain/legal/modules/solvencia/SolvencyValidator.ts
+index.ts;14;src/ui/index.ts | src/ui/types/index.ts | src/infrastructure/ai/index.ts | src/domain/rules/solvency/index.ts | src/domain/rules/guarantees/index.ts | src/domain/legal/reasoner/index.ts | src/domain/legal/modules/plazos/index.ts | src/domain/legal/modules/publicidad/index.ts | src/domain/legal/modules/cpv/index.ts | src/domain/legal/modules/garantias/index.ts | src/domain/legal/modules/procedimiento/index.ts | src/domain/legal/modules/solvencia/index.ts | src/application/export/index.ts | src/application/workflow/index.ts

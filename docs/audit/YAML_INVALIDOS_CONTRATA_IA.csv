@@ -1,0 +1,8 @@
+﻿ruta;linea;columna;problema
+knowledge/rule-engine/00-core.rules.yaml;1946;3;could not find expected ':'
+knowledge/rules/extincion.rules.yaml;117;1;expected <block end>, but found '-'
+knowledge/rules/criterios.rules.yaml;76;1;expected <block end>, but found '-'
+knowledge/rules/evaluacion.rules.yaml;204;1;expected <block end>, but found '-'
+knowledge/rules/pliegos.rules.yaml;157;1;expected <block end>, but found '-'
+knowledge/rules/ejecucion.rules.yaml;131;1;expected <block end>, but found '-'
+knowledge/rules/documentos.rules.yaml;181;1;expected <block end>, but found '-'

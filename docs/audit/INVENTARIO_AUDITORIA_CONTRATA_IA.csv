@@ -1,0 +1,536 @@
+﻿ruta;bloque;extension;bytes;lineas;sintaxis_ok;imports_relativos_no_resueltos;marcador_temporal_todo;usa_any
+README.md;Otros;.md;178;3;;0;NO;NO
+knowledge/README.md;Conocimiento normativo y datos;.md;6126;358;;0;SI;NO
+knowledge/VERSION.yaml;Conocimiento normativo y datos;.yaml;1045;53;;0;NO;NO
+knowledge/catalogo-maestro/PATRON-MODULO-CONOCIMIENTO.yaml;Conocimiento normativo y datos;.yaml;37878;2328;;0;SI;NO
+knowledge/catalogo-maestro/README.md;Conocimiento normativo y datos;.md;4886;347;;0;SI;NO
+knowledge/catalogo-maestro/activos/memoria/necesidad.yaml;Conocimiento normativo y datos;.yaml;38471;2322;;0;SI;NO
+knowledge/catalogo-maestro/metadatos/esquema-activo.yaml;Conocimiento normativo y datos;.yaml;3379;238;;0;NO;NO
+knowledge/catalogo-maestro/metadatos/esquema-plantilla.yaml;Conocimiento normativo y datos;.yaml;3790;224;;0;NO;NO
+knowledge/catalogo-maestro/metadatos/esquema-regla.yaml;Conocimiento normativo y datos;.yaml;3368;211;;0;NO;NO
+knowledge/catalogo-maestro/modulos/catalogo-maestro.yaml;Conocimiento normativo y datos;.yaml;28692;1688;;0;SI;NO
+knowledge/catalogo-maestro/modulos/cpv.yaml;Conocimiento normativo y datos;.yaml;54132;3042;;0;SI;NO
+knowledge/catalogo-maestro/modulos/criterios_adjudicacion.yaml;Conocimiento normativo y datos;.yaml;1952;149;;0;NO;NO
+knowledge/catalogo-maestro/modulos/decision_expediente.yaml;Conocimiento normativo y datos;.yaml;1405;129;;0;NO;NO
+knowledge/catalogo-maestro/modulos/documentos.yaml;Conocimiento normativo y datos;.yaml;2097;159;;0;NO;NO
+knowledge/catalogo-maestro/modulos/objeto.yaml;Conocimiento normativo y datos;.yaml;36945;2137;;0;SI;NO
+knowledge/catalogo-maestro/modulos/plazos.yaml;Conocimiento normativo y datos;.yaml;1719;128;;0;NO;NO
+knowledge/catalogo-maestro/modulos/procedimientos.yaml;Conocimiento normativo y datos;.yaml;1903;128;;0;NO;NO
+knowledge/catalogo-maestro/modulos/publicidad.yaml;Conocimiento normativo y datos;.yaml;1763;136;;0;NO;NO
+knowledge/catalogo-maestro/modulos/solvencia.yaml;Conocimiento normativo y datos;.yaml;1292;100;;0;NO;NO
+knowledge/catalogo_expediente.yaml;Conocimiento normativo y datos;.yaml;3264;181;;0;NO;NO
+knowledge/cpv/cpv.json;Conocimiento normativo y datos;.json;4974;246;;0;NO;NO
+knowledge/inference/InferenceEngine.ts;Conocimiento normativo y datos;.ts;152798;8136;NO;10;SI;NO
+knowledge/lcsp/articulos/art099.json;Conocimiento normativo y datos;.json;871;45;;0;NO;NO
+knowledge/lcsp/articulos/art100.json;Conocimiento normativo y datos;.json;1028;49;;0;NO;NO
+knowledge/ontology/ontology-index.yaml;Conocimiento normativo y datos;.yaml;167092;8480;;0;SI;NO
+knowledge/parameters/solvencia.parameters.yaml;Conocimiento normativo y datos;.yaml;52732;3268;;0;NO;NO
+knowledge/reasoning/LegalReasoner.ts;Conocimiento normativo y datos;.ts;108534;5687;NO;3;SI;NO
+knowledge/rule-engine/00-core.rules.yaml;Conocimiento normativo y datos;.yaml;138397;7111;;0;SI;NO
+knowledge/rule-engine/index.yaml;Conocimiento normativo y datos;.yaml;132910;6667;;0;SI;NO
+knowledge/rules/criterios.rules.yaml;Conocimiento normativo y datos;.yaml;118217;7262;;0;SI;NO
+knowledge/rules/documentos.rules.yaml;Conocimiento normativo y datos;.yaml;269407;16282;;0;SI;NO
+knowledge/rules/ejecucion.rules.yaml;Conocimiento normativo y datos;.yaml;136562;8303;;0;SI;NO
+knowledge/rules/evaluacion.rules.yaml;Conocimiento normativo y datos;.yaml;124075;7372;;0;SI;NO
+knowledge/rules/extincion.rules.yaml;Conocimiento normativo y datos;.yaml;129064;7689;;0;SI;NO
+knowledge/rules/objeto.rules.json;Conocimiento normativo y datos;.json;1719;68;;0;NO;NO
+knowledge/rules/pliegos.rules.yaml;Conocimiento normativo y datos;.yaml;216077;12962;;0;SI;NO
+knowledge/rules/procedimiento.rules.json;Conocimiento normativo y datos;.json;1173;50;;0;NO;NO
+knowledge/rules/procedimiento.rules.yaml;Conocimiento normativo y datos;.yaml;61697;3585;;0;NO;NO
+knowledge/rules/publicidad.rules.json;Conocimiento normativo y datos;.json;1648;67;;0;NO;NO
+knowledge/rules/solvencia.rules.json;Conocimiento normativo y datos;.json;1402;62;;0;NO;NO
+knowledge/rules/solvencia.rules.yaml;Conocimiento normativo y datos;.yaml;71166;4075;;0;SI;NO
+knowledge/snippets/README.md;Conocimiento normativo y datos;.md;1265;112;;0;NO;NO
+knowledge/snippets/insuficiencia_medios/insuficiencia_general.md;Conocimiento normativo y datos;.md;600;6;;0;NO;NO
+knowledge/snippets/insuficiencia_medios.yaml;Conocimiento normativo y datos;.yaml;6587;286;;0;SI;NO
+knowledge/snippets/necesidad/necesidad_general.md;Conocimiento normativo y datos;.md;823;8;;0;NO;NO
+knowledge/snippets/necesidad.yaml;Conocimiento normativo y datos;.yaml;4524;237;;0;SI;NO
+knowledge/templates/README.md;Conocimiento normativo y datos;.md;1412;114;;0;SI;NO
+src/application/ExpedienteBuilder.ts;Integración de aplicación;.ts;2612;142;SI;0;NO;SI
+src/application/documents/DocumentGenerator.ts;Motor documental y generación;.ts;88352;6415;NO;1;SI;NO
+src/application/export/DOCXExporter.ts;Exportación;.ts;2082;134;SI;0;SI;SI
+src/application/export/DocumentExporter.ts;Exportación;.ts;2205;162;SI;0;SI;NO
+src/application/export/ExportConfiguration.ts;Exportación;.ts;2389;180;SI;0;NO;NO
+src/application/export/ExportDiagnostics.ts;Exportación;.ts;2221;139;SI;0;NO;NO
+src/application/export/ExportFactory.ts;Exportación;.ts;1428;77;SI;0;NO;NO
+src/application/export/ExportHistory.ts;Exportación;.ts;3586;233;SI;0;NO;NO
+src/application/export/ExportIntegrityVerifier.ts;Exportación;.ts;2627;163;SI;0;NO;NO
+src/application/export/ExportManager.ts;Exportación;.ts;2751;174;SI;0;NO;NO
+src/application/export/ExportManifestGenerator.ts;Exportación;.ts;3958;262;SI;0;NO;NO
+src/application/export/ExportModule.ts;Exportación;.ts;3304;160;SI;0;NO;NO
+src/application/export/ExportPackageGenerator.ts;Exportación;.ts;2787;187;SI;0;NO;NO
+src/application/export/ExportPipeline.ts;Exportación;.ts;3455;229;SI;0;NO;NO
+src/application/export/ExportProgressTracker.ts;Exportación;.ts;3240;194;SI;0;NO;NO
+src/application/export/ExportQueue.ts;Exportación;.ts;2752;196;SI;0;NO;NO
+src/application/export/ExportReportGenerator.ts;Exportación;.ts;2892;197;SI;0;NO;NO
+src/application/export/ExportScheduler.ts;Exportación;.ts;2445;153;SI;0;NO;NO
+src/application/export/ExportService.ts;Exportación;.ts;2410;143;SI;0;SI;NO
+src/application/export/ExportSession.ts;Exportación;.ts;3845;256;SI;0;NO;NO
+src/application/export/ExportStatistics.ts;Exportación;.ts;3608;249;SI;0;NO;NO
+src/application/export/ExportTemplateEngine.ts;Exportación;.ts;3215;211;SI;0;SI;NO
+src/application/export/ExportValidator.ts;Exportación;.ts;2901;192;SI;0;NO;NO
+src/application/export/HTMLExporter.ts;Exportación;.ts;2245;166;SI;0;NO;SI
+src/application/export/JSONExporter.ts;Exportación;.ts;1845;124;SI;0;NO;SI
+src/application/export/MarkdownExporter.ts;Exportación;.ts;1925;127;SI;0;NO;SI
+src/application/export/PDFExporter.ts;Exportación;.ts;2002;131;SI;0;SI;SI
+src/application/export/XMLExporter.ts;Exportación;.ts;3299;218;SI;0;NO;SI
+src/application/export/ZIPExporter.ts;Exportación;.ts;3207;217;SI;0;SI;NO
+src/application/export/index.ts;Exportación;.ts;1236;62;SI;0;NO;NO
+src/application/generation/DocumentGenerationPipeline.ts;Motor documental y generación;.ts;2614;163;SI;0;SI;NO
+src/application/generation/ExpedienteGenerator.ts;Motor documental y generación;.ts;2794;181;SI;0;NO;SI
+src/application/generation/GenerationContext.ts;Motor documental y generación;.ts;3836;256;SI;0;NO;NO
+src/application/generation/GenerationCoordinator.ts;Motor documental y generación;.ts;2166;116;SI;0;NO;SI
+src/application/generation/GenerationPipeline.ts;Motor documental y generación;.ts;2623;166;SI;0;NO;NO
+src/application/generation/GenerationStepFactory.ts;Motor documental y generación;.ts;2872;167;SI;0;NO;NO
+src/application/generation/generators/CriteriosAdjudicacionGenerator.ts;Motor documental y generación;.ts;3165;171;SI;0;NO;SI
+src/application/generation/generators/InformeInsuficienciaMediosGenerator.ts;Motor documental y generación;.ts;2906;131;SI;0;NO;SI
+src/application/generation/generators/InformeNecesidadGenerator.ts;Motor documental y generación;.ts;2729;134;SI;0;NO;SI
+src/application/generation/generators/InformeProcedimientoGenerator.ts;Motor documental y generación;.ts;3563;151;SI;0;NO;SI
+src/application/generation/generators/MemoriaJustificativaGenerator.ts;Motor documental y generación;.ts;2389;120;SI;0;NO;SI
+src/application/generation/generators/PCAPGenerator.ts;Motor documental y generación;.ts;3369;174;SI;0;NO;SI
+src/application/generation/generators/PPTGenerator.ts;Motor documental y generación;.ts;2877;149;SI;0;NO;SI
+src/application/generation/generators/ResolucionInicioGenerator.ts;Motor documental y generación;.ts;3201;139;SI;0;NO;SI
+src/application/integration/ApplicationKernel.ts;Integración de aplicación;.ts;2949;149;SI;1;SI;NO
+src/application/integration/WorkflowOrchestrator.ts;Integración de aplicación;.ts;3701;201;SI;1;SI;SI
+src/application/modules/contract-generator/ContractContext.ts;Integración de aplicación;.ts;72172;3500;NO;4;SI;NO
+src/application/modules/contract-generator/ContractGenerator.ts;Integración de aplicación;.ts;74077;4693;SI;8;SI;SI
+src/application/modules/contract-generator/GenerationResult.ts;Integración de aplicación;.ts;54334;2740;NO;2;SI;NO
+src/application/workflow/WorkflowBootstrap.ts;Workflow;.ts;2975;122;SI;0;SI;SI
+src/application/workflow/WorkflowContext.ts;Workflow;.ts;1972;84;SI;1;SI;NO
+src/application/workflow/WorkflowEngine.ts;Workflow;.ts;1374;75;SI;0;NO;NO
+src/application/workflow/WorkflowEvent.ts;Workflow;.ts;2446;119;SI;0;NO;NO
+src/application/workflow/WorkflowExecutor.ts;Workflow;.ts;1327;70;SI;0;NO;NO
+src/application/workflow/WorkflowHistory.ts;Workflow;.ts;793;41;SI;0;NO;NO
+src/application/workflow/WorkflowResult.ts;Workflow;.ts;1066;57;SI;0;NO;NO
+src/application/workflow/WorkflowState.ts;Workflow;.ts;1776;95;SI;0;SI;NO
+src/application/workflow/WorkflowStep.ts;Workflow;.ts;1067;58;SI;0;NO;NO
+src/application/workflow/WorkflowTrace.ts;Workflow;.ts;1333;89;SI;0;NO;NO
+src/application/workflow/WorkflowTransition.ts;Workflow;.ts;3820;174;SI;0;NO;NO
+src/application/workflow/WorkflowValidator.ts;Workflow;.ts;1380;80;SI;0;NO;NO
+src/application/workflow/index.ts;Workflow;.ts;380;12;SI;0;NO;NO
+src/application/workflows/QuestionFlowEngine.ts;Workflow;.ts;11820;637;NO;1;SI;NO
+src/bootstrap/ArchitectureBootstrap.ts;Arquitectura transversal/legacy;.ts;14504;763;NO;0;SI;NO
+src/bootstrap/KnowledgeBootstrap.ts;Arquitectura transversal/legacy;.ts;3191;173;SI;0;SI;SI
+src/documental/generators/MemoryComposer.ts;Motor documental y generación;.ts;995;41;SI;1;NO;NO
+src/domain/clauses/ClauseGeneratorEngine.ts;Motor documental y generación;.ts;43555;2203;NO;2;SI;NO
+src/domain/conocimiento/ArticuloNormativo.ts;Motores jurídicos, reglas y CPV;.ts;1297;77;SI;0;NO;NO
+src/domain/conocimiento/BaseConocimiento.ts;Motores jurídicos, reglas y CPV;.ts;666;30;SI;0;NO;NO
+src/domain/conocimiento/CandidatoCPV.ts;Motores jurídicos, reglas y CPV;.ts;2231;102;SI;0;NO;NO
+src/domain/conocimiento/CatalogoNormativo.ts;Motores jurídicos, reglas y CPV;.ts;2241;122;SI;0;SI;NO
+src/domain/conocimiento/DecisionJuridica.ts;Motores jurídicos, reglas y CPV;.ts;1199;64;SI;0;NO;NO
+src/domain/conocimiento/ExpressionEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;3327;218;SI;0;NO;SI
+src/domain/conocimiento/FuenteJuridica.ts;Motores jurídicos, reglas y CPV;.ts;1266;79;SI;0;NO;NO
+src/domain/conocimiento/InferenceEngine.ts;Motores jurídicos, reglas y CPV;.ts;2252;135;SI;0;NO;NO
+src/domain/conocimiento/KnowledgeCategory.ts;Motores jurídicos, reglas y CPV;.ts;918;54;SI;0;NO;NO
+src/domain/conocimiento/KnowledgeEngine.ts;Motores jurídicos, reglas y CPV;.ts;79637;5753;NO;0;SI;NO
+src/domain/conocimiento/KnowledgeLoader.ts;Motores jurídicos, reglas y CPV;.ts;1724;109;SI;0;SI;NO
+src/domain/conocimiento/KnowledgeManager.ts;Motores jurídicos, reglas y CPV;.ts;2839;137;SI;0;SI;NO
+src/domain/conocimiento/KnowledgeQueryEngine.ts;Motores jurídicos, reglas y CPV;.ts;2648;184;SI;0;SI;SI
+src/domain/conocimiento/KnowledgeRepository.ts;Motores jurídicos, reglas y CPV;.ts;4930;302;SI;0;SI;SI
+src/domain/conocimiento/PlanDocumentalEngine.ts;Motores jurídicos, reglas y CPV;.ts;2762;182;SI;0;NO;NO
+src/domain/conocimiento/ReferenciaNormativa.ts;Motores jurídicos, reglas y CPV;.ts;1784;94;SI;0;NO;NO
+src/domain/conocimiento/ReglaJuridica.ts;Motores jurídicos, reglas y CPV;.ts;2082;123;SI;0;NO;NO
+src/domain/conocimiento/RepositorioCPV.ts;Motores jurídicos, reglas y CPV;.ts;1914;92;SI;0;NO;NO
+src/domain/conocimiento/RepositorioClausulas.ts;Motores jurídicos, reglas y CPV;.ts;395;18;SI;0;NO;NO
+src/domain/conocimiento/RepositorioInformes.ts;Motores jurídicos, reglas y CPV;.ts;305;15;SI;0;NO;NO
+src/domain/conocimiento/RepositorioNormativo.ts;Motores jurídicos, reglas y CPV;.ts;1937;100;SI;0;SI;NO
+src/domain/conocimiento/RepositorioPlantillas.ts;Motores jurídicos, reglas y CPV;.ts;392;18;SI;0;NO;NO
+src/domain/conocimiento/RepositorioReglas.ts;Motores jurídicos, reglas y CPV;.ts;321;15;SI;0;NO;NO
+src/domain/conocimiento/ResultadoBusquedaCPV.ts;Motores jurídicos, reglas y CPV;.ts;1098;57;SI;0;NO;NO
+src/domain/conocimiento/ResultadoMotor.ts;Motores jurídicos, reglas y CPV;.ts;1211;62;SI;0;SI;NO
+src/domain/conocimiento/RuleEngine.ts;Motores jurídicos, reglas y CPV;.ts;2218;137;SI;0;NO;NO
+src/domain/conocimiento/RuleLoader.ts;Motores jurídicos, reglas y CPV;.ts;1176;67;SI;0;NO;NO
+src/domain/container/DependencyContainer.ts;Arquitectura transversal/legacy;.ts;16483;979;NO;0;SI;SI
+src/domain/cpv/CPVEngine.ts;Motores jurídicos, reglas y CPV;.ts;105820;7268;NO;0;NO;NO
+src/domain/cpv/CPVEntry.ts;Motores jurídicos, reglas y CPV;.ts;1073;65;SI;0;NO;NO
+src/domain/cpv/CPVMatcher.ts;Motores jurídicos, reglas y CPV;.ts;2707;184;SI;0;NO;NO
+src/domain/cpv/CPVRepository.ts;Motores jurídicos, reglas y CPV;.ts;2903;196;SI;0;SI;NO
+src/domain/decision/ContractDecisionEngine.ts;Dominio y expediente;.ts;21337;1372;SI;1;SI;SI
+src/domain/decision/DecisionEngine.ts;Dominio y expediente;.ts;3716;209;SI;0;NO;NO
+src/domain/decisiones/DecisionAdministrativa.ts;Dominio y expediente;.ts;1064;58;SI;0;NO;NO
+src/domain/decisiones/DecisionMotivada.ts;Dominio y expediente;.ts;547;24;SI;0;NO;NO
+src/domain/decisiones/EstadoDecision.ts;Dominio y expediente;.ts;254;19;SI;0;SI;NO
+src/domain/decisiones/MotivacionJuridica.ts;Dominio y expediente;.ts;697;32;SI;0;NO;NO
+src/domain/diagnostics/DiagnosticsCenter.ts;Arquitectura transversal/legacy;.ts;16697;1051;NO;0;SI;NO
+src/domain/document-composer/types.ts;Motor documental y generación;.ts;47427;3388;SI;7;SI;NO
+src/domain/documentModel/DocumentDefinition.ts;Motor documental y generación;.ts;1653;107;SI;0;NO;NO
+src/domain/documentModel/DocumentGenerationContext.ts;Motor documental y generación;.ts;867;35;SI;0;SI;NO
+src/domain/documentModel/DocumentModelEngine.ts;Motor documental y generación;.ts;2906;149;SI;0;SI;NO
+src/domain/documentModel/DocumentRegistry.ts;Motor documental y generación;.ts;2728;151;SI;0;SI;NO
+src/domain/documentModel/DocumentType.ts;Motor documental y generación;.ts;2949;133;SI;0;SI;NO
+src/domain/documentModel/SectionDefinition.ts;Motor documental y generación;.ts;1716;131;SI;0;NO;NO
+src/domain/documentModel/definitions/MemoryDefinition.ts;Motor documental y generación;.ts;9071;581;SI;0;NO;NO
+src/domain/documental/BaseDocumentGenerator.ts;Motor documental y generación;.ts;2545;153;SI;1;SI;NO
+src/domain/documental/ClauseBuilder.ts;Motor documental y generación;.ts;6077;378;SI;0;NO;NO
+src/domain/documental/DocumentAssembler.ts;Motor documental y generación;.ts;5033;272;NO;5;NO;NO
+src/domain/documental/DocumentContext.ts;Motor documental y generación;.ts;1729;119;SI;10;SI;NO
+src/domain/documental/DocumentResult.ts;Motor documental y generación;.ts;1574;108;SI;0;SI;NO
+src/domain/documental/LegalCitationBuilder.ts;Motor documental y generación;.ts;6005;360;SI;0;SI;NO
+src/domain/documental/ParagraphBuilder.ts;Motor documental y generación;.ts;5347;321;SI;0;NO;NO
+src/domain/documental/SectionBuilder.ts;Motor documental y generación;.ts;5143;309;SI;0;SI;NO
+src/domain/documental/TemplateEngine.ts;Motor documental y generación;.ts;5113;344;SI;0;NO;NO
+src/domain/documental/generators/MemoryGenerator.ts;Motor documental y generación;.ts;11844;639;SI;0;SI;NO
+src/domain/documental/generators/NeedReportGenerator.ts;Motor documental y generación;.ts;5468;267;SI;0;SI;NO
+src/domain/documental/generators/PCAPGenerator.ts;Motor documental y generación;.ts;21487;1149;SI;0;SI;NO
+src/domain/documental/generators/PPTGenerator.ts;Motor documental y generación;.ts;16259;788;SI;0;SI;NO
+src/domain/documentos/InformeInsuficienciaMedios.ts;Motor documental y generación;.ts;604;28;SI;0;NO;NO
+src/domain/documentos/InformeProcedimiento.ts;Motor documental y generación;.ts;586;27;SI;0;NO;NO
+src/domain/documentos/InformeSolvencia.ts;Motor documental y generación;.ts;397;23;SI;0;NO;NO
+src/domain/documentos/MemoriaInsuficienciaMedios.ts;Motor documental y generación;.ts;467;25;SI;0;NO;NO
+src/domain/documentos/MemoriaJustificativa.ts;Motor documental y generación;.ts;773;35;SI;0;NO;NO
+src/domain/documentos/MemoriaNecesidad.ts;Motor documental y generación;.ts;508;27;SI;0;NO;NO
+src/domain/documentos/PropuestaDivisionLotes.ts;Motor documental y generación;.ts;539;29;SI;0;NO;NO
+src/domain/events/EventBus.ts;Arquitectura transversal/legacy;.ts;17415;1118;NO;0;SI;NO
+src/domain/expediente/Contrato.ts;Dominio y expediente;.ts;575;25;SI;0;NO;NO
+src/domain/expediente/CriterioAdjudicacion.ts;Dominio y expediente;.ts;733;34;SI;0;NO;NO
+src/domain/expediente/CriterioSolvencia.ts;Dominio y expediente;.ts;463;25;SI;0;NO;NO
+src/domain/expediente/DecisionLog.ts;Dominio y expediente;.ts;1064;55;SI;0;NO;SI
+src/domain/expediente/EstadoExpediente.ts;Dominio y expediente;.ts;3519;222;SI;0;NO;NO
+src/domain/expediente/Expediente.ts;Dominio y expediente;.ts;1716;98;SI;0;NO;NO
+src/domain/expediente/ExpedienteContext.ts;Dominio y expediente;.ts;3210;120;SI;0;SI;NO
+src/domain/expediente/ExpedienteContexto.ts;Dominio y expediente;.ts;1227;56;SI;0;SI;SI
+src/domain/expediente/ExpedienteJournal.ts;Dominio y expediente;.ts;2444;165;SI;0;SI;NO
+src/domain/expediente/ExpedienteTrace.ts;Dominio y expediente;.ts;1515;90;SI;0;NO;NO
+src/domain/expediente/InsuficienciaMedios.ts;Dominio y expediente;.ts;575;28;SI;0;NO;NO
+src/domain/expediente/Lote.ts;Dominio y expediente;.ts;528;29;SI;0;NO;NO
+src/domain/expediente/NecesidadContrato.ts;Dominio y expediente;.ts;431;21;SI;0;NO;NO
+src/domain/expediente/ObjetoContrato.ts;Dominio y expediente;.ts;519;23;SI;0;NO;NO
+src/domain/expediente/PresupuestoBaseLicitacion.ts;Dominio y expediente;.ts;412;21;SI;0;NO;NO
+src/domain/expediente/ProcedimientoContratacion.ts;Dominio y expediente;.ts;551;25;SI;0;NO;NO
+src/domain/expediente/ResponsableContrato.ts;Dominio y expediente;.ts;546;29;SI;0;NO;NO
+src/domain/expediente/ValorEstimado.ts;Dominio y expediente;.ts;523;24;SI;0;NO;NO
+src/domain/generadores/GeneradorInformeInsuficiencia.ts;Otros;.ts;483;18;SI;0;NO;NO
+src/domain/generadores/GeneradorMemoria.ts;Otros;.ts;589;22;SI;0;NO;NO
+src/domain/hechos/HechoAdministrativo.ts;Dominio y expediente;.ts;1016;49;SI;0;NO;NO
+src/domain/hechos/TipoHecho.ts;Dominio y expediente;.ts;1225;61;SI;0;NO;NO
+src/domain/interview/ContractInterviewEngine.ts;Otros;.ts;20714;1185;SI;0;SI;NO
+src/domain/interview/InterviewSession.ts;Otros;.ts;15208;959;SI;0;SI;NO
+src/domain/knowledge/ContractDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2669;110;SI;0;SI;NO
+src/domain/knowledge/ContractKnowledgeEngine.ts;Motores jurídicos, reglas y CPV;.ts;3481;205;SI;0;SI;NO
+src/domain/knowledge/DecisionContext.ts;Motores jurídicos, reglas y CPV;.ts;1934;98;SI;1;SI;NO
+src/domain/knowledge/DecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2571;141;SI;0;SI;NO
+src/domain/knowledge/DecisionTrace.ts;Motores jurídicos, reglas y CPV;.ts;2652;179;SI;0;NO;NO
+src/domain/knowledge/ExpedienteAnalyzer.ts;Motores jurídicos, reglas y CPV;.ts;2726;170;SI;0;SI;SI
+src/domain/knowledge/ExpedienteFacts.ts;Motores jurídicos, reglas y CPV;.ts;1761;102;SI;0;SI;NO
+src/domain/knowledge/KnowledgeGraph.ts;Motores jurídicos, reglas y CPV;.ts;3389;233;SI;0;NO;NO
+src/domain/knowledge/KnowledgeModuleRegistry.ts;Motores jurídicos, reglas y CPV;.ts;1520;103;SI;0;NO;NO
+src/domain/knowledge/KnowledgePackLoader.ts;Motores jurídicos, reglas y CPV;.ts;11295;703;SI;0;SI;NO
+src/domain/knowledge/KnowledgeQueryEngine.ts;Motores jurídicos, reglas y CPV;.ts;20645;1344;SI;0;SI;NO
+src/domain/knowledge/KnowledgeRepository.ts;Motores jurídicos, reglas y CPV;.ts;2009;122;SI;0;NO;NO
+src/domain/knowledge/KnowledgeRuleProvider.ts;Motores jurídicos, reglas y CPV;.ts;2353;135;SI;0;NO;NO
+src/domain/knowledge/QuestionFlowEngine.ts;Motores jurídicos, reglas y CPV;.ts;3670;211;SI;0;NO;NO
+src/domain/knowledge/RuleEngine.ts;Motores jurídicos, reglas y CPV;.ts;2920;188;SI;0;NO;NO
+src/domain/knowledge/catalogs/CPVCatalog.ts;Motores jurídicos, reglas y CPV;.ts;2795;144;SI;0;SI;NO
+src/domain/knowledge/catalogs/CoreKnowledgeConcepts.ts;Motores jurídicos, reglas y CPV;.ts;20159;1185;NO;0;SI;NO
+src/domain/knowledge/catalogs/KnowledgePackCatalog.ts;Motores jurídicos, reglas y CPV;.ts;2540;126;SI;0;SI;NO
+src/domain/knowledge/catalogs/ProcedureCatalog.ts;Motores jurídicos, reglas y CPV;.ts;2499;124;SI;0;SI;NO
+src/domain/knowledge/models/KnowledgeConcept.ts;Motores jurídicos, reglas y CPV;.ts;2145;139;SI;0;SI;NO
+src/domain/knowledge/models/KnowledgeDecision.ts;Motores jurídicos, reglas y CPV;.ts;2219;124;SI;0;SI;NO
+src/domain/knowledge/models/KnowledgePack.ts;Motores jurídicos, reglas y CPV;.ts;3905;267;SI;0;SI;NO
+src/domain/knowledge/packs/KP0001_ProcedimientoAdjudicacion.ts;Motores jurídicos, reglas y CPV;.ts;7243;399;SI;0;SI;NO
+src/domain/knowledge/rules/CPVRules.ts;Motores jurídicos, reglas y CPV;.ts;4955;276;SI;0;NO;SI
+src/domain/knowledge/rules/EstimatedValueRules.ts;Motores jurídicos, reglas y CPV;.ts;4010;186;SI;0;NO;SI
+src/domain/knowledge/rules/NeedRules.ts;Motores jurídicos, reglas y CPV;.ts;5264;278;SI;0;NO;SI
+src/domain/knowledge/rules/ProcedureRules.ts;Motores jurídicos, reglas y CPV;.ts;5227;263;SI;0;NO;SI
+src/domain/legal/LegalReasoner.ts;Motores jurídicos, reglas y CPV;.ts;123662;9451;NO;1;SI;NO
+src/domain/legal/LegalReference.ts;Motores jurídicos, reglas y CPV;.ts;1714;129;SI;0;NO;NO
+src/domain/legal/LegalReferenceEngine.ts;Motores jurídicos, reglas y CPV;.ts;14322;874;NO;0;SI;NO
+src/domain/legal/LegalReferenceRegistry.ts;Motores jurídicos, reglas y CPV;.ts;5134;297;SI;0;SI;NO
+src/domain/legal/core/Conflict.ts;Motores jurídicos, reglas y CPV;.ts;1105;63;SI;0;NO;NO
+src/domain/legal/core/ConflictResolver.ts;Motores jurídicos, reglas y CPV;.ts;2853;145;SI;0;NO;NO
+src/domain/legal/core/ConflictSeverity.ts;Motores jurídicos, reglas y CPV;.ts;1031;49;SI;0;NO;NO
+src/domain/legal/core/ConflictType.ts;Motores jurídicos, reglas y CPV;.ts;1433;64;SI;0;NO;NO
+src/domain/legal/core/DecisionContext.ts;Motores jurídicos, reglas y CPV;.ts;2647;126;SI;0;SI;NO
+src/domain/legal/core/DecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;3765;209;SI;0;SI;NO
+src/domain/legal/core/DecisionResult.ts;Motores jurídicos, reglas y CPV;.ts;3681;223;SI;0;NO;NO
+src/domain/legal/core/InferenceEngine.ts;Motores jurídicos, reglas y CPV;.ts;3935;222;SI;0;NO;NO
+src/domain/legal/core/InferenceResult.ts;Motores jurídicos, reglas y CPV;.ts;1354;73;SI;0;NO;NO
+src/domain/legal/core/InferenceRule.ts;Motores jurídicos, reglas y CPV;.ts;1936;113;SI;0;SI;NO
+src/domain/legal/core/InferenceTrace.ts;Motores jurídicos, reglas y CPV;.ts;1357;80;SI;0;NO;NO
+src/domain/legal/core/LegalJustificationEngine.ts;Motores jurídicos, reglas y CPV;.ts;1486;85;SI;0;NO;NO
+src/domain/legal/core/LegalReasoner.ts;Motores jurídicos, reglas y CPV;.ts;2336;109;SI;0;NO;NO
+src/domain/legal/core/RuleLoader.ts;Motores jurídicos, reglas y CPV;.ts;1805;95;SI;0;NO;NO
+src/domain/legal/core/RuleRepository.ts;Motores jurídicos, reglas y CPV;.ts;2641;150;SI;0;NO;NO
+src/domain/legal/framework/AuditService.ts;Motores jurídicos, reglas y CPV;.ts;4686;289;SI;1;NO;NO
+src/domain/legal/framework/BaseCache.ts;Motores jurídicos, reglas y CPV;.ts;4679;313;SI;0;NO;NO
+src/domain/legal/framework/BaseDecision.ts;Motores jurídicos, reglas y CPV;.ts;3758;227;SI;0;SI;NO
+src/domain/legal/framework/BaseResolver.ts;Motores jurídicos, reglas y CPV;.ts;4461;270;SI;0;SI;NO
+src/domain/legal/framework/BaseRule.ts;Motores jurídicos, reglas y CPV;.ts;3666;209;SI;1;NO;NO
+src/domain/legal/framework/BaseValidator.ts;Motores jurídicos, reglas y CPV;.ts;4830;345;SI;0;SI;NO
+src/domain/legal/framework/DecisionFactory.ts;Motores jurídicos, reglas y CPV;.ts;5546;318;SI;0;NO;NO
+src/domain/legal/framework/DiagnosticService.ts;Motores jurídicos, reglas y CPV;.ts;5093;323;SI;1;SI;NO
+src/domain/legal/framework/FrameworkTypes.ts;Motores jurídicos, reglas y CPV;.ts;3894;215;SI;1;SI;NO
+src/domain/legal/framework/KnowledgeConnector.ts;Motores jurídicos, reglas y CPV;.ts;3655;269;SI;0;NO;NO
+src/domain/legal/framework/ResolverPipeline.ts;Motores jurídicos, reglas y CPV;.ts;4687;292;SI;0;SI;NO
+src/domain/legal/framework/RuleExecutor.ts;Motores jurídicos, reglas y CPV;.ts;4681;274;SI;0;NO;NO
+src/domain/legal/framework/RuleRegistry.ts;Motores jurídicos, reglas y CPV;.ts;3929;251;SI;0;SI;NO
+src/domain/legal/framework/StatisticsService.ts;Motores jurídicos, reglas y CPV;.ts;5130;346;SI;0;SI;NO
+src/domain/legal/framework/ValidationPipeline.ts;Motores jurídicos, reglas y CPV;.ts;4212;259;SI;0;SI;NO
+src/domain/legal/modules/cpv/CPVContext.ts;Motores jurídicos, reglas y CPV;.ts;860;52;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVDecision.ts;Motores jurídicos, reglas y CPV;.ts;1128;64;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2010;112;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;1565;89;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVResolver.ts;Motores jurídicos, reglas y CPV;.ts;1498;85;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVResult.ts;Motores jurídicos, reglas y CPV;.ts;1045;62;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVRule.ts;Motores jurídicos, reglas y CPV;.ts;1400;88;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVTrace.ts;Motores jurídicos, reglas y CPV;.ts;1319;78;SI;0;NO;NO
+src/domain/legal/modules/cpv/CPVValidator.ts;Motores jurídicos, reglas y CPV;.ts;1618;87;SI;0;NO;NO
+src/domain/legal/modules/cpv/index.ts;Motores jurídicos, reglas y CPV;.ts;609;20;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeContext.ts;Motores jurídicos, reglas y CPV;.ts;586;32;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeDecision.ts;Motores jurídicos, reglas y CPV;.ts;1302;69;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2209;115;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;1649;91;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeResolver.ts;Motores jurídicos, reglas y CPV;.ts;1554;85;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeResult.ts;Motores jurídicos, reglas y CPV;.ts;1094;62;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeRule.ts;Motores jurídicos, reglas y CPV;.ts;1608;98;SI;0;NO;NO
+src/domain/legal/modules/garantias/GuaranteeTrace.ts;Motores jurídicos, reglas y CPV;.ts;1747;101;SI;0;SI;NO
+src/domain/legal/modules/garantias/GuaranteeValidator.ts;Motores jurídicos, reglas y CPV;.ts;1937;97;SI;0;NO;NO
+src/domain/legal/modules/garantias/index.ts;Motores jurídicos, reglas y CPV;.ts;689;20;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineContext.ts;Motores jurídicos, reglas y CPV;.ts;415;26;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineDecision.ts;Motores jurídicos, reglas y CPV;.ts;1057;65;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2185;115;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;1573;88;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineResolver.ts;Motores jurídicos, reglas y CPV;.ts;1468;79;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineResult.ts;Motores jurídicos, reglas y CPV;.ts;594;39;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineRule.ts;Motores jurídicos, reglas y CPV;.ts;839;58;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineTrace.ts;Motores jurídicos, reglas y CPV;.ts;1217;75;SI;0;NO;NO
+src/domain/legal/modules/plazos/DeadlineValidator.ts;Motores jurídicos, reglas y CPV;.ts;1388;81;SI;0;NO;NO
+src/domain/legal/modules/plazos/index.ts;Motores jurídicos, reglas y CPV;.ts;666;21;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureContext.ts;Motores jurídicos, reglas y CPV;.ts;1514;84;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureDecision.ts;Motores jurídicos, reglas y CPV;.ts;1598;85;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2487;134;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;2036;106;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureResolver.ts;Motores jurídicos, reglas y CPV;.ts;2146;106;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureResult.ts;Motores jurídicos, reglas y CPV;.ts;1519;83;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureRule.ts;Motores jurídicos, reglas y CPV;.ts;1867;103;SI;0;SI;NO
+src/domain/legal/modules/procedimiento/ProcedureTrace.ts;Motores jurídicos, reglas y CPV;.ts;1694;102;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/ProcedureValidator.ts;Motores jurídicos, reglas y CPV;.ts;2012;111;SI;0;NO;NO
+src/domain/legal/modules/procedimiento/index.ts;Motores jurídicos, reglas y CPV;.ts;699;21;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityContext.ts;Motores jurídicos, reglas y CPV;.ts;1243;71;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityDecision.ts;Motores jurídicos, reglas y CPV;.ts;1225;73;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2483;134;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;1960;109;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityResolver.ts;Motores jurídicos, reglas y CPV;.ts;1981;96;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityResult.ts;Motores jurídicos, reglas y CPV;.ts;1449;81;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityRule.ts;Motores jurídicos, reglas y CPV;.ts;1810;103;SI;0;SI;NO
+src/domain/legal/modules/publicidad/PublicityTrace.ts;Motores jurídicos, reglas y CPV;.ts;1720;101;SI;0;NO;NO
+src/domain/legal/modules/publicidad/PublicityValidator.ts;Motores jurídicos, reglas y CPV;.ts;1914;108;SI;0;NO;NO
+src/domain/legal/modules/publicidad/index.ts;Motores jurídicos, reglas y CPV;.ts;692;21;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyContext.ts;Motores jurídicos, reglas y CPV;.ts;1328;75;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyDecision.ts;Motores jurídicos, reglas y CPV;.ts;1263;64;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyDecisionEngine.ts;Motores jurídicos, reglas y CPV;.ts;2469;134;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;1969;104;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyResolver.ts;Motores jurídicos, reglas y CPV;.ts;1878;92;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyResult.ts;Motores jurídicos, reglas y CPV;.ts;1336;78;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyRule.ts;Motores jurídicos, reglas y CPV;.ts;1900;111;SI;0;SI;NO
+src/domain/legal/modules/solvencia/SolvencyTrace.ts;Motores jurídicos, reglas y CPV;.ts;1721;101;SI;0;NO;NO
+src/domain/legal/modules/solvencia/SolvencyValidator.ts;Motores jurídicos, reglas y CPV;.ts;2199;107;SI;0;NO;NO
+src/domain/legal/modules/solvencia/index.ts;Motores jurídicos, reglas y CPV;.ts;681;21;SI;0;NO;NO
+src/domain/legal/reasoner/InferenceEngine.ts;Motores jurídicos, reglas y CPV;.ts;608;37;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerContext.ts;Motores jurídicos, reglas y CPV;.ts;998;35;SI;1;NO;NO
+src/domain/legal/reasoner/LegalReasonerDecision.ts;Motores jurídicos, reglas y CPV;.ts;763;47;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerEngine.ts;Motores jurídicos, reglas y CPV;.ts;1372;75;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerEvaluator.ts;Motores jurídicos, reglas y CPV;.ts;1642;86;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerResolver.ts;Motores jurídicos, reglas y CPV;.ts;782;44;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerResult.ts;Motores jurídicos, reglas y CPV;.ts;949;58;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerRule.ts;Motores jurídicos, reglas y CPV;.ts;1364;73;SI;0;NO;NO
+src/domain/legal/reasoner/LegalReasonerTrace.ts;Motores jurídicos, reglas y CPV;.ts;1016;53;SI;0;SI;NO
+src/domain/legal/reasoner/index.ts;Motores jurídicos, reglas y CPV;.ts;352;10;SI;0;NO;NO
+src/domain/motores/MotorCPV.ts;Motores jurídicos, reglas y CPV;.ts;415;18;SI;0;NO;NO
+src/domain/motores/MotorEvaluacionReglas.ts;Motores jurídicos, reglas y CPV;.ts;1001;40;SI;0;NO;NO
+src/domain/motores/MotorInsuficienciaMedios.ts;Motores jurídicos, reglas y CPV;.ts;531;21;SI;0;NO;NO
+src/domain/motores/MotorJuridico.ts;Motores jurídicos, reglas y CPV;.ts;608;22;SI;0;NO;NO
+src/domain/motores/MotorJuridicoLCSP.ts;Motores jurídicos, reglas y CPV;.ts;1105;42;SI;0;NO;NO
+src/domain/motores/MotorProcedimiento.ts;Motores jurídicos, reglas y CPV;.ts;588;21;SI;0;NO;NO
+src/domain/motores/MotorProcedimientoLCSP.ts;Motores jurídicos, reglas y CPV;.ts;962;38;SI;0;NO;NO
+src/domain/normativa/ArticuloNormativo.ts;Motores jurídicos, reglas y CPV;.ts;628;36;SI;0;NO;NO
+src/domain/normativa/Norma.ts;Motores jurídicos, reglas y CPV;.ts;826;41;SI;0;NO;NO
+src/domain/normativa/ReferenciaNormativa.ts;Motores jurídicos, reglas y CPV;.ts;438;21;SI;0;NO;NO
+src/domain/objeto/ObjetoContrato.ts;Dominio y expediente;.ts;1351;75;SI;0;NO;NO
+src/domain/objeto/ObjetoResultado.ts;Dominio y expediente;.ts;1336;71;SI;0;NO;NO
+src/domain/objeto/ObjetoValidator.ts;Dominio y expediente;.ts;2717;139;SI;0;NO;NO
+src/domain/pcap/PCAPComposer.ts;Motor documental y generación;.ts;43212;2628;SI;3;SI;SI
+src/domain/pcap/PCAPGeneratorAdapter.ts;Motor documental y generación;.ts;3709;256;SI;1;NO;SI
+src/domain/pcap/PCAPGeneratorEngine.ts;Motor documental y generación;.ts;18338;1204;NO;1;NO;SI
+src/domain/plugins/PluginManager.ts;Arquitectura transversal/legacy;.ts;14730;936;NO;0;SI;NO
+src/domain/procedimiento/TipoProcedimiento.ts;Dominio y expediente;.ts;792;32;SI;0;NO;NO
+src/domain/publicidad/TipoPublicidad.ts;Dominio y expediente;.ts;724;40;SI;0;NO;NO
+src/domain/registry/ResolverRegistry.ts;Arquitectura transversal/legacy;.ts;13384;806;SI;0;SI;SI
+src/domain/reglas/RegistroReglasProcedimiento.ts;Motores jurídicos, reglas y CPV;.ts;913;38;SI;0;NO;NO
+src/domain/reglas/ReglaAbierto.ts;Motores jurídicos, reglas y CPV;.ts;717;31;SI;0;NO;NO
+src/domain/reglas/ReglaAbiertoSimplificado.ts;Motores jurídicos, reglas y CPV;.ts;754;31;SI;0;NO;NO
+src/domain/reglas/ReglaCPV.ts;Motores jurídicos, reglas y CPV;.ts;585;28;SI;0;NO;NO
+src/domain/reglas/ReglaContratoMenor.ts;Motores jurídicos, reglas y CPV;.ts;815;34;SI;0;NO;NO
+src/domain/reglas/ReglaDivisionLotes.ts;Motores jurídicos, reglas y CPV;.ts;577;26;SI;0;NO;NO
+src/domain/reglas/ReglaInsuficienciaMedios.ts;Motores jurídicos, reglas y CPV;.ts;599;28;SI;0;NO;NO
+src/domain/reglas/ReglaNegociado.ts;Motores jurídicos, reglas y CPV;.ts;725;31;SI;0;NO;NO
+src/domain/reglas/ReglaProcedimiento.ts;Motores jurídicos, reglas y CPV;.ts;569;24;SI;0;NO;NO
+src/domain/reglas/ReglaRestringido.ts;Motores jurídicos, reglas y CPV;.ts;733;31;SI;0;NO;NO
+src/domain/reglas/ResultadoEvaluacion.ts;Motores jurídicos, reglas y CPV;.ts;393;21;SI;0;NO;NO
+src/domain/resolvers/AwardCriteriaResolver.ts;Motores jurídicos, reglas y CPV;.ts;16511;916;NO;12;SI;SI
+src/domain/resolvers/BaseResolver.ts;Motores jurídicos, reglas y CPV;.ts;3865;296;SI;0;SI;NO
+src/domain/resolvers/CPVResolver.ts;Motores jurídicos, reglas y CPV;.ts;14974;862;SI;12;NO;SI
+src/domain/resolvers/ContractTypeResolver.ts;Motores jurídicos, reglas y CPV;.ts;18878;1071;SI;12;NO;SI
+src/domain/resolvers/DeadlinesResolver.ts;Motores jurídicos, reglas y CPV;.ts;16424;954;SI;12;NO;SI
+src/domain/resolvers/GuaranteeResolver.ts;Motores jurídicos, reglas y CPV;.ts;15585;863;SI;12;NO;SI
+src/domain/resolvers/LotsResolver.ts;Motores jurídicos, reglas y CPV;.ts;17360;983;SI;12;NO;SI
+src/domain/resolvers/ProcedureResolver.ts;Motores jurídicos, reglas y CPV;.ts;13276;724;SI;12;NO;SI
+src/domain/resolvers/PublicationResolver.ts;Motores jurídicos, reglas y CPV;.ts;15963;900;SI;12;NO;SI
+src/domain/resolvers/ResolutionResult.ts;Motores jurídicos, reglas y CPV;.ts;2878;203;SI;0;SI;NO
+src/domain/resolvers/SolvencyResolver.ts;Motores jurídicos, reglas y CPV;.ts;16541;939;SI;12;NO;SI
+src/domain/resolvers/ThresholdResolver.ts;Motores jurídicos, reglas y CPV;.ts;14709;822;SI;12;NO;SI
+src/domain/rules/RuleEngine.ts;Motores jurídicos, reglas y CPV;.ts;139226;10199;NO;2;SI;SI
+src/domain/rules/RuleEvaluatorEngine.ts;Motores jurídicos, reglas y CPV;.ts;79696;5209;NO;2;SI;NO
+src/domain/rules/families/ContractRules.ts;Motores jurídicos, reglas y CPV;.ts;6676;370;SI;2;NO;SI
+src/domain/rules/guarantees/ComplementaryGuaranteeRule.ts;Motores jurídicos, reglas y CPV;.ts;5555;359;SI;1;NO;NO
+src/domain/rules/guarantees/DefinitiveGuaranteeRule.ts;Motores jurídicos, reglas y CPV;.ts;4902;289;SI;1;NO;NO
+src/domain/rules/guarantees/GuaranteeCalculationRule.ts;Motores jurídicos, reglas y CPV;.ts;4939;290;SI;1;NO;NO
+src/domain/rules/guarantees/GuaranteeExemptionRule.ts;Motores jurídicos, reglas y CPV;.ts;4446;270;SI;1;NO;NO
+src/domain/rules/guarantees/GuaranteeResolver.ts;Motores jurídicos, reglas y CPV;.ts;4927;281;SI;0;NO;NO
+src/domain/rules/guarantees/GuaranteeReturnRule.ts;Motores jurídicos, reglas y CPV;.ts;4829;314;SI;0;SI;NO
+src/domain/rules/guarantees/GuaranteeTypes.ts;Motores jurídicos, reglas y CPV;.ts;3635;197;SI;2;NO;NO
+src/domain/rules/guarantees/GuaranteeValidator.ts;Motores jurídicos, reglas y CPV;.ts;5025;315;SI;0;NO;NO
+src/domain/rules/guarantees/ProvisionalGuaranteeRule.ts;Motores jurídicos, reglas y CPV;.ts;4125;243;SI;1;NO;NO
+src/domain/rules/guarantees/index.ts;Motores jurídicos, reglas y CPV;.ts;705;29;SI;0;NO;NO
+src/domain/rules/solvency/ClassificationRule.ts;Motores jurídicos, reglas y CPV;.ts;5597;386;NO;2;NO;NO
+src/domain/rules/solvency/EconomicSolvencyRule.ts;Motores jurídicos, reglas y CPV;.ts;4029;183;SI;2;NO;NO
+src/domain/rules/solvency/InsuranceRule.ts;Motores jurídicos, reglas y CPV;.ts;4279;268;SI;2;NO;NO
+src/domain/rules/solvency/MeansRule.ts;Motores jurídicos, reglas y CPV;.ts;5433;326;SI;2;NO;NO
+src/domain/rules/solvency/ProfessionalSolvencyRule.ts;Motores jurídicos, reglas y CPV;.ts;3370;174;SI;2;NO;NO
+src/domain/rules/solvency/ReferencesRule.ts;Motores jurídicos, reglas y CPV;.ts;5719;372;SI;2;NO;NO
+src/domain/rules/solvency/SolvencyResolver.ts;Motores jurídicos, reglas y CPV;.ts;5652;348;SI;0;NO;NO
+src/domain/rules/solvency/SolvencyTypes.ts;Motores jurídicos, reglas y CPV;.ts;4242;228;SI;2;NO;NO
+src/domain/rules/solvency/SolvencyValidator.ts;Motores jurídicos, reglas y CPV;.ts;5989;410;SI;0;NO;NO
+src/domain/rules/solvency/TechnicalSolvencyRule.ts;Motores jurídicos, reglas y CPV;.ts;4837;269;SI;2;NO;NO
+src/domain/rules/solvency/TurnoverRule.ts;Motores jurídicos, reglas y CPV;.ts;3973;242;SI;1;NO;NO
+src/domain/rules/solvency/index.ts;Motores jurídicos, reglas y CPV;.ts;2216;90;SI;0;NO;NO
+src/domain/solvencia/SolvenciaRegla.ts;Motores jurídicos, reglas y CPV;.ts;1459;83;SI;0;NO;NO
+src/domain/solvencia/SolvenciaResultado.ts;Motores jurídicos, reglas y CPV;.ts;954;52;SI;0;NO;NO
+src/domain/validacion/ExpedienteValidator.ts;Dominio y expediente;.ts;3759;265;SI;0;SI;NO
+src/domain/validation/ValidationFramework.ts;Dominio y expediente;.ts;16315;1067;NO;0;SI;NO
+src/domain/value-objects/EstadoExpediente.ts;Dominio y expediente;.ts;417;23;SI;0;SI;NO
+src/domain/value-objects/ExpedienteId.ts;Dominio y expediente;.ts;650;33;SI;0;NO;NO
+src/domain/value-objects/FechaAdministrativa.ts;Dominio y expediente;.ts;689;33;SI;0;NO;NO
+src/domain/value-objects/NumeroExpediente.ts;Dominio y expediente;.ts;792;39;SI;0;NO;NO
+src/engines/BaseEngine.ts;Arquitectura transversal/legacy;.ts;1314;59;SI;0;SI;SI
+src/engines/CPVEngine.ts;Arquitectura transversal/legacy;.ts;2157;115;SI;0;SI;NO
+src/engines/ContrataIAEngine.ts;Arquitectura transversal/legacy;.ts;2401;101;SI;0;SI;NO
+src/engines/DocumentEngine.ts;Arquitectura transversal/legacy;.ts;1822;118;SI;0;SI;NO
+src/engines/ExpedienteEngine.ts;Arquitectura transversal/legacy;.ts;2552;135;SI;0;SI;NO
+src/engines/KnowledgeEngine.ts;Arquitectura transversal/legacy;.ts;1742;81;SI;0;NO;NO
+src/engines/ObjetoEngine.ts;Arquitectura transversal/legacy;.ts;2735;114;SI;0;NO;NO
+src/engines/ProcedimientoEngine.ts;Arquitectura transversal/legacy;.ts;2651;143;SI;0;NO;NO
+src/engines/PublicidadEngine.ts;Arquitectura transversal/legacy;.ts;2612;142;SI;0;NO;NO
+src/engines/RuleEngine.ts;Arquitectura transversal/legacy;.ts;1191;78;SI;0;NO;NO
+src/engines/SolvenciaEngine.ts;Arquitectura transversal/legacy;.ts;2576;146;SI;0;NO;NO
+src/generators/BaseDocumentGenerator.ts;Motor documental y generación;.ts;2080;108;SI;1;SI;NO
+src/generators/MemoriaJustificativaGenerator.ts;Motor documental y generación;.ts;1240;56;SI;0;NO;NO
+src/infrastructure/ai/AICache.ts;Infraestructura IA;.ts;5611;397;SI;0;NO;NO
+src/infrastructure/ai/AIHealthMonitor.ts;Infraestructura IA;.ts;5068;320;SI;0;NO;NO
+src/infrastructure/ai/AIManager.ts;Infraestructura IA;.ts;43699;3219;NO;1;SI;SI
+src/infrastructure/ai/AIObservability.ts;Infraestructura IA;.ts;5405;322;SI;0;NO;NO
+src/infrastructure/ai/AIProvider.ts;Infraestructura IA;.ts;1956;131;SI;0;SI;NO
+src/infrastructure/ai/AIProviderRegistry.ts;Infraestructura IA;.ts;4922;235;SI;0;NO;NO
+src/infrastructure/ai/AIRequestQueue.ts;Infraestructura IA;.ts;7725;510;SI;1;NO;NO
+src/infrastructure/ai/AIStatistics.ts;Infraestructura IA;.ts;6202;396;SI;0;NO;NO
+src/infrastructure/ai/CircuitBreaker.ts;Infraestructura IA;.ts;6031;404;SI;0;NO;NO
+src/infrastructure/ai/CostEstimator.ts;Infraestructura IA;.ts;7629;506;SI;0;NO;NO
+src/infrastructure/ai/GeminiAdapter.ts;Infraestructura IA;.ts;5737;330;SI;0;NO;SI
+src/infrastructure/ai/LocalLLMAdapter.ts;Infraestructura IA;.ts;7103;436;SI;0;NO;SI
+src/infrastructure/ai/OllamaAdapter.ts;Infraestructura IA;.ts;6777;431;SI;0;NO;SI
+src/infrastructure/ai/OpenAIAdapter.ts;Infraestructura IA;.ts;5978;324;SI;0;NO;SI
+src/infrastructure/ai/PromptExecutor.ts;Infraestructura IA;.ts;4667;296;SI;0;NO;NO
+src/infrastructure/ai/PromptRenderer.ts;Infraestructura IA;.ts;5481;365;SI;0;NO;NO
+src/infrastructure/ai/PromptRepository.ts;Infraestructura IA;.ts;5240;318;SI;0;SI;NO
+src/infrastructure/ai/RetryPolicy.ts;Infraestructura IA;.ts;4577;338;SI;0;NO;NO
+src/infrastructure/ai/TokenCounter.ts;Infraestructura IA;.ts;5162;317;SI;0;NO;NO
+src/infrastructure/ai/index.ts;Infraestructura IA;.ts;483;16;SI;7;NO;NO
+src/infrastructure/ai/providers/AIProvider.ts;Infraestructura IA;.ts;1763;134;SI;0;SI;NO
+src/infrastructure/ai/providers/AnthropicProvider.ts;Infraestructura IA;.ts;2492;146;SI;0;NO;NO
+src/infrastructure/ai/providers/GeminiProvider.ts;Infraestructura IA;.ts;3540;214;SI;0;NO;SI
+src/infrastructure/ai/providers/OllamaProvider.ts;Infraestructura IA;.ts;2784;178;SI;0;NO;NO
+src/infrastructure/ai/providers/OpenAIProvider.ts;Infraestructura IA;.ts;7795;470;SI;0;NO;SI
+src/infrastructure/ai/providers/ProviderFactory.ts;Infraestructura IA;.ts;2551;155;SI;0;NO;NO
+src/infrastructure/ai/providers/ProviderHealth.ts;Infraestructura IA;.ts;6620;418;SI;0;NO;NO
+src/infrastructure/ai/providers/ProviderRegistry.ts;Infraestructura IA;.ts;4689;266;SI;0;NO;NO
+src/infrastructure/config/AppConfiguration.ts;Infrastructure Core (sin IA);.ts;3037;248;SI;0;NO;NO
+src/infrastructure/config/ApplicationConfiguration.ts;Infrastructure Core (sin IA);.ts;4647;305;SI;0;NO;NO
+src/infrastructure/config/ConfigManager.ts;Infrastructure Core (sin IA);.ts;6415;442;SI;0;NO;NO
+src/infrastructure/config/ConfigurationBootstrap.ts;Infrastructure Core (sin IA);.ts;2223;158;SI;0;NO;NO
+src/infrastructure/config/ConfigurationLoader.ts;Infrastructure Core (sin IA);.ts;1807;145;SI;0;NO;NO
+src/infrastructure/config/ConfigurationManager.ts;Infrastructure Core (sin IA);.ts;2320;158;SI;0;NO;NO
+src/infrastructure/config/ConfigurationValidator.ts;Infrastructure Core (sin IA);.ts;3773;264;SI;0;NO;NO
+src/infrastructure/config/Environment.ts;Infrastructure Core (sin IA);.ts;2341;166;SI;0;NO;NO
+src/infrastructure/config/SecretsManager.ts;Infrastructure Core (sin IA);.ts;4632;338;SI;0;NO;NO
+src/infrastructure/events/DomainEvents.ts;Infrastructure Core (sin IA);.ts;4464;386;SI;0;NO;NO
+src/infrastructure/events/EventBus.ts;Infrastructure Core (sin IA);.ts;3317;226;SI;0;NO;NO
+src/infrastructure/events/EventDispatcher.ts;Infrastructure Core (sin IA);.ts;3195;234;SI;0;NO;NO
+src/infrastructure/events/EventStore.ts;Infrastructure Core (sin IA);.ts;4238;293;SI;0;SI;NO
+src/infrastructure/events/IntegrationEvents.ts;Infrastructure Core (sin IA);.ts;4882;404;SI;0;NO;NO
+src/infrastructure/logging/AuditLogger.ts;Infrastructure Core (sin IA);.ts;3103;250;SI;0;NO;NO
+src/infrastructure/logging/ConsoleLogger.ts;Infrastructure Core (sin IA);.ts;2276;172;SI;0;NO;NO
+src/infrastructure/logging/ExecutionLogger.ts;Infrastructure Core (sin IA);.ts;4142;270;SI;0;NO;NO
+src/infrastructure/logging/FileLogger.ts;Infrastructure Core (sin IA);.ts;3101;268;SI;0;NO;NO
+src/infrastructure/logging/Logger.ts;Infrastructure Core (sin IA);.ts;4753;388;SI;0;NO;NO
+src/infrastructure/logging/LoggerFactory.ts;Infrastructure Core (sin IA);.ts;4553;380;SI;0;NO;SI
+src/infrastructure/logging/LoggingBootstrap.ts;Infrastructure Core (sin IA);.ts;2940;220;SI;0;NO;NO
+src/infrastructure/monitoring/DiagnosticsService.ts;Infrastructure Core (sin IA);.ts;4625;286;SI;0;NO;SI
+src/infrastructure/monitoring/HealthCheck.ts;Infrastructure Core (sin IA);.ts;2024;138;SI;0;NO;NO
+src/infrastructure/monitoring/HealthReport.ts;Infrastructure Core (sin IA);.ts;3236;226;SI;0;NO;NO
+src/infrastructure/monitoring/MemoryMonitor.ts;Infrastructure Core (sin IA);.ts;4042;256;SI;0;NO;NO
+src/infrastructure/monitoring/MetricsCollector.ts;Infrastructure Core (sin IA);.ts;4746;344;SI;0;NO;NO
+src/infrastructure/monitoring/PerformanceMonitor.ts;Infrastructure Core (sin IA);.ts;4490;300;SI;0;NO;NO
+src/infrastructure/monitoring/StartupReport.ts;Infrastructure Core (sin IA);.ts;2465;144;SI;0;NO;NO
+src/infrastructure/monitoring/SystemStatus.ts;Infrastructure Core (sin IA);.ts;2538;152;SI;0;NO;NO
+src/infrastructure/persistence/CacheRepository.ts;Infrastructure Core (sin IA);.ts;3886;270;SI;0;NO;NO
+src/infrastructure/persistence/DocumentRepository.ts;Infrastructure Core (sin IA);.ts;3976;284;SI;0;NO;NO
+src/infrastructure/persistence/ExpedienteRepository.ts;Infrastructure Core (sin IA);.ts;3852;264;SI;0;NO;NO
+src/infrastructure/persistence/FileRepository.ts;Infrastructure Core (sin IA);.ts;5397;381;SI;0;NO;NO
+src/infrastructure/persistence/JSONRepository.ts;Infrastructure Core (sin IA);.ts;3982;324;SI;0;NO;NO
+src/infrastructure/persistence/KnowledgeRepository.ts;Infrastructure Core (sin IA);.ts;4197;304;SI;0;NO;NO
+src/infrastructure/persistence/PersistenceBootstrap.ts;Infrastructure Core (sin IA);.ts;2788;177;SI;0;NO;NO
+src/infrastructure/persistence/Repository.ts;Infrastructure Core (sin IA);.ts;2781;171;SI;0;SI;NO
+src/infrastructure/persistence/RepositoryContext.ts;Infrastructure Core (sin IA);.ts;2535;137;SI;0;SI;NO
+src/infrastructure/persistence/RepositoryFactory.ts;Infrastructure Core (sin IA);.ts;3419;205;SI;0;NO;NO
+src/infrastructure/persistence/RepositoryManager.ts;Infrastructure Core (sin IA);.ts;2693;127;SI;0;NO;NO
+src/infrastructure/persistence/RulesRepository.ts;Infrastructure Core (sin IA);.ts;4188;318;SI;0;NO;NO
+src/infrastructure/services/ApplicationContext.ts;Infrastructure Core (sin IA);.ts;3055;153;SI;0;NO;NO
+src/infrastructure/services/Bootstrapper.ts;Infrastructure Core (sin IA);.ts;2823;164;SI;0;NO;NO
+src/infrastructure/services/DependencyResolver.ts;Infrastructure Core (sin IA);.ts;3835;266;SI;0;NO;NO
+src/infrastructure/services/LifetimeManager.ts;Infrastructure Core (sin IA);.ts;4328;286;SI;0;NO;NO
+src/infrastructure/services/ServiceContainer.ts;Infrastructure Core (sin IA);.ts;3785;256;SI;0;NO;NO
+src/infrastructure/services/ServiceRegistry.ts;Infrastructure Core (sin IA);.ts;3202;146;SI;1;NO;NO
+src/knowledge/InferenceEngine.ts;Conocimiento normativo y datos;.ts;827;41;SI;0;NO;NO
+src/knowledge/KnowledgeAction.ts;Conocimiento normativo y datos;.ts;945;58;SI;0;NO;NO
+src/knowledge/KnowledgeCondition.ts;Conocimiento normativo y datos;.ts;699;48;SI;0;NO;NO
+src/knowledge/KnowledgeFact.ts;Conocimiento normativo y datos;.ts;460;23;SI;0;NO;NO
+src/knowledge/KnowledgeRule.ts;Conocimiento normativo y datos;.ts;1065;64;SI;0;NO;NO
+src/knowledge/LCSPKnowledge.ts;Conocimiento normativo y datos;.ts;5781;329;SI;0;SI;NO
+src/knowledge/LegalDecision.ts;Conocimiento normativo y datos;.ts;910;55;SI;0;NO;NO
+src/knowledge/LegalRule.ts;Conocimiento normativo y datos;.ts;1532;95;SI;0;NO;NO
+src/knowledge/LegalRulesCatalog.ts;Conocimiento normativo y datos;.ts;2013;112;SI;0;NO;NO
+src/knowledge/RuleEngine.ts;Conocimiento normativo y datos;.ts;1659;98;SI;0;SI;NO
+src/knowledge/lcsp/LibroI.ts;Conocimiento normativo y datos;.ts;1283;86;SI;0;NO;NO
+src/knowledge/rules/CriteriosAdjudicacionRules.ts;Conocimiento normativo y datos;.ts;4131;261;SI;0;SI;NO
+src/knowledge/rules/NecesidadRules.ts;Conocimiento normativo y datos;.ts;2339;139;SI;0;SI;NO
+src/knowledge/rules/ObjetoRules.ts;Conocimiento normativo y datos;.ts;4078;265;SI;0;SI;NO
+src/knowledge/rules/ProcedimientoRules.ts;Conocimiento normativo y datos;.ts;3307;199;SI;0;SI;NO
+src/knowledge/rules/PublicidadRules.ts;Conocimiento normativo y datos;.ts;5075;320;SI;0;SI;NO
+src/knowledge/rules/SolvenciaRules.ts;Conocimiento normativo y datos;.ts;3988;256;SI;0;NO;NO
+src/repositories/KnowledgeRepository.ts;Arquitectura transversal/legacy;.ts;1549;92;SI;0;SI;NO
+src/tools/architecture/ArchitectureInspector.ts;Arquitectura transversal/legacy;.ts;4726;248;SI;0;NO;NO
+src/tools/architecture/DeadCodeDetector.ts;Arquitectura transversal/legacy;.ts;4591;268;SI;0;NO;NO
+src/tools/architecture/DependencyGraph.ts;Arquitectura transversal/legacy;.ts;5082;323;SI;0;SI;NO
+src/tools/architecture/DuplicateDetector.ts;Arquitectura transversal/legacy;.ts;5920;381;SI;0;NO;NO
+src/tools/architecture/FileScanner.ts;Arquitectura transversal/legacy;.ts;4331;290;SI;0;SI;NO
+src/tools/architecture/ImportAnalyzer.ts;Arquitectura transversal/legacy;.ts;3760;251;SI;0;SI;NO
+src/tools/architecture/MarkdownReportGenerator.ts;Arquitectura transversal/legacy;.ts;5005;265;SI;0;NO;NO
+src/tools/architecture/StatisticsGenerator.ts;Arquitectura transversal/legacy;.ts;3424;191;SI;0;NO;NO
+src/ui/App.tsx;Frontend/UI;.tsx;4195;134;SI;0;NO;NO
+src/ui/components/Navigation.tsx;Frontend/UI;.tsx;5247;291;SI;0;NO;NO
+src/ui/index.ts;Frontend/UI;.ts;922;31;SI;0;SI;NO
+src/ui/layouts/MainLayout.tsx;Frontend/UI;.tsx;3135;131;SI;0;NO;NO
+src/ui/theme/Theme.ts;Frontend/UI;.ts;4786;345;SI;0;SI;NO
+src/ui/types/index.ts;Frontend/UI;.ts;3222;199;SI;0;NO;NO
+src/workflow/ExpedienteOrchestrator.ts;Workflow;.ts;4359;274;SI;0;SI;NO
+src/workflow/WorkflowExpediente.ts;Workflow;.ts;2569;164;SI;0;NO;NO
