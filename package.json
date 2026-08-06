@@ -13,7 +13,8 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "start": "node dist/main.js",
-    "audit:imports": "node scripts/check-relative-imports.mjs"
+    "audit:imports": "node scripts/check-relative-imports.mjs",
+    "audit:knowledge": "node scripts/validate-knowledge.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
