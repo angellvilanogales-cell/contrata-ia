@@ -1,0 +1,26 @@
+{
+  "name": "contrata-ia",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Asistente inteligente para la contratación pública y la generación de expedientes conforme a la LCSP.",
+  "license": "UNLICENSED",
+  "main": "dist/main.js",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.0.0",
+    "typescript": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}
