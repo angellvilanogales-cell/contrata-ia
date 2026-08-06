@@ -2,7 +2,7 @@
   "name": "contrata-ia",
   "version": "0.1.0",
   "private": true,
-  "description": "Asistente inteligente para la contratación pública y la generación de expedientes conforme a la LCSP.",
+  "description": "Asistente inteligente para la contratación pública y la generación de expedientes conforme a la Ley 9/2017 de Contratos del Sector Público (LCSP).",
   "license": "UNLICENSED",
   "main": "dist/main.js",
   "engines": {
@@ -18,10 +18,9 @@
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
-  "@types/js-yaml": "^4.0.9",
-  "@types/node": "^24.0.0",
-  "typescript": "^7.0.2",
-  "vitest": "^3.0.0"
-}
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2",
+    "vitest": "^3.0.0"
   }
 }
