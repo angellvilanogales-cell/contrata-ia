@@ -1,7 +1,9 @@
 name: Generate package-lock
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - agent/lb1-proyecto-compilable
 
 permissions:
   contents: write
@@ -21,7 +23,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          
+
       - name: Generate package-lock.json
         run: npm install --package-lock-only
 
@@ -31,10 +33,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           if git diff --quiet -- package-lock.json; then
-            echo "No changes detected in package-lock.json"
+            echo "No package-lock.json changes detected."
             exit 0
           fi
 
           git add package-lock.json
-          git commit -m "build: generate npm lockfile"
+          git commit -m "build: generate npm lockfile [skip ci]"
           git push origin agent/lb1-proyecto-compilable
