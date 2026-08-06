@@ -1,0 +1,26 @@
+﻿ruta;diagnosticos;primera_linea;columna;codigo;mensaje
+knowledge/inference/InferenceEngine.ts;777;3039;5;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/cpv/CPVEngine.ts;678;676;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/conocimiento/KnowledgeEngine.ts;558;284;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/rules/RuleEngine.ts;553;699;1;TS1128;Declaration or statement expected.
+src/application/documents/DocumentGenerator.ts;503;3380;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/legal/LegalReasoner.ts;418;4995;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/application/modules/contract-generator/GenerationResult.ts;340;333;1;TS1131;Property or signature expected.
+src/application/modules/contract-generator/ContractContext.ts;321;1619;1;TS1128;Declaration or statement expected.
+knowledge/reasoning/LegalReasoner.ts;319;3788;5;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/infrastructure/ai/AIManager.ts;255;2036;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/events/EventBus.ts;187;232;5;TS1128;Declaration or statement expected.
+src/domain/knowledge/catalogs/CoreKnowledgeConcepts.ts;150;347;13;TS1005;"';' expected."
+src/bootstrap/ArchitectureBootstrap.ts;124;141;5;TS1128;Declaration or statement expected.
+src/domain/container/DependencyContainer.ts;120;201;5;TS1128;Declaration or statement expected.
+src/domain/diagnostics/DiagnosticsCenter.ts;115;200;5;TS1128;Declaration or statement expected.
+src/application/workflows/QuestionFlowEngine.ts;106;189;5;TS1128;Declaration or statement expected.
+src/domain/legal/LegalReferenceEngine.ts;95;205;5;TS1128;Declaration or statement expected.
+src/domain/rules/RuleEvaluatorEngine.ts;77;4823;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/clauses/ClauseGeneratorEngine.ts;46;1400;3;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/pcap/PCAPGeneratorEngine.ts;46;531;3;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/documental/DocumentAssembler.ts;14;145;1;TS1128;Declaration or statement expected.
+src/domain/rules/solvency/ClassificationRule.ts;4;311;17;TS1005;',' expected.
+src/domain/plugins/PluginManager.ts;1;935;1;TS1128;Declaration or statement expected.
+src/domain/resolvers/AwardCriteriaResolver.ts;1;214;1;TS1068;Unexpected token. A constructor, method, accessor, or property was expected.
+src/domain/validation/ValidationFramework.ts;1;1066;1;TS1128;Declaration or statement expected.
