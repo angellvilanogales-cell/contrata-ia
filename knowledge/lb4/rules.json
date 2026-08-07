@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.2.0",
+  "effectiveFrom": "2026-01-01",
+  "effectiveTo": "2027-12-31",
+  "scope": {
+    "contractType": "SERVICES",
+    "serviceFamily": "CLEANING_BUILDINGS_OFFICES",
+    "contractingAuthority": "ADMINISTRACION_PUBLICA_JUNTA_ANDALUCIA",
+    "processing": "ORDINARY",
+    "excluded": ["EMERGENCY", "MINOR_CONTRACT", "CONCESSION", "INTELLECTUAL_SERVICES", "ANNEX_IV_SPECIAL_SERVICES"]
+  },
+  "thresholds": {
+    "saraServicesRegional": {"amount": 216000, "currency": "EUR", "sourceId": "LCSP-2017-CONSOLIDADA-2026", "article": "22.1.b"},
+    "simplifiedOpenServices": {"amountExclusive": 140000, "currency": "EUR", "sourceId": "LCSP-2017-CONSOLIDADA-2026", "article": "159.1.a in relation with 22.1.a"},
+    "abbreviatedSimplifiedServices": {"amountExclusive": 60000, "currency": "EUR", "sourceId": "LCSP-2017-CONSOLIDADA-2026", "article": "159.6"}
+  },
+  "rules": [
+    {
+      "id": "LB4-SVC-CLEAN-CPV-001", "topic": "cpv", "kind": "controlled-proposal",
+      "result": {"primary": "90911200-8", "alternatives": ["90919200-4"]},
+      "condition": "serviceFamily == CLEANING_BUILDINGS_OFFICES",
+      "justification": "Para limpieza general de edificios se propone 90911200-8; 90919200-4 es alternativa específica para oficinas. La selección definitiva debe comprobar el objeto y prestaciones efectivas.",
+      "sourceIds": ["JA-PCAP-LIMPIEZA-EJEMPLOS-USUARIO"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-PROC-000", "topic": "procedure", "kind": "deterministic-with-guards",
+      "condition": "estimatedValue < 60000 AND allAwardCriteriaFormulaBased == true AND intellectualService == false",
+      "result": "OPEN_SIMPLIFIED_ABBREVIATED",
+      "justification": "El artículo 159.6 permite la tramitación simplificada abreviada en servicios de valor estimado inferior a 60.000 euros, excepto prestaciones intelectuales; las ofertas se evalúan únicamente con criterios cuantificables mediante fórmulas.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-PROCEDIMIENTOS"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-PROC-001", "topic": "procedure", "kind": "deterministic-with-guards",
+      "condition": "estimatedValue < 140000 AND judgmentValuePercent <= 25",
+      "result": "OPEN_SIMPLIFIED",
+      "justification": "El procedimiento abierto simplificado para este servicio no intelectual exige valor estimado inferior al umbral actualizado del artículo 22.1.a y que los criterios sujetos a juicio de valor no superen el 25%.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-PROC-002", "topic": "procedure", "kind": "deterministic-with-guards",
+      "condition": "simplifiedGuardsNotMet",
+      "result": "OPEN_ORDINARY",
+      "justification": "Cuando no se cumplen los guardas del abierto simplificado, el MVP ordinario propone procedimiento abierto, sin perjuicio de otros procedimientos si concurren presupuestos legales específicos no modelados.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-SARA-001", "topic": "harmonized-regulation", "kind": "deterministic",
+      "condition": "estimatedValue >= 216000", "result": "SARA",
+      "justification": "Para entidades del sector público distintas de AGE, organismos autónomos y entidades gestoras/servicios comunes de Seguridad Social, los servicios quedan sujetos a regulación armonizada desde 216.000 euros en 2026-2027.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "UE-2025-2152"], "humanValidation": false
+    },
+    {
+      "id": "LB4-SVC-LOTS-001", "topic": "lots", "kind": "decision-support", "result": "ASSESS_DIVISION_INTO_LOTS",
+      "justification": "Debe preverse la división en lotes cuando la naturaleza u objeto lo permitan. La no división requiere motivación; en limpieza puede justificarse por dificultad técnica o necesidad de coordinación solo si esas circunstancias se acreditan.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-PCAP-LIMPIEZA-EJEMPLOS-USUARIO"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-SOLV-ECO-001", "topic": "economic-solvency", "kind": "default-if-pliego-omits", "result": "TURNOVER_1_5X",
+      "justification": "Si el pliego no concreta requisitos y el contrato no exige clasificación, el criterio supletorio es volumen anual de negocios de al menos 1,5 veces el valor estimado si dura hasta un año, o 1,5 veces el valor anual medio si dura más.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-SOLV-TECH-001", "topic": "technical-solvency", "kind": "decision-support", "result": "SIMILAR_SERVICES_LAST_3_YEARS",
+      "justification": "La experiencia en principales servicios de igual o similar naturaleza de los últimos tres años es uno de los medios legales de solvencia técnica; el órgano debe concretar medio y mínimo proporcional al objeto.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-MODELOS-PCAP"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-GUAR-001", "topic": "guarantees", "kind": "deterministic-with-exception",
+      "result": {"provisional": "NOT_REQUIRED_DEFAULT", "ordinaryDefinitivePercent": 5, "abbreviatedDefinitivePercent": 0},
+      "justification": "La garantía provisional no procede con carácter general. La definitiva ordinaria es el 5% del precio final ofertado sin IVA; en la tramitación del artículo 159.6 no se requiere garantía definitiva.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-AWARD-001", "topic": "award-criteria", "kind": "decision-support", "result": "BEST_QUALITY_PRICE_PLURALITY",
+      "justification": "La adjudicación se basa con carácter general en pluralidad de criterios y mejor relación calidad-precio. Los criterios cualitativos, incluidos sociales o ambientales, deben estar vinculados al objeto, ser objetivos y permitir comparación efectiva de ofertas.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-CLAUSULAS-SOCIALES-AMBIENTALES"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-EXEC-001", "topic": "special-execution-condition", "kind": "mandatory-requirement", "result": "AT_LEAST_ONE_ART202_CONDITION",
+      "justification": "El PCAP debe incluir al menos una condición especial de ejecución de las previstas en el artículo 202, vinculada al objeto, no discriminatoria y compatible con el Derecho de la Unión.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-CLAUSULAS-SOCIALES-AMBIENTALES", "JA-ACUERDO-2016-CLAUSULAS"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-DATA-001", "topic": "data-protection-execution-condition", "kind": "conditional-mandatory",
+      "condition": "publicBodyTransfersPersonalDataToContractor == true",
+      "result": "ADD_DATA_PROTECTION_SPECIAL_EXECUTION_CONDITION",
+      "justification": "Cuando la ejecución implique cesión de datos por una entidad del sector público al contratista, debe incorporarse la condición especial de ejecución relativa al sometimiento a la normativa nacional y de la Unión Europea en materia de protección de datos.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": false
+    },
+    {
+      "id": "LB4-SVC-SUBROG-001", "topic": "subrogation", "kind": "conditional-mandatory", "result": "REQUEST_AND_DISCLOSE_LABOUR_DATA_IF_SUBROGATION_APPLIES",
+      "justification": "Si una norma legal, convenio colectivo o acuerdo de negociación colectiva de eficacia general impone subrogación, el pliego debe facilitar la información laboral necesaria para evaluar exactamente sus costes.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-PCAP-LIMPIEZA-EJEMPLOS-USUARIO"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-DEADLINE-001", "topic": "tender-deadline", "kind": "deterministic-with-guards",
+      "result": {"openNonSaraDaysMinimum": 15, "openSaraDaysGeneral": 35, "openSimplifiedDaysMinimum": 15, "openSimplifiedAbbreviatedWorkingDaysMinimum": 10},
+      "justification": "El abierto no SARA de servicios tiene mínimo de 15 días; el abierto SARA conserva como regla general 35 días; el abierto simplificado 15 días y el simplificado abreviado 10 días hábiles, sin automatizar reducciones que exijan hechos adicionales.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": false
+    }
+  ]
+}

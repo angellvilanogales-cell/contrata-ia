@@ -6,12 +6,14 @@ on:
       - agent/lb1-proyecto-compilable
       - agent/lb2-arquitectura-canonica
       - agent/lb3-recorrido-vertical
+      - agent/lb4-motor-normativo
   pull_request:
     branches:
       - main
       - agent/lb1-proyecto-compilable
       - agent/lb2-arquitectura-canonica
       - agent/lb3-recorrido-vertical
+      - agent/lb4-motor-normativo
   workflow_dispatch:
 
 permissions:
@@ -55,6 +57,18 @@ jobs:
       - run: npm run audit:knowledge
       - run: npm run audit:knowledge:integrity
 
+  audit-normative:
+    name: Validate LB-4 normative pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:normative
+
   typecheck:
     name: TypeScript typecheck
     runs-on: ubuntu-latest
@@ -68,7 +82,7 @@ jobs:
       - run: npm run typecheck
 
   tests:
-    name: Unit and vertical tests
+    name: Unit, vertical and normative tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -80,7 +94,7 @@ jobs:
       - run: npm test
 
   build:
-    name: Production build and vertical smoke
+    name: Production build and MVP smoke tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,3 +108,5 @@ jobs:
         run: npm start
       - name: Execute LB-3 vertical flow
         run: npm run demo:vertical
+      - name: Execute LB-4 normative MVP
+        run: npm run demo:lb4
