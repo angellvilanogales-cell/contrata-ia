@@ -1048,5 +1048,3 @@ export class DiagnosticsCenter {
     }
 
 }
-
-}

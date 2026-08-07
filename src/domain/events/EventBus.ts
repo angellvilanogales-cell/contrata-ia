@@ -1114,6 +1114,3 @@ export class EventBus {
     }
 
 }
-
-
-}
