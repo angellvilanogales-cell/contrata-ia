@@ -131,3 +131,10 @@ jobs:
           test -f artifacts/lb5/manifest.json
           test "$(find artifacts/lb5 -name '*.docx' | wc -l)" -ge 4
           test "$(find artifacts/lb5 -name '*.pdf' | wc -l)" -ge 4
+      - name: Preserve LB-5 document package
+        uses: actions/upload-artifact@v4
+        with:
+          name: lb5-administrative-documents
+          path: artifacts/lb5
+          if-no-files-found: error
+          retention-days: 30
