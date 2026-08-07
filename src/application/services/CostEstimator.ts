@@ -4,16 +4,16 @@ export interface CostEstimateInput {
 }
 
 export interface CostEstimate {
-  value: number;
+  value?: number;
   currency: "EUR";
   basis: "provided_estimated_value" | "not_available";
 }
 
 export class CostEstimator {
   public estimate(input: CostEstimateInput): CostEstimate {
-    if (typeof input.estimatedValue === "number" && Number.isFinite(input.estimatedValue)) {
+    if (typeof input.estimatedValue === "number" && Number.isFinite(input.estimatedValue) && input.estimatedValue >= 0) {
       return { value: input.estimatedValue, currency: "EUR", basis: "provided_estimated_value" };
     }
-    return { value: 0, currency: "EUR", basis: "not_available" };
+    return { currency: "EUR", basis: "not_available" };
   }
 }
