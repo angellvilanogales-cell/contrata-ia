@@ -1,3 +1,4 @@
+// One-shot structural recovery for KnowledgeEngine; the workflow removes this helper after use.
 import fs from "node:fs";
 import { execFileSync } from "node:child_process";
 
