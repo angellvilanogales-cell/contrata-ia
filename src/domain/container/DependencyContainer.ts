@@ -190,8 +190,6 @@ export class DependencyContainer {
 
     }
 
-}
-
     /**
      * =====================================================
      * RESOLVER SERVICIO
