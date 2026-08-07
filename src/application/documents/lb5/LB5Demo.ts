@@ -3,8 +3,10 @@ import path from "node:path";
 import { LB4CleaningServiceEngine } from "../../normative/LB4CleaningServiceEngine";
 import { AdministrativeDocumentRenderer } from "./AdministrativeDocumentRenderer";
 import { LB5DocumentComposer } from "./LB5DocumentComposer";
+import { ProcedureDocumentPlanner } from "./ProcedureDocumentPlanner";
+import { ProceduralDraftFactory } from "./ProceduralDraftFactory";
 import { SimpleDocumentRequestInterpreter } from "./SimpleDocumentRequest";
-import type { LB5DocumentContext, LB5RenderedPackage } from "./DocumentModel";
+import type { LB5CompositionOptions, LB5DocumentContext, LB5RenderedPackage } from "./DocumentModel";
 
 export function createLB5DemoContext(): LB5DocumentContext {
   const input = {
@@ -80,21 +82,30 @@ export function createLB5DemoContext(): LB5DocumentContext {
   };
 }
 
-export function runLB5Demo(): LB5RenderedPackage {
-  const context = createLB5DemoContext();
-  const additional = new SimpleDocumentRequestInterpreter().interpret(
-    "Genera un informe justificativo de la no división en lotes y del procedimiento de adjudicación"
-  );
-  const packageValue = new LB5DocumentComposer().compose(context, {
+export function createLB5DemoOptions(): LB5CompositionOptions {
+  const interpreter = new SimpleDocumentRequestInterpreter();
+  const procedural = new ProceduralDraftFactory();
+  return {
     needPlacement: "IN_MEMORY",
     insufficiencyPlacement: "IN_MEMORY",
-    customDocuments: [additional]
-  });
+    customDocuments: [
+      interpreter.interpret("Genera un informe justificativo de la no división en lotes y del procedimiento de adjudicación"),
+      procedural.create("PROPUESTA_INICIO"),
+      procedural.create("ACUERDO_INICIO")
+    ]
+  };
+}
+
+export function runLB5Demo(): LB5RenderedPackage {
+  const context = createLB5DemoContext();
+  const packageValue = new LB5DocumentComposer().compose(context, createLB5DemoOptions());
   return new AdministrativeDocumentRenderer().render(packageValue);
 }
 
 export function writeLB5DemoArtifacts(outputDirectory: string): LB5RenderedPackage {
   const rendered = runLB5Demo();
+  const options = createLB5DemoOptions();
+  const procedureDocumentPlan = new ProcedureDocumentPlanner().plan(rendered.package.context, options);
   fs.mkdirSync(outputDirectory, { recursive: true });
   for (const artifact of [...rendered.editable, ...rendered.pdf]) {
     fs.writeFileSync(path.join(outputDirectory, artifact.fileName), Buffer.from(artifact.data));
@@ -110,6 +121,7 @@ export function writeLB5DemoArtifacts(outputDirectory: string): LB5RenderedPacka
         valid: document.validation.valid,
         pendingHumanValidation: document.validation.pendingHumanValidation
       })),
+      procedureDocumentPlan,
       coherenceFingerprint: rendered.package.coherenceFingerprint,
       globalValidation: rendered.package.globalValidation
     }, null, 2),
