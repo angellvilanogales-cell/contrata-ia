@@ -1,0 +1,4 @@
+ruta;clasificacion;syntax_ok;duplicado?;motivo_resumen;recomendacion
+knowledge/inference/InferenceEngine.ts;E;NO;Sí;Archivo muy extenso y con muchos diagnósticos;Archivar copia original en archive/ y reconstruir implementación canónica.
+src/domain/cpv/CPVEngine.ts;E;NO;Sí;Alto número de diagnósticos;Archivar/aislar y reconstruir o crear adaptador canónico según consumo.
+# Nota: clasificación parcial incluida. La clasificación completa se generará con scripts de auditoría.

@@ -1,0 +1,23 @@
+{
+  "name": "contrata-ia",
+  "version": "0.0.0-dev",
+  "private": true,
+  "description": "Contrata-IA — asistencia inteligente para la contratación pública (toolchain LB-1)",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "validate-knowledge": "node ./scripts/validate-knowledge.mjs",
+    "check-imports": "node ./scripts/check-relative-imports.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest --run --reporter verbose",
+    "start": "node ./dist/main.js",
+    "smoke": "node ./scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.1.6",
+    "vitest": "1.4.8",
+    "js-yaml": "4.1.0"
+  }
+}
