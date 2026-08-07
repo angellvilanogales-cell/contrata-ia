@@ -2,7 +2,7 @@ import {
   EnvironmentConfiguration,
   getCanonicalArchitecture
 } from "./architecture";
-import { runVerticalDemo } from "./application/vertical/VerticalSlice";
+import { executeVerticalDemo } from "./runtime";
 
 export interface ApplicationInfo {
   name: "contrata-ia";
@@ -29,7 +29,7 @@ export function createApplication(): ApplicationInfo {
 
 async function run(): Promise<void> {
   if (process.argv.includes("--vertical-demo")) {
-    const result = await runVerticalDemo();
+    const result = await executeVerticalDemo();
     console.log(JSON.stringify({
       expedienteId: result.expediente.id,
       status: result.expediente.status,
