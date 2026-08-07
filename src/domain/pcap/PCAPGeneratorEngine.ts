@@ -557,7 +557,7 @@ private renumberSections(
 
             ...section,
 
-            number:index++.toString()
+            number:(index++).toString()
 
         })
 
@@ -830,28 +830,6 @@ public preview(
 * BLOQUE 8 de 12
 *
 ******************************************************************************************/
-  ===========================================================
-ARCHIVO
-
-PCAPGeneratorEngine.ts
-
-BLOQUE
-
-9 de 12
-
-ESTADO
-
-██████████████████░░░░ 75 %
-
-SIGUIENTE
-
-Bloque 10 de 12
-
-RUTA
-
-src/domain/pcap/PCAPGeneratorEngine.ts
-
-===========================================================
   /*****************************************************************************************
 *
 * BLOQUE 11 de 12

@@ -3068,7 +3068,7 @@ public async validate()
 
     return await this.healthCheck();
 
-}
+
 
 
 /*===========================================================================
@@ -3122,6 +3122,8 @@ public async shutdown()
 = FACTORY
 =
 ===========================================================================*/
+
+}
 
 export class AIManagerFactory{
 
