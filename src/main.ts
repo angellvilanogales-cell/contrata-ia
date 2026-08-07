@@ -2,7 +2,7 @@ import {
   EnvironmentConfiguration,
   getCanonicalArchitecture
 } from "./architecture";
-import { executeVerticalDemo } from "./runtime";
+import { executeLB4CleaningDemo, executeVerticalDemo } from "./runtime";
 
 export interface ApplicationInfo {
   name: "contrata-ia";
@@ -37,6 +37,24 @@ async function run(): Promise<void> {
       documentType: result.expediente.document?.type,
       exports: ["json", "html"],
       auditEntries: result.audit.length
+    }));
+    return;
+  }
+
+  if (process.argv.includes("--lb4-cleaning-demo")) {
+    const result = executeLB4CleaningDemo();
+    console.log(JSON.stringify({
+      scope: result.scope,
+      effectivePeriod: result.effectivePeriod,
+      cpv: result.cpv.primary,
+      procedure: result.procedure.procedure,
+      sara: result.procedure.sara,
+      lots: result.lots.result,
+      economicSolvencyMinimum: result.solvency.economic.calculatedMinimum,
+      definitiveGuaranteePercent: result.guarantees.definitive.percentOfFinalPriceExVat,
+      subrogation: result.subrogation.status,
+      traceEntries: result.traces.length,
+      validation: result.overallValidation
     }));
     return;
   }
