@@ -1,0 +1,41 @@
+name: LB1 syntax repair
+
+on:
+  push:
+    branches:
+      - agent/lb1-proyecto-compilable
+    paths:
+      - scripts/lb1-syntax-repair.mjs
+      - .github/workflows/lb1-syntax-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/lb1-proyecto-compilable
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/lb1-syntax-repair.mjs
+      - run: |
+          rm -f scripts/lb1-syntax-repair.mjs
+          rm -f .github/workflows/lb1-syntax-repair.yml
+      - name: Commit repairs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 1
+          fi
+          git commit -m "fix: repair remaining LB-1 syntax breaks"
+          git push origin HEAD:agent/lb1-proyecto-compilable
