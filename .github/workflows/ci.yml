@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
 
+# Temporary targeted structural recovery; removed by the repair job itself.
 jobs:
   repair-knowledge-structure:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/lb1-proyecto-compilable'
@@ -21,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: agent/lb1-proyecto-compilable
-          fetch-depth: 1
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -35,8 +36,7 @@ jobs:
           import re
           p=Path('src/domain/conocimiento/KnowledgeEngine.ts')
           s=p.read_text(encoding='utf-8')
-          if re.search(r'(?m)^\s*(<<<<<<<.*|=======|>>>>>>>.*)\s*$', s):
-              raise SystemExit('Real merge marker found; refusing automatic resolution.')
+          if re.search(r'(?m)^\s*(<<<<<<<.*|=======|>>>>>>>.*)\s*$', s): raise SystemExit('Real merge marker found; refusing automatic resolution.')
           cm=re.search(r'export class KnowledgeEngine\s*\{',s)
           if not cm: raise SystemExit('KnowledgeEngine class not found')
           def close(src,o):
@@ -69,7 +69,7 @@ jobs:
                       if c=='`':st='c'
                       i+=1
               return None
-          start=cm.start();pos=cm.end();blocks=[]
+          pos=cm.end();blocks=[]
           while True:
               m=re.search(r'export interface\s+[A-Za-z0-9_]+\s*\{',s[pos:])
               if not m:break
@@ -86,14 +86,7 @@ jobs:
       - name: Commit repair and restore canonical CI
         shell: bash
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('.github/workflows/ci.yml');s=p.read_text(encoding='utf-8')
-          a=s.index('  repair-knowledge-structure:\n');b=s.index('  audit-imports:\n',a)
-          s=s[:a]+s[b:]
-          s=s.replace('permissions:\n  contents: write\n','permissions:\n  contents: read\n',1)
-          p.write_text(s,encoding='utf-8')
-          PY
+          git show HEAD~1:.github/workflows/ci.yml > .github/workflows/ci.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add src/domain/conocimiento/KnowledgeEngine.ts .github/workflows/ci.yml
