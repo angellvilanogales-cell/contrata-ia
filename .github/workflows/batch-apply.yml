@@ -11,21 +11,26 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: contrata-ia-batch-apply
+  cancel-in-progress: false
+
 jobs:
   batch-apply:
-    name: Apply batch manifest
+    name: Apply batch manifest to LB-1 branch
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout target branch
+      - name: Checkout LB-1 branch
         uses: actions/checkout@v4
         with:
+          ref: agent/lb1-proyecto-compilable
           fetch-depth: 0
 
       - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .nvmrc
 
       - name: Verify manifest
         env:
@@ -34,42 +39,18 @@ jobs:
           node -e "
           const fs = require('fs');
           const path = process.env.MANIFEST;
-
-          if (!fs.existsSync(path)) {
-            console.error('ERROR: No existe el manifest: ' + path);
-            process.exit(1);
-          }
-
+          if (!fs.existsSync(path)) throw new Error('No existe el manifest: ' + path);
           const data = JSON.parse(fs.readFileSync(path, 'utf8'));
-
-          if (!data || !Array.isArray(data.files)) {
-            console.error('ERROR: El manifest debe contener un array files');
-            process.exit(1);
-          }
-
+          if (!data || !Array.isArray(data.files)) throw new Error('El manifest debe contener un array files');
           for (const [i, file] of data.files.entries()) {
-            if (!file || typeof file.path !== 'string') {
-              console.error('ERROR: Entrada ' + i + ' sin path válido');
-              process.exit(1);
+            if (!file || typeof file.path !== 'string' || typeof file.content !== 'string') {
+              throw new Error('Entrada ' + i + ' inválida');
             }
-
-            if (typeof file.content !== 'string') {
-              console.error('ERROR: Entrada ' + i + ' sin content válido');
-              process.exit(1);
-            }
-
-            if (
-              file.path.startsWith('/') ||
-              file.path.includes('../') ||
-              file.path === '..'
-            ) {
-              console.error('ERROR: Ruta no permitida: ' + file.path);
-              process.exit(1);
+            if (file.path.startsWith('/') || file.path.includes('../') || file.path === '..') {
+              throw new Error('Ruta no permitida: ' + file.path);
             }
           }
-
-          console.log('Manifest válido');
-          console.log('Archivos declarados: ' + data.files.length);
+          console.log('Manifest válido: ' + data.files.length + ' archivos');
           "
 
       - name: Apply batch manifest
@@ -79,97 +60,41 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-
-          const manifestPath = process.env.MANIFEST;
-          const manifest = JSON.parse(
-            fs.readFileSync(manifestPath, 'utf8')
-          );
-
-          let created = 0;
-          let updated = 0;
-          let unchanged = 0;
-
+          const manifest = JSON.parse(fs.readFileSync(process.env.MANIFEST, 'utf8'));
+          let created = 0, updated = 0, unchanged = 0;
           for (const file of manifest.files) {
             const target = path.resolve(file.path);
-
-            const relative = path.relative(
-              process.cwd(),
-              target
-            );
-
-            if (
-              relative.startsWith('..') ||
-              path.isAbsolute(relative)
-            ) {
-              throw new Error(
-                `Ruta fuera del repositorio: ${file.path}`
-              );
-            }
-
-            fs.mkdirSync(path.dirname(target), {
-              recursive: true
-            });
-
+            const relative = path.relative(process.cwd(), target);
+            if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error(`Ruta fuera del repositorio: ${file.path}`);
+            fs.mkdirSync(path.dirname(target), { recursive: true });
             if (fs.existsSync(target)) {
-              const previous = fs.readFileSync(
-                target,
-                'utf8'
-              );
-
-              if (previous === file.content) {
-                unchanged++;
-                console.log(`UNCHANGED ${file.path}`);
-                continue;
-              }
-
-              fs.writeFileSync(
-                target,
-                file.content,
-                'utf8'
-              );
-
+              const previous = fs.readFileSync(target, 'utf8');
+              if (previous === file.content) { unchanged++; continue; }
+              fs.writeFileSync(target, file.content, 'utf8');
               updated++;
-              console.log(`UPDATED   ${file.path}`);
-              continue;
+            } else {
+              fs.writeFileSync(target, file.content, 'utf8');
+              created++;
             }
-
-            fs.writeFileSync(
-              target,
-              file.content,
-              'utf8'
-            );
-
-            created++;
-            console.log(`CREATED   ${file.path}`);
           }
-
-          console.log('');
-          console.log('==============================');
-          console.log('BATCH APPLICATION');
-          console.log('==============================');
-          console.log(`Created:   ${created}`);
-          console.log(`Updated:   ${updated}`);
-          console.log(`Unchanged: ${unchanged}`);
-          console.log('==============================');
+          console.log({ created, updated, unchanged });
           NODE
 
-      - name: Show changed files
+      - name: Validate generated changes
         run: |
-          echo "Cambios detectados:"
-          git status --short
+          npm ci
+          npm run audit:imports
+          npm run audit:knowledge
+          npm run typecheck
 
-      - name: Commit generated changes
+      - name: Commit generated changes only on LB-1
         run: |
           if git diff --quiet; then
             echo "No hay cambios que confirmar."
             exit 0
           fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add .
-
           git commit -m "build: apply batch manifest"
-
-          git push
+          git push origin agent/lb1-proyecto-compilable
