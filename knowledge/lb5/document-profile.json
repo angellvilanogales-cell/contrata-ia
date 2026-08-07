@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "scope": "CLEANING_BUILDINGS_OFFICES_JUNTA_ANDALUCIA",
   "primaryDocuments": ["MEMORIA_JUSTIFICATIVA", "PCAP", "PPT"],
   "configurableContent": {
@@ -10,6 +10,27 @@
     "mode": "BLOCK_COMPOSITION",
     "simpleInstructionInterpreter": true,
     "requiresVerifiedBlocks": true
+  },
+  "procedureDocumentPlanning": {
+    "enabled": true,
+    "responsibilities": [
+      "CONTRATA_IA_GENERATES",
+      "CONTRATA_IA_CAN_DRAFT_ON_REQUEST",
+      "EXTERNAL_SYSTEM_GENERATES",
+      "EXTERNAL_AUTHORITY_OR_CONTROL_BODY",
+      "NOT_APPLICABLE"
+    ],
+    "supportedDrafts": [
+      "PROPUESTA_INICIO",
+      "SOLICITUD_EXISTENCIA_CREDITO",
+      "ACUERDO_INICIO",
+      "SOLICITUD_INFORME_JURIDICO"
+    ],
+    "externalEvidenceNeverFabricated": [
+      "CERTIFICADO_EXISTENCIA_CREDITO",
+      "RESERVA_CREDITO",
+      "INFORME_ASESORIA_JURIDICA"
+    ]
   },
   "editableFormat": "DOCX",
   "secondaryFormat": "PDF",
@@ -44,7 +65,7 @@
       "id": "SAE-GUIA-OPERATIVA-CONTRATACION",
       "authority": "Documentación operativa SAE aportada al proyecto",
       "locator": "file-library",
-      "purpose": "Flujo documental y posibilidad de integrar necesidad/insuficiencia en Memoria"
+      "purpose": "Flujo documental, documentos iniciales y posibilidad de integrar necesidad/insuficiencia en Memoria"
     }
   ]
 }
