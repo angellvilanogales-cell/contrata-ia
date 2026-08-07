@@ -3,13 +3,9 @@
 /**
  * Contrata-IA — auditoría de imports relativos del runtime.
  *
- * El runtime canónico está en src/. El directorio knowledge/ es conocimiento
- * declarativo (YAML/JSON) y se valida con los auditores de conocimiento.
- * Los antiguos .ts de knowledge/ no forman parte del runtime compilable.
- *
- * Uso:
- *   npm run audit:imports
- *   node scripts/check-relative-imports.mjs src knowledge
+ * La auditoría comprueba el árbol real de src/ y no oculta referencias rotas.
+ * Para que los logs de CI sean diagnosticables, cuando existen muchos errores
+ * se muestran los primeros 30 y se conserva el recuento total.
  */
 
 import fs from "node:fs";
@@ -113,7 +109,11 @@ function main() {
   }
 
   console.error("RESULTADO: ERROR");
-  for (const item of unresolved) console.error(`- ${item.file}:${item.line} -> ${item.specifier}`);
+  const visible = unresolved.slice(0, 30);
+  for (const item of visible) console.error(`- ${item.file}:${item.line} -> ${item.specifier}`);
+  if (unresolved.length > visible.length) {
+    console.error(`- ... ${unresolved.length - visible.length} referencias adicionales omitidas del log; el recuento total anterior sigue siendo vinculante.`);
+  }
   process.exitCode = 1;
 }
 
