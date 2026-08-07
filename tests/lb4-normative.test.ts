@@ -39,11 +39,28 @@ describe("LB-4 cleaning-services normative MVP", () => {
     expect(result.guarantees.definitive.required).toBe(false);
   });
 
+  it("does not treat exactly 60000 euros as abbreviated simplified", () => {
+    const result = engine.evaluate({
+      ...baseInput(),
+      estimatedValue: 60000,
+      judgmentValuePercent: 0,
+      allAwardCriteriaFormulaBased: true
+    });
+    expect(result.procedure.procedure).toBe("OPEN_SIMPLIFIED");
+    expect(result.guarantees.definitive.required).toBe(true);
+  });
+
   it("selects ordinary simplified procedure below 140000 when judgment criteria stay within 25 percent", () => {
     const result = engine.evaluate(baseInput());
     expect(result.procedure.procedure).toBe("OPEN_SIMPLIFIED");
     expect(result.procedure.sara).toBe(false);
     expect(result.procedure.tenderDeadlineDaysMinimum).toBe(15);
+  });
+
+  it("does not treat exactly 140000 euros as open simplified", () => {
+    const result = engine.evaluate({ ...baseInput(), estimatedValue: 140000 });
+    expect(result.procedure.procedure).toBe("OPEN_ORDINARY");
+    expect(result.procedure.sara).toBe(false);
   });
 
   it("rejects simplified procedure when judgment-value weighting exceeds 25 percent", () => {
