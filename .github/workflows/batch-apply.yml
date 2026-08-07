@@ -1,0 +1,331 @@
+name: Batch Apply
+
+run-name: Batch Apply - ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  batch-apply:
+    name: Apply batch manifest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Verify batch manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f "tools/batch-manifest.json" ]; then
+            echo "ERROR: tools/batch-manifest.json does not exist."
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+
+          const file = "tools/batch-manifest.json";
+
+          const content = fs.readFileSync(
+            file,
+            "utf8"
+          );
+
+          let manifest;
+
+          try {
+            manifest = JSON.parse(content);
+          } catch (error) {
+            console.error(
+              "ERROR: batch-manifest.json is not valid JSON."
+            );
+
+            console.error(
+              error instanceof Error
+                ? error.message
+                : String(error)
+            );
+
+            process.exit(1);
+          }
+
+          if (
+            !manifest ||
+            typeof manifest !== "object" ||
+            Array.isArray(manifest)
+          ) {
+            console.error(
+              "ERROR: manifest must contain a JSON object."
+            );
+
+            process.exit(1);
+          }
+
+          if (!Array.isArray(manifest.files)) {
+            console.error(
+              "ERROR: manifest.files must be an array."
+            );
+
+            process.exit(1);
+          }
+
+          console.log(
+            `Files declared in manifest: ${manifest.files.length}`
+          );
+
+          const seen = new Set();
+
+          for (const [index, entry] of manifest.files.entries()) {
+            if (
+              !entry ||
+              typeof entry !== "object" ||
+              Array.isArray(entry)
+            ) {
+              console.error(
+                `ERROR: files[${index}] must be an object.`
+              );
+
+              process.exit(1);
+            }
+
+            if (
+              typeof entry.path !== "string" ||
+              entry.path.trim() === ""
+            ) {
+              console.error(
+                `ERROR: files[${index}].path must be a non-empty string.`
+              );
+
+              process.exit(1);
+            }
+
+            if (
+              typeof entry.content !== "string"
+            ) {
+              console.error(
+                `ERROR: files[${index}].content must be a string.`
+              );
+
+              process.exit(1);
+            }
+
+            const normalized =
+              entry.path
+                .replaceAll("\\", "/")
+                .replace(/^\/+/, "");
+
+            if (
+              normalized.startsWith("../") ||
+              normalized.includes("/../") ||
+              normalized === ".."
+            ) {
+              console.error(
+                `ERROR: unsafe path detected: ${entry.path}`
+              );
+
+              process.exit(1);
+            }
+
+            if (
+              normalized === "" ||
+              normalized.endsWith("/")
+            ) {
+              console.error(
+                `ERROR: invalid file path: ${entry.path}`
+              );
+
+              process.exit(1);
+            }
+
+            if (seen.has(normalized)) {
+              console.error(
+                `ERROR: duplicated path in manifest: ${normalized}`
+              );
+
+              process.exit(1);
+            }
+
+            seen.add(normalized);
+          }
+
+          console.log(
+            "Manifest validation: OK"
+          );
+          NODE
+
+      - name: Apply batch manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          import path from "node:path";
+
+          const manifestPath =
+            "tools/batch-manifest.json";
+
+          const manifest =
+            JSON.parse(
+              fs.readFileSync(
+                manifestPath,
+                "utf8"
+              )
+            );
+
+          const projectRoot =
+            process.cwd();
+
+          let created = 0;
+          let updated = 0;
+          let unchanged = 0;
+
+          for (const entry of manifest.files) {
+            const relativePath =
+              entry.path
+                .replaceAll("\\", "/")
+                .replace(/^\/+/, "");
+
+            const targetPath =
+              path.resolve(
+                projectRoot,
+                relativePath
+              );
+
+            const relativeResolved =
+              path.relative(
+                projectRoot,
+                targetPath
+              );
+
+            if (
+              relativeResolved.startsWith("..") ||
+              path.isAbsolute(relativeResolved)
+            ) {
+              throw new Error(
+                `Unsafe target path: ${entry.path}`
+              );
+            }
+
+            const directory =
+              path.dirname(targetPath);
+
+            fs.mkdirSync(
+              directory,
+              {
+                recursive: true
+              }
+            );
+
+            const newContent =
+              entry.content;
+
+            if (
+              fs.existsSync(targetPath)
+            ) {
+              const oldContent =
+                fs.readFileSync(
+                  targetPath,
+                  "utf8"
+                );
+
+              if (
+                oldContent === newContent
+              ) {
+                unchanged++;
+                console.log(
+                  `UNCHANGED ${relativePath}`
+                );
+
+                continue;
+              }
+
+              fs.writeFileSync(
+                targetPath,
+                newContent,
+                "utf8"
+              );
+
+              updated++;
+
+              console.log(
+                `UPDATED ${relativePath}`
+              );
+
+              continue;
+            }
+
+            fs.writeFileSync(
+              targetPath,
+              newContent,
+              "utf8"
+            );
+
+            created++;
+
+            console.log(
+              `CREATED ${relativePath}`
+            );
+          }
+
+          console.log("");
+          console.log(
+            `Created: ${created}`
+          );
+
+          console.log(
+            `Updated: ${updated}`
+          );
+
+          console.log(
+            `Unchanged: ${unchanged}`
+          );
+
+          console.log(
+            "Batch application: OK"
+          );
+          NODE
+
+      - name: Show changed files
+        shell: bash
+        run: |
+          echo "===== GIT STATUS ====="
+          git status --short
+
+          echo ""
+          echo "===== GIT DIFF STAT ====="
+          git diff --stat
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet; then
+            echo "No changes detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          git commit \
+            -m "build: apply batch manifest"
+
+          git push origin HEAD:${{ github.ref_name }}
