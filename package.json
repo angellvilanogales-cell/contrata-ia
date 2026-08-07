@@ -13,15 +13,18 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "start": "node dist/main.js",
+    "serve": "node dist/main.js --serve",
     "demo:vertical": "node dist/main.js --vertical-demo",
     "demo:lb4": "node dist/main.js --lb4-cleaning-demo",
     "demo:lb5": "node dist/main.js --lb5-documents-demo",
+    "demo:lb6": "node dist/main.js --lb6-intake-demo",
     "audit:imports": "node scripts/check-relative-imports.mjs",
     "audit:architecture": "node scripts/audit-architecture.mjs",
     "audit:knowledge": "node scripts/validate-knowledge-integrity.mjs",
     "audit:knowledge:integrity": "node scripts/validate-knowledge-integrity.mjs",
     "audit:normative": "node scripts/audit-lb4-normative.mjs",
-    "audit:documents": "node scripts/audit-lb5-documents.mjs"
+    "audit:documents": "node scripts/audit-lb5-documents.mjs",
+    "audit:lb6": "node scripts/audit-lb6.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
