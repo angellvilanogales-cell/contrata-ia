@@ -24,7 +24,8 @@
     "audit:knowledge:integrity": "node scripts/validate-knowledge-integrity.mjs",
     "audit:normative": "node scripts/audit-lb4-normative.mjs",
     "audit:documents": "node scripts/audit-lb5-documents.mjs",
-    "audit:lb6": "node scripts/audit-lb6.mjs"
+    "audit:lb6": "node scripts/audit-lb6.mjs",
+    "audit:lb7": "node scripts/audit-lb7.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
