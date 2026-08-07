@@ -8,6 +8,7 @@ on:
       - agent/lb3-recorrido-vertical
       - agent/lb4-motor-normativo
       - agent/lb5-documentos-administrativos
+      - agent/lb6-api-ui-integracion
   pull_request:
     branches:
       - main
@@ -16,6 +17,7 @@ on:
       - agent/lb3-recorrido-vertical
       - agent/lb4-motor-normativo
       - agent/lb5-documentos-administrativos
+      - agent/lb6-api-ui-integracion
   workflow_dispatch:
 
 permissions:
@@ -83,6 +85,18 @@ jobs:
       - run: npm ci
       - run: npm run audit:documents
 
+  audit-lb6:
+    name: Validate LB-6 dual intake and interface
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:lb6
+
   typecheck:
     name: TypeScript typecheck
     runs-on: ubuntu-latest
@@ -96,7 +110,7 @@ jobs:
       - run: npm run typecheck
 
   tests:
-    name: Unit, vertical, normative and document tests
+    name: Unit, vertical, normative, document and intake tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -108,7 +122,7 @@ jobs:
       - run: npm test
 
   build:
-    name: Production build and MVP smoke tests
+    name: Production build and end-to-end smoke tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -126,15 +140,42 @@ jobs:
         run: npm run demo:lb4
       - name: Generate LB-5 administrative documents
         run: npm run demo:lb5
-      - name: Verify LB-5 artifacts
+      - name: Execute LB-6 dual intake demo
+        run: npm run demo:lb6
+      - name: Smoke test LB-6 HTTP API and UI
+        run: |
+          npm run serve > /tmp/contrata-ia-lb6.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:3000/api/questions > /tmp/questions.json; then break; fi
+            sleep 0.25
+          done
+          grep -q 'contractingAuthority' /tmp/questions.json
+          curl --fail --silent http://127.0.0.1:3000/ | grep -q 'Asistente guiado'
+          kill $SERVER_PID
+          wait $SERVER_PID 2>/dev/null || true
+          trap - EXIT
+      - name: Verify LB-5 and LB-6 artifacts
         run: |
           test -f artifacts/lb5/manifest.json
           test "$(find artifacts/lb5 -name '*.docx' | wc -l)" -ge 4
           test "$(find artifacts/lb5 -name '*.pdf' | wc -l)" -ge 4
+          test -f artifacts/lb6/lb6-manifest.json
+          test "$(find artifacts/lb6 -name 'Ficha_Datos_*.docx' | wc -l)" -ge 1
+          test "$(find artifacts/lb6 -name '*.docx' | wc -l)" -ge 4
+          test "$(find artifacts/lb6 -name '*.pdf' | wc -l)" -ge 3
       - name: Preserve LB-5 document package
         uses: actions/upload-artifact@v4
         with:
           name: lb5-administrative-documents
           path: artifacts/lb5
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve LB-6 intake and generated package
+        uses: actions/upload-artifact@v4
+        with:
+          name: lb6-intake-and-documents
+          path: artifacts/lb6
           if-no-files-found: error
           retention-days: 30

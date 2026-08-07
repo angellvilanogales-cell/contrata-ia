@@ -5,7 +5,9 @@ import {
 import {
   executeLB4CleaningDemo,
   executeVerticalDemo,
-  generateLB5DemoFiles
+  generateLB5DemoFiles,
+  generateLB6DemoFiles,
+  serveLB6
 } from "./runtime";
 
 export interface ApplicationInfo {
@@ -73,6 +75,22 @@ async function run(): Promise<void> {
       valid: result.package.globalValidation.valid,
       outputDirectory: "artifacts/lb5"
     }));
+    return;
+  }
+
+  if (process.argv.includes("--lb6-intake-demo")) {
+    generateLB6DemoFiles();
+    console.log(JSON.stringify({
+      status: "LB6_DEMO_GENERATED",
+      outputDirectory: "artifacts/lb6",
+      includesQuestionnaire: true,
+      requiresHumanValidationBeforeGeneration: true
+    }));
+    return;
+  }
+
+  if (process.argv.includes("--serve")) {
+    await serveLB6();
     return;
   }
 
