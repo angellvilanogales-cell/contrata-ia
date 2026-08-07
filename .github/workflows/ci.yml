@@ -5,11 +5,13 @@ on:
     branches:
       - agent/lb1-proyecto-compilable
       - agent/lb2-arquitectura-canonica
+      - agent/lb3-recorrido-vertical
   pull_request:
     branches:
       - main
       - agent/lb1-proyecto-compilable
       - agent/lb2-arquitectura-canonica
+      - agent/lb3-recorrido-vertical
   workflow_dispatch:
 
 permissions:
@@ -66,7 +68,7 @@ jobs:
       - run: npm run typecheck
 
   tests:
-    name: Unit tests
+    name: Unit and vertical tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +80,7 @@ jobs:
       - run: npm test
 
   build:
-    name: Production build
+    name: Production build and vertical smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,3 +92,5 @@ jobs:
       - run: npm run build
       - name: Smoke test application start
         run: npm start
+      - name: Execute LB-3 vertical flow
+        run: npm run demo:vertical

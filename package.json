@@ -13,6 +13,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "start": "node dist/main.js",
+    "demo:vertical": "node dist/main.js --vertical-demo",
     "audit:imports": "node scripts/check-relative-imports.mjs",
     "audit:architecture": "node scripts/audit-architecture.mjs",
     "audit:knowledge": "node scripts/validate-knowledge-integrity.mjs",
