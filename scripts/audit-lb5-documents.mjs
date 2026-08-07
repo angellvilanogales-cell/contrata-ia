@@ -31,6 +31,17 @@ if (profile) {
   if (profile.additionalDocuments?.simpleInstructionInterpreter !== true) {
     errors.push("Debe existir un intérprete de indicaciones simples para documentos adicionales.");
   }
+
+  if (profile.procedureDocumentPlanning?.enabled !== true) errors.push("Debe existir planificación documental del procedimiento.");
+  const responsibilities = new Set(profile.procedureDocumentPlanning?.responsibilities ?? []);
+  for (const item of ["CONTRATA_IA_GENERATES", "CONTRATA_IA_CAN_DRAFT_ON_REQUEST", "EXTERNAL_SYSTEM_GENERATES", "EXTERNAL_AUTHORITY_OR_CONTROL_BODY", "NOT_APPLICABLE"]) {
+    if (!responsibilities.has(item)) errors.push(`Falta responsabilidad documental ${item}.`);
+  }
+  const protectedExternal = new Set(profile.procedureDocumentPlanning?.externalEvidenceNeverFabricated ?? []);
+  for (const item of ["CERTIFICADO_EXISTENCIA_CREDITO", "RESERVA_CREDITO", "INFORME_ASESORIA_JURIDICA"]) {
+    if (!protectedExternal.has(item)) errors.push(`Debe protegerse contra fabricación automática: ${item}.`);
+  }
+
   if (profile.editableFormat !== "DOCX") errors.push("El formato editable principal de LB-5 debe ser DOCX.");
   if (profile.secondaryFormat !== "PDF") errors.push("LB-5 debe producir también PDF derivado.");
   if (profile.style?.primaryFont !== "Source Sans Pro") errors.push("El perfil de referencia documental debe usar Source Sans Pro como familia principal.");
@@ -52,6 +63,8 @@ const requiredCodeFiles = [
   "src/application/documents/lb5/LB5DocumentComposer.ts",
   "src/application/documents/lb5/AdministrativeDocumentRenderer.ts",
   "src/application/documents/lb5/SimpleDocumentRequest.ts",
+  "src/application/documents/lb5/ProcedureDocumentPlanner.ts",
+  "src/application/documents/lb5/ProceduralDraftFactory.ts",
   "src/application/documents/lb5/LB5Demo.ts"
 ];
 for (const file of requiredCodeFiles) {
@@ -68,5 +81,7 @@ console.log("LB-5 document audit: PASS");
 console.log("- Memoria, PCAP y PPT: registrados como núcleo");
 console.log("- necesidad e insuficiencia: ubicación configurable");
 console.log("- documentos adicionales: composición por bloques verificables");
+console.log("- planificación procedimental: activa");
+console.log("- certificados/retenciones/dictámenes externos: protegidos contra fabricación");
 console.log("- salida editable DOCX y PDF: declaradas");
 console.log("- fuentes documentales y perfil administrativo: registrados");
