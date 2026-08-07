@@ -63,6 +63,7 @@ if (sourcesDoc && rulesDoc) {
     "guarantees",
     "award-criteria",
     "special-execution-condition",
+    "data-protection-execution-condition",
     "subrogation",
     "tender-deadline"
   ]);
