@@ -4,14 +4,10 @@
     "rootDir": ".",
     "outDir": "./dist-test",
     "noEmit": true,
-    "types": [
-      "node",
-      "vitest/globals"
-    ]
+    "types": ["node", "vitest/globals"]
   },
   "include": [
     "src/**/*.ts",
-    "knowledge/**/*.ts",
     "tests/**/*.ts",
     "test/**/*.ts",
     "**/*.test.ts",
@@ -20,6 +16,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "dist-test"
+    "dist-test",
+    "knowledge/**/*.ts"
   ]
 }
