@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "effectiveFrom": "2026-01-01",
   "effectiveTo": "2027-12-31",
   "scope": {
@@ -79,6 +79,13 @@
       "id": "LB4-SVC-EXEC-001", "topic": "special-execution-condition", "kind": "mandatory-requirement", "result": "AT_LEAST_ONE_ART202_CONDITION",
       "justification": "El PCAP debe incluir al menos una condición especial de ejecución de las previstas en el artículo 202, vinculada al objeto, no discriminatoria y compatible con el Derecho de la Unión.",
       "sourceIds": ["LCSP-2017-CONSOLIDADA-2026", "JA-CLAUSULAS-SOCIALES-AMBIENTALES", "JA-ACUERDO-2016-CLAUSULAS"], "humanValidation": true
+    },
+    {
+      "id": "LB4-SVC-DATA-001", "topic": "data-protection-execution-condition", "kind": "conditional-mandatory",
+      "condition": "publicBodyTransfersPersonalDataToContractor == true",
+      "result": "ADD_DATA_PROTECTION_SPECIAL_EXECUTION_CONDITION",
+      "justification": "Cuando la ejecución implique cesión de datos por una entidad del sector público al contratista, debe incorporarse la condición especial de ejecución relativa al sometimiento a la normativa nacional y de la Unión Europea en materia de protección de datos.",
+      "sourceIds": ["LCSP-2017-CONSOLIDADA-2026"], "humanValidation": false
     },
     {
       "id": "LB4-SVC-SUBROG-001", "topic": "subrogation", "kind": "conditional-mandatory", "result": "REQUEST_AND_DISCLOSE_LABOUR_DATA_IF_SUBROGATION_APPLIES",
