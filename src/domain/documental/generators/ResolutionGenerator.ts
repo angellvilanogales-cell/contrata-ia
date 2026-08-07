@@ -1,3 +1,5 @@
 export class ResolutionGenerator {
-  public generate(input: unknown): unknown { return input; }
+  public generate(_input: unknown): never {
+    throw new Error("Resolution generation is not implemented by the current canonical engine.");
+  }
 }
