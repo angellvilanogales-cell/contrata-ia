@@ -1,0 +1,96 @@
+name: LB-1 structural repair
+
+on:
+  push:
+    branches:
+      - agent/lb1-proyecto-compilable
+
+permissions:
+  contents: write
+
+jobs:
+  repair-clause:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Repair ClauseGeneratorEngine structure
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          p = Path('src/domain/clauses/ClauseGeneratorEngine.ts')
+          s = p.read_text(encoding='utf-8')
+
+          markers = ['<<<<<<<', '=======', '>>>>>>>']
+          if any(m in s for m in markers):
+              raise SystemExit('Conflict marker found in ClauseGeneratorEngine.ts; refusing automatic resolution.')
+
+          pattern = re.compile(
+              r'(?ms)^\s*=+\s*\nARCHIVO\s*\n\s*ClauseGeneratorEngine\.ts\s*\n\s*BLOQUE\s*\n\s*\d+ de 24\s*\n\s*ESTADO\s*\n.*?\nSIGUIENTE\s*\n.*?\nRUTA\s*\n\s*src/domain/clauses/ClauseGeneratorEngine\.ts\s*\n\s*=+\s*\n'
+          )
+          cleaned, count = pattern.subn('', s)
+          if count == 0:
+              raise SystemExit('Expected ClauseGeneratorEngine metadata corruption was not found; refusing blind edit.')
+          if count < 3:
+              raise SystemExit(f'Expected at least 3 metadata blocks, found {count}; refusing partial repair.')
+
+          # Lexically count braces while ignoring strings and comments.
+          depth = 0
+          i = 0
+          state = 'code'
+          while i < len(cleaned):
+              c = cleaned[i]
+              n = cleaned[i+1] if i + 1 < len(cleaned) else ''
+              if state == 'code':
+                  if c == '/' and n == '/': state = 'line'; i += 2; continue
+                  if c == '/' and n == '*': state = 'block'; i += 2; continue
+                  if c == '"': state = 'dq'; i += 1; continue
+                  if c == "'": state = 'sq'; i += 1; continue
+                  if c == '`': state = 'bt'; i += 1; continue
+                  if c == '{': depth += 1
+                  elif c == '}': depth -= 1
+                  if depth < 0: raise SystemExit('Brace closes before it opens; refusing repair.')
+                  i += 1; continue
+              if state == 'line':
+                  if c == '\n': state = 'code'
+                  i += 1; continue
+              if state == 'block':
+                  if c == '*' and n == '/': state = 'code'; i += 2; continue
+                  i += 1; continue
+              if state in ('dq','sq'):
+                  if c == '\\': i += 2; continue
+                  if (state == 'dq' and c == '"') or (state == 'sq' and c == "'"): state = 'code'
+                  i += 1; continue
+              if state == 'bt':
+                  if c == '\\': i += 2; continue
+                  if c == '`': state = 'code'
+                  i += 1; continue
+
+          if depth != 1:
+              raise SystemExit(f'Unexpected top-level brace depth after metadata repair: {depth}; refusing blind edit.')
+
+          cleaned = cleaned.rstrip() + '\n}\n'
+          p.write_text(cleaned, encoding='utf-8')
+          print(f'Removed {count} known metadata-corruption blocks and restored the single missing class closing brace.')
+      - run: npx tsc --noEmit --pretty false
+      - run: npm test
+      - run: npm run build
+      - run: npm run audit:imports
+      - name: Commit repaired file and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/domain/clauses/ClauseGeneratorEngine.ts
+          git rm .github/workflows/lb1-structural-repair.yml
+          git diff --cached --check
+          git diff --cached --quiet && { echo 'No changes to commit'; exit 1; }
+          git commit -m 'fix: recover clause generator structure'
+          git push origin HEAD:agent/lb1-proyecto-compilable
