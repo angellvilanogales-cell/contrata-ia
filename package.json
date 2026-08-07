@@ -14,10 +14,12 @@
     "test": "vitest run",
     "start": "node dist/main.js",
     "demo:vertical": "node dist/main.js --vertical-demo",
+    "demo:lb4": "node dist/main.js --lb4-cleaning-demo",
     "audit:imports": "node scripts/check-relative-imports.mjs",
     "audit:architecture": "node scripts/audit-architecture.mjs",
     "audit:knowledge": "node scripts/validate-knowledge-integrity.mjs",
-    "audit:knowledge:integrity": "node scripts/validate-knowledge-integrity.mjs"
+    "audit:knowledge:integrity": "node scripts/validate-knowledge-integrity.mjs",
+    "audit:normative": "node scripts/audit-lb4-normative.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
