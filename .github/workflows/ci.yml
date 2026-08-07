@@ -1,0 +1,46 @@
+name: Contrata-IA CI
+
+on:
+  push:
+    branches:
+      - agent/lb1-proyecto-compilable
+  pull_request:
+    branches:
+      - main
+      - agent/lb1-proyecto-compilable
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit relative imports
+        run: npm run audit:imports
+
+      - name: Validate knowledge
+        run: npm run audit:knowledge
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
