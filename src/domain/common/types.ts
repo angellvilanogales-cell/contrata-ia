@@ -2,6 +2,7 @@ export type UUID = string;
 export type Identifier = string;
 export type ISODate = string;
 export type Money = number;
+export type Percentage = number;
 
 export type ValidationStatus = "pending" | "validated" | "rejected" | "modified";
 
