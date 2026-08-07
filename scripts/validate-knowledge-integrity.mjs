@@ -7,6 +7,8 @@ import yaml from "js-yaml";
 
 const ROOT = path.resolve(process.cwd(), "knowledge");
 const EXTENSIONS = new Set([".yaml", ".yml", ".json"]);
+const EXECUTION_RULE_FILE = "knowledge/rules/ejecucion.rules.yaml";
+const COMPOSITE_PLIEGOS_FILE = "knowledge/rules/pliegos.rules.yaml";
 
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -86,11 +88,28 @@ function sameRule(a, b) {
   return JSON.stringify(stableValue(a)) === JSON.stringify(stableValue(b));
 }
 
+/**
+ * `pliegos.rules.yaml` is a legacy composite catalogue. Its embedded EJE-* block
+ * predates the dedicated execution module. The dedicated execution file is the
+ * canonical owner of the EJE namespace; the composite copy is retained only for
+ * historical compatibility and must not register a second production identity.
+ *
+ * This does not accept arbitrary conflicting duplicates: only the known EJE
+ * namespace inside the known composite file is shadowed, and only when the
+ * canonical execution file has already registered that exact identifier.
+ */
+function isLegacyExecutionShadow(relative, id, previous) {
+  return relative === COMPOSITE_PLIEGOS_FILE
+    && /^EJE-\d+$/.test(id)
+    && previous?.file === EXECUTION_RULE_FILE;
+}
+
 const files = walk(ROOT).sort();
 const errors = [];
 const productionIds = new Map();
 const pendingIds = new Set();
 let mirroredDuplicates = 0;
+let legacyExecutionShadows = 0;
 
 for (const file of files) {
   const relative = path.relative(process.cwd(), file).replaceAll(path.sep, "/");
@@ -122,6 +141,11 @@ for (const file of files) {
           console.log(`Regla espejo idéntica aceptada '${id}': ${previous.file} y ${relative}`);
           continue;
         }
+        if (isLegacyExecutionShadow(relative, id, previous)) {
+          legacyExecutionShadows++;
+          console.log(`Copia legacy EJE ignorada '${id}': canónica=${previous.file}; compuesta=${relative}`);
+          continue;
+        }
         errors.push(`ID duplicado con contenido distinto '${id}': ${previous.file} y ${relative}`);
       } else {
         productionIds.set(id, { file: relative, value });
@@ -136,6 +160,7 @@ console.log(`Archivos inspeccionados: ${files.length}`);
 console.log(`Identificadores de producción: ${productionIds.size}`);
 console.log(`Identificadores pendientes: ${pendingIds.size}`);
 console.log(`Reglas espejo idénticas: ${mirroredDuplicates}`);
+console.log(`Copias legacy EJE no registradas: ${legacyExecutionShadows}`);
 
 if (errors.length) {
   console.error(`Errores de integridad: ${errors.length}`);
