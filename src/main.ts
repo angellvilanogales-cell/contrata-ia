@@ -2,7 +2,11 @@ import {
   EnvironmentConfiguration,
   getCanonicalArchitecture
 } from "./architecture";
-import { executeLB4CleaningDemo, executeVerticalDemo } from "./runtime";
+import {
+  executeLB4CleaningDemo,
+  executeVerticalDemo,
+  generateLB5DemoFiles
+} from "./runtime";
 
 export interface ApplicationInfo {
   name: "contrata-ia";
@@ -55,6 +59,19 @@ async function run(): Promise<void> {
       subrogation: result.subrogation.status,
       traceEntries: result.traces.length,
       validation: result.overallValidation
+    }));
+    return;
+  }
+
+  if (process.argv.includes("--lb5-documents-demo")) {
+    const result = generateLB5DemoFiles();
+    console.log(JSON.stringify({
+      expedienteId: result.package.context.expedienteId,
+      documents: result.package.documents.map(document => document.kind),
+      editableArtifacts: result.editable.length,
+      pdfArtifacts: result.pdf.length,
+      valid: result.package.globalValidation.valid,
+      outputDirectory: "artifacts/lb5"
     }));
     return;
   }

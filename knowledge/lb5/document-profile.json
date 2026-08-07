@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.1.0",
+  "scope": "CLEANING_BUILDINGS_OFFICES_JUNTA_ANDALUCIA",
+  "primaryDocuments": ["MEMORIA_JUSTIFICATIVA", "PCAP", "PPT"],
+  "configurableContent": {
+    "NEED_IDONEITY": ["IN_MEMORY", "STANDALONE"],
+    "INSUFFICIENCY_MEANS": ["IN_MEMORY", "STANDALONE"]
+  },
+  "additionalDocuments": {
+    "mode": "BLOCK_COMPOSITION",
+    "simpleInstructionInterpreter": true,
+    "requiresVerifiedBlocks": true
+  },
+  "procedureDocumentPlanning": {
+    "enabled": true,
+    "responsibilities": [
+      "CONTRATA_IA_GENERATES",
+      "CONTRATA_IA_CAN_DRAFT_ON_REQUEST",
+      "EXTERNAL_SYSTEM_GENERATES",
+      "EXTERNAL_AUTHORITY_OR_CONTROL_BODY",
+      "NOT_APPLICABLE"
+    ],
+    "supportedDrafts": [
+      "PROPUESTA_INICIO",
+      "SOLICITUD_EXISTENCIA_CREDITO",
+      "ACUERDO_INICIO",
+      "SOLICITUD_INFORME_JURIDICO"
+    ],
+    "externalEvidenceNeverFabricated": [
+      "CERTIFICADO_EXISTENCIA_CREDITO",
+      "RESERVA_CREDITO",
+      "INFORME_ASESORIA_JURIDICA"
+    ]
+  },
+  "editableFormat": "DOCX",
+  "secondaryFormat": "PDF",
+  "style": {
+    "profileId": "JA-SAE-SOURCES-2025-2026",
+    "primaryFont": "Source Sans Pro",
+    "bodySizePt": 10,
+    "headingBold": true,
+    "pageSize": "A4",
+    "note": "Source Sans Pro es la familia predominante identificada en los PCAP, memorias y PPT aportados al proyecto. No se distribuyen archivos de fuente; el DOCX referencia la familia instalada en el entorno del usuario."
+  },
+  "sources": [
+    {
+      "id": "LCSP-2017-CONSOLIDADA-2026",
+      "authority": "BOE",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902",
+      "purpose": "Necesidad, expediente, PCAP, PPT y justificaciones legales"
+    },
+    {
+      "id": "JA-MODELOS-PCAP",
+      "authority": "Junta de Andalucía - Comisión Consultiva de Contratación Pública",
+      "locator": "https://www.juntadeandalucia.es/temas/contratacion-publica/gestion/comision-consultiva/paginas/pliegos.html",
+      "purpose": "Modelo recomendado vigente de PCAP de servicios; la página publica control de actualizaciones de diciembre de 2025"
+    },
+    {
+      "id": "JA-PCAP-LIMPIEZA-EJEMPLOS-USUARIO",
+      "authority": "Documentación administrativa aportada al proyecto",
+      "locator": "file-library",
+      "purpose": "Estructura, terminología, anexos y patrón documental; nunca sustituye a la norma vigente"
+    },
+    {
+      "id": "SAE-GUIA-OPERATIVA-CONTRATACION",
+      "authority": "Documentación operativa SAE aportada al proyecto",
+      "locator": "file-library",
+      "purpose": "Flujo documental, documentos iniciales y posibilidad de integrar necesidad/insuficiencia en Memoria"
+    }
+  ]
+}
