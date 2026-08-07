@@ -43,6 +43,8 @@ export function runLB6Demo() {
 export function writeLB6DemoArtifacts(outputDirectory: string): void {
   const { orchestrator, caseValue, review, rendered } = runLB6Demo();
   fs.mkdirSync(outputDirectory, { recursive: true });
+  const blankQuestionnaire = orchestrator.questionnaire();
+  fs.writeFileSync(path.join(outputDirectory, "Ficha_Datos_Expediente_EN_BLANCO.docx"), Buffer.from(blankQuestionnaire.data));
   const questionnaire = orchestrator.questionnaire(caseValue.id);
   fs.writeFileSync(path.join(outputDirectory, questionnaire.fileName), Buffer.from(questionnaire.data));
   for (const artifact of [...rendered.editable, ...rendered.pdf]) fs.writeFileSync(path.join(outputDirectory, artifact.fileName), Buffer.from(artifact.data));
@@ -52,6 +54,7 @@ export function writeLB6DemoArtifacts(outputDirectory: string): void {
     validated: caseValue.validation.validated,
     validatedBy: caseValue.validation.validatedBy,
     reviewFingerprint: review.fingerprint,
+    questionnaireArtifacts: ["Ficha_Datos_Expediente_EN_BLANCO.docx", questionnaire.fileName],
     documents: rendered.package.documents.map(document => ({ id: document.id, kind: document.kind, valid: document.validation.valid })),
     coherenceFingerprint: rendered.package.coherenceFingerprint
   }, null, 2));
