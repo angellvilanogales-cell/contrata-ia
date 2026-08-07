@@ -238,6 +238,210 @@ export interface LegalReasonerConfiguration{
 =
 ===========================================================================*/
 
+export interface LegalInference{
+
+    id:UUID;
+
+    type:LegalReasonType;
+
+    premise:string;
+
+    inference:string;
+
+    justification:string;
+
+    confidence:number;
+
+    references:LegalReference[];
+
+}
+
+export interface LegalConflict{
+
+    id:UUID;
+
+    type:LegalReasonType;
+
+    description:string;
+
+    primary:LegalReference;
+
+    secondary:LegalReference;
+
+    resolved:boolean;
+
+    solution?:string;
+
+}
+
+export interface LegalMotivation{
+
+    id:UUID;
+
+    generated:Date;
+
+    title:string;
+
+    body:string;
+
+    references:LegalReference[];
+
+    reasoning:LegalReasoning[];
+
+    legalRisk:"LOW"|"MEDIUM"|"HIGH";
+
+}
+
+export interface LegalDoctrine{
+
+    id:UUID;
+
+    authority:string;
+
+    title:string;
+
+    reference:string;
+
+    date:Date;
+
+    hierarchy:LegalHierarchy;
+
+    summary:string;
+
+    applicableTo:LegalReasonType[];
+
+}
+
+export interface LegalValidationResult{
+
+    id:UUID;
+
+    generated:Date;
+
+    valid:boolean;
+
+    score:number;
+
+    observations:string[];
+
+    warnings:string[];
+
+    errors:string[];
+
+    recommendations:string[];
+
+}
+
+export interface LegalRisk{
+
+    id:UUID;
+
+    severity:"LOW"|"MEDIUM"|"HIGH"|"CRITICAL";
+
+    title:string;
+
+    description:string;
+
+    recommendation:string;
+
+    references:LegalReference[];
+
+}
+
+export interface LegalRecommendation{
+
+    id:UUID;
+
+    priority:"LOW"|"MEDIUM"|"HIGH"|"CRITICAL";
+
+    title:string;
+
+    description:string;
+
+    action:string;
+
+    automatic:boolean;
+
+    applied:boolean;
+
+}
+
+export interface LegalOpinion{
+
+    id:UUID;
+
+    generated:Date;
+
+    result:"FAVORABLE"|"FAVORABLE_WITH_OBSERVATIONS"|"UNFAVORABLE";
+
+    score:number;
+
+    executiveSummary:string;
+
+    strengths:string[];
+
+    weaknesses:string[];
+
+    recommendations:string[];
+
+    risks:LegalRisk[];
+
+}
+
+export interface ExpertDecision{
+
+    id:UUID;
+
+    generated:Date;
+
+    approved:boolean;
+
+    confidence:number;
+
+    score:number;
+
+    opinion:LegalOpinion;
+
+    validation:LegalValidationResult;
+
+    risks:LegalRisk[];
+
+    recommendations:LegalRecommendation[];
+
+    finalDecision:string;
+
+}
+
+export interface LegalEngineResult{
+
+    validation:LegalValidationResult;
+
+    opinion:LegalOpinion;
+
+    decision:ExpertDecision;
+
+    risks:ReadonlyArray<LegalRisk>;
+
+    recommendations:ReadonlyArray<LegalRecommendation>;
+
+    motivations:ReadonlyArray<LegalMotivation>;
+
+    statistics:{
+
+        score:number;
+
+        confidence:number;
+
+        approved:boolean;
+
+        totalRisks:number;
+
+        pendingRecommendations:number;
+
+    };
+
+}
+
 export class LegalReasoner{
 
     private context?:ContractContextModel;
@@ -4992,26 +5196,6 @@ public verifyPublicationRequirements()
 =
 ===========================================================================*/
 
-export interface LegalInference{
-
-    id:UUID;
-
-    type:LegalReasonType;
-
-    premise:string;
-
-    inference:string;
-
-    justification:string;
-
-    confidence:number;
-
-    references:LegalReference[];
-
-}
-
-
-
 /*===========================================================================
 =
 = BASE DE INFERENCIAS
@@ -5407,26 +5591,6 @@ public buildInferenceSummary(){
 = CONFLICTOS NORMATIVOS
 =
 ===========================================================================*/
-
-export interface LegalConflict{
-
-    id:UUID;
-
-    type:LegalReasonType;
-
-    description:string;
-
-    primary:LegalReference;
-
-    secondary:LegalReference;
-
-    resolved:boolean;
-
-    solution?:string;
-
-}
-
-
 
 /*===========================================================================
 =
@@ -5858,26 +6022,6 @@ public getConflictStatistics(){
 =
 ===========================================================================*/
 
-export interface LegalMotivation{
-
-    id:UUID;
-
-    generated:Date;
-
-    title:string;
-
-    body:string;
-
-    references:LegalReference[];
-
-    reasoning:LegalReasoning[];
-
-    legalRisk:"LOW"|"MEDIUM"|"HIGH";
-
-}
-
-
-
 /*===========================================================================
 =
 = REPOSITORIO
@@ -6291,28 +6435,6 @@ public clearMotivations()
 = DOCTRINA Y JURISPRUDENCIA
 =
 ===========================================================================*/
-
-export interface LegalDoctrine{
-
-    id:UUID;
-
-    authority:string;
-
-    title:string;
-
-    reference:string;
-
-    date:Date;
-
-    hierarchy:LegalHierarchy;
-
-    summary:string;
-
-    applicableTo:LegalReasonType[];
-
-}
-
-
 
 /*===========================================================================
 =
@@ -6747,28 +6869,6 @@ public doctrineStatistics(){
 = VALIDACIÓN JURÍDICA DEL EXPEDIENTE
 =
 ===========================================================================*/
-
-export interface LegalValidationResult{
-
-    id:UUID;
-
-    generated:Date;
-
-    valid:boolean;
-
-    score:number;
-
-    observations:string[];
-
-    warnings:string[];
-
-    errors:string[];
-
-    recommendations:string[];
-
-}
-
-
 
 /*===========================================================================
 =
@@ -7266,24 +7366,6 @@ public isLegallyValid()
 =
 ===========================================================================*/
 
-export interface LegalRisk{
-
-    id:UUID;
-
-    severity:"LOW"|"MEDIUM"|"HIGH"|"CRITICAL";
-
-    title:string;
-
-    description:string;
-
-    recommendation:string;
-
-    references:LegalReference[];
-
-}
-
-
-
 /*===========================================================================
 =
 = BASE DE RIESGOS
@@ -7708,26 +7790,6 @@ public clearLegalRisks()
 =
 ===========================================================================*/
 
-export interface LegalRecommendation{
-
-    id:UUID;
-
-    priority:"LOW"|"MEDIUM"|"HIGH"|"CRITICAL";
-
-    title:string;
-
-    description:string;
-
-    action:string;
-
-    automatic:boolean;
-
-    applied:boolean;
-
-}
-
-
-
 /*===========================================================================
 =
 = REPOSITORIO
@@ -8135,30 +8197,6 @@ public clearRecommendations()
 = DICTAMEN JURÍDICO
 =
 ===========================================================================*/
-
-export interface LegalOpinion{
-
-    id:UUID;
-
-    generated:Date;
-
-    result:"FAVORABLE"|"FAVORABLE_WITH_OBSERVATIONS"|"UNFAVORABLE";
-
-    score:number;
-
-    executiveSummary:string;
-
-    strengths:string[];
-
-    weaknesses:string[];
-
-    recommendations:string[];
-
-    risks:LegalRisk[];
-
-}
-
-
 
 /*===========================================================================
 =
@@ -8585,32 +8623,6 @@ public shortOpinion()
 = DECISIÓN EXPERTA
 =
 ===========================================================================*/
-
-export interface ExpertDecision{
-
-    id:UUID;
-
-    generated:Date;
-
-    approved:boolean;
-
-    confidence:number;
-
-    score:number;
-
-    opinion:LegalOpinion;
-
-    validation:LegalValidationResult;
-
-    risks:LegalRisk[];
-
-    recommendations:LegalRecommendation[];
-
-    finalDecision:string;
-
-}
-
-
 
 /*===========================================================================
 =
@@ -9090,38 +9102,6 @@ public isReadyForApproval()
 =
 ===========================================================================*/
 
-export interface LegalEngineResult{
-
-    validation:LegalValidationResult;
-
-    opinion:LegalOpinion;
-
-    decision:ExpertDecision;
-
-    risks:ReadonlyArray<LegalRisk>;
-
-    recommendations:ReadonlyArray<LegalRecommendation>;
-
-    motivations:ReadonlyArray<LegalMotivation>;
-
-    statistics:{
-
-        score:number;
-
-        confidence:number;
-
-        approved:boolean;
-
-        totalRisks:number;
-
-        pendingRecommendations:number;
-
-    };
-
-}
-
-
-
 /*===========================================================================
 =
 = ANÁLISIS COMPLETO
@@ -9448,3 +9428,4 @@ public run()
 =
 ===========================================================================*/
 
+}

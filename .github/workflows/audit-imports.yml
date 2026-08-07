@@ -1,0 +1,54 @@
+name: Audit relative imports
+
+on:
+  push:
+    branches:
+      - agent/lb1-proyecto-compilable
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-imports:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout LB-1 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/lb1-proyecto-compilable
+          fetch-depth: 0
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run relative import audit
+        shell: bash
+        run: |
+          set +e
+
+          npm run audit:imports > import-audit-report.txt 2>&1
+
+          STATUS=$?
+
+          cat import-audit-report.txt
+
+          echo ""
+          echo "Audit exit code: $STATUS"
+
+          exit $STATUS
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contrata-ia-import-audit-report
+          path: import-audit-report.txt
+          if-no-files-found: error

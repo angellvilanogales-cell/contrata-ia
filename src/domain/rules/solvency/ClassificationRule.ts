@@ -306,9 +306,7 @@ export class ClassificationRule {
 
             id:
 
-                crypto.randomUUID()
-
-                as UUID,
+                crypto.randomUUID() as UUID,
 
             type:
 
@@ -356,9 +354,7 @@ export class ClassificationRule {
 
             id:
 
-                crypto.randomUUID()
-
-                as UUID,
+                crypto.randomUUID() as UUID,
 
             type:
 

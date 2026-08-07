@@ -330,10 +330,7 @@ export const CORE_KNOWLEDGE_CONCEPTS: KnowledgeConcept[] = [
         legalReferences: [],
 
         enabled: true
-
-    }
-
-];
+    },
 
     /**
      * --------------------------------------------------------

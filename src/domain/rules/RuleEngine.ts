@@ -12,6 +12,296 @@ import {
 =
 ===========================================================================*/
 
+export enum RulePriority{
+
+    VERY_LOW=10,
+
+    LOW=20,
+
+    NORMAL=30,
+
+    HIGH=40,
+
+    VERY_HIGH=50,
+
+    CRITICAL=100
+
+}
+
+export enum RuleCategory{
+
+    CONTRACT,
+
+    PROCEDURE,
+
+    CPV,
+
+    VALUE,
+
+    LOTS,
+
+    SOLVENCY,
+
+    GUARANTEE,
+
+    PUBLICITY,
+
+    DEADLINES,
+
+    AWARD,
+
+    EXECUTION,
+
+    MODIFICATION,
+
+    PENALTIES,
+
+    SOCIAL,
+
+    ENVIRONMENTAL,
+
+    RESOURCES,
+
+    JURISPRUDENCE,
+
+    VALIDATION
+
+}
+
+export enum RuleScope{
+
+    EUROPEAN,
+
+    NATIONAL,
+
+    AUTONOMIC,
+
+    ORGANISATIONAL,
+
+    INTERNAL
+
+}
+
+export enum RuleSource{
+
+    LCSP,
+
+    RD,
+
+    DIRECTIVE,
+
+    JCCA,
+
+    TACRC,
+
+    TJUE,
+
+    TS,
+
+    INTERNAL_POLICY
+
+}
+
+export enum RuleAction{
+
+    CALCULATE,
+
+    VALIDATE,
+
+    RECOMMEND,
+
+    REQUIRE,
+
+    FORBID,
+
+    ALLOW,
+
+    GENERATE,
+
+    WARNING
+
+}
+
+export interface RuleResult{
+
+    valid:boolean;
+
+    message:string;
+
+    value?:unknown;
+
+}
+
+export interface Rule{
+
+    id:UUID;
+
+
+
+    code:string;
+
+
+
+    name:string;
+
+
+
+    description:string;
+
+
+
+    priority:RulePriority;
+
+
+
+    category:RuleCategory;
+
+
+
+    scope:RuleScope;
+
+
+
+    source:RuleSource;
+
+
+
+    action:RuleAction;
+
+
+
+    legalReason?:
+
+        LegalReasonType;
+
+
+
+    hierarchy?:
+
+        LegalHierarchy;
+
+
+
+    condition(
+
+        context:any,
+
+        variables:Map<string,unknown>
+
+    ):boolean;
+
+
+
+    success:RuleResult;
+
+
+
+    failure:RuleResult;
+
+}
+
+export interface RuleEvaluation{
+
+    id:UUID;
+
+
+
+    ruleId:UUID;
+
+
+
+    name:string;
+
+
+
+    satisfied:boolean;
+
+
+
+    priority:
+
+        RulePriority;
+
+
+
+    result:
+
+        RuleResult;
+
+}
+
+export interface RuleGroup{
+
+    id:UUID;
+
+
+
+    name:string;
+
+
+
+    description:string;
+
+
+
+    category:
+
+        RuleCategory;
+
+
+
+    rules:Rule[];
+
+}
+
+export interface RuleReport{
+
+    generated:Date;
+
+
+
+    totalRules:number;
+
+
+
+    executedRules:number;
+
+
+
+    satisfiedRules:number;
+
+
+
+    failedRules:number;
+
+
+
+    evaluations:
+
+        RuleEvaluation[];
+
+}
+
+export interface RuleSummary{
+
+    category:
+
+        RuleCategory;
+
+
+
+    total:number;
+
+
+
+    satisfied:number;
+
+
+
+    failed:number;
+
+}
+
 export class RuleEngine{
 
 /*===========================================================================
@@ -312,7 +602,7 @@ public reset()
 
 }
 
-}
+
 
 /*===========================================================================
 =
@@ -320,71 +610,11 @@ public reset()
 =
 ===========================================================================*/
 
-export enum RulePriority{
-
-    VERY_LOW=10,
-
-    LOW=20,
-
-    NORMAL=30,
-
-    HIGH=40,
-
-    VERY_HIGH=50,
-
-    CRITICAL=100
-
-}
-
-
-
 /*===========================================================================
 =
 = CATEGORÍAS
 =
 ===========================================================================*/
-
-export enum RuleCategory{
-
-    CONTRACT,
-
-    PROCEDURE,
-
-    CPV,
-
-    VALUE,
-
-    LOTS,
-
-    SOLVENCY,
-
-    GUARANTEE,
-
-    PUBLICITY,
-
-    DEADLINES,
-
-    AWARD,
-
-    EXECUTION,
-
-    MODIFICATION,
-
-    PENALTIES,
-
-    SOCIAL,
-
-    ENVIRONMENTAL,
-
-    RESOURCES,
-
-    JURISPRUDENCE,
-
-    VALIDATION
-
-}
-
-
 
 /*===========================================================================
 =
@@ -392,49 +622,11 @@ export enum RuleCategory{
 =
 ===========================================================================*/
 
-export enum RuleScope{
-
-    EUROPEAN,
-
-    NATIONAL,
-
-    AUTONOMIC,
-
-    ORGANISATIONAL,
-
-    INTERNAL
-
-}
-
-
-
 /*===========================================================================
 =
 = ORIGEN
 =
 ===========================================================================*/
-
-export enum RuleSource{
-
-    LCSP,
-
-    RD,
-
-    DIRECTIVE,
-
-    JCCA,
-
-    TACRC,
-
-    TJUE,
-
-    TS,
-
-    INTERNAL_POLICY
-
-}
-
-
 
 /*===========================================================================
 =
@@ -442,45 +634,11 @@ export enum RuleSource{
 =
 ===========================================================================*/
 
-export enum RuleAction{
-
-    CALCULATE,
-
-    VALIDATE,
-
-    RECOMMEND,
-
-    REQUIRE,
-
-    FORBID,
-
-    ALLOW,
-
-    GENERATE,
-
-    WARNING
-
-}
-
-
-
 /*===========================================================================
 =
 = RESULTADO
 =
 ===========================================================================*/
-
-export interface RuleResult{
-
-    valid:boolean;
-
-    message:string;
-
-    value?:unknown;
-
-}
-
-
 
 /*===========================================================================
 =
@@ -488,113 +646,11 @@ export interface RuleResult{
 =
 ===========================================================================*/
 
-export interface Rule{
-
-    id:UUID;
-
-
-
-    code:string;
-
-
-
-    name:string;
-
-
-
-    description:string;
-
-
-
-    priority:RulePriority;
-
-
-
-    category:RuleCategory;
-
-
-
-    scope:RuleScope;
-
-
-
-    source:RuleSource;
-
-
-
-    action:RuleAction;
-
-
-
-    legalReason?:
-
-        LegalReasonType;
-
-
-
-    hierarchy?:
-
-        LegalHierarchy;
-
-
-
-    condition(
-
-        context:any,
-
-        variables:Map<string,unknown>
-
-    ):boolean;
-
-
-
-    success:RuleResult;
-
-
-
-    failure:RuleResult;
-
-}
-
-
-
 /*===========================================================================
 =
 = EVALUACIÓN
 =
 ===========================================================================*/
-
-export interface RuleEvaluation{
-
-    id:UUID;
-
-
-
-    ruleId:UUID;
-
-
-
-    name:string;
-
-
-
-    satisfied:boolean;
-
-
-
-    priority:
-
-        RulePriority;
-
-
-
-    result:
-
-        RuleResult;
-
-}
-
-
 
 /*===========================================================================
 =
@@ -602,93 +658,17 @@ export interface RuleEvaluation{
 =
 ===========================================================================*/
 
-export interface RuleGroup{
-
-    id:UUID;
-
-
-
-    name:string;
-
-
-
-    description:string;
-
-
-
-    category:
-
-        RuleCategory;
-
-
-
-    rules:Rule[];
-
-}
-
-
-
 /*===========================================================================
 =
 = INFORME
 =
 ===========================================================================*/
 
-export interface RuleReport{
-
-    generated:Date;
-
-
-
-    totalRules:number;
-
-
-
-    executedRules:number;
-
-
-
-    satisfiedRules:number;
-
-
-
-    failedRules:number;
-
-
-
-    evaluations:
-
-        RuleEvaluation[];
-
-}
-
-
-
 /*===========================================================================
 =
 = RESUMEN
 =
 ===========================================================================*/
-
-export interface RuleSummary{
-
-    category:
-
-        RuleCategory;
-
-
-
-    total:number;
-
-
-
-    satisfied:number;
-
-
-
-    failed:number;
-
-}
 
 /*===========================================================================
 =
@@ -10187,6 +10167,8 @@ constructor(){
 = EXPORTACIÓN
 =
 ===========================================================================*/
+}
+
 
 export default RuleEngine;
 

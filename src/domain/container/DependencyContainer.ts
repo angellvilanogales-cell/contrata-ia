@@ -27,6 +27,25 @@
 export type Constructor<T> = new (...args: any[]) => T;
 
 /**
+ * Resultado de validación estructural del contenedor.
+ */
+export interface ContainerValidationResult {
+    valid: boolean;
+    errors: string[];
+}
+
+/**
+ * Estado de salud observable del contenedor.
+ */
+export interface ContainerHealthStatus {
+    healthy: boolean;
+    registeredServices: number;
+    singletonInstances: number;
+    activeResolutions: number;
+    errors: string[];
+}
+
+/**
  * Registro interno.
  */
 interface ServiceDescriptor<T = unknown> {
@@ -190,8 +209,6 @@ export class DependencyContainer {
 
     }
 
-}
-
     /**
      * =====================================================
      * RESOLVER SERVICIO
@@ -310,16 +327,6 @@ export class DependencyContainer {
 
     ): T {
 
-        /**
-         * En esta primera versión
-         * los servicios no reciben
-         * parámetros en constructor.
-         *
-         * Posteriormente se ampliará
-         * para inyección automática
-         * mediante metadatos.
-         */
-
         return new implementation();
 
     }
@@ -430,9 +437,6 @@ export class DependencyContainer {
 
     private readonly resolvingStack: Constructor<any>[] = [];
 
-    /**
-     * Comprueba si un servicio ya está siendo resuelto.
-     */
     private isResolving<T>(
 
         token: Constructor<T>
@@ -447,9 +451,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * Marca el inicio de resolución.
-     */
     private beginResolve<T>(
 
         token: Constructor<T>
@@ -470,9 +471,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * Finaliza la resolución.
-     */
     private endResolve<T>(
 
         token: Constructor<T>
@@ -490,12 +488,6 @@ export class DependencyContainer {
         }
 
     }
-
-    /**
-     * =====================================================
-     * VALIDACIÓN DEL CONTENEDOR
-     * =====================================================
-     */
 
     public validate(): ContainerValidationResult {
 
@@ -531,12 +523,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * HEALTH CHECK
-     * =====================================================
-     */
-
     public health(): ContainerHealthStatus {
 
         const validation = this.validate();
@@ -560,12 +546,6 @@ export class DependencyContainer {
         };
 
     }
-
-    /**
-     * =====================================================
-     * MÉTRICAS
-     * =====================================================
-     */
 
     public metrics() {
 
@@ -600,12 +580,6 @@ export class DependencyContainer {
         };
 
     }
-
-    /**
-     * =====================================================
-     * EXPORTACIÓN
-     * =====================================================
-     */
 
     public exportState() {
 
@@ -647,12 +621,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * RESOLUCIÓN SEGURA
-     * =====================================================
-     */
-
     public resolveSafe<T>(
 
         token: Constructor<T>
@@ -681,12 +649,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * REEMPLAZAR IMPLEMENTACIÓN
-     * =====================================================
-     */
-
     public replace<T>(
 
         token: Constructor<T>,
@@ -709,12 +671,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * COMPROBAR INSTANCIA
-     * =====================================================
-     */
-
     public isInstantiated<T>(
 
         token: Constructor<T>
@@ -735,12 +691,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * OBTENER DESCRIPTOR
-     * =====================================================
-     */
-
     public descriptor<T>(
 
         token: Constructor<T>
@@ -754,12 +704,6 @@ export class DependencyContainer {
         ) as ServiceDescriptor<T>;
 
     }
-
-    /**
-     * =====================================================
-     * PRECALENTAR SINGLETONS
-     * =====================================================
-     */
 
     public warmUp(): void {
 
@@ -793,12 +737,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * REINICIO COMPLETO
-     * =====================================================
-     */
-
     public reset(): void {
 
         this.destroyAll();
@@ -806,12 +744,6 @@ export class DependencyContainer {
         this.resolvingStack.length = 0;
 
     }
-
-    /**
-     * =====================================================
-     * SNAPSHOT
-     * =====================================================
-     */
 
     public snapshot() {
 
@@ -849,12 +781,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * LOG DEL CONTENEDOR
-     * =====================================================
-     */
-
     public printStatus(): void {
 
         console.table(
@@ -867,25 +793,6 @@ export class DependencyContainer {
 
     }
 
-
-    /**
-     * =====================================================
-     * FACTORÍA POR DEFECTO
-     * =====================================================
-     *
-     * Punto único de creación del contenedor.
-     *
-     * En versiones posteriores este método registrará
-     * automáticamente todos los componentes principales:
-     *
-     *  • KnowledgeRepository
-     *  • KnowledgeQueryEngine
-     *  • ResolverRegistry
-     *  • ContractDecisionEngine
-     *  • Todos los Resolvers
-     *
-     */
-
     public static createDefault():
 
         DependencyContainer {
@@ -894,38 +801,9 @@ export class DependencyContainer {
 
             new DependencyContainer();
 
-        /**
-         * =================================================
-         * REGISTROS
-         * =================================================
-         *
-         * Aquí irán apareciendo todos los registros
-         * automáticos del sistema.
-         *
-         * Ejemplo:
-         *
-         * container.register(
-         *      KnowledgeRepository,
-         *      KnowledgeRepository
-         * );
-         *
-         * container.register(
-         *      ResolverRegistry,
-         *      ResolverRegistry
-         * );
-         *
-         * ...
-         */
-
         return container;
 
     }
-
-    /**
-     * =====================================================
-     * INFORMACIÓN
-     * =====================================================
-     */
 
     public info() {
 
@@ -943,12 +821,6 @@ export class DependencyContainer {
 
     }
 
-    /**
-     * =====================================================
-     * SERIALIZACIÓN
-     * =====================================================
-     */
-
     public toJSON(): string {
 
         return JSON.stringify(
@@ -962,12 +834,6 @@ export class DependencyContainer {
         );
 
     }
-
-    /**
-     * =====================================================
-     * VERSIÓN
-     * =====================================================
-     */
 
     public version(): string {
 

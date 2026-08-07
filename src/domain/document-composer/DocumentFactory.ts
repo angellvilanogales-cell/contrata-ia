@@ -1,0 +1,1 @@
+export { DocumentFactory } from "./types";

@@ -1,226 +1,92 @@
 /**
- * ============================================================
- * CONTRATA-IA
- * ------------------------------------------------------------
- * BaseDecision
- * ------------------------------------------------------------
  * Clase base para cualquier decisión jurídica.
- *
- * Todos los motores devolverán objetos derivados
- * de esta clase.
- *
- * ============================================================
+ * Toda decisión producida por el motor nace como propuesta pendiente de
+ * validación humana y conserva la trazabilidad de esa validación.
  */
 
+import type { UUID, ValidationStatus } from "../../common/types";
 import {
-
     ResolverDecision,
     ValidationResult,
     ResolverReport,
     StatisticsResult,
     DiagnosticResult,
     AuditResult
-
 } from "./FrameworkTypes";
 
-export abstract class BaseDecision<T>
-implements ResolverDecision<T> {
-
-    /**
-     * ¿La decisión es válida?
-     */
+export abstract class BaseDecision<T> implements ResolverDecision<T> {
     public valid = true;
-
-    /**
-     * Decisión producida por el motor.
-     */
     public decision!: T;
-
-    /**
-     * Resultado de validación.
-     */
-    public validation: ValidationResult = {
-
-        valid: true,
-
-        warnings: [],
-
-        errors: []
-
-    };
-
-    /**
-     * Informe.
-     */
-    public report: ResolverReport = {
-
-        generatedAt: new Date(),
-
-        warnings: [],
-
-        recommendations: []
-
-    };
-
-    /**
-     * Estadísticas.
-     */
+    public validation: ValidationResult = { valid: true, warnings: [], errors: [] };
+    public report: ResolverReport = { generatedAt: new Date(), warnings: [], recommendations: [] };
     public statistics?: StatisticsResult;
-
-    /**
-     * Diagnóstico.
-     */
     public diagnostics?: DiagnosticResult;
-
-    /**
-     * Auditoría.
-     */
     public audit?: AuditResult;
 
-    /**
-     * =====================================================
-     * Añade advertencia
-     * =====================================================
-     */
+    public status: ValidationStatus = "pending";
+    public proposedAt = new Date();
+    public validatedBy?: UUID;
+    public validatedAt?: Date;
+    public validationJustification?: string;
+    public ruleIds?: string[];
+    public sourceIds?: string[];
 
-    public warning(
-
-        message: string
-
-    ): void {
-
-        this.validation.warnings.push(
-
-            message
-
-        );
-
-        this.report.warnings.push(
-
-            message
-
-        );
-
+    public warning(message: string): void {
+        this.validation.warnings.push(message);
+        this.report.warnings.push(message);
     }
 
-    /**
-     * =====================================================
-     * Añade error
-     * =====================================================
-     */
-
-    public error(
-
-        message: string
-
-    ): void {
-
+    public error(message: string): void {
         this.valid = false;
-
         this.validation.valid = false;
-
-        this.validation.errors.push(
-
-            message
-
-        );
-
+        this.validation.errors.push(message);
     }
 
-    /**
-     * =====================================================
-     * Añade recomendación
-     * =====================================================
-     */
-
-    public recommendation(
-
-        message: string
-
-    ): void {
-
-        this.report.recommendations.push(
-
-            message
-
-        );
-
+    public recommendation(message: string): void {
+        this.report.recommendations.push(message);
     }
 
-    /**
-     * =====================================================
-     * Estadísticas
-     * =====================================================
-     */
+    public setStatistics(statistics: StatisticsResult): void { this.statistics = statistics; }
+    public setDiagnostics(diagnostics: DiagnosticResult): void { this.diagnostics = diagnostics; }
+    public setAudit(audit: AuditResult): void { this.audit = audit; }
 
-    public setStatistics(
-
-        statistics: StatisticsResult
-
-    ): void {
-
-        this.statistics = statistics;
-
+    public validateHuman(actor: UUID, justification: string): void {
+        this.status = "validated";
+        this.validatedBy = actor;
+        this.validatedAt = new Date();
+        this.validationJustification = justification;
     }
 
-    /**
-     * =====================================================
-     * Diagnóstico
-     * =====================================================
-     */
-
-    public setDiagnostics(
-
-        diagnostics: DiagnosticResult
-
-    ): void {
-
-        this.diagnostics = diagnostics;
-
+    public rejectHuman(actor: UUID, justification: string): void {
+        this.status = "rejected";
+        this.validatedBy = actor;
+        this.validatedAt = new Date();
+        this.validationJustification = justification;
     }
 
-    /**
-     * =====================================================
-     * Auditoría
-     * =====================================================
-     */
-
-    public setAudit(
-
-        audit: AuditResult
-
-    ): void {
-
-        this.audit = audit;
-
+    public modifyHuman(actor: UUID, justification: string): void {
+        this.status = "modified";
+        this.validatedBy = actor;
+        this.validatedAt = new Date();
+        this.validationJustification = justification;
     }
-
-    /**
-     * =====================================================
-     * Exportación JSON
-     * =====================================================
-     */
 
     public toJSON() {
-
         return {
-
             valid: this.valid,
-
             decision: this.decision,
-
             validation: this.validation,
-
             report: this.report,
-
             statistics: this.statistics,
-
             diagnostics: this.diagnostics,
-
-            audit: this.audit
-
+            audit: this.audit,
+            status: this.status,
+            proposedAt: this.proposedAt,
+            validatedBy: this.validatedBy,
+            validatedAt: this.validatedAt,
+            validationJustification: this.validationJustification,
+            ruleIds: this.ruleIds,
+            sourceIds: this.sourceIds
         };
-
     }
-
 }

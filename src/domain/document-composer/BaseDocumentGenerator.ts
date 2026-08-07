@@ -1,0 +1,1 @@
+export { BaseDocumentGenerator } from "./types";

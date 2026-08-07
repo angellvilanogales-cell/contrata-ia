@@ -527,30 +527,6 @@ private buildAuditSummary(
 * BLOQUE 5 de 12
 *
 ******************************************************************************************/
-
-  ===========================================================
-ARCHIVO
-
-PCAPGeneratorEngine.ts
-
-BLOQUE
-
-5 de 12
-
-ESTADO
-
-██████████░░░░░░░░░░░░ 42 %
-
-SIGUIENTE
-
-Bloque 6 de 12
-
-RUTA
-
-src/domain/pcap/PCAPGeneratorEngine.ts
-
-===========================================================
-
   /*****************************************************************************************
 *
 * BLOQUE 6 de 12
@@ -581,7 +557,7 @@ private renumberSections(
 
             ...section,
 
-            number:index++.toString()
+            number:(index++).toString()
 
         })
 
@@ -854,76 +830,6 @@ public preview(
 * BLOQUE 8 de 12
 *
 ******************************************************************************************/
-
-===========================================================
-ARCHIVO
-
-PCAPGeneratorEngine.ts
-
-BLOQUE
-
-8 de 12
-
-ESTADO
-
-████████████████░░░░░░ 67 %
-
-SIGUIENTE
-
-Bloque 9 de 12
-
-RUTA
-
-src/domain/pcap/PCAPGeneratorEngine.ts
-
-===========================================================
-
-  ===========================================================
-ARCHIVO
-
-PCAPGeneratorEngine.ts
-
-BLOQUE
-
-9 de 12
-
-ESTADO
-
-██████████████████░░░░ 75 %
-
-SIGUIENTE
-
-Bloque 10 de 12
-
-RUTA
-
-src/domain/pcap/PCAPGeneratorEngine.ts
-
-===========================================================
-
-  ===========================================================
-ARCHIVO
-
-PCAPGeneratorEngine.ts
-
-BLOQUE
-
-10 de 12
-
-ESTADO
-
-████████████████████░░ 83 %
-
-SIGUIENTE
-
-Bloque 11 de 12
-
-RUTA
-
-src/domain/pcap/PCAPGeneratorEngine.ts
-
-===========================================================
-
   /*****************************************************************************************
 *
 * BLOQUE 11 de 12
