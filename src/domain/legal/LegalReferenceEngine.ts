@@ -871,5 +871,3 @@ export class LegalReferenceEngine {
     }
 
 }
-
-}

@@ -931,5 +931,3 @@ export class PluginManager {
     }
 
 }
-
-}
