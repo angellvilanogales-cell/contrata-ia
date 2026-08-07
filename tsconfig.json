@@ -1,12 +1,12 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "./dist",
     "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts"
+  "files": [
+    "src/main.ts"
   ],
   "exclude": [
     "node_modules",
