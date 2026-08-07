@@ -1,3 +1,1 @@
-export interface AnnexComposer {
-  compose(annex: unknown, context: unknown): unknown;
-}
+export { AnnexComposer } from "./types";
