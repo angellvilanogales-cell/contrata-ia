@@ -3,19 +3,18 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "./dist",
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
   "include": [
-    "src/**/*.ts",
-    "knowledge/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
+    "dist-test",
     "tests",
     "test",
+    "knowledge/**/*.ts",
     "**/*.test.ts",
     "**/*.spec.ts"
   ]
