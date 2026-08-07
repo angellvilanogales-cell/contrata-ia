@@ -1,14 +1,7 @@
 import type { Identifier, ISODate, TraceEntry } from "../common/types";
+import type { LegalReference } from "./LegalReference";
 
-export interface LegalReference {
-  id: Identifier;
-  citation: string;
-  source: string;
-  version?: string;
-  locator?: string;
-  effectiveFrom?: ISODate;
-  effectiveTo?: ISODate;
-}
+export type { LegalReference } from "./LegalReference";
 
 export interface LegalRule {
   id: Identifier;
@@ -30,4 +23,10 @@ export interface LegalDecision<T = unknown> {
 
 export interface LegalContext {
   [key: string]: unknown;
+}
+
+export interface LegalVersion {
+  id: Identifier;
+  effectiveFrom?: ISODate;
+  effectiveTo?: ISODate;
 }
