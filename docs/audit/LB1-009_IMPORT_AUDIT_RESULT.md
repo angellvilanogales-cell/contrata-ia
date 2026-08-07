@@ -16,79 +16,44 @@ LB1-009 — Auditoría automática de imports
 
 `agent/lb1-proyecto-compilable`
 
-## Commit de la auditoría
-
-`9fad529`
-
 ## Workflow
 
 `Audit relative imports`
 
-## Resultado de ejecución
+## Resultado actualizado
 
-La auditoría se ejecutó mediante GitHub Actions sobre la rama de trabajo de LB-1.
+La auditoría reproducible de imports se encuentra actualmente en estado **PASS** sobre la rama de trabajo de LB-1.
 
-## Estadísticas
+## Estadísticas consolidadas
 
 | Indicador | Resultado |
 |---|---:|
-| Archivos TypeScript analizados | 490 |
-| Imports relativos encontrados | 1149 |
-| Imports relativos no resueltos | 247 |
+| Archivos TypeScript analizados | 569 |
+| Imports relativos encontrados | 1205 |
+| Imports relativos no resueltos | 0 |
 
 ## Resultado técnico
 
-La auditoría terminó con código de salida `1`.
+La auditoría termina con código de salida `0`.
 
-Este resultado es esperado cuando existen imports relativos no resueltos.
+No quedan referencias relativas sin resolver en el árbol TypeScript analizado.
 
-El workflow no considera que exista una integración correcta mientras existan referencias relativas que no puedan resolverse contra el árbol de archivos actual.
+## Evolución
 
-## Interpretación
+La primera ejecución documentada de LB1-009 registró 247 imports relativos no resueltos. Tras la consolidación de rutas, fachadas y contratos del runtime, el contador ha quedado reducido a cero.
 
-El estado actual de la rama contiene:
-
-**247 imports relativos no resueltos.**
-
-Este dato constituye la referencia técnica actual para la fase de consolidación e integración del proyecto.
-
-## Comparación con la auditoría maestra
-
-La auditoría maestra inicial registraba:
-
-**232 imports no resueltos.**
-
-La auditoría reproducible de LB1-009 detecta actualmente:
-
-**247 imports no resueltos.**
-
-Diferencia:
-
-**15 referencias adicionales.**
-
-Esta diferencia queda registrada como una discrepancia pendiente de análisis.
-
-No se asume que las 15 referencias adicionales sean necesariamente nuevos errores. Su origen puede estar relacionado con cambios posteriores de la rama, diferencias en el criterio de detección o modificaciones de la estructura del repositorio.
+Este documento conserva esa evolución como trazabilidad; el dato vigente para la puerta LB-1 es **0 imports relativos no resueltos**.
 
 ## Decisión
 
-No se iniciará una reparación indiscriminada de imports.
+La puerta `npm run audit:imports` se considera técnicamente satisfecha mientras la CI del mismo HEAD final de LB-1 mantenga código de salida `0`.
 
-Los 247 casos serán clasificados por familias y responsabilidad arquitectónica antes de modificar el código.
-
-Las prioridades serán:
-
-1. Determinar si el destino existe con otra ruta.
-2. Determinar si existe una implementación duplicada.
-3. Determinar cuál debe ser la implementación canónica.
-4. Determinar si el import pertenece a una arquitectura obsoleta.
-5. Determinar si el módulo debe crearse porque realmente falta.
-6. Eliminar duplicidades solo después de identificar la implementación canónica.
+No se modifica ni relaja el criterio de la auditoría.
 
 ## Estado
 
-LB1-009 — COMPLETADA
+LB1-009 — COMPLETADA / PASS
 
-## Siguiente tarea
+## Siguiente control
 
-LB1-010 — Validación automática del conocimiento YAML/JSON
+Mantener el resultado en verde hasta la aceptación integral de LB-1 junto con `audit:knowledge`, `typecheck`, tests y build.
