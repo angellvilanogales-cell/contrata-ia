@@ -1,4 +1,3 @@
-```typescript
 /**
  * ============================================================
  * CONTRATA-IA
@@ -122,4 +121,3 @@ export function getDraftKnowledgePacks(): KnowledgePack[] {
     );
 
 }
-```

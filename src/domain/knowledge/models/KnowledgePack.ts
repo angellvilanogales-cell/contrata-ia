@@ -1,4 +1,3 @@
-```typescript
 /**
  * ============================================================
  * CONTRATA-IA
@@ -263,4 +262,3 @@ export interface KnowledgePack {
     decisionImpacts: DecisionImpact[];
 
 }
-```
