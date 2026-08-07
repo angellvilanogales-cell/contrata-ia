@@ -1,0 +1,61 @@
+name: Validate knowledge
+
+on:
+  push:
+    branches:
+      - feature/lb1-toolchain
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-knowledge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify Node.js and npm
+        run: |
+          node --version
+          npm --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run knowledge validation
+        shell: bash
+        run: |
+          set +e
+
+          npm run validate-knowledge > knowledge-validation-report.txt 2>&1
+
+          STATUS=$?
+
+          cat knowledge-validation-report.txt
+
+          echo ""
+          echo "Knowledge validation exit code: $STATUS"
+
+          exit $STATUS
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contrata-ia-knowledge-validation-report
+          path: knowledge-validation-report.txt
+          if-no-files-found: error
