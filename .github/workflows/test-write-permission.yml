@@ -1,26 +1,17 @@
 name: Test write permission
 
+# TEMPORARY WORKFLOW RETIRED.
+# Kept as an inert historical marker until repository-history cleanup is performed.
+# It intentionally performs no writes and is not triggered automatically.
+
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  test-write:
+  retired:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Test repository write access
-        run: |
-          echo "Prueba de escritura de GitHub Actions" > .github/write-test.txt
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add .github/write-test.txt
-          git commit -m "test: verify GitHub Actions write permission"
-          git push
+      - run: echo "This temporary write-permission test is retired."
