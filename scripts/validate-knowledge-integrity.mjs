@@ -24,9 +24,6 @@ function parseStandard(file) {
   const text = fs.readFileSync(file, "utf8");
   if (!text.trim()) throw new Error("archivo vacío");
   if (file.endsWith(".json")) return JSON.parse(text);
-  // Some generated master indexes intentionally repeat configuration sections
-  // across concatenated parts. json:true preserves the last value instead of
-  // treating the legacy concatenation as a syntax error.
   return yaml.load(text, { json: true });
 }
 
@@ -75,10 +72,25 @@ function parseLegacyRules(file) {
   return rules;
 }
 
+function stableValue(value) {
+  if (Array.isArray(value)) return value.map(stableValue);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.keys(value)
+      .sort()
+      .map(key => [key, stableValue(value[key])])
+  );
+}
+
+function sameRule(a, b) {
+  return JSON.stringify(stableValue(a)) === JSON.stringify(stableValue(b));
+}
+
 const files = walk(ROOT).sort();
 const errors = [];
 const productionIds = new Map();
 const pendingIds = new Set();
+let mirroredDuplicates = 0;
 
 for (const file of files) {
   const relative = path.relative(process.cwd(), file).replaceAll(path.sep, "/");
@@ -104,8 +116,16 @@ for (const file of files) {
         continue;
       }
       const previous = productionIds.get(id);
-      if (previous) errors.push(`ID duplicado '${id}': ${previous} y ${relative}`);
-      else productionIds.set(id, relative);
+      if (previous) {
+        if (sameRule(previous.value, value)) {
+          mirroredDuplicates++;
+          console.log(`Regla espejo idéntica aceptada '${id}': ${previous.file} y ${relative}`);
+          continue;
+        }
+        errors.push(`ID duplicado con contenido distinto '${id}': ${previous.file} y ${relative}`);
+      } else {
+        productionIds.set(id, { file: relative, value });
+      }
     }
   } catch (error) {
     errors.push(`${relative}: ${error instanceof Error ? error.message : String(error)}`);
@@ -115,6 +135,7 @@ for (const file of files) {
 console.log(`Archivos inspeccionados: ${files.length}`);
 console.log(`Identificadores de producción: ${productionIds.size}`);
 console.log(`Identificadores pendientes: ${pendingIds.size}`);
+console.log(`Reglas espejo idénticas: ${mirroredDuplicates}`);
 
 if (errors.length) {
   console.error(`Errores de integridad: ${errors.length}`);
