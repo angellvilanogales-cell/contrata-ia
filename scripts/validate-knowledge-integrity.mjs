@@ -47,10 +47,11 @@ function parseLegacyRules(file) {
   const flush = () => {
     if (!current) return;
     const parsed = yaml.load(current.join("\n"));
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || typeof parsed.id !== "string") {
+    const candidate = Array.isArray(parsed) && parsed.length === 1 ? parsed[0] : parsed;
+    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate) || typeof candidate.id !== "string" || !candidate.id.trim()) {
       throw new Error("bloque de regla sin identificador válido");
     }
-    rules.push(parsed);
+    rules.push(candidate);
     current = null;
   };
 
