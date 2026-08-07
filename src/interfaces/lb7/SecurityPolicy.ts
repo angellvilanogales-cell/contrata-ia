@@ -18,12 +18,15 @@ export class SecurityPolicy {
 
   public constructor(environment: NodeJS.ProcessEnv = process.env) {
     this.required = environment.CONTRATA_IA_AUTH_REQUIRED === "1" || environment.NODE_ENV === "production";
-    this.tokens = [
-      environment.CONTRATA_IA_VIEWER_TOKEN ? { token: environment.CONTRATA_IA_VIEWER_TOKEN, actor: { id: "viewer", role: "VIEWER" as const } } : undefined,
-      environment.CONTRATA_IA_OPERATOR_TOKEN ? { token: environment.CONTRATA_IA_OPERATOR_TOKEN, actor: { id: "operator", role: "OPERATOR" as const } } : undefined,
-      environment.CONTRATA_IA_REVIEWER_TOKEN ? { token: environment.CONTRATA_IA_REVIEWER_TOKEN, actor: { id: "reviewer", role: "REVIEWER" as const } } : undefined,
-      environment.CONTRATA_IA_ADMIN_TOKEN ? { token: environment.CONTRATA_IA_ADMIN_TOKEN, actor: { id: "admin", role: "ADMIN" as const } } : undefined
-    ].filter((item): item is { token: string; actor: AuthenticatedActor } => Boolean(item));
+    const tokens: { token: string; actor: AuthenticatedActor }[] = [];
+    const add = (token: string | undefined, id: string, role: ApplicationRole): void => {
+      if (token) tokens.push({ token, actor: { id, role } });
+    };
+    add(environment.CONTRATA_IA_VIEWER_TOKEN, "viewer", "VIEWER");
+    add(environment.CONTRATA_IA_OPERATOR_TOKEN, "operator", "OPERATOR");
+    add(environment.CONTRATA_IA_REVIEWER_TOKEN, "reviewer", "REVIEWER");
+    add(environment.CONTRATA_IA_ADMIN_TOKEN, "admin", "ADMIN");
+    this.tokens = tokens;
     if (this.required && this.tokens.length === 0) throw new Error("Producción requiere al menos una credencial CONTRATA_IA_*_TOKEN.");
   }
 
