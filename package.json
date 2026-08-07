@@ -1,0 +1,23 @@
+{
+  "name": "contrata-ia",
+  "version": "0.0.0-recovery",
+  "private": true,
+  "description": "Recovery toolchain and basic scripts for Contrata-IA (feat/copilot/recovery-lb1)",
+  "scripts": {
+    "ci": "npm ci",
+    "validate-knowledge": "node ./scripts/validate-knowledge.js",
+    "check-imports": "node ./scripts/check-imports.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "start": "node ./dist/main.js || node ./dist/index.js || node ./dist/bootstrap.js",
+    "smoke": "npm run validate-knowledge && npm run check-imports && npm run typecheck && npm run build && npm test"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vitest": "^1.0.0",
+    "js-yaml": "^4.1.0",
+    "glob": "^8.1.0",
+    "ajv": "^8.12.0"
+  }
+}
