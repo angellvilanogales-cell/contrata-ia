@@ -12,6 +12,6 @@ export function createApplication(): ApplicationInfo {
   };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   console.log(JSON.stringify(createApplication()));
 }
