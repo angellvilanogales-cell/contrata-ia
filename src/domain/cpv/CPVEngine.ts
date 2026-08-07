@@ -98,6 +98,326 @@ export interface CPVSearchResult{
 =
 ==============================================================================*/
 
+export interface CPVDetection{
+
+    principal:CPVCode;
+
+    alternatives:CPVCode[];
+
+    confidence:number;
+
+    analysedWords:string[];
+
+}
+
+export interface CPVValidation{
+
+    valid:boolean;
+
+    score:number;
+
+    errors:string[];
+
+    warnings:string[];
+
+    suggestions:CPVCode[];
+
+}
+
+export interface CPVCompatibility{
+
+    source:string;
+
+    target:string;
+
+    compatible:boolean;
+
+    reason:string;
+
+    priority:number;
+
+}
+
+export interface CPVProposal{
+
+    principal:CPVCode;
+
+    secondary:CPVCode[];
+
+    confidence:number;
+
+    justification:string;
+
+    analysedTerms:string[];
+
+}
+
+export interface CPVContractConfiguration{
+
+    cpv:string;
+
+    contractType:ContractType;
+
+    recommendedProcedure:string;
+
+    divisionIntoLots:boolean;
+
+    technicalSolvency:boolean;
+
+    economicSolvency:boolean;
+
+    environmentalClauses:boolean;
+
+    socialClauses:boolean;
+
+    qualityCriteria:boolean;
+
+}
+
+export interface CPVSolvencyConfiguration{
+
+    cpv:string;
+
+    requiresTechnicalSolvency:boolean;
+
+    requiresEconomicSolvency:boolean;
+
+    recommendedTechnicalMeans:string[];
+
+    recommendedEconomicMeans:string[];
+
+    recommendedAwardCriteria:string[];
+
+    recommendedExecutionConditions:string[];
+
+}
+
+export interface CPVProcedureConfiguration{
+
+    cpv:string;
+
+    recommendedProcedure:string;
+
+    allowsOpenProcedure:boolean;
+
+    allowsSimplifiedProcedure:boolean;
+
+    allowsRestrictedProcedure:boolean;
+
+    allowsNegotiatedProcedure:boolean;
+
+    allowsMinorContract:boolean;
+
+    publicationRequired:boolean;
+
+    europeanRegulation:boolean;
+
+    observations:string[];
+
+}
+
+export interface CPVClauseConfiguration{
+
+    cpv:string;
+
+    socialClauses:string[];
+
+    environmentalClauses:string[];
+
+    innovationClauses:string[];
+
+    accessibilityClauses:string[];
+
+    equalityClauses:string[];
+
+    mandatorySocial:boolean;
+
+    mandatoryEnvironmental:boolean;
+
+}
+
+export interface CPVDocumentationConfiguration{
+
+    cpv:string;
+
+    requiredDocuments:string[];
+
+    optionalDocuments:string[];
+
+    technicalReports:string[];
+
+    administrativeReports:string[];
+
+    executionDocuments:string[];
+
+}
+
+export interface CPVResourcesConfiguration{
+
+    cpv:string;
+
+    humanResources:string[];
+
+    materialResources:string[];
+
+    machinery:string[];
+
+    software:string[];
+
+    certifications:string[];
+
+    requiresProjectManager:boolean;
+
+}
+
+export interface CPVExecutionConfiguration{
+
+    cpv:string;
+
+    estimatedExecutionMonths:number;
+
+    allowsExtensions:boolean;
+
+    maximumExtensions:number;
+
+    recommendedWarrantyMonths:number;
+
+    requiresContractManager:boolean;
+
+    periodicMonitoring:boolean;
+
+    recommendedMilestones:string[];
+
+    executionRisks:string[];
+
+}
+
+export interface CPVKPIConfiguration{
+
+    cpv:string;
+
+    indicators:string[];
+
+    serviceLevelIndicators:string[];
+
+    qualityIndicators:string[];
+
+    environmentalIndicators:string[];
+
+    economicIndicators:string[];
+
+    periodicity:string;
+
+}
+
+export interface CPVRiskConfiguration{
+
+    cpv:string;
+
+    operationalRisks:string[];
+
+    legalRisks:string[];
+
+    economicRisks:string[];
+
+    environmentalRisks:string[];
+
+    contingencyMeasures:string[];
+
+    monitoringActions:string[];
+
+}
+
+export interface CPVReuseConfiguration{
+
+    cpv:string;
+
+    reusableTemplates:string[];
+
+    reusableReports:string[];
+
+    reusablePPT:string[];
+
+    reusablePCAP:string[];
+
+    reusableCriteria:string[];
+
+    reusableClauses:string[];
+
+}
+
+export interface CPVHistory{
+
+    cpv:string;
+
+    uses:number;
+
+    successfulUses:number;
+
+    rejectedUses:number;
+
+    lastUse?:Date;
+
+    averageConfidence:number;
+
+}
+
+export interface CPVBusinessRule{
+
+    id:string;
+
+    name:string;
+
+    description:string;
+
+    appliesTo:string[];
+
+    severity:"INFO"|"WARNING"|"ERROR";
+
+    validator:(cpv:CPVCode)=>boolean;
+
+}
+
+export interface RuleValidationResult{
+
+    valid:boolean;
+
+    messages:string[];
+
+}
+
+export interface CPVAuditResult{
+
+    total:number;
+
+    valid:number;
+
+    invalid:number;
+
+    duplicated:number;
+
+    orphan:number;
+
+    messages:string[];
+
+}
+
+export interface CPVEngineMetrics{
+
+    totalSearches:number;
+
+    successfulSearches:number;
+
+    failedSearches:number;
+
+    averageConfidence:number;
+
+    averageSearchTime:number;
+
+    lastExecution?:Date;
+
+}
+
 export class CPVEngine{
 
     private cpvDatabase:
@@ -672,20 +992,6 @@ private calculateConfidence(
 = RESULTADO IA
 =
 ==============================================================================*/
-
-export interface CPVDetection{
-
-    principal:CPVCode;
-
-    alternatives:CPVCode[];
-
-    confidence:number;
-
-    analysedWords:string[];
-
-}
-
-
 
 /*==============================================================================
 =
@@ -1262,20 +1568,6 @@ public buildHierarchy(
 =
 ==============================================================================*/
 
-export interface CPVValidation{
-
-    valid:boolean;
-
-    score:number;
-
-    errors:string[];
-
-    warnings:string[];
-
-    suggestions:CPVCode[];
-
-}
-
 /*==============================================================================
 =
 = VALIDACIÓN GENERAL
@@ -1521,20 +1813,6 @@ public isCompatible(
 = MATRIZ DE COMPATIBILIDAD
 =
 ==============================================================================*/
-
-export interface CPVCompatibility{
-
-    source:string;
-
-    target:string;
-
-    compatible:boolean;
-
-    reason:string;
-
-    priority:number;
-
-}
 
 /*==============================================================================
 =
@@ -1830,20 +2108,6 @@ public compatibilityReport(
 =
 ==============================================================================*/
 
-export interface CPVProposal{
-
-    principal:CPVCode;
-
-    secondary:CPVCode[];
-
-    confidence:number;
-
-    justification:string;
-
-    analysedTerms:string[];
-
-}
-
 /*==============================================================================
 =
 = GENERAR PROPUESTA
@@ -2077,28 +2341,6 @@ public proposalReport(
 = CONFIGURACIÓN CONTRACTUAL
 =
 ==============================================================================*/
-
-export interface CPVContractConfiguration{
-
-    cpv:string;
-
-    contractType:ContractType;
-
-    recommendedProcedure:string;
-
-    divisionIntoLots:boolean;
-
-    technicalSolvency:boolean;
-
-    economicSolvency:boolean;
-
-    environmentalClauses:boolean;
-
-    socialClauses:boolean;
-
-    qualityCriteria:boolean;
-
-}
 
 /*==============================================================================
 =
@@ -2410,24 +2652,6 @@ public contractConfigurationReport(
 =
 ==============================================================================*/
 
-export interface CPVSolvencyConfiguration{
-
-    cpv:string;
-
-    requiresTechnicalSolvency:boolean;
-
-    requiresEconomicSolvency:boolean;
-
-    recommendedTechnicalMeans:string[];
-
-    recommendedEconomicMeans:string[];
-
-    recommendedAwardCriteria:string[];
-
-    recommendedExecutionConditions:string[];
-
-}
-
 /*==============================================================================
 =
 = BASE DE DATOS
@@ -2738,30 +2962,6 @@ public solvencyReport(
 =
 ==============================================================================*/
 
-export interface CPVProcedureConfiguration{
-
-    cpv:string;
-
-    recommendedProcedure:string;
-
-    allowsOpenProcedure:boolean;
-
-    allowsSimplifiedProcedure:boolean;
-
-    allowsRestrictedProcedure:boolean;
-
-    allowsNegotiatedProcedure:boolean;
-
-    allowsMinorContract:boolean;
-
-    publicationRequired:boolean;
-
-    europeanRegulation:boolean;
-
-    observations:string[];
-
-}
-
 /*==============================================================================
 =
 = BASE DE PROCEDIMIENTOS
@@ -3056,26 +3256,6 @@ public procedureReport(
 =
 ==============================================================================*/
 
-export interface CPVClauseConfiguration{
-
-    cpv:string;
-
-    socialClauses:string[];
-
-    environmentalClauses:string[];
-
-    innovationClauses:string[];
-
-    accessibilityClauses:string[];
-
-    equalityClauses:string[];
-
-    mandatorySocial:boolean;
-
-    mandatoryEnvironmental:boolean;
-
-}
-
 /*==============================================================================
 =
 = BASE DE CLÁUSULAS
@@ -3359,22 +3539,6 @@ public clauseReport(
 = DOCUMENTACIÓN ASOCIADA
 =
 ==============================================================================*/
-
-export interface CPVDocumentationConfiguration{
-
-    cpv:string;
-
-    requiredDocuments:string[];
-
-    optionalDocuments:string[];
-
-    technicalReports:string[];
-
-    administrativeReports:string[];
-
-    executionDocuments:string[];
-
-}
 
 /*==============================================================================
 =
@@ -3685,26 +3849,6 @@ public documentationReport(
 = MEDIOS NECESARIOS
 =
 ==============================================================================*/
-
-export interface CPVResourcesConfiguration{
-
-    cpv:string;
-
-    humanResources:string[];
-
-    materialResources:string[];
-
-    machinery:string[];
-
-    software:string[];
-
-    certifications:string[];
-
-    requiresProjectManager:boolean;
-
-}
-
-
 
 /*==============================================================================
 =
@@ -4042,30 +4186,6 @@ public resourcesReport(
 =
 ==============================================================================*/
 
-export interface CPVExecutionConfiguration{
-
-    cpv:string;
-
-    estimatedExecutionMonths:number;
-
-    allowsExtensions:boolean;
-
-    maximumExtensions:number;
-
-    recommendedWarrantyMonths:number;
-
-    requiresContractManager:boolean;
-
-    periodicMonitoring:boolean;
-
-    recommendedMilestones:string[];
-
-    executionRisks:string[];
-
-}
-
-
-
 /*==============================================================================
 =
 = BASE DE EJECUCIÓN
@@ -4368,26 +4488,6 @@ public executionReport(
 =
 ==============================================================================*/
 
-export interface CPVKPIConfiguration{
-
-    cpv:string;
-
-    indicators:string[];
-
-    serviceLevelIndicators:string[];
-
-    qualityIndicators:string[];
-
-    environmentalIndicators:string[];
-
-    economicIndicators:string[];
-
-    periodicity:string;
-
-}
-
-
-
 /*==============================================================================
 =
 = BASE KPI
@@ -4675,26 +4775,6 @@ public KPIReport(
 = CONFIGURACIÓN DE RIESGOS
 =
 ==============================================================================*/
-
-export interface CPVRiskConfiguration{
-
-    cpv:string;
-
-    operationalRisks:string[];
-
-    legalRisks:string[];
-
-    economicRisks:string[];
-
-    environmentalRisks:string[];
-
-    contingencyMeasures:string[];
-
-    monitoringActions:string[];
-
-}
-
-
 
 /*==============================================================================
 =
@@ -5021,26 +5101,6 @@ public riskReport(
 = CONFIGURACIÓN DE REUTILIZACIÓN
 =
 ==============================================================================*/
-
-export interface CPVReuseConfiguration{
-
-    cpv:string;
-
-    reusableTemplates:string[];
-
-    reusableReports:string[];
-
-    reusablePPT:string[];
-
-    reusablePCAP:string[];
-
-    reusableCriteria:string[];
-
-    reusableClauses:string[];
-
-}
-
-
 
 /*==============================================================================
 =
@@ -5373,24 +5433,6 @@ public reuseReport(
 = HISTÓRICO DE UTILIZACIÓN
 =
 ==============================================================================*/
-
-export interface CPVHistory{
-
-    cpv:string;
-
-    uses:number;
-
-    successfulUses:number;
-
-    rejectedUses:number;
-
-    lastUse?:Date;
-
-    averageConfidence:number;
-
-}
-
-
 
 /*==============================================================================
 =
@@ -5926,39 +5968,11 @@ public diagnosticReport()
 =
 ==============================================================================*/
 
-export interface CPVBusinessRule{
-
-    id:string;
-
-    name:string;
-
-    description:string;
-
-    appliesTo:string[];
-
-    severity:"INFO"|"WARNING"|"ERROR";
-
-    validator:(cpv:CPVCode)=>boolean;
-
-}
-
-
-
 /*==============================================================================
 =
 = RESULTADO
 =
 ==============================================================================*/
-
-export interface RuleValidationResult{
-
-    valid:boolean;
-
-    messages:string[];
-
-}
-
-
 
 /*==============================================================================
 =
@@ -6496,24 +6510,6 @@ public engineReport()
 =
 ==============================================================================*/
 
-export interface CPVAuditResult{
-
-    total:number;
-
-    valid:number;
-
-    invalid:number;
-
-    duplicated:number;
-
-    orphan:number;
-
-    messages:string[];
-
-}
-
-
-
 /*==============================================================================
 =
 = AUDITORÍA COMPLETA
@@ -6763,24 +6759,6 @@ public exportAudit()
 = MÉTRICAS DEL MOTOR
 =
 ==============================================================================*/
-
-export interface CPVEngineMetrics{
-
-    totalSearches:number;
-
-    successfulSearches:number;
-
-    failedSearches:number;
-
-    averageConfidence:number;
-
-    averageSearchTime:number;
-
-    lastExecution?:Date;
-
-}
-
-
 
 /*==============================================================================
 =

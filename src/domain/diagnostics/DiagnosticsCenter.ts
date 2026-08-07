@@ -189,7 +189,7 @@ export class DiagnosticsCenter {
 
     }
 
-}
+
 
     /**
      * =====================================================
@@ -1046,5 +1046,7 @@ export class DiagnosticsCenter {
         return "1.0.0";
 
     }
+
+}
 
 }

@@ -195,6 +195,78 @@ export interface AIManagerStatistics{
 =
 ===========================================================================*/
 
+export enum AIManagerEvent{
+
+    REQUEST_CREATED="REQUEST_CREATED",
+
+    REQUEST_STARTED="REQUEST_STARTED",
+
+    REQUEST_FINISHED="REQUEST_FINISHED",
+
+    REQUEST_FAILED="REQUEST_FAILED",
+
+    PROVIDER_SELECTED="PROVIDER_SELECTED",
+
+    PROVIDER_FAILED="PROVIDER_FAILED",
+
+    CACHE_HIT="CACHE_HIT",
+
+    CACHE_MISS="CACHE_MISS",
+
+    STREAM_STARTED="STREAM_STARTED",
+
+    STREAM_FINISHED="STREAM_FINISHED"
+
+}
+
+export interface AIManagerEventRecord{
+
+    id:UUID;
+
+    timestamp:string;
+
+    type:AIManagerEvent;
+
+    provider?:string;
+
+    requestId?:UUID;
+
+    details?:unknown;
+
+}
+
+export interface AIManagerObserver{
+
+    onEvent?(
+
+        event:AIManagerEventRecord
+
+    ):Promise<void>;
+
+}
+
+export interface AIAuditRecord{
+
+    id:UUID;
+
+    timestamp:string;
+
+    provider:string;
+
+    model:string;
+
+    executionMilliseconds:number;
+
+    success:boolean;
+
+    promptTokens:number;
+
+    completionTokens:number;
+
+    totalTokens:number;
+
+}
+
 export class AIManager{
 
     private status=
@@ -2033,47 +2105,6 @@ public getActiveStreams()
 =
 ===========================================================================*/
 
-export enum AIManagerEvent{
-
-    REQUEST_CREATED="REQUEST_CREATED",
-
-    REQUEST_STARTED="REQUEST_STARTED",
-
-    REQUEST_FINISHED="REQUEST_FINISHED",
-
-    REQUEST_FAILED="REQUEST_FAILED",
-
-    PROVIDER_SELECTED="PROVIDER_SELECTED",
-
-    PROVIDER_FAILED="PROVIDER_FAILED",
-
-    CACHE_HIT="CACHE_HIT",
-
-    CACHE_MISS="CACHE_MISS",
-
-    STREAM_STARTED="STREAM_STARTED",
-
-    STREAM_FINISHED="STREAM_FINISHED"
-
-}
-
-export interface AIManagerEventRecord{
-
-    id:UUID;
-
-    timestamp:string;
-
-    type:AIManagerEvent;
-
-    provider?:string;
-
-    requestId?:UUID;
-
-    details?:unknown;
-
-}
-
-
 /*===========================================================================
 =
 = HISTORIAL DE EVENTOS
@@ -2155,16 +2186,6 @@ public clearEvents()
 = OBSERVADORES
 =
 ===========================================================================*/
-
-export interface AIManagerObserver{
-
-    onEvent?(
-
-        event:AIManagerEventRecord
-
-    ):Promise<void>;
-
-}
 
 private readonly managerObservers:
 
@@ -2253,28 +2274,6 @@ private async notifyObservers(
 = AUDITORÍA IA
 =
 ===========================================================================*/
-
-export interface AIAuditRecord{
-
-    id:UUID;
-
-    timestamp:string;
-
-    provider:string;
-
-    model:string;
-
-    executionMilliseconds:number;
-
-    success:boolean;
-
-    promptTokens:number;
-
-    completionTokens:number;
-
-    totalTokens:number;
-
-}
 
 private readonly audit:
 

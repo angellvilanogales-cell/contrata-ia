@@ -144,6 +144,20 @@ export interface RuleEvaluationReport{
 =
 ==============================================================================*/
 
+export interface RuleEngineMetrics{
+
+    evaluations:number;
+
+    passedEvaluations:number;
+
+    failedEvaluations:number;
+
+    averageScore:number;
+
+    lastExecution?:Date;
+
+}
+
 export class RuleEvaluatorEngine{
 
     private rules:RuleDefinition[]=[];
@@ -4819,22 +4833,6 @@ public finalValidation(
 = MÉTRICAS
 =
 ==============================================================================*/
-
-export interface RuleEngineMetrics{
-
-    evaluations:number;
-
-    passedEvaluations:number;
-
-    failedEvaluations:number;
-
-    averageScore:number;
-
-    lastExecution?:Date;
-
-}
-
-
 
 /*==============================================================================
 =

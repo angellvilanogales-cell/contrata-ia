@@ -183,7 +183,7 @@ export class LegalReferenceEngine {
 
     }
 
-}
+
 
     /**
      * =====================================================
@@ -869,5 +869,7 @@ export class LegalReferenceEngine {
         };
 
     }
+
+}
 
 }
