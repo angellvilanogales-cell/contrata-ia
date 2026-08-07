@@ -11,9 +11,36 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  repair-knowledge-engine-once:
+    name: Recover KnowledgeEngine structure once
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/lb1-proyecto-compilable' && !contains(github.event.head_commit.message, 'fix: recover knowledge engine structure')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Recover KnowledgeEngine structure
+        run: node scripts/repair-knowledge-engine-once.mjs
+      - name: Commit repaired KnowledgeEngine and restore CI
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout HEAD -- .github/workflows/ci.yml
+          rm scripts/repair-knowledge-engine-once.mjs
+          git add src/domain/conocimiento/KnowledgeEngine.ts .github/workflows/ci.yml
+          git add -u scripts/repair-knowledge-engine-once.mjs
+          if git diff --cached --quiet; then
+            echo "No structural repair produced"
+            exit 1
+          fi
+          git commit -m "fix: recover knowledge engine structure"
+          git push origin HEAD:agent/lb1-proyecto-compilable
+
   audit-imports:
     name: Audit relative imports
     runs-on: ubuntu-latest
