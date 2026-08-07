@@ -37,8 +37,16 @@ jobs:
 
           path = Path('src/domain/conocimiento/KnowledgeEngine.ts')
           text = path.read_text(encoding='utf-8')
-          if re.search(r'(?m)^\s*(<<<<<<<|=======|>>>>>>>)', text):
-              raise SystemExit('KnowledgeEngine contains a real merge marker; refusing automatic resolution.')
+          marker_re = re.compile(r'(?m)^\s*(<<<<<<<|=======|>>>>>>>)')
+          markers = list(marker_re.finditer(text))
+          if markers:
+              lines = text.splitlines()
+              for m in markers:
+                  line = text.count('\n', 0, m.start()) + 1
+                  print(f'MERGE_MARKER line={line} marker={m.group(1)}')
+                  for i in range(max(0, line - 5), min(len(lines), line + 8)):
+                      print(f'{i+1:04d}: {lines[i]}')
+              raise SystemExit('KnowledgeEngine contains real merge markers; resolution must inspect both sides.')
 
           class_match = re.search(r'export class KnowledgeEngine\s*\{', text)
           if not class_match:
