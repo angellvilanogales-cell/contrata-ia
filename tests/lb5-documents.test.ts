@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { AdministrativeDocumentRenderer } from "../src/application/documents/lb5/AdministrativeDocumentRenderer";
 import { createLB5DemoContext, runLB5Demo } from "../src/application/documents/lb5/LB5Demo";
 import { LB5DocumentComposer } from "../src/application/documents/lb5/LB5DocumentComposer";
+import { ProcedureDocumentPlanner } from "../src/application/documents/lb5/ProcedureDocumentPlanner";
+import { ProceduralDraftFactory } from "../src/application/documents/lb5/ProceduralDraftFactory";
 import { SimpleDocumentRequestInterpreter } from "../src/application/documents/lb5/SimpleDocumentRequest";
 
 describe("LB-5 administrative document composer", () => {
@@ -102,5 +104,42 @@ describe("LB-5 administrative document composer", () => {
     );
     expect(rendered.package.globalValidation.pendingHumanValidation.length).toBeGreaterThan(0);
     expect(rendered.package.documents.every(document => document.validation.valid)).toBe(true);
+  });
+
+  it("plans the full preparation-stage document set without fabricating external evidence", () => {
+    const plan = new ProcedureDocumentPlanner().plan(createLB5DemoContext(), {
+      needPlacement: "IN_MEMORY",
+      insufficiencyPlacement: "IN_MEMORY"
+    });
+    expect(plan.items.find(item => item.id === "MEMORIA_JUSTIFICATIVA")?.responsibility).toBe("CONTRATA_IA_GENERATES");
+    expect(plan.items.find(item => item.id === "PCAP")?.responsibility).toBe("CONTRATA_IA_GENERATES");
+    expect(plan.items.find(item => item.id === "PPT")?.responsibility).toBe("CONTRATA_IA_GENERATES");
+    expect(plan.items.find(item => item.id === "CERTIFICADO_EXISTENCIA_CREDITO")?.responsibility).toBe("EXTERNAL_SYSTEM_GENERATES");
+    expect(plan.items.find(item => item.id === "RESERVA_CREDITO")?.responsibility).toBe("EXTERNAL_SYSTEM_GENERATES");
+    expect(plan.items.find(item => item.id === "INFORME_ASESORIA_JURIDICA")?.responsibility).toBe("EXTERNAL_AUTHORITY_OR_CONTROL_BODY");
+  });
+
+  it("changes need-report responsibility when the operator chooses standalone placement", () => {
+    const planner = new ProcedureDocumentPlanner();
+    const integrated = planner.plan(createLB5DemoContext(), {
+      needPlacement: "IN_MEMORY",
+      insufficiencyPlacement: "IN_MEMORY"
+    });
+    const standalone = planner.plan(createLB5DemoContext(), {
+      needPlacement: "STANDALONE",
+      insufficiencyPlacement: "STANDALONE"
+    });
+    expect(integrated.items.find(item => item.id === "INFORME_NECESIDAD")?.responsibility).toBe("NOT_APPLICABLE");
+    expect(standalone.items.find(item => item.id === "INFORME_NECESIDAD")?.responsibility).toBe("CONTRATA_IA_GENERATES");
+  });
+
+  it("can draft initiation and legal-request documents from the same verified blocks", () => {
+    const factory = new ProceduralDraftFactory();
+    const proposal = factory.create("PROPUESTA_INICIO");
+    const legalRequest = factory.create("SOLICITUD_INFORME_JURIDICO");
+    expect(proposal.blockIds).toContain("NEED_IDONEITY");
+    expect(proposal.blockIds).toContain("PROCEDURE");
+    expect(legalRequest.blockIds).toContain("ADMINISTRATIVE_REGIME");
+    expect(legalRequest.introductoryText).toMatch(/no sustituye ni simula el informe jurídico/i);
   });
 });
