@@ -7,6 +7,7 @@ on:
       - agent/lb2-arquitectura-canonica
       - agent/lb3-recorrido-vertical
       - agent/lb4-motor-normativo
+      - agent/lb5-documentos-administrativos
   pull_request:
     branches:
       - main
@@ -14,6 +15,7 @@ on:
       - agent/lb2-arquitectura-canonica
       - agent/lb3-recorrido-vertical
       - agent/lb4-motor-normativo
+      - agent/lb5-documentos-administrativos
   workflow_dispatch:
 
 permissions:
@@ -69,6 +71,18 @@ jobs:
       - run: npm ci
       - run: npm run audit:normative
 
+  audit-documents:
+    name: Validate LB-5 document model
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:documents
+
   typecheck:
     name: TypeScript typecheck
     runs-on: ubuntu-latest
@@ -82,7 +96,7 @@ jobs:
       - run: npm run typecheck
 
   tests:
-    name: Unit, vertical and normative tests
+    name: Unit, vertical, normative and document tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -110,3 +124,10 @@ jobs:
         run: npm run demo:vertical
       - name: Execute LB-4 normative MVP
         run: npm run demo:lb4
+      - name: Generate LB-5 administrative documents
+        run: npm run demo:lb5
+      - name: Verify LB-5 artifacts
+        run: |
+          test -f artifacts/lb5/manifest.json
+          test "$(find artifacts/lb5 -name '*.docx' | wc -l)" -ge 4
+          test "$(find artifacts/lb5 -name '*.pdf' | wc -l)" -ge 4
