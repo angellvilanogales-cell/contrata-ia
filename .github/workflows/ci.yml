@@ -37,8 +37,8 @@ jobs:
 
           path = Path('src/domain/conocimiento/KnowledgeEngine.ts')
           text = path.read_text(encoding='utf-8')
-          if any(marker in text for marker in ('<<<<<<<', '=======', '>>>>>>>')):
-              raise SystemExit('KnowledgeEngine contains a merge marker; refusing automatic resolution.')
+          if re.search(r'(?m)^\s*(<<<<<<<|=======|>>>>>>>)', text):
+              raise SystemExit('KnowledgeEngine contains a real merge marker; refusing automatic resolution.')
 
           class_match = re.search(r'export class KnowledgeEngine\s*\{', text)
           if not class_match:
@@ -79,11 +79,8 @@ jobs:
                       i += 1; continue
               return None
 
-          # Interfaces declared after the class declaration are type declarations,
-          # not class members. Move each complete interface before the class while
-          # preserving its implementation exactly.
           interfaces = []
-          search_from = class_start + class_match.group(0).__len__()
+          search_from = class_start + len(class_match.group(0))
           while True:
               match = re.search(r'export interface\s+[A-Za-z0-9_]+\s*\{', text[search_from:])
               if not match:
@@ -99,28 +96,21 @@ jobs:
           if not interfaces:
               raise SystemExit('No misplaced KnowledgeEngine interfaces found; refusing blind edit.')
 
-          # Remove from right to left so offsets remain valid.
           cleaned = text
           for start, end, _ in reversed(interfaces):
               cleaned = cleaned[:start] + cleaned[end:]
 
-          # Recompute class position and insert declarations immediately before it.
           class_match = re.search(r'export class KnowledgeEngine\s*\{', cleaned)
-          if not class_match:
-              raise SystemExit('KnowledgeEngine class disappeared during interface recovery.')
           insertion = '\n\n'.join(block for _, _, block in interfaces) + '\n\n\n'
           cleaned = cleaned[:class_match.start()] + insertion + cleaned[class_match.start():]
 
-          # Validate that the class has exactly one top-level closing brace.
           class_match = re.search(r'export class KnowledgeEngine\s*\{', cleaned)
           opening = class_match.end() - 1
           closing = matching_brace(cleaned, opening)
           if closing is None:
               cleaned = cleaned.rstrip() + '\n}\n'
-          else:
-              trailing = cleaned[closing + 1:].strip()
-              if trailing:
-                  raise SystemExit('KnowledgeEngine closes before EOF; refusing to move arbitrary code into the class.')
+          elif cleaned[closing + 1:].strip():
+              raise SystemExit('KnowledgeEngine closes before EOF; refusing to move arbitrary code into the class.')
 
           path.write_text(cleaned, encoding='utf-8')
           print(f'Moved {len(interfaces)} misplaced interface declarations outside KnowledgeEngine.')
@@ -133,9 +123,8 @@ jobs:
           from pathlib import Path
           p = Path('.github/workflows/ci.yml')
           s = p.read_text(encoding='utf-8')
-          marker = "  repair-knowledge-structure:\n"
-          start = s.index(marker)
-          jobs = s.index("  audit-imports:\n", start)
+          start = s.index('  repair-knowledge-structure:\n')
+          jobs = s.index('  audit-imports:\n', start)
           s = s[:start] + s[jobs:]
           s = s.replace('permissions:\n  contents: write\n', 'permissions:\n  contents: read\n', 1)
           p.write_text(s, encoding='utf-8')
