@@ -1,152 +1,42 @@
 /**
- * ============================================================
- * CONTRATA IA
- * BaseDocumentGenerator
- * ============================================================
- *
- * Clase base para todos los generadores documentales.
- *
- * Esta versión mantiene la compatibilidad con el proyecto
- * actual y prepara la futura refactorización.
- *
- * ============================================================
+ * BaseDocumentGenerator — base común de los generadores documentales.
  */
 
-import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
+import { ExpedienteContext } from "../expediente/ExpedienteContext";
 
 export abstract class BaseDocumentGenerator {
-
-    /**
-     * Punto de entrada único.
-     */
-    public async generar(
-
-        contexto: ExpedienteContext
-
-    ): Promise<string> {
-
+    public async generar(contexto: ExpedienteContext): Promise<string> {
         this.validar(contexto);
-
         await this.preparar(contexto);
-
         const resultado = await this.generarDocumento(contexto);
-
-        return await this.finalizar(
-
-            resultado,
-
-            contexto
-
-        );
-
+        return this.finalizar(resultado, contexto);
     }
 
-    /**
-     * Preparación opcional.
-     */
-    protected async preparar(
+    protected async preparar(_contexto: ExpedienteContext): Promise<void> {}
 
-        _contexto: ExpedienteContext
-
-    ): Promise<void> {
-
-        // Vacío por defecto.
-
+    protected validar(contexto: ExpedienteContext): void {
+        if (!contexto) throw new Error("ExpedienteContext no definido.");
     }
 
-    /**
-     * Validación común.
-     */
-    protected validar(
+    protected abstract generarDocumento(contexto: ExpedienteContext): Promise<string>;
 
-        contexto: ExpedienteContext
-
-    ): void {
-
-        if (!contexto) {
-
-            throw new Error(
-
-                "ExpedienteContext no definido."
-
-            );
-
-        }
-
-    }
-
-    /**
-     * Implementación específica.
-     */
-    protected abstract generarDocumento(
-
-        contexto: ExpedienteContext
-
-    ): Promise<string>;
-
-    /**
-     * Posprocesado.
-     */
-    protected async finalizar(
-
-        resultado: string,
-
-        _contexto: ExpedienteContext
-
-    ): Promise<string> {
-
+    protected async finalizar(resultado: string, _contexto: ExpedienteContext): Promise<string> {
         return resultado;
-
     }
 
-    /**
-     * =====================================================
-     * Compatibilidad con la arquitectura actual.
-     * =====================================================
-     */
-
-    protected reemplazarVariables(
-
-        plantilla: string,
-
-        variables: Record<string, unknown>
-
-    ): string {
-
+    protected reemplazarVariables(plantilla: string, variables: Record<string, unknown>): string {
         let resultado = plantilla;
-
         for (const [clave, valor] of Object.entries(variables)) {
-
-            resultado = resultado.replaceAll(
-
-                `{{${clave}}}`,
-
-                valor?.toString() ?? ""
-
-            );
-
+            resultado = resultado.replaceAll(`{{${clave}}}`, valor?.toString() ?? "");
         }
-
         return resultado;
-
     }
 
-    protected limpiar(
-
-        texto: string
-
-    ): string {
-
+    protected limpiar(texto: string): string {
         return texto
-
             .replace(/\{\{.*?\}\}/g, "")
-
             .replace(/[ \t]+\n/g, "\n")
-
             .replace(/\n{3,}/g, "\n\n")
-
             .trim();
-
     }
-
 }
