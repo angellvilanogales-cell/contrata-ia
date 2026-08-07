@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "2.0.0",
+  "runtimeEntrypoint": "src/main.ts",
+  "components": [
+    {"id":"configuration","contract":"ApplicationConfiguration","canonicalPath":"src/architecture/runtime/EnvironmentConfiguration.ts","legacyPaths":[]},
+    {"id":"events","contract":"EventBusPort","canonicalPath":"src/domain/events/EventBus.ts","legacyPaths":[]},
+    {"id":"rules","contract":"RuleEnginePort","canonicalPath":"src/domain/rules/RuleEngine.ts","legacyPaths":["src/knowledge/RuleEngine.ts","src/domain/conocimiento/RuleEngine.ts","src/engines/RuleEngine.ts"]},
+    {"id":"inference","contract":"InferenceEnginePort","canonicalPath":"src/domain/conocimiento/InferenceEngine.ts","legacyPaths":["src/knowledge/InferenceEngine.ts"]},
+    {"id":"knowledge","contract":"KnowledgeEnginePort","canonicalPath":"src/domain/conocimiento/KnowledgeEngine.ts","legacyPaths":["src/engines/KnowledgeEngine.ts"]},
+    {"id":"legalReasoning","contract":"LegalReasonerPort","canonicalPath":"src/domain/legal/LegalReasoner.ts","legacyPaths":[]},
+    {"id":"cpv","contract":"CPVEnginePort","canonicalPath":"src/domain/cpv/CPVEngine.ts","legacyPaths":["src/engines/CPVEngine.ts"]},
+    {"id":"procedure","contract":"ProcedureResolverPort","canonicalPath":"src/domain/resolvers/ProcedureResolver.ts","legacyPaths":[]},
+    {"id":"documents","contract":"DocumentGeneratorPort","canonicalPath":"src/application/documents/DocumentGenerator.ts","legacyPaths":["src/generators/BaseDocumentGenerator.ts"]},
+    {"id":"export","contract":"DocumentExporterPort","canonicalPath":"src/application/export/ExportManager.ts","legacyPaths":[]},
+    {"id":"ai","contract":"AIServicePort","canonicalPath":"src/infrastructure/ai/AIManager.ts","legacyPaths":[]}
+  ]
+}

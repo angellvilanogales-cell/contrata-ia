@@ -5,8 +5,9 @@
     "outDir": "./dist",
     "types": ["node"]
   },
-  "files": [
-    "src/main.ts"
+  "include": [
+    "src/main.ts",
+    "src/architecture/**/*.ts"
   ],
   "exclude": [
     "node_modules",
