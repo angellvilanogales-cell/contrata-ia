@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "scope": "LB-4 MVP normativo para contratos de servicios de limpieza de edificios/oficinas de una Administración Pública de la Junta de Andalucía, tramitación ordinaria",
+  "checkedAt": "2026-08-07",
+  "sources": [
+    {
+      "id": "LCSP-2017-CONSOLIDADA-2026",
+      "authority": "BOE",
+      "title": "Ley 9/2017, de 8 de noviembre, de Contratos del Sector Público - texto consolidado",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902",
+      "effectiveContext": "Texto consolidado consultado el 2026-08-07; actualización de umbrales 2026 en vigor desde 2026-01-01",
+      "articles": ["22", "87", "90", "99", "106", "107", "130", "131", "145", "146", "156", "159", "201", "202"]
+    },
+    {
+      "id": "UE-2025-2152",
+      "authority": "EUR-Lex",
+      "title": "Reglamento Delegado (UE) 2025/2152 de la Comisión, de 22 de octubre de 2025",
+      "url": "https://eur-lex.europa.eu/eli/reg_del/2025/2152/oj",
+      "effectiveContext": "Umbrales de contratación pública 2026-2027; aplicable desde 2026-01-01"
+    },
+    {
+      "id": "JA-MODELOS-PCAP",
+      "authority": "Junta de Andalucía",
+      "title": "Modelos de pliegos y contratos recomendados por la Comisión Consultiva de Contratación Pública",
+      "url": "https://www.juntadeandalucia.es/temas/contratacion-publica/gestion/comision-consultiva/paginas/pliegos.html",
+      "effectiveContext": "Página oficial consultada 2026-08-07; referencia a actualizaciones de modelos de diciembre de 2025"
+    },
+    {
+      "id": "JA-PROCEDIMIENTOS",
+      "authority": "Junta de Andalucía",
+      "title": "Tipos de contratos y procedimientos",
+      "url": "https://www.juntadeandalucia.es/temas/contratacion-publica/como-contratar/tipos.html",
+      "effectiveContext": "Resumen oficial de procedimiento abierto simplificado y simplificado abreviado"
+    },
+    {
+      "id": "JA-CLAUSULAS-SOCIALES-AMBIENTALES",
+      "authority": "Junta de Andalucía",
+      "title": "Cláusulas sociales y ambientales",
+      "url": "https://www.juntadeandalucia.es/temas/contratacion-publica/gestion/guia.html",
+      "effectiveContext": "Guía y recursos oficiales; las cláusulas deben adecuarse al objeto, sector, finalidad y naturaleza del contrato"
+    },
+    {
+      "id": "JA-ACUERDO-2016-CLAUSULAS",
+      "authority": "BOJA / Junta de Andalucía",
+      "title": "Acuerdo de 18 de octubre de 2016 del Consejo de Gobierno sobre cláusulas sociales y ambientales",
+      "url": "https://www.juntadeandalucia.es/boja/2016/203/2",
+      "effectiveContext": "Aplicación a Administración de la Junta de Andalucía y entidades instrumentales públicas"
+    },
+    {
+      "id": "JA-PCAP-LIMPIEZA-EJEMPLOS-USUARIO",
+      "authority": "Documentación administrativa aportada al proyecto",
+      "title": "PCAP y memorias de servicios de limpieza de la Junta de Andalucía aportados como fuentes",
+      "effectiveContext": "Ejemplos 2024-2025 usados solo como patrón administrativo y contraste; no sustituyen a la norma vigente"
+    }
+  ]
+}
