@@ -1,0 +1,317 @@
+# PENDIENTE DE VALIDACIÓN — FUENTE DE CONOCIMIENTO
+#
+# Este archivo procede de knowledge/rules/procedimiento.rules.yaml.
+# Se conserva fuera del directorio canónico de reglas porque su contenido
+# declara id: solvencia y categoria: solvencia, pese a su nombre de archivo
+# procedimiento.rules.yaml.
+#
+# NO se considera una regla canónica de procedimiento hasta que el conflicto
+# entre fuentes sea resuelto mediante validación documental/normativa.
+
+# ============================================================
+# CONTRATA-IA
+# Reglas de solvencia
+# ============================================================
+
+id: solvencia
+nombre: Reglas de solvencia
+version: "1.0.0"
+descripcion: >
+  Reglas para determinar la necesidad, tipo y alcance de la
+  solvencia económica, financiera y técnica o profesional
+  exigible en los contratos públicos.
+
+categoria: solvencia
+
+variables:
+
+  requiereSolvencia:
+    tipo: boolean
+    descripcion: >
+      Determina si procede exigir solvencia al operador económico.
+    valorPorDefecto: true
+
+  solvenciaEconomica:
+    tipo: boolean
+    descripcion: >
+      Determina si procede exigir solvencia económica y financiera.
+    valorPorDefecto: true
+
+  solvenciaTecnica:
+    tipo: boolean
+    descripcion: >
+      Determina si procede exigir solvencia técnica o profesional.
+    valorPorDefecto: true
+
+  tipoContrato:
+    tipo: string
+    descripcion: >
+      Tipo de contrato que condiciona los medios de acreditación
+      de la solvencia.
+    valores:
+      - obras
+      - servicios
+      - suministros
+      - concesionObras
+      - concesionServicios
+      - mixto
+
+  procedimiento:
+    tipo: string
+    descripcion: >
+      Procedimiento de adjudicación utilizado.
+    valores:
+      - abierto
+      - abiertoSimplificado
+      - abiertoSimplificadoAbreviado
+      - restringido
+      - negociado
+      - dialogoCompetitivo
+      - asociacionInnovacion
+      - contratoMenor
+
+  importeContrato:
+    tipo: number
+    descripcion: >
+      Importe utilizado para determinar las condiciones
+      aplicables al expediente.
+
+  valorEstimado:
+    tipo: number
+    descripcion: >
+      Valor estimado del contrato.
+
+  clasificacionExigible:
+    tipo: boolean
+    descripcion: >
+      Determina si procede exigir clasificación empresarial
+      cuando resulte legalmente aplicable.
+    valorPorDefecto: false
+
+  mediosSolvenciaEconomica:
+    tipo: array
+    descripcion: >
+      Medios de acreditación de la solvencia económica y financiera.
+    valorPorDefecto: []
+
+  mediosSolvenciaTecnica:
+    tipo: array
+    descripcion: >
+      Medios de acreditación de la solvencia técnica o profesional.
+    valorPorDefecto: []
+
+  justificacion:
+    tipo: string
+    descripcion: >
+      Justificación normativa y técnica de la exigencia de solvencia.
+    valorPorDefecto: ""
+
+  observaciones:
+    tipo: string
+    descripcion: >
+      Observaciones adicionales sobre la solvencia.
+    valorPorDefecto: ""
+
+reglas:
+
+  - id: solvencia-001
+    nombre: Determinación general de la solvencia
+    descripcion: >
+      Determina inicialmente si debe contemplarse la solvencia
+      económica y financiera y la solvencia técnica o profesional.
+    condiciones:
+      - campo: procedimiento
+        operador: distinto
+        valor: contratoMenor
+    acciones:
+      - establecer:
+          variable: requiereSolvencia
+          valor: true
+      - establecer:
+          variable: solvenciaEconomica
+          valor: true
+      - establecer:
+          variable: solvenciaTecnica
+          valor: true
+
+  - id: solvencia-002
+    nombre: Contrato menor
+    descripcion: >
+      En los contratos menores se aplicará el régimen específico
+      previsto por la normativa de contratación pública.
+    condiciones:
+      - campo: procedimiento
+        operador: igual
+        valor: contratoMenor
+    acciones:
+      - establecer:
+          variable: requiereSolvencia
+          valor: false
+      - establecer:
+          variable: solvenciaEconomica
+          valor: false
+      - establecer:
+          variable: solvenciaTecnica
+          valor: false
+
+  - id: solvencia-003
+    nombre: Solvencia económica y financiera
+    descripcion: >
+      Cuando proceda exigir solvencia, deberá determinarse el medio
+      de acreditación adecuado y proporcional al objeto y características
+      del contrato.
+    condiciones:
+      - campo: requiereSolvencia
+        operador: igual
+        valor: true
+    acciones:
+      - añadir:
+          variable: mediosSolvenciaEconomica
+          valor:
+            - volumenAnualNegocios
+
+  - id: solvencia-004
+    nombre: Solvencia técnica o profesional en servicios
+    descripcion: >
+      En contratos de servicios deberán establecerse medios adecuados
+      para acreditar la capacidad técnica o profesional del licitador.
+    condiciones:
+      - campo: requiereSolvencia
+        operador: igual
+        valor: true
+      - campo: tipoContrato
+        operador: igual
+        valor: servicios
+    acciones:
+      - añadir:
+          variable: mediosSolvenciaTecnica
+          valor:
+            - trabajosRealizados
+
+  - id: solvencia-005
+    nombre: Solvencia técnica en suministros
+    descripcion: >
+      En contratos de suministros deberán utilizarse medios adecuados
+      para acreditar la capacidad técnica y profesional.
+    condiciones:
+      - campo: requiereSolvencia
+        operador: igual
+        valor: true
+      - campo: tipoContrato
+        operador: igual
+        valor: suministros
+    acciones:
+      - añadir:
+          variable: mediosSolvenciaTecnica
+          valor:
+            - principalesSuministrosRealizados
+
+  - id: solvencia-006
+    nombre: Solvencia técnica en obras
+    descripcion: >
+      En contratos de obras deberán contemplarse los medios de
+      acreditación de solvencia técnica o profesional que correspondan.
+    condiciones:
+      - campo: requiereSolvencia
+        operador: igual
+        valor: true
+      - campo: tipoContrato
+        operador: igual
+        valor: obras
+    acciones:
+      - añadir:
+          variable: mediosSolvenciaTecnica
+          valor:
+            - obrasRealizadas
+
+  - id: solvencia-007
+    nombre: Clasificación empresarial
+    descripcion: >
+      La clasificación empresarial solamente se exigirá cuando
+      resulte legalmente procedente.
+    condiciones:
+      - campo: tipoContrato
+        operador: igual
+        valor: obras
+    acciones:
+      - establecer:
+          variable: clasificacionExigible
+          valor: true
+
+  - id: solvencia-008
+    nombre: Proporcionalidad
+    descripcion: >
+      Los requisitos de solvencia deben guardar relación con el objeto
+      del contrato y ser proporcionales al mismo.
+    condiciones:
+      - campo: requiereSolvencia
+        operador: igual
+        valor: true
+    acciones:
+      - establecer:
+          variable: observaciones
+          valor: >
+            Los requisitos de solvencia deberán determinarse de forma
+            proporcional al objeto, importe, características y riesgos
+            del contrato.
+
+  - id: solvencia-009
+    nombre: Justificación de la solvencia
+    descripcion: >
+      Toda exigencia de solvencia deberá quedar motivada en el expediente.
+    condiciones:
+      - campo: requiereSolvencia
+        operador: igual
+        valor: true
+    acciones:
+      - establecer:
+          variable: justificacion
+          valor: >
+            Se exige la acreditación de la solvencia económica y financiera
+            y de la solvencia técnica o profesional por resultar necesaria
+            para garantizar que el licitador dispone de los medios y
+            capacidad suficientes para ejecutar correctamente el contrato,
+            debiendo concretarse los medios de acreditación de forma
+            proporcional al objeto y características del mismo.
+
+trazabilidad:
+
+  normaPrincipal:
+    - LCSP
+
+  principios:
+    - proporcionalidad
+    - adecuacionAlObjeto
+    - capacidadDelContratista
+    - igualdadDeTrato
+    - transparencia
+
+  justificacionObligatoria: true
+
+  registrar:
+    - decisionSolvencia
+    - tipoSolvencia
+    - mediosAcreditacion
+    - justificacion
+    - validacionTecnica
+
+salidas:
+
+  - id: decisionSolvencia
+    descripcion: >
+      Decisión propuesta sobre la exigencia de solvencia.
+  - id: solvenciaEconomica
+    descripcion: >
+      Requisitos propuestos de solvencia económica y financiera.
+  - id: solvenciaTecnica
+    descripcion: >
+      Requisitos propuestos de solvencia técnica o profesional.
+  - id: mediosAcreditacion
+    descripcion: >
+      Medios de acreditación propuestos.
+  - id: justificacion
+    descripcion: >
+      Justificación de la propuesta.
+  - id: validacionTecnica
+    descripcion: >
+      Decisión final pendiente de validación por el responsable técnico.
