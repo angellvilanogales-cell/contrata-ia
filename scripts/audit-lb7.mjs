@@ -9,10 +9,17 @@ const requiredFiles = [
   "src/infrastructure/operations/lb7/HashChainAuditLog.ts",
   "src/interfaces/lb7/SecurityPolicy.ts",
   "src/interfaces/lb7/PwaAssets.ts",
+  "src/application/intake/lb7/EventServicesProfile.ts",
+  "src/application/legal-review/lb7/PreLegalReview.ts",
   "knowledge/lb7/document-patterns.json",
+  "knowledge/lb7/event-services-profile.json",
+  "knowledge/lb7/legal-review-cases.json",
   "tests/lb7-security.test.ts",
   "tests/lb7-pwa.test.ts",
   "tests/lb7-document-regression.test.ts",
+  "tests/lb7-event-services.test.ts",
+  "tests/lb7-legal-review-regression.test.ts",
+  "tests/lb7-prelegal-review.test.ts",
   "docs/documents/LB7-GOLDEN-SET.md",
   "docs/operations/LB7-PILOT-AND-RELEASE.md"
 ];
@@ -53,6 +60,19 @@ if (fs.existsSync(path.join(root, "knowledge/lb7/document-patterns.json"))) {
   if (!value.pptPattern?.neverInvent?.includes("SUBROGATION_WORKER_DATA")) errors.push("El patrón PPT no protege datos de subrogación frente a invención.");
   if (!value.crossDocumentInvariants?.includes("OBJECT") || !value.crossDocumentInvariants?.includes("ESTIMATED_VALUE")) errors.push("Faltan invariantes documentales mínimos.");
 }
+if (fs.existsSync(path.join(root, "knowledge/lb7/event-services-profile.json"))) {
+  const value = JSON.parse(read("knowledge/lb7/event-services-profile.json"));
+  if (value.family !== "EVENT_SERVICES") errors.push("El perfil documental de eventos no declara EVENT_SERVICES.");
+  if (value.normativeCoverage !== "PENDING_DEDICATED_RULE_VALIDATION") errors.push("EVENT_SERVICES no mantiene explícitamente pendiente la validación normativa dedicada.");
+  if (!Array.isArray(value.evidenceCases) || value.evidenceCases.length < 4) errors.push("EVENT_SERVICES debe conservar al menos los cuatro expedientes de evidencia profunda actuales.");
+  if (!value.neverInvent?.includes("EXPECTED_ATTENDANCE") || !value.neverInvent?.includes("LOT_RESERVATION_STATUS")) errors.push("EVENT_SERVICES no protege hechos técnicos/administrativos de alto riesgo frente a invención.");
+}
+if (fs.existsSync(path.join(root, "src/application/legal-review/lb7/PreLegalReview.ts"))) {
+  const value = read("src/application/legal-review/lb7/PreLegalReview.ts");
+  for (const marker of ["LEGAL-REAL-001", "REQUIRES_CURRENT_LAW_VERIFICATION", "canBeTreatedAsLegalOpinion: false", "rulePromotionAllowed: false"]) {
+    if (!value.includes(marker)) errors.push(`Revisión jurídica preventiva LB-7 sin salvaguarda: ${marker}`);
+  }
+}
 if (fs.existsSync(path.join(root, "src/application/documents/lb5/AdministrativeDocumentRenderer.ts"))) {
   const value = read("src/application/documents/lb5/AdministrativeDocumentRenderer.ts");
   if (value.includes('paragraphXml(`Fuentes:')) errors.push("El renderer final sigue insertando IDs técnicos de fuentes en documentos administrativos.");
@@ -70,5 +90,7 @@ console.log("- auditoría hash-chain verificable: presente");
 console.log("- RBAC/autenticación obligatoria en producción: presente");
 console.log("- PWA instalable con caché limitada al shell público: presente");
 console.log("- golden set 10+10+10 y patrones de coherencia documental: presente");
+console.log("- EVENT_SERVICES con entrada condicional y política de no invención: presente");
+console.log("- revisión jurídica preventiva calibrada con LEGAL-REAL-001 y sin emitir dictamen: presente");
 console.log("- metadatos técnicos excluidos de documentos administrativos visibles: verificado");
 console.log("- plan de piloto y liberación: presente");
