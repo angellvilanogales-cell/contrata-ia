@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Casos especializados identificados para ampliar la regresión documental LB-7 fuera del núcleo de limpieza/mantenimiento. La inclusión en este registro no implica que el contenido íntegro de los documentos haya sido leído si status=IDENTIFIED_ONLY.",
+  "cases": [
+    {
+      "id": "SPEC-EVENTS-001",
+      "label": "Premios Meridiana 2026",
+      "expediente": "CONTR 2025 0000645768",
+      "juntaExpedienteId": 877198,
+      "contractType": "SERVICES",
+      "procedure": "OPEN_SIMPLIFIED",
+      "scope": "EVENT_SERVICES",
+      "cpv": "79952000",
+      "baseBudgetExVat": 59880.36,
+      "estimatedValue": 72455.24,
+      "durationMonths": 2,
+      "publicationDate": "2025-11-28",
+      "deadline": "2025-12-15T14:00:00",
+      "status": "IDENTIFIED_ONLY",
+      "documentInventory": [
+        "Resolución de aprobación del expediente.PDF",
+        "Pliego de Cláusula Administrativa.PDF",
+        "Pliego de prescripciones técnicas.PDF",
+        "Memoria justificativa de la contratación.PDF",
+        "Resolución designación mesa.PDF",
+        "Corrección errores.PDF",
+        "Acta de la Mesa de Contratación.PDF",
+        "Acta Segunda Sesión Mesa contratación.PDF",
+        "Acta tercera sesión Mesa de Contratación.PDF",
+        "Acta 4ª y 5ª sesión Mesa de Contratación.PDF",
+        "Informe baja temeraria.PDF",
+        "Diligencia corrección Acta 2ª sesión.PDF",
+        "Acta 6ª sesión Mesa de Contratación.PDF",
+        "Acta 7ª Mesa de Contratación.PDF",
+        "Resolución de adjudicación.PDF"
+      ],
+      "sourcePolicy": {
+        "preferred": "JUNTA_OFFICIAL_DETAIL",
+        "secondaryDiscovery": ["GOBIERTO", "TENDIOS"],
+        "rule": "Las fuentes secundarias se usan solo para inventario/localización. El contenido jurídico o documental que alimente reglas/generación debe contrastarse con documento oficial o copia aportada por el usuario."
+      },
+      "nextAction": "OBTAIN_OFFICIAL_MEMORY_PCAP_PPT_OR_USER_COPIES_BEFORE_DEEP_READ"
+    }
+  ]
+}
