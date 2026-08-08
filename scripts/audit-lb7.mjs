@@ -9,8 +9,11 @@ const requiredFiles = [
   "src/infrastructure/operations/lb7/HashChainAuditLog.ts",
   "src/interfaces/lb7/SecurityPolicy.ts",
   "src/interfaces/lb7/PwaAssets.ts",
+  "knowledge/lb7/document-patterns.json",
   "tests/lb7-security.test.ts",
   "tests/lb7-pwa.test.ts",
+  "tests/lb7-document-regression.test.ts",
+  "docs/documents/LB7-GOLDEN-SET.md",
   "docs/operations/LB7-PILOT-AND-RELEASE.md"
 ];
 for (const file of requiredFiles) if (!fs.existsSync(path.join(root, file))) errors.push(`Falta componente LB-7: ${file}`);
@@ -43,6 +46,13 @@ if (fs.existsSync(path.join(root, "src/interfaces/lb6/LB6Server.ts"))) {
     if (!value.includes(marker)) errors.push(`Interfaz LB-7 no expone PWA: ${marker}`);
   }
 }
+if (fs.existsSync(path.join(root, "knowledge/lb7/document-patterns.json"))) {
+  const value = JSON.parse(read("knowledge/lb7/document-patterns.json"));
+  if (!Array.isArray(value.corpus) || value.corpus.length !== 10) errors.push("El golden set LB-7 debe contener exactamente diez ternas Memoria-PCAP-PPT en esta primera batería.");
+  if (value.authorityOrder?.[0] !== "CURRENT_LAW" || value.authorityOrder?.[1] !== "CURRENT_JUNTA_RECOMMENDED_MODEL") errors.push("El golden set no prioriza normativa y modelo oficial vigente.");
+  if (!value.pptPattern?.neverInvent?.includes("SUBROGATION_WORKER_DATA")) errors.push("El patrón PPT no protege datos de subrogación frente a invención.");
+  if (!value.crossDocumentInvariants?.includes("OBJECT") || !value.crossDocumentInvariants?.includes("ESTIMATED_VALUE")) errors.push("Faltan invariantes documentales mínimos.");
+}
 if (fs.existsSync(path.join(root, "src/application/documents/lb5/AdministrativeDocumentRenderer.ts"))) {
   const value = read("src/application/documents/lb5/AdministrativeDocumentRenderer.ts");
   if (value.includes('paragraphXml(`Fuentes:')) errors.push("El renderer final sigue insertando IDs técnicos de fuentes en documentos administrativos.");
@@ -59,5 +69,6 @@ console.log("- persistencia atómica con integridad y backup: presente");
 console.log("- auditoría hash-chain verificable: presente");
 console.log("- RBAC/autenticación obligatoria en producción: presente");
 console.log("- PWA instalable con caché limitada al shell público: presente");
+console.log("- golden set 10+10+10 y patrones de coherencia documental: presente");
 console.log("- metadatos técnicos excluidos de documentos administrativos visibles: verificado");
 console.log("- plan de piloto y liberación: presente");
