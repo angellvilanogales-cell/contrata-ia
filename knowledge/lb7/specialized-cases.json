@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "purpose": "Casos especializados para ampliar la regresión documental LB-7 fuera del núcleo de limpieza/mantenimiento. Los casos DEEP_READ se basan en copias documentales aportadas por el usuario o documentos oficiales leídos; los IDENTIFIED_ONLY no alimentan reglas jurídicas ni generación hasta lectura profunda.",
   "cases": [
     {
@@ -62,6 +62,68 @@
       "sourcePolicy": {
         "preferred": "USER_PROVIDED_OFFICIAL_COPIES",
         "rule": "El contenido se usa para estructura y praxis. Las reglas jurídicas se validan contra normativa vigente y modelos oficiales vigentes antes de incorporarse al motor."
+      }
+    },
+    {
+      "id": "SPEC-EVENTS-003",
+      "label": "I Gala Premios al Trabajo Autónomo en Andalucía",
+      "expediente": "ADM/2025/0008 (CONTR/2025/374417)",
+      "contractType": "SERVICES",
+      "procedure": "OPEN_SIMPLIFIED_ABBREVIATED",
+      "scope": "EVENT_SERVICES_AWARD_GALA_MULTI_LOT",
+      "cpv": ["79952000-2", "55320000-9"],
+      "location": "Almería",
+      "lots": 2,
+      "status": "DEEP_READ",
+      "documents": {
+        "memory": "user-upload:Pliegos Gala- Evento.zip/Memoria Gala.pdf",
+        "pcap": "user-upload:Pliegos Gala- Evento.zip/PCAP Gala.pdf",
+        "ppt": "user-upload:Pliegos Gala- Evento.zip/PPT Gala.pdf"
+      },
+      "observedPatterns": [
+        "EVENT_GALA_OBJECT_WITH_AWARD_CEREMONY",
+        "NEED_AND_INSUFFICIENCY_IN_MEMORY",
+        "TWO_LOTS_EVENT_AND_RESERVED_CATERING",
+        "RESERVED_LOT_SOCIAL_INSERTION_COMPANIES",
+        "TRAVEL_AND_ACCOMMODATION_FOR_AWARDEES_JURY",
+        "SIGN_LANGUAGE_PRESENTATION_SCENOGRAPHY_STREAMING",
+        "PHOTO_VIDEO_CORPORATE_IMAGE_AND_CATERING",
+        "PCAP_OFFICIAL_RECOMMENDED_SERVICES_MODEL",
+        "PCAP_LEGAL_REVIEW_REFERENCE_AJ_CEETA_2025_62"
+      ],
+      "sourcePolicy": {
+        "preferred": "USER_PROVIDED_SIGNED_COPIES",
+        "rule": "Se usa como evidencia de práctica documental y composición; cualquier regla jurídica derivada se contrasta con normativa vigente y fuente oficial aplicable."
+      }
+    },
+    {
+      "id": "SPEC-EVENTS-004",
+      "label": "Quince eventos provinciales en materia de emprendimiento",
+      "expediente": "CONTR 2026 112626",
+      "contractType": "SERVICES",
+      "procedure": "OPEN_SIMPLIFIED_ABBREVIATED",
+      "scope": "EVENT_SERVICES_PROVINCIAL_MULTI_LOT",
+      "cpv": ["79952000-2", "79951000-5"],
+      "lots": 8,
+      "status": "DEEP_READ",
+      "documents": {
+        "memory": "user-upload:Pliegos Gala- Evento.zip/Memoria Evento.pdf",
+        "pcap": "user-upload:Pliegos Gala- Evento.zip/PCAP Evento.pdf",
+        "ppt": "user-upload:Pliegos Gala- Evento.zip/PPT Evento.pdf"
+      },
+      "observedPatterns": [
+        "FIFTEEN_EVENTS_EIGHT_PROVINCIAL_LOTS",
+        "MEMORY_COMPETENCE_AND_PUBLIC_PURPOSE_CONTEXT",
+        "MULTIPLE_NUTS_AND_LOCATIONS",
+        "PPT_PER_LOT_TECHNICAL_SPECIFICATION",
+        "SECTOR_SPECIFIC_EVENT_CONTENT",
+        "PCAP_OFFICIAL_RECOMMENDED_SERVICES_MODEL_UPDATED_2025",
+        "PCAP_LEGAL_REVIEW_REFERENCE_AJ_CUII_2026_17",
+        "ANNEX_I_AS_CASE_SPECIFIC_CENTER"
+      ],
+      "sourcePolicy": {
+        "preferred": "USER_PROVIDED_SIGNED_COPIES",
+        "rule": "Se usa como evidencia de práctica documental y composición; cualquier regla jurídica derivada se contrasta con normativa vigente y fuente oficial aplicable."
       }
     }
   ]
