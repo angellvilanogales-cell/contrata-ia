@@ -1,0 +1,201 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Corpus de regresión documental LB-7. Los ejemplos históricos sirven para estructura y praxis; nunca sustituyen a la normativa vigente ni al modelo oficial vigente.",
+  "authorityOrder": [
+    "CURRENT_LAW",
+    "CURRENT_JUNTA_RECOMMENDED_MODEL",
+    "CURRENT_OR_RECENT_REAL_EXPEDIENT",
+    "HISTORICAL_REAL_EXPEDIENT"
+  ],
+  "corpus": [
+    {
+      "id": "GOLD-001",
+      "label": "CARL limpieza sede Sevilla",
+      "expediente": "ADM-2024-0004 / CONTR-2024-636510",
+      "year": 2024,
+      "scope": "SERVICES_CLEANING",
+      "status": "DEEP_READ",
+      "memory": "uploaded:ilovepdf_merged_4_memorias:CARL",
+      "pcap": "uploaded:ilovepdf_merged_4_PCAP:CARL",
+      "ppt": "uploaded:ilovepdf_merged_4_PPT:CARL"
+    },
+    {
+      "id": "GOLD-002",
+      "label": "SAE Huelva limpieza Ayamonte-Lepe-Isla Cristina-Puebla de Guzmán",
+      "expediente": "CONTR-2025-468715",
+      "year": 2025,
+      "scope": "SERVICES_CLEANING",
+      "status": "DEEP_READ",
+      "memory": "uploaded:ilovepdf_merged_4_memorias:Huelva",
+      "pcap": "uploaded:ilovepdf_merged_4_PCAP:Huelva",
+      "ppt": "uploaded:ilovepdf_merged_4_PPT:Huelva"
+    },
+    {
+      "id": "GOLD-003",
+      "label": "SAE Sevilla mantenimiento integral y gestión técnica",
+      "expediente": "CONTR-2026-38892",
+      "year": 2026,
+      "scope": "SERVICES_BUILDING_MAINTENANCE",
+      "status": "DEEP_READ",
+      "memory": "uploaded:ilovepdf_merged_4_memorias:Sevilla-maintenance",
+      "pcap": "uploaded:ilovepdf_merged_4_PCAP:Sevilla-maintenance",
+      "ppt": "uploaded:ilovepdf_merged_4_PPT:Sevilla-maintenance"
+    },
+    {
+      "id": "GOLD-004",
+      "label": "Junta PdC publicación 2020-0000082000",
+      "publication": "2020-0000082000",
+      "year": 2020,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:Memoria justificativa",
+      "pcap": "PdC:PCAP DEF 01.10.2020",
+      "ppt": "PdC:PPT DEF 01.10.2020"
+    },
+    {
+      "id": "GOLD-005",
+      "label": "Junta PdC publicación 2019-0000070769",
+      "publication": "2019-0000070769",
+      "year": 2019,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:MEMORIA JUSTIFICATIVA tras inf.gj",
+      "pcap": "PdC:PCAP tras Intervención Provincial",
+      "ppt": "PdC:PPT tras informe GJ"
+    },
+    {
+      "id": "GOLD-006",
+      "label": "Junta PdC publicación 2021-0000093344",
+      "publication": "2021-0000093344",
+      "year": 2021,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:Memoria justificativa tras Gabinete Jurídico",
+      "pcap": "PdC:Pliego de Cláusula Administrativa tras Gabinete Jurídico",
+      "ppt": "PdC:Pliego de prescripciones técnicas"
+    },
+    {
+      "id": "GOLD-007",
+      "label": "Junta PdC publicación 2021-0000091030",
+      "publication": "2021-0000091030",
+      "year": 2021,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:Memoria justificativa + anexo",
+      "pcap": "PdC:PCAP tras GAB JUR",
+      "ppt": "PdC:Pliego de prescripciones técnicas"
+    },
+    {
+      "id": "GOLD-008",
+      "label": "Junta PdC publicación 2020-0000073100",
+      "publication": "2020-0000073100",
+      "year": 2020,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:Memoria justificativa nueva",
+      "pcap": "PdC:PCAP definitivo",
+      "ppt": "PdC:Pliego de prescripciones técnicas"
+    },
+    {
+      "id": "GOLD-009",
+      "label": "Junta PdC publicación 2021-0000112115",
+      "publication": "2021-0000112115",
+      "year": 2021,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:Memoria justificativa",
+      "pcap": "PdC:Pliego de Cláusula Administrativa",
+      "ppt": "PdC:Pliego de prescripciones técnicas"
+    },
+    {
+      "id": "GOLD-010",
+      "label": "Junta PdC publicación 2021-0000090399",
+      "publication": "2021-0000090399",
+      "year": 2021,
+      "scope": "SERVICES",
+      "status": "IDENTIFIED",
+      "memory": "PdC:Memoria justificativa",
+      "pcap": "PdC:PCAP firmado",
+      "ppt": "PdC:Pliego de prescripciones técnicas"
+    }
+  ],
+  "memoryPattern": {
+    "recurrentBlocks": [
+      "IDENTIFICATION_AND_OBJECT",
+      "NEED_AND_IDONEITY",
+      "INSUFFICIENCY_FOR_SERVICES",
+      "DURATION_AND_EXTENSIONS",
+      "LOTS_AND_MOTIVATION",
+      "CPV",
+      "BUDGET_AND_ESTIMATED_VALUE",
+      "PROCEDURE_AND_REGULATION",
+      "SOLVENCY_JUSTIFICATION",
+      "AWARD_CRITERIA_JUSTIFICATION",
+      "SPECIAL_EXECUTION_CONDITIONS_WHEN_JUSTIFIED"
+    ],
+    "observedVariants": [
+      "NEED_AND_INSUFFICIENCY_INTEGRATED",
+      "INSUFFICIENCY_STANDALONE",
+      "SUMMARY_HEADER_BEFORE_NARRATIVE",
+      "ECONOMIC_COSTING_TABLES",
+      "PREVIOUS_CONTRACT_BACKGROUND"
+    ]
+  },
+  "pcapPattern": {
+    "strategy": "BIND_TO_OFFICIAL_RECOMMENDED_MODEL",
+    "selectionDimensions": ["CONTRACT_TYPE", "PROCEDURE", "FUNDING", "MODEL_VERSION"],
+    "recurrentStructure": [
+      "CONTRACT_ELEMENTS",
+      "AWARD",
+      "EXECUTION",
+      "ADMINISTRATION_PREROGATIVES",
+      "JURISDICTION_AND_REMEDIES",
+      "GENERAL_ANNEXES",
+      "SERVICE_SPECIFIC_ANNEXES"
+    ],
+    "caseSpecificCenter": "ANNEX_I_CONTRACT_CHARACTERISTICS"
+  },
+  "pptPattern": {
+    "recurrentBlocks": [
+      "OBJECT_AND_SCOPE",
+      "SITES_OR_ASSET_INVENTORY",
+      "TECHNICAL_SERVICE_DESCRIPTION",
+      "TASKS_AND_FREQUENCIES",
+      "PERSONNEL_AND_HOURS_WHEN_APPLICABLE",
+      "MATERIALS_AND_CONSUMABLES",
+      "QUALITY_CONTROL",
+      "HEALTH_AND_SAFETY",
+      "COORDINATION_AND_RESPONSIBILITY",
+      "EXECUTION_METHOD",
+      "SUBROGATION_INFORMATION_WHEN_APPLICABLE",
+      "TECHNICAL_ANNEXES"
+    ],
+    "neverInvent": [
+      "SURFACES",
+      "SITE_ADDRESSES",
+      "TASK_FREQUENCIES",
+      "SERVICE_HOURS",
+      "PERSONNEL_COUNTS",
+      "MACHINERY",
+      "CONSUMABLE_QUANTITIES",
+      "SUBROGATION_WORKER_DATA",
+      "TECHNICAL_PERFORMANCE_LEVELS"
+    ]
+  },
+  "crossDocumentInvariants": [
+    "EXPEDIENTE_ID",
+    "OBJECT",
+    "CPV",
+    "LOTS",
+    "BUDGET_BASE",
+    "ESTIMATED_VALUE",
+    "DURATION_AND_EXTENSIONS",
+    "PROCEDURE",
+    "SITES",
+    "SUBROGATION_STATUS"
+  ],
+  "visibleDocumentPolicy": {
+    "forbidden": ["INTERNAL_SOURCE_IDS", "INTERNAL_FILENAMES", "TECHNICAL_VALIDATION_STATES"],
+    "allowed": ["LEGAL_NORM_AND_ARTICLE_WHEN_RELEVANT"]
+  }
+}
