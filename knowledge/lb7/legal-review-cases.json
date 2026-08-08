@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Casos de regresión jurídica real LB-7. Cada caso conserva hechos del expediente, observaciones jurídicas recibidas, decisión humana validada y correcciones esperadas. No convierte automáticamente una observación de un caso en regla general: antes de promover una regla al motor normativo debe contrastarse con normativa vigente y fuente oficial aplicable.",
+  "cases": [
+    {
+      "id": "LEGAL-REAL-001",
+      "label": "Suministro de ferretería SAE — revisión AJ-SAE 2026/16",
+      "expediente": "CONTR/2026/240267",
+      "contractType": "SUPPLIES",
+      "procedure": "OPEN_SIMPLIFIED_ABBREVIATED",
+      "cpv": "44316400-2",
+      "status": "HUMAN_VALIDATED",
+      "documents": {
+        "memory": "user-upload:Memoría Ferretería SSCC SAE V11.pdf",
+        "pcap": "user-upload:PCAP_suministro_abierto_simplificado_abreviado_autofinanciada (ferretería) V5.pdf",
+        "ppt": "user-upload:PPT Feretería SSCC SAE V6.pdf",
+        "legalReport": "user-upload:INFORME_AJ_SAE_2026-16 (letrado).pdf"
+      },
+      "legalReport": {
+        "issuer": "Asesoría Jurídica del Servicio Andaluz de Empleo",
+        "reference": "AJ-SAE 2026/16",
+        "date": "2026-07-29",
+        "observations": [
+          {
+            "id": "OBS-01",
+            "topic": "OFFICIAL_PCAP_MODEL",
+            "decision": "ACCEPT_NO_MATERIAL_CHANGE",
+            "expectedCorrection": "Conservar el clausulado general del modelo recomendado y concentrar las adaptaciones en Anexo I, Memoria y PPT."
+          },
+          {
+            "id": "OBS-02",
+            "topic": "NEEDS_BASED_CONTRACT_BUDGET_AND_EXTENSIONS",
+            "decision": "ACCEPT",
+            "expectedCorrection": "Tratar el presupuesto como máximo limitativo para toda la vigencia; la prórroga amplía tiempo pero no repone presupuesto; revisar el cálculo del valor estimado evitando duplicación automática por prórroga."
+          },
+          {
+            "id": "OBS-03",
+            "topic": "SINGLE_AWARD_CRITERION",
+            "decision": "ACCEPT_WITH_STRONGER_CORRECTION",
+            "expectedCorrection": "Sustituir el precio como único criterio por pluralidad de criterios automáticos al existir modificación prevista; mantener compatibilidad con el procedimiento simplificado abreviado."
+          },
+          {
+            "id": "OBS-04",
+            "topic": "MODIFICATION_NEW_UNPRICED_ITEMS",
+            "decision": "ACCEPT",
+            "expectedCorrection": "Eliminar la incorporación de artículos no previstos sin precio unitario y limitar la modificación al incremento de necesidades de artículos ya definidos contractualmente."
+          }
+        ]
+      },
+      "humanValidation": {
+        "validated": true,
+        "decision": "DICTAMEN_ACCEPTED",
+        "validatedInConversation": true,
+        "rule": "Las cuatro observaciones se aceptan para este expediente. Las correcciones propuestas forman la salida esperada de la regresión jurídica."
+      },
+      "expectedCrossDocumentCorrections": [
+        "MEMORY_BUDGET_EXTENSION_LANGUAGE",
+        "MEMORY_ESTIMATED_VALUE_RECALCULATION",
+        "MEMORY_AWARD_CRITERIA_PLURALITY",
+        "PCAP_ANNEX_I_BUDGET_EXTENSION_LANGUAGE",
+        "PCAP_ANNEX_I_AWARD_CRITERIA_PLURALITY",
+        "PCAP_ANNEX_I_MODIFICATION_SCOPE",
+        "PPT_CATALOGUE_CLOSED_TO_PRICED_ITEMS",
+        "PPT_DELIVERY_TIME_LINKED_TO_AWARD_OFFER",
+        "PROPOSAL_FORM_INCLUDES_DELIVERY_TIME"
+      ],
+      "safety": {
+        "promoteCaseFindingDirectlyToGeneralRule": false,
+        "requiresCurrentLawVerificationBeforeRulePromotion": true,
+        "requiresHumanValidationForLegalConclusion": true
+      }
+    }
+  ]
+}
