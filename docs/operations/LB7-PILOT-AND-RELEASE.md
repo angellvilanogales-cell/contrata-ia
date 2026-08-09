@@ -15,7 +15,9 @@ Convertir el recorrido funcional de LB-1 a LB-6 en una base apta para un piloto 
 7. La API aplica límites de tamaño y cabeceras de seguridad; los errores de autenticación/autorización se distinguen de errores de datos.
 8. Los DOCX/PDF administrativos no exponen IDs de fuentes internas, nombres de ficheros ni estados técnicos; la trazabilidad permanece en el modelo estructurado y la auditoría. Las referencias a artículos/normas que procedan permanecen en la redacción jurídica.
 9. Existe prueba automatizada de persistencia, corrupción, backup, auditoría, RBAC y limpieza de salida documental.
-10. Se realiza piloto funcional con casos representativos y revisión humana antes de etiquetar V1.0.
+10. EVENT_SERVICES y la revisión jurídica preventiva están integrados en el workflow persistente, pero sus pantallas especializadas deben quedar terminadas antes del piloto de usuario final.
+11. Existe imagen de contenedor y arranque específico de piloto detrás de HTTPS, sin modificar el comportamiento local seguro del servidor ordinario.
+12. Se realiza piloto funcional con casos representativos y revisión humana antes de etiquetar V1.0.
 
 ## Matriz mínima de piloto
 
@@ -31,6 +33,8 @@ El piloto deberá incluir, como mínimo, casos del alcance normativo actualmente
 - subrogación `UNKNOWN` para verificar que no se inventa una conclusión;
 - protección de datos activada y desactivada;
 - documento adicional solicitado en lenguaje simple;
+- un caso EVENT_SERVICES con hechos técnicos completos y otro con un dato activado ausente para comprobar el bloqueo por no invención;
+- un caso con revisión jurídica preventiva `REVIEW_REQUIRED` y otro `READY_FOR_HUMAN_LEGAL_REFERRAL`;
 - reinicio del servidor entre captura y generación para comprobar persistencia;
 - restauración desde backup en un entorno aislado.
 
@@ -47,6 +51,12 @@ Para cada expediente, una persona tramitadora deberá revisar al menos Memoria, 
 
 Los hallazgos se clasificarán como BLOQUEANTE, MAYOR, MENOR o MEJORA. No se propondrá V1.0 con defectos BLOQUEANTES o MAYORES abiertos.
 
+## Despliegue piloto
+
+La rama LB-7 dispone de `Dockerfile`, arranque `scripts/start-pilot.mjs` e instrucciones en `docs/operations/LB7-PILOT-HTTPS-DEPLOYMENT.md`. El contenedor escucha internamente en `0.0.0.0:3000` y debe permanecer detrás de un terminador HTTPS/proxy o plataforma gestionada. Los datos se montan en volumen persistente y los secretos se suministran mediante configuración segura del entorno.
+
+El despliegue técnico puede prepararse sin decidir todavía la infraestructura corporativa definitiva. Para entregar una URL real de prueba sí será necesario elegir un alojamiento piloto HTTPS y disponer de acceso/credenciales para desplegar allí.
+
 ## Seguridad y operación
 
 La autenticación local por token de LB-7 es un control técnico de piloto, no sustituye la futura integración con el proveedor corporativo de identidad. Para un despliegue real se deberá decidir e integrar el mecanismo institucional de autenticación/autorización, TLS/terminación segura, gestión de secretos, política de retención, copias de seguridad operadas, registros centralizados, protección de datos y continuidad de servicio.
@@ -59,6 +69,7 @@ La etiqueta V1.0 solo podrá proponerse cuando:
 
 - CI completa esté verde;
 - `npm run audit:lb7` esté verde;
+- las pantallas especializadas necesarias para el piloto estén disponibles en la interfaz;
 - las pruebas de piloto estén documentadas;
 - no existan defectos BLOQUEANTES/MAYORES;
 - la normativa y los modelos documentales del alcance estén vigentes y revalidados;
