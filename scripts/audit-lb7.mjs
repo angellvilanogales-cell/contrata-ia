@@ -9,6 +9,8 @@ const requiredFiles = [
   "src/infrastructure/operations/lb7/HashChainAuditLog.ts",
   "src/interfaces/lb7/SecurityPolicy.ts",
   "src/interfaces/lb7/PwaAssets.ts",
+  "src/interfaces/lb7/MainPilotUi.ts",
+  "src/interfaces/lb7/SpecializedWorkflowUi.ts",
   "src/application/intake/lb7/EventServicesProfile.ts",
   "src/application/legal-review/lb7/PreLegalReview.ts",
   "knowledge/lb7/document-patterns.json",
@@ -16,12 +18,14 @@ const requiredFiles = [
   "knowledge/lb7/legal-review-cases.json",
   "tests/lb7-security.test.ts",
   "tests/lb7-pwa.test.ts",
+  "tests/lb7-specialized-ui.test.ts",
   "tests/lb7-document-regression.test.ts",
   "tests/lb7-event-services.test.ts",
   "tests/lb7-legal-review-regression.test.ts",
   "tests/lb7-prelegal-review.test.ts",
   "docs/documents/LB7-GOLDEN-SET.md",
-  "docs/operations/LB7-PILOT-AND-RELEASE.md"
+  "docs/operations/LB7-PILOT-AND-RELEASE.md",
+  "docs/operations/LB7-FIRST-REAL-PILOT.md"
 ];
 for (const file of requiredFiles) if (!fs.existsSync(path.join(root, file))) errors.push(`Falta componente LB-7: ${file}`);
 
@@ -48,9 +52,21 @@ if (fs.existsSync(path.join(root, "src/interfaces/lb7/PwaAssets.ts"))) {
   if (value.includes("'/api/cases'")) errors.push("La caché PWA no debe contener rutas de expedientes.");
 }
 if (fs.existsSync(path.join(root, "src/interfaces/lb6/LB6Server.ts"))) {
-  const value = read("src/interfaces/lb6/LB6Server.ts");
-  for (const marker of ["/manifest.webmanifest", "/sw.js", "beforeinstallprompt", "apple-mobile-web-app-capable"]) {
-    if (!value.includes(marker)) errors.push(`Interfaz LB-7 no expone PWA: ${marker}`);
+  const server = read("src/interfaces/lb6/LB6Server.ts");
+  for (const marker of ["/manifest.webmanifest", "/sw.js", "/specialized", "event-services", "pre-legal-review"]) {
+    if (!server.includes(marker)) errors.push(`Interfaz LB-7 no expone ruta requerida: ${marker}`);
+  }
+}
+if (fs.existsSync(path.join(root, "src/interfaces/lb7/MainPilotUi.ts"))) {
+  const value = read("src/interfaces/lb7/MainPilotUi.ts");
+  for (const marker of ["beforeinstallprompt", "apple-mobile-web-app-capable", "serviceWorker.register('/sw.js'", "Configurar EVENT_SERVICES / revisión prejurídica"]) {
+    if (!value.includes(marker)) errors.push(`Shell principal LB-7 sin requisito: ${marker}`);
+  }
+}
+if (fs.existsSync(path.join(root, "src/interfaces/lb7/SpecializedWorkflowUi.ts"))) {
+  const value = read("src/interfaces/lb7/SpecializedWorkflowUi.ts");
+  for (const marker of ["EVENT_SERVICES", "Revisión jurídica preventiva", "No sustituye el informe del Letrado", "pre-legal-review"]) {
+    if (!value.includes(marker)) errors.push(`Pantalla especializada LB-7 sin requisito: ${marker}`);
   }
 }
 if (fs.existsSync(path.join(root, "knowledge/lb7/document-patterns.json"))) {
@@ -92,5 +108,6 @@ console.log("- PWA instalable con caché limitada al shell público: presente");
 console.log("- golden set 10+10+10 y patrones de coherencia documental: presente");
 console.log("- EVENT_SERVICES con entrada condicional y política de no invención: presente");
 console.log("- revisión jurídica preventiva calibrada con LEGAL-REAL-001 y sin emitir dictamen: presente");
+console.log("- pantalla especializada disponible sin acceso manual a API: presente");
 console.log("- metadatos técnicos excluidos de documentos administrativos visibles: verificado");
-console.log("- plan de piloto y liberación: presente");
+console.log("- plan de piloto y primera prueba real: presente");
