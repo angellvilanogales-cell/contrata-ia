@@ -14,6 +14,7 @@
     "test": "vitest run",
     "start": "node dist/main.js",
     "serve": "node dist/main.js --serve",
+    "serve:pilot": "node scripts/start-pilot.mjs",
     "demo:vertical": "node dist/main.js --vertical-demo",
     "demo:lb4": "node dist/main.js --lb4-cleaning-demo",
     "demo:lb5": "node dist/main.js --lb5-documents-demo",
