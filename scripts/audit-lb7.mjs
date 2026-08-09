@@ -59,13 +59,13 @@ if (fs.existsSync(path.join(root, "src/interfaces/lb6/LB6Server.ts"))) {
 }
 if (fs.existsSync(path.join(root, "src/interfaces/lb7/MainPilotUi.ts"))) {
   const value = read("src/interfaces/lb7/MainPilotUi.ts");
-  for (const marker of ["beforeinstallprompt", "apple-mobile-web-app-capable", "serviceWorker.register('/sw.js'", "Configurar EVENT_SERVICES / revisión prejurídica"]) {
+  for (const marker of ["beforeinstallprompt", "apple-mobile-web-app-capable", "serviceWorker.register('/sw.js'", "Revisión especializada / prejurídica", "sessionStorage.setItem('contrataIaCaseId'", "Datos consolidados"]) {
     if (!value.includes(marker)) errors.push(`Shell principal LB-7 sin requisito: ${marker}`);
   }
 }
 if (fs.existsSync(path.join(root, "src/interfaces/lb7/SpecializedWorkflowUi.ts"))) {
   const value = read("src/interfaces/lb7/SpecializedWorkflowUi.ts");
-  for (const marker of ["EVENT_SERVICES", "Revisión jurídica preventiva", "No sustituye el informe del Letrado", "pre-legal-review"]) {
+  for (const marker of ["EVENT_SERVICES", "Revisión jurídica preventiva", "no emite dictamen jurídico", "pre-legal-review", "El motor normativo validado en LB-4 no se amplía automáticamente", "sessionStorage.getItem('contrataIaToken')"]) {
     if (!value.includes(marker)) errors.push(`Pantalla especializada LB-7 sin requisito: ${marker}`);
   }
 }
