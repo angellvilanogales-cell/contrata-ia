@@ -9,23 +9,23 @@ La primera prueba real se realizará dentro del alcance normativo ya validado po
 ## Preparación
 
 1. Abrir la URL HTTPS del piloto.
-2. Introducir la credencial de piloto con permisos suficientes.
+2. Introducir la credencial de piloto con permisos suficientes. La credencial permanece solo en la sesión del navegador mientras se navega entre la pantalla principal y la especializada.
 3. Tener a mano un expediente real de limpieza del corpus, con Memoria, PCAP y PPT de referencia.
 4. No copiar conclusiones jurídicas desde el expediente de referencia sin verificarlas: se usarán sus hechos y práctica documental, mientras que normativa y modelos oficiales vigentes prevalecen.
 
 ## Recorrido de usuario
 
-### Paso 1. Crear expediente
+### Paso 1. Crear o reanudar expediente
 
-Seleccionar `Asistente guiado`.
+Seleccionar `Nuevo expediente guiado`, importar una Ficha DOCX o introducir el identificador de un expediente persistido para reanudarlo.
 
-Resultado esperado: Contrata-IA crea un identificador de expediente y empieza por la primera pregunta obligatoria.
+Resultado esperado: Contrata-IA crea o recupera un identificador de expediente, conserva el expediente seleccionado durante la sesión y muestra el progreso del recorrido.
 
 ### Paso 2. Introducir los hechos administrativos
 
 Cumplimentar órgano de contratación, unidad promotora, objeto, necesidad, valor estimado, duración, presupuesto, IVA y demás hechos requeridos.
 
-Resultado esperado: la aplicación no inventa datos no aportados; si falta un hecho obligatorio, no habilita la validación.
+Resultado esperado: la aplicación no inventa datos no aportados; si falta un hecho obligatorio, no habilita la revisión final de datos.
 
 ### Paso 3. Introducir los hechos técnicos
 
@@ -47,19 +47,21 @@ Resultado esperado: las cuestiones no acreditadas permanecen abiertas y no se re
 
 ### Paso 6. Ejecutar revisión jurídica preventiva
 
-Desde `Configurar EVENT_SERVICES / revisión prejurídica`, acceder a la pantalla especializada y cumplimentar únicamente el bloque de revisión prejurídica para el expediente de limpieza.
+Desde `Revisión especializada / prejurídica`, acceder a la pantalla especializada y cumplimentar únicamente el bloque de revisión preventiva para el expediente de limpieza.
 
-Resultado esperado: el expediente queda en `REVIEW_REQUIRED` si detecta una configuración de riesgo calibrada con `LEGAL-REAL-001`, o en `READY_FOR_HUMAN_LEGAL_REFERRAL` si no aparecen esas alertas. Este estado no sustituye el informe jurídico.
+Resultado esperado: la interfaz muestra en lenguaje administrativo `Requiere revisión antes de remisión jurídica`, `Sin alertas preventivas detectadas` o `Revisión preventiva no ejecutada`, conservando internamente los estados `REVIEW_REQUIRED`, `READY_FOR_HUMAN_LEGAL_REFERRAL` y `NOT_RUN`. El resultado no sustituye el informe jurídico.
+
+La pantalla especializada recuerda además que EVENT_SERVICES es, en esta fase, un perfil documental y técnico y que su presencia no amplía automáticamente el alcance normativo validado en LB-4.
 
 ### Paso 7. Revisar y validar humanamente
 
-Volver al asistente principal, revisar las propuestas, advertencias y hechos capturados e identificar a la persona que valida.
+Volver al asistente principal. La revisión debe presentar datos consolidados, propuestas del sistema, advertencias y alertas preventivas en formato legible, sin exigir leer JSON técnico. Identificar a la persona que valida.
 
 Resultado esperado: la generación solo se habilita tras validación humana. Cualquier cambio posterior invalida esa validación.
 
 ### Paso 8. Generar documentos
 
-Generar el paquete documental.
+Generar el paquete documental y descargar desde la propia interfaz los archivos ofrecidos.
 
 Resultado esperado: descargar al menos Memoria, PCAP y PPT en DOCX editable y PDF; no deben aparecer IDs internos, nombres de fuentes, rutas técnicas ni estados como `PENDING_HUMAN_VALIDATION`.
 
@@ -81,7 +83,7 @@ Cada hallazgo se clasifica como `BLOQUEANTE`, `MAYOR`, `MENOR` o `MEJORA`.
 
 ### Paso 10. Persistencia
 
-Cerrar/reiniciar el contenedor o servicio y volver a abrir el expediente.
+Cerrar/reiniciar el contenedor o servicio y volver a abrir el expediente usando su identificador.
 
 Resultado esperado: respuestas, revisión especializada, validaciones vigentes y datos del caso reaparecen de forma consistente.
 
@@ -99,15 +101,17 @@ Resultado esperado: el shell puede instalarse, pero `/api/`, expedientes, creden
 
 Una vez superado el caso de limpieza, repetir el recorrido con uno de los expedientes de eventos ya `DEEP_READ`. En la pantalla especializada se activarán únicamente las prestaciones reales (sede, audiovisual, streaming, catering, accesibilidad, viajes, premios, etc.).
 
+La interfaz debe recuperar una configuración EVENT_SERVICES ya guardada al volver al expediente, mostrar los hechos activados pendientes y evitar que una ausencia técnica se convierta en un dato inventado.
+
 La finalidad de esta segunda pasada es comprobar composición documental y no ampliar silenciosamente el alcance jurídico: mientras el perfil permanezca `PENDING_DEDICATED_RULE_VALIDATION`, toda decisión normativa especializada deberá verificarse y validarse humanamente.
 
 ## Criterio de cierre de la primera prueba
 
 La prueba se considera técnicamente superada cuando:
 
-- el recorrido se completa desde navegador sin tocar código/API;
+- el recorrido se completa desde navegador sin tocar código/API ni leer estructuras JSON internas;
 - Memoria, PCAP y PPT se generan y abren correctamente;
-- el expediente sobrevive a reinicio;
+- el expediente puede reanudarse y sobrevive a reinicio;
 - el backup queda verificado;
 - no hay metadatos internos en documentos finales;
 - no hay defectos `BLOQUEANTE` ni `MAYOR` sin resolver.
