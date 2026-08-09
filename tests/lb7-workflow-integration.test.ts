@@ -3,11 +3,40 @@ import { LB6Orchestrator } from "../src/application/intake/lb6/LB6Orchestrator";
 import { augmentEventServicesPackage } from "../src/application/documents/lb7/EventServicesDocumentAugmenter";
 import { composeEventTechnicalOutline } from "../src/application/intake/lb7/EventServicesProfile";
 import type { LB5DocumentPackage } from "../src/application/documents/lb5/DocumentModel";
+import type { IntakeQuestionId } from "../src/application/intake/lb6/IntakeModel";
+
+const COMPLETE: Readonly<Partial<Record<IntakeQuestionId, unknown>>> = {
+  contractingAuthority: "Servicio Andaluz de Empleo",
+  promotingUnit: "Unidad promotora",
+  object: "Servicio objeto del expediente",
+  need: "Necesidad administrativa definida por la unidad promotora.",
+  estimatedValue: 120000,
+  durationMonths: 24,
+  judgmentValuePercent: 20,
+  allAwardCriteriaFormulaBased: false,
+  lotAssessment: "UNASSESSED",
+  subrogationObligation: "UNKNOWN",
+  publicBodyTransfersPersonalDataToContractor: false,
+  budgetBaseVatIncluded: 145200,
+  vatRatePercent: 21,
+  insufficiencyOfMeans: "La unidad declara insuficiencia de medios propios para atender la prestación con continuidad.",
+  buildingsDescription: "Ámbito técnico definido en el expediente.",
+  minimumTasks: ["Prestación técnica definida"],
+  qualityIndicators: ["Control verificable de ejecución"],
+  needPlacement: "IN_MEMORY",
+  insufficiencyPlacement: "IN_MEMORY"
+};
+
+function fill(orchestrator: LB6Orchestrator, id: string): void {
+  for (const [questionId, value] of Object.entries(COMPLETE)) orchestrator.answer(id, questionId as IntakeQuestionId, value);
+}
 
 describe("LB-7 specialized workflow integration", () => {
   it("persists EVENT_SERVICES supplements and exposes missing facts in ordinary review", () => {
     const orchestrator = new LB6Orchestrator();
     const created = orchestrator.createCase("GUIDED", "EVT-001");
+    fill(orchestrator, created.id);
+    const beforeSpecialization = orchestrator.getCase(created.id);
     const updated = orchestrator.configureEventServices(created.id, ["VENUE", "AUDIOVISUAL"], {
       eventOfficialNames: "Gala institucional",
       eventCount: 1,
@@ -18,7 +47,7 @@ describe("LB-7 specialized workflow integration", () => {
       cpvByLotOrPrestacion: "79952000-2"
     });
     expect(updated.lb7?.family).toBe("EVENT_SERVICES");
-    expect(updated.revision).toBe(created.revision + 1);
+    expect(updated.revision).toBe(beforeSpecialization.revision + 1);
     expect(updated.validation.validated).toBe(false);
     const review = orchestrator.review(created.id);
     expect(review.lb7.eventServices?.readyForDocumentDraft).toBe(false);
@@ -28,6 +57,7 @@ describe("LB-7 specialized workflow integration", () => {
   it("places preventive legal findings in the pre-referral gate", () => {
     const orchestrator = new LB6Orchestrator();
     const created = orchestrator.createCase("GUIDED", "LEGAL-001");
+    fill(orchestrator, created.id);
     orchestrator.configurePreLegalReview(created.id, {
       contractType: "SUPPLIES",
       usesOfficialRecommendedPcapModel: true,
@@ -51,6 +81,7 @@ describe("LB-7 specialized workflow integration", () => {
   it("marks a configured case ready for human legal referral when preventive review has no findings", () => {
     const orchestrator = new LB6Orchestrator();
     const created = orchestrator.createCase("GUIDED", "LEGAL-OK");
+    fill(orchestrator, created.id);
     orchestrator.configurePreLegalReview(created.id, {
       contractType: "SERVICES",
       usesOfficialRecommendedPcapModel: true,
