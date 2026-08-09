@@ -33,7 +33,8 @@ if (!orchestrator.includes("toLB5Context")) errors.push("LB-6 no desemboca en el
 if (!server.includes("/api/questionnaire/import")) errors.push("Falta endpoint de importación de ficha.");
 if (!server.includes('parts[3] === "validate"')) errors.push("Falta validación humana vía API.");
 if (!server.includes('parts[3] === "generate"')) errors.push("Falta generación documental vía API.");
-if (!ui.includes("Asistente guiado") || !ui.includes("Descargar Ficha de Datos")) errors.push("La interfaz no ofrece las dos vías principales de entrada.");
+const hasGuidedEntry = ui.includes("Asistente guiado") || ui.includes("Nuevo expediente guiado");
+if (!hasGuidedEntry || !ui.includes("Descargar Ficha de Datos")) errors.push("La interfaz no ofrece las dos vías principales de entrada.");
 
 if (errors.length) {
   console.error("LB-6 audit: FAIL");
