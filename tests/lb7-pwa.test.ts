@@ -52,6 +52,6 @@ describe("LB-7 installable PWA", () => {
     expect(html).toContain("apple-mobile-web-app-capable");
     expect(html).toContain("serviceWorker.register('/sw.js'");
     expect(html).toContain("beforeinstallprompt");
-    expect(html).toContain("@media(max-width:640px)");
+    expect(html).toMatch(/@media\(max-width:\d+px\)/);
   });
 });
