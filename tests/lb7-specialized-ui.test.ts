@@ -24,13 +24,19 @@ describe("LB-7 specialized pilot interface", () => {
   it("publishes a human-facing specialized screen linked from the main pilot UI", async () => {
     const base = await baseUrl();
     const main = await (await fetch(base)).text();
-    expect(main).toContain("Configurar EVENT_SERVICES / revisión prejurídica");
+    expect(main).toContain("Revisión especializada / prejurídica");
+    expect(main).toContain("Datos consolidados");
+    expect(main).not.toContain("<pre>'+JSON.stringify(v");
+    expect(main).toContain("sessionStorage.setItem('contrataIaCaseId'");
+
     const specialized = await fetch(`${base}/specialized?caseId=DEMO`);
     expect(specialized.status).toBe(200);
     const html = await specialized.text();
-    expect(html).toContain("EVENT_SERVICES");
+    expect(html).toContain("Perfil documental EVENT_SERVICES");
     expect(html).toContain("Revisión jurídica preventiva");
-    expect(html).toContain("No sustituye el informe del Letrado");
+    expect(html).toContain("no emite dictamen jurídico");
+    expect(html).toContain("El motor normativo validado en LB-4 no se amplía automáticamente");
+    expect(html).toContain("sessionStorage.getItem('contrataIaToken')");
   });
 
   it("configures event facts and preventive review through the HTTP workflow", async () => {
@@ -60,8 +66,9 @@ describe("LB-7 specialized pilot interface", () => {
       })
     });
     expect(eventResponse.status).toBe(200);
-    const eventBody = await eventResponse.json() as { eventConfigured: boolean };
+    const eventBody = await eventResponse.json() as { eventConfigured: boolean; caseValue: { lb7?: { family?: string } } };
     expect(eventBody.eventConfigured).toBe(true);
+    expect(eventBody.caseValue.lb7?.family).toBe("EVENT_SERVICES");
 
     const legalResponse = await fetch(`${base}/api/cases/${encodeURIComponent(created.id)}/pre-legal-review`, {
       method: "POST",
@@ -77,8 +84,9 @@ describe("LB-7 specialized pilot interface", () => {
       })
     });
     expect(legalResponse.status).toBe(200);
-    const legalBody = await legalResponse.json() as { preLegalConfigured: boolean };
+    const legalBody = await legalResponse.json() as { preLegalConfigured: boolean; caseValue: { lb7?: { preLegalReviewInput?: unknown } } };
     expect(legalBody.preLegalConfigured).toBe(true);
+    expect(legalBody.caseValue.lb7?.preLegalReviewInput).toBeDefined();
   });
 
   it("advertises the specialized workflow in health status", async () => {
