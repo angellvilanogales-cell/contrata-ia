@@ -8,6 +8,7 @@ import type { EventAnswerId, EventFeature } from "../../application/intake/lb7/E
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
 import { HashChainAuditLog } from "../../infrastructure/operations/lb7/HashChainAuditLog";
+import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
 import { MAIN_PILOT_UI } from "../lb7/MainPilotUi";
 import { PWA_ICON_SVG, PWA_MANIFEST, PWA_SERVICE_WORKER } from "../lb7/PwaAssets";
 import { SecurityPolicy, type ApplicationRole } from "../lb7/SecurityPolicy";
@@ -97,6 +98,10 @@ export function createLB6Server(): http.Server {
 
       if (request.method === "GET" && url.pathname === "/") {
         sendText(response, 200, MAIN_PILOT_UI, "text/html; charset=utf-8");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/adaptive") {
+        sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8");
         return;
       }
       if (request.method === "GET" && url.pathname === "/specialized") {
