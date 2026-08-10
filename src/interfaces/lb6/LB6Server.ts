@@ -3,6 +3,7 @@ import path from "node:path";
 import { LB6_QUESTIONS } from "../../application/intake/lb6/IntakeEngine";
 import { LB6Orchestrator } from "../../application/intake/lb6/LB6Orchestrator";
 import type { IntakeMode, IntakeQuestionId } from "../../application/intake/lb6/IntakeModel";
+import { AdaptiveProcurementFlow, type AdaptiveFlowAnswers } from "../../application/intake/lb7/AdaptiveProcurementFlow";
 import type { EventAnswerId, EventFeature } from "../../application/intake/lb7/EventServicesProfile";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -24,6 +25,7 @@ function buildOperationalOrchestrator(): LB6Orchestrator {
 
 const orchestrator = buildOperationalOrchestrator();
 const security = new SecurityPolicy();
+const adaptiveFlow = new AdaptiveProcurementFlow();
 
 function sendJson(response: ServerResponse, status: number, value: unknown): void {
   const body = Buffer.from(JSON.stringify(value));
@@ -114,12 +116,19 @@ export function createLB6Server(): http.Server {
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/health") {
-        sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 7, pwa: true, specializedWorkflow: true, timestamp: new Date().toISOString() });
+        sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 7, pwa: true, specializedWorkflow: true, adaptiveFlow: true, timestamp: new Date().toISOString() });
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/questions") {
         requireRole(request, "VIEWER");
         sendJson(response, 200, LB6_QUESTIONS);
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") {
+        requireRole(request, "OPERATOR");
+        const body = await readJson(request);
+        const answers = (body.answers ?? body) as unknown as AdaptiveFlowAnswers;
+        sendJson(response, 200, adaptiveFlow.analyze(answers));
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/questionnaire") {
