@@ -36,8 +36,8 @@ describe("LB-7 adaptive procurement flow", () => {
     expect(decision.economics.annualProjection).toEqual([
       { period: "Año 1", amountExVat: 10000 },
       { period: "Año 2", amountExVat: 2000 },
-      { period: "Prórroga 1", amountExVat: 2000 },
-      { period: "Prórroga 2", amountExVat: 2000 }
+      { period: "Prórroga 1 (12 meses)", amountExVat: 2000 },
+      { period: "Prórroga 2 (12 meses)", amountExVat: 2000 }
     ]);
     expect(decision.procedure).toBe("OPEN_SIMPLIFIED_ABBREVIATED_CANDIDATE");
   });
