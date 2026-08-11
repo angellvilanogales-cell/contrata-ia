@@ -78,7 +78,7 @@ export class SecurityPolicy {
     response.setHeader("x-frame-options", "DENY");
     response.setHeader("referrer-policy", "no-referrer");
     response.setHeader("permissions-policy", "camera=(), microphone=(), geolocation=()");
-    response.setHeader("content-security-policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+    response.setHeader("content-security-policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
     response.setHeader("cache-control", "no-store");
   }
 }
