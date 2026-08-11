@@ -8,6 +8,7 @@ import type { EventAnswerId, EventFeature } from "../../application/intake/lb7/E
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
 import { HashChainAuditLog } from "../../infrastructure/operations/lb7/HashChainAuditLog";
+import { ADAPTIVE_FLOW_SCRIPT } from "../lb7/AdaptiveFlowScript";
 import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
 import { MAIN_PILOT_UI } from "../lb7/MainPilotUi";
 import { PWA_ICON_SVG, PWA_MANIFEST, PWA_SERVICE_WORKER } from "../lb7/PwaAssets";
@@ -40,6 +41,12 @@ function sendText(response: ServerResponse, status: number, bodyText: string, co
   response.end(body);
 }
 
+function redirect(response: ServerResponse, location: string, cookie?: string): void {
+  if (cookie) response.setHeader("set-cookie", cookie);
+  response.writeHead(303, { location, "cache-control": "no-store" });
+  response.end();
+}
+
 function sendBinary(response: ServerResponse, status: number, data: Uint8Array, contentType: string, fileName: string): void {
   const body = Buffer.from(data);
   response.writeHead(status, {
@@ -50,7 +57,7 @@ function sendBinary(response: ServerResponse, status: number, data: Uint8Array, 
   response.end(body);
 }
 
-async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
+async function readBody(request: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of request) {
@@ -59,14 +66,24 @@ async function readJson(request: IncomingMessage): Promise<Record<string, unknow
     if (size > MAX_JSON_BYTES) throw new Error("Solicitud demasiado grande.");
     chunks.push(value);
   }
-  if (chunks.length === 0) return {};
-  return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
+  return Buffer.concat(chunks);
+}
+
+async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
+  const body = await readBody(request);
+  if (body.length === 0) return {};
+  return JSON.parse(body.toString("utf8")) as Record<string, unknown>;
+}
+
+async function readForm(request: IncomingMessage): Promise<URLSearchParams> {
+  const body = await readBody(request);
+  return new URLSearchParams(body.toString("utf8"));
 }
 
 function routeParts(pathname: string): string[] { return pathname.split("/").filter(Boolean); }
 
 function statusForError(error: Error): number {
-  if (/autenticación|credencial/i.test(error.message)) return 401;
+  if (/autenticación|credencial|sesión segura/i.test(error.message)) return 401;
   if (/permiso insuficiente/i.test(error.message)) return 403;
   if (/no encontrado/i.test(error.message)) return 404;
   if (/demasiado grande/i.test(error.message)) return 413;
@@ -89,6 +106,11 @@ function eventAnswers(value: unknown): Readonly<Partial<Record<EventAnswerId, un
   return value as Readonly<Partial<Record<EventAnswerId, unknown>>>;
 }
 
+function adaptiveAnswers(value: unknown): AdaptiveFlowAnswers {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as AdaptiveFlowAnswers;
+}
+
 export function createLB6Server(): http.Server {
   return http.createServer(async (request, response) => {
     security.applySecurityHeaders(response);
@@ -101,7 +123,23 @@ export function createLB6Server(): http.Server {
         return;
       }
       if (request.method === "GET" && url.pathname === "/adaptive") {
-        sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8");
+        sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8", "no-store");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/adaptive.js") {
+        sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store");
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/adaptive/login") {
+        const form = await readForm(request);
+        const token = String(form.get("token") ?? "").trim();
+        if (!token) throw new Error("Falta la credencial de acceso.");
+        security.authenticateToken(token);
+        redirect(response, "/adaptive", security.sessionCookie(token));
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/adaptive/logout") {
+        redirect(response, "/adaptive", security.clearSessionCookie());
         return;
       }
       if (request.method === "GET" && url.pathname === "/specialized") {
@@ -124,16 +162,15 @@ export function createLB6Server(): http.Server {
         sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 7, pwa: true, specializedWorkflow: true, adaptiveFlow: true, timestamp: new Date().toISOString() });
         return;
       }
-      if (request.method === "GET" && url.pathname === "/api/questions") {
-        requireRole(request, "VIEWER");
-        sendJson(response, 200, LB6_QUESTIONS);
-        return;
-      }
       if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") {
         requireRole(request, "OPERATOR");
         const body = await readJson(request);
-        const answers = (body.answers ?? body) as unknown as AdaptiveFlowAnswers;
-        sendJson(response, 200, adaptiveFlow.analyze(answers));
+        sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers)));
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/questions") {
+        requireRole(request, "VIEWER");
+        sendJson(response, 200, LB6_QUESTIONS);
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/questionnaire") {
@@ -167,7 +204,6 @@ export function createLB6Server(): http.Server {
 
       if (parts[0] === "api" && parts[1] === "cases" && parts[2]) {
         const id = decodeURIComponent(parts[2]);
-
         if (request.method === "GET" && parts.length === 3) {
           requireRole(request, "VIEWER");
           sendJson(response, 200, { caseValue: orchestrator.getCase(id), progress: orchestrator.progress(id) });
@@ -224,9 +260,7 @@ export function createLB6Server(): http.Server {
               expedienteId: id,
               validation: rendered.package.globalValidation,
               coherenceFingerprint: rendered.package.coherenceFingerprint,
-              preLegal: (() => {
-                try { return orchestrator.review(id).lb7; } catch { return undefined; }
-              })()
+              preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })()
             },
             documents: [...rendered.editable, ...rendered.pdf].map(file => ({
               documentId: file.documentId,
