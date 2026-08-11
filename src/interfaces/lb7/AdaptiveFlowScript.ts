@@ -23,7 +23,7 @@ if(["initialBudgetExVat","initialDurationMonths","initialOneOffCostExVat","recur
 return '<textarea id="ans" placeholder="Responda con lenguaje natural"></textarea>';
 }
 function parseSpanishNumber(rawValue){
-var s=String(rawValue||"").trim().replace(/\\s/g,"").replace(/€/g,"");
+var s=String(rawValue||"").trim().split(" ").join("").replaceAll("€","");
 if(!s)throw new Error("Indique una cifra válida.");
 var lastComma=s.lastIndexOf(",");
 var lastDot=s.lastIndexOf(".");
@@ -47,8 +47,41 @@ if(d.economics.annualProjection&&d.economics.annualProjection.length)h+='<h3>Pro
 if(d.proposals&&d.proposals.length)h+='<h3>Propuestas del sistema</h3><ul>'+d.proposals.map(function(x){return '<li>'+esc(x)+"</li>";}).join("")+'</ul>';
 if(d.warnings&&d.warnings.length)h+=d.warnings.map(function(x){return '<div class="warning">'+esc(x)+'</div>';}).join("");
 h+='<div class="info"><strong>Criterios de adjudicación:</strong> '+esc(d.awardCriteriaConstraint)+'</div><details><summary>Ver fundamento jurídico</summary>'+d.legalGrounds.map(function(x){return '<p><strong>'+esc(x.article)+'</strong><br>'+esc(x.rule)+'<br><span class="muted">Verificación de normativa vigente obligatoria antes de cerrar el expediente.</span></p>';}).join("")+'</details></div>';return h;}
-function correctionCard(){var initial=answers.initialOneOffCostExVat==null?"":answers.initialOneOffCostExVat;var recurring=answers.recurringAnnualCostExVat==null?"":answers.recurringAnnualCostExVat;return '<div class="card warning"><h2>Corregir distribución económica</h2><p>La espina dorsal no puede darse por completada mientras estas cifras no cuadren con el presupuesto inicial.</p><label><strong>Coste inicial no recurrente</strong></label><input id="fixInitial" inputmode="decimal" value="'+esc(initial)+'"><label><strong>Coste anual de mantenimiento o prestación recurrente</strong></label><input id="fixRecurring" inputmode="decimal" value="'+esc(recurring)+'"><button id="saveEconomicFix">Guardar corrección económica</button></div>';}
-async function analyze(){try{var d=await callAnalyze();status.textContent="Sesión autenticada.";var html=renderDecision(d);var needsEconomicFix=d.economics&&d.economics.status==="INCONSISTENT";if(needsEconomicFix){html+=correctionCard();}else if(d.nextQuestion){html+='<div class="card"><h2>Siguiente pregunta</h2><h3>'+esc(d.nextQuestion.label)+'</h3><p>'+esc(d.nextQuestion.help)+'</p>'+inputFor(d.nextQuestion)+'<button id="saveAnswer">Guardar y continuar</button></div>';}else{html+='<div class="card info"><h2>Espina dorsal completada</h2><p>Ya pueden abrirse las ramas específicas que correspondan.</p></div>';}work.innerHTML=html;if(needsEconomicFix){document.getElementById("saveEconomicFix").addEventListener("click",async function(){try{var initialEl=document.getElementById("fixInitial");var recurringEl=document.getElementById("fixRecurring");answers.initialOneOffCostExVat=parseSpanishNumber(initialEl.value);answers.recurringAnnualCostExVat=parseSpanishNumber(recurringEl.value);delete answers.economicCorrectionTarget;sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));await analyze();}catch(e){alert(e.message);}});}else if(d.nextQuestion){document.getElementById("saveAnswer").addEventListener("click",async function(){var el=document.getElementById("ans");if(!el||!el.value.trim()){alert("Indique una respuesta.");return;}try{var id=d.nextQuestion.id;answers[id]=parseValue(id,el.value.trim());if((id==="initialOneOffCostExVat"||id==="recurringAnnualCostExVat")&&answers.economicCorrectionTarget)delete answers.economicCorrectionTarget;sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));await analyze();}catch(e){alert(e.message);}});}}catch(e){status.textContent="Sesión no autenticada o error de acceso.";work.innerHTML='<div class="card warning">'+esc(e.message)+'</div>';}}
+function correctionCard(){var initial=answers.initialOneOffCostExVat==null?"":answers.initialOneOffCostExVat;var recurring=answers.recurringAnnualCostExVat==null?"":answers.recurringAnnualCostExVat;return '<div class="card warning"><h2>Corregir distribución económica</h2><p>La espina dorsal no puede darse por completada mientras estas cifras no cuadren con el presupuesto inicial.</p><label><strong>Coste inicial no recurrente</strong></label><input id="fixInitial" inputmode="decimal" value="'+esc(initial)+'"><label><strong>Coste anual de mantenimiento o prestación recurrente</strong></label><input id="fixRecurring" inputmode="decimal" value="'+esc(recurring)+'"><button id="saveEconomicFix" type="button">Guardar corrección económica</button><p id="economicFixStatus" class="muted"></p></div>';}
+async function analyze(){try{var d=await callAnalyze();status.textContent="Sesión autenticada.";var html=renderDecision(d);var needsEconomicFix=d.economics&&d.economics.status==="INCONSISTENT";if(needsEconomicFix){html+=correctionCard();}else if(d.nextQuestion){html+='<div class="card"><h2>Siguiente pregunta</h2><h3>'+esc(d.nextQuestion.label)+'</h3><p>'+esc(d.nextQuestion.help)+'</p>'+inputFor(d.nextQuestion)+'<button id="saveAnswer" type="button">Guardar y continuar</button></div>';}else{html+='<div class="card info"><h2>Espina dorsal completada</h2><p>Ya pueden abrirse las ramas específicas que correspondan.</p></div>';}work.innerHTML=html;}catch(e){status.textContent="Sesión no autenticada o error de acceso.";work.innerHTML='<div class="card warning">'+esc(e.message)+'</div>';}}
+work.addEventListener("click",async function(event){
+var target=event.target;
+if(!target||!target.id)return;
+if(target.id==="saveEconomicFix"){
+  event.preventDefault();
+  var fixStatus=document.getElementById("economicFixStatus");
+  try{
+    var initialEl=document.getElementById("fixInitial");
+    var recurringEl=document.getElementById("fixRecurring");
+    answers.initialOneOffCostExVat=parseSpanishNumber(initialEl.value);
+    answers.recurringAnnualCostExVat=parseSpanishNumber(recurringEl.value);
+    delete answers.economicCorrectionTarget;
+    sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));
+    if(fixStatus)fixStatus.textContent="Corrección guardada. Recalculando…";
+    await analyze();
+  }catch(e){if(fixStatus)fixStatus.textContent=e.message;else alert(e.message);}
+  return;
+}
+if(target.id==="saveAnswer"){
+  event.preventDefault();
+  var el=document.getElementById("ans");
+  if(!el||!el.value.trim()){alert("Indique una respuesta.");return;}
+  try{
+    var d=await callAnalyze();
+    if(!d.nextQuestion)return;
+    var id=d.nextQuestion.id;
+    answers[id]=parseValue(id,el.value.trim());
+    if((id==="initialOneOffCostExVat"||id==="recurringAnnualCostExVat")&&answers.economicCorrectionTarget)delete answers.economicCorrectionTarget;
+    sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));
+    await analyze();
+  }catch(e){alert(e.message);}
+}
+});
 document.getElementById("resetFlow").addEventListener("click",function(){answers={};sessionStorage.removeItem("contrataIaAdaptiveAnswers");analyze();});
 analyze();
 })();`;
