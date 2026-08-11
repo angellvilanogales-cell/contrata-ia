@@ -14,6 +14,7 @@ import { MAIN_PILOT_UI } from "../lb7/MainPilotUi";
 import { PWA_ICON_SVG, PWA_MANIFEST, PWA_SERVICE_WORKER } from "../lb7/PwaAssets";
 import { SecurityPolicy, type ApplicationRole } from "../lb7/SecurityPolicy";
 import { SPECIALIZED_WORKFLOW_UI } from "../lb7/SpecializedWorkflowUi";
+import { SUPPLY_CATALOGUE_SCRIPT } from "../lb7/SupplyCatalogueScript";
 
 const MAX_JSON_BYTES = 12 * 1024 * 1024;
 
@@ -128,6 +129,10 @@ export function createLB6Server(): http.Server {
       }
       if (request.method === "GET" && url.pathname === "/adaptive.js") {
         sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/supply-catalogue.js") {
+        sendText(response, 200, SUPPLY_CATALOGUE_SCRIPT, "application/javascript; charset=utf-8", "no-store");
         return;
       }
       if (request.method === "POST" && url.pathname === "/adaptive/login") {
