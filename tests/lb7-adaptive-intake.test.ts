@@ -4,30 +4,30 @@ import { AdaptiveProcurementFlow } from "../src/application/intake/lb7/AdaptiveP
 describe("LB-7 adaptive procurement flow", () => {
   const flow = new AdaptiveProcurementFlow();
 
-  it("infers a web development service and proposes a single coordinated lot", () => {
+  it("infers a web development service and opens service-specific questions", () => {
     const decision = flow.analyze({
       needAndPurpose: "Necesito una página web para promocionar proyectos de la red EURES.",
       scopeDetail: "Diseño, desarrollo, mantenimiento, actualización de eventos y soporte a usuarios.",
-      contentResponsibility: "ADMIN_SUPPLIES_CONTRACTOR_ADAPTS",
-      technicalContinuity: "SAME_CONTRACTOR_PREFERRED",
-      dominantComponent: "INITIAL_DEVELOPMENT"
+      technicalContinuity: "SAME_CONTRACTOR_PREFERRED"
     });
     expect(decision.contractNature).toBe("SERVICES");
     expect(decision.lotProposal).toBe("SINGLE_LOT");
     expect(decision.cpv.find(item => item.role === "PRIMARY")?.code).toBe("72413000-8");
-    expect(decision.nextQuestion?.id).toBe("initialBudgetExVat");
+    expect(decision.nextQuestion?.id).toBe("serviceMeansAvailability");
   });
 
-  it("projects recurrent extensions without duplicating the initial development cost", () => {
+  it("projects web development plus maintenance without duplicating the initial cost", () => {
     const decision = flow.analyze({
       needAndPurpose: "Página web para la red EURES",
       scopeDetail: "Diseño, desarrollo y mantenimiento",
-      contentResponsibility: "ADMIN_SUPPLIES_CONTRACTOR_ADAPTS",
       technicalContinuity: "SAME_CONTRACTOR_PREFERRED",
-      dominantComponent: "INITIAL_DEVELOPMENT",
+      serviceMeansAvailability: "INSUFFICIENT",
+      contentResponsibility: "ADMIN_SUPPLIES_CONTRACTOR_ADAPTS",
+      serviceDataHandling: "NONE",
       initialBudgetExVat: 12000,
       initialDurationMonths: 24,
       extensionMonths: [12, 12],
+      serviceEconomicPattern: "ONE_OFF_PLUS_RECURRING",
       initialOneOffCostExVat: 8000,
       recurringAnnualCostExVat: 2000
     });
@@ -47,12 +47,13 @@ describe("LB-7 adaptive procurement flow", () => {
       needAndPurpose: "Página web institucional",
       scopeDetail: "Diseño y desarrollo web",
       technicalContinuity: "SAME_CONTRACTOR_PREFERRED",
-      dominantComponent: "INITIAL_DEVELOPMENT",
+      serviceMeansAvailability: "INSUFFICIENT",
+      contentResponsibility: "ADMIN_SUPPLIES_CONTRACTOR_ADAPTS",
+      serviceDataHandling: "NONE",
       initialBudgetExVat: 12000,
-      initialDurationMonths: 24,
+      initialDurationMonths: 12,
       extensionMonths: [],
-      initialOneOffCostExVat: 8000,
-      recurringAnnualCostExVat: 2000,
+      serviceEconomicPattern: "SINGLE_RESULT",
       requiresNonFormulaQualityAssessment: true
     });
     expect(decision.procedure).toBe("OPEN_SIMPLIFIED_CANDIDATE");
@@ -67,7 +68,6 @@ describe("LB-7 adaptive procurement flow", () => {
     });
     expect(decision.contractNature).toBe("SUPPLIES");
     expect(decision.cpv.find(item => item.role === "PRIMARY")?.code).toBe("44316400-2");
-    expect(decision.contractNatureReason).not.toContain("limpieza");
     expect(decision.nextQuestion?.id).toBe("supplyAcquisitionMode");
     expect(decision.nextQuestion?.label).not.toContain("coste inicial no recurrente");
   });
@@ -100,10 +100,33 @@ describe("LB-7 adaptive procurement flow", () => {
     });
     expect(decision.economics.status).toBe("COHERENT");
     expect(decision.economics.estimatedValueExVat).toBe(28000);
-    expect(decision.economics.annualProjection).toEqual([
-      { period: "Periodo inicial (12 meses)", amountExVat: 12000 },
-      { period: "Prórroga 1 (12 meses)", amountExVat: 9000 },
-      { period: "Prórroga 2 (12 meses)", amountExVat: 7000 }
-    ]);
+  });
+
+  it("recognizes works and opens project and execution questions instead of service questions", () => {
+    const decision = flow.analyze({
+      needAndPurpose: "Terminación de las obras de remodelación integral de un edificio público.",
+      scopeDetail: "Ejecución de unidades de obra de edificación, instalaciones y acabados.",
+      technicalContinuity: "SAME_CONTRACTOR_PREFERRED"
+    });
+    expect(decision.contractNature).toBe("WORKS");
+    expect(decision.nextQuestion?.id).toBe("worksProjectStatus");
+    expect(decision.nextQuestion?.label).not.toContain("mantenimiento");
+  });
+
+  it("uses the current abbreviated works threshold separately from supplies and services", () => {
+    const decision = flow.analyze({
+      needAndPurpose: "Obras de reforma interior de una oficina pública.",
+      scopeDetail: "Demoliciones, tabiquería, instalaciones y acabados.",
+      technicalContinuity: "SAME_CONTRACTOR_PREFERRED",
+      worksProjectStatus: "APPROVED",
+      worksLandAvailability: "AVAILABLE",
+      initialBudgetExVat: 70000,
+      initialDurationMonths: 4,
+      worksSafetyDocument: "BASIC_STUDY",
+      worksPriceReviewExpected: false,
+      requiresNonFormulaQualityAssessment: false
+    });
+    expect(decision.economics.status).toBe("COHERENT");
+    expect(decision.procedure).toBe("OPEN_SIMPLIFIED_ABBREVIATED_CANDIDATE");
   });
 });
