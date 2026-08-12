@@ -59,15 +59,51 @@ describe("LB-7 adaptive procurement flow", () => {
     expect(decision.awardCriteriaConstraint).toContain("145");
   });
 
-  it("recognizes hardware supplies without reusing the cleaning-service profile", () => {
+  it("recognizes hardware supplies and opens the supply-specific acquisition branch", () => {
     const decision = flow.analyze({
       needAndPurpose: "Adquirir útiles y materiales de ferretería para pequeñas reparaciones en edificios del SAE.",
       scopeDetail: "Suministro sucesivo de piezas y artículos de ferretería.",
-      technicalContinuity: "SEPARABLE",
-      dominantComponent: "GOODS"
+      technicalContinuity: "SEPARABLE"
     });
     expect(decision.contractNature).toBe("SUPPLIES");
     expect(decision.cpv.find(item => item.role === "PRIMARY")?.code).toBe("44316400-2");
     expect(decision.contractNatureReason).not.toContain("limpieza");
+    expect(decision.nextQuestion?.id).toBe("supplyAcquisitionMode");
+    expect(decision.nextQuestion?.label).not.toContain("coste inicial no recurrente");
+  });
+
+  it("never asks a supply for service startup and maintenance costs", () => {
+    const decision = flow.analyze({
+      needAndPurpose: "Suministro de material de ferretería",
+      scopeDetail: "Pedidos sucesivos de tornillería, herrajes, herramientas y consumibles.",
+      technicalContinuity: "SAME_CONTRACTOR_PREFERRED",
+      supplyAcquisitionMode: "SUCCESSIVE_NEEDS",
+      initialBudgetExVat: 12000,
+      initialDurationMonths: 12,
+      extensionMonths: [12, 12]
+    });
+    expect(decision.nextQuestion?.id).toBe("supplyExtensionBudgetsExVat");
+    expect(decision.nextQuestion?.label).not.toContain("mantenimiento");
+    expect(decision.economics.status).toBe("PROVISIONAL");
+  });
+
+  it("uses explicit supply extension budgets instead of linear extrapolation", () => {
+    const decision = flow.analyze({
+      needAndPurpose: "Suministro de material de ferretería",
+      scopeDetail: "Pedidos sucesivos de artículos de ferretería según necesidad.",
+      technicalContinuity: "SAME_CONTRACTOR_PREFERRED",
+      supplyAcquisitionMode: "SUCCESSIVE_NEEDS",
+      initialBudgetExVat: 12000,
+      initialDurationMonths: 12,
+      extensionMonths: [12, 12],
+      supplyExtensionBudgetsExVat: [9000, 7000]
+    });
+    expect(decision.economics.status).toBe("COHERENT");
+    expect(decision.economics.estimatedValueExVat).toBe(28000);
+    expect(decision.economics.annualProjection).toEqual([
+      { period: "Periodo inicial (12 meses)", amountExVat: 12000 },
+      { period: "Prórroga 1 (12 meses)", amountExVat: 9000 },
+      { period: "Prórroga 2 (12 meses)", amountExVat: 7000 }
+    ]);
   });
 });
