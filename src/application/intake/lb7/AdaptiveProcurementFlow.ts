@@ -8,9 +8,11 @@ export interface AdaptiveFlowAnswers {
   readonly contentResponsibility?: "ADMIN_SUPPLIES_CONTRACTOR_ADAPTS" | "CONTRACTOR_CREATES" | "NOT_APPLICABLE";
   readonly technicalContinuity?: "SAME_CONTRACTOR_PREFERRED" | "SEPARABLE" | "UNKNOWN";
   readonly dominantComponent?: "INITIAL_DEVELOPMENT" | "RECURRENT_SERVICE" | "GOODS" | "BALANCED" | "UNKNOWN";
+  readonly supplyAcquisitionMode?: "SUCCESSIVE_NEEDS" | "CLOSED_QUANTITIES";
   readonly initialBudgetExVat?: number;
   readonly initialDurationMonths?: number;
   readonly extensionMonths?: readonly number[];
+  readonly supplyExtensionBudgetsExVat?: readonly number[];
   readonly initialOneOffCostExVat?: number;
   readonly recurringAnnualCostExVat?: number;
   readonly economicCorrectionTarget?: "INITIAL" | "RECURRING";
@@ -54,10 +56,16 @@ function inferNature(answers: AdaptiveFlowAnswers): { nature: ContractNature; re
   return { nature: "UNKNOWN", reason: "Todavía no hay hechos suficientes para clasificar con seguridad la naturaleza del contrato." };
 }
 
-function lotDecision(answers: AdaptiveFlowAnswers): { proposal: LotProposal; reason: string } {
-  if (answers.technicalContinuity === "SAME_CONTRACTOR_PREFERRED") return { proposal: "SINGLE_LOT", reason: "Se propone un único lote porque la unidad promotora declara una necesidad de continuidad y coordinación técnica entre la prestación inicial y las posteriores. Esta motivación debe ser validada y trasladada al expediente." };
-  if (answers.technicalContinuity === "SEPARABLE") return { proposal: "MULTIPLE_LOTS", reason: "Las prestaciones se han declarado separables; procede estudiar lotes funcionalmente autónomos y justificar su configuración concreta." };
-  return { proposal: "PENDING", reason: "Debe comprobarse si las prestaciones pueden ejecutarse separadamente sin perjudicar la coordinación o la correcta ejecución." };
+function lotDecision(answers: AdaptiveFlowAnswers, nature: ContractNature): { proposal: LotProposal; reason: string } {
+  if (answers.technicalContinuity === "SAME_CONTRACTOR_PREFERRED") {
+    if (nature === "SUPPLIES") return { proposal: "SINGLE_LOT", reason: "Se propone un único lote porque la unidad promotora aprecia que la gestión conjunta de las referencias y pedidos responde mejor a la necesidad. La motivación concreta debe validarse y trasladarse al expediente." };
+    return { proposal: "SINGLE_LOT", reason: "Se propone un único lote porque la unidad promotora declara una necesidad de continuidad y coordinación técnica entre la prestación inicial y las posteriores. Esta motivación debe ser validada y trasladada al expediente." };
+  }
+  if (answers.technicalContinuity === "SEPARABLE") {
+    if (nature === "SUPPLIES") return { proposal: "MULTIPLE_LOTS", reason: "Los grupos de artículos se han declarado separables; procede estudiar lotes funcionalmente autónomos y justificar su configuración concreta." };
+    return { proposal: "MULTIPLE_LOTS", reason: "Las prestaciones se han declarado separables; procede estudiar lotes funcionalmente autónomos y justificar su configuración concreta." };
+  }
+  return { proposal: "PENDING", reason: nature === "SUPPLIES" ? "Debe comprobarse si existen grupos de artículos que puedan adjudicarse y suministrarse de forma independiente." : "Debe comprobarse si las prestaciones pueden ejecutarse separadamente sin perjudicar la coordinación o la correcta ejecución." };
 }
 
 function cpvDecision(nature: ContractNature, answers: AdaptiveFlowAnswers): readonly CpvProposal[] {
@@ -72,7 +80,7 @@ function cpvDecision(nature: ContractNature, answers: AdaptiveFlowAnswers): read
   return [];
 }
 
-function economics(answers: AdaptiveFlowAnswers): EconomicProjection {
+function serviceEconomics(answers: AdaptiveFlowAnswers): EconomicProjection {
   const initialBudget = answers.initialBudgetExVat;
   const initialMonths = answers.initialDurationMonths;
   const extensions = answers.extensionMonths ?? [];
@@ -107,6 +115,34 @@ function economics(answers: AdaptiveFlowAnswers): EconomicProjection {
   };
 }
 
+function supplyEconomics(answers: AdaptiveFlowAnswers): EconomicProjection {
+  const initialBudget = answers.initialBudgetExVat;
+  const initialMonths = answers.initialDurationMonths;
+  const extensions = answers.extensionMonths ?? [];
+  const extensionMonths = extensions.reduce((sum, months) => sum + months, 0);
+  const maximumDurationMonths = initialMonths === undefined ? undefined : initialMonths + extensionMonths;
+  if (initialBudget === undefined || initialMonths === undefined) return { initialBudgetExVat: initialBudget, maximumDurationMonths, status: "PENDING", note: "Faltan presupuesto inicial o duración para cerrar la proyección económica del suministro." };
+  if (answers.supplyAcquisitionMode === undefined) return { initialBudgetExVat: initialBudget, maximumDurationMonths, status: "PROVISIONAL", note: "Debe indicarse si el suministro responde a cantidades cerradas o a pedidos sucesivos según necesidades." };
+  const extensionBudgets = answers.supplyExtensionBudgetsExVat;
+  if (extensions.length > 0 && (extensionBudgets === undefined || extensionBudgets.length !== extensions.length)) return { initialBudgetExVat: initialBudget, maximumDurationMonths, status: "PROVISIONAL", note: "No se extrapolan las prórrogas por división lineal: indique el importe máximo previsto para cada prórroga." };
+  const projection: { period: string; amountExVat: number }[] = [{ period: `Periodo inicial (${initialMonths} meses)`, amountExVat: initialBudget }];
+  extensions.forEach((months, index) => projection.push({ period: `Prórroga ${index + 1} (${months} meses)`, amountExVat: extensionBudgets?.[index] ?? 0 }));
+  const estimatedValue = initialBudget + (extensionBudgets ?? []).reduce((sum, value) => sum + value, 0);
+  return {
+    initialBudgetExVat: initialBudget,
+    maximumDurationMonths,
+    estimatedValueExVat: estimatedValue,
+    annualProjection: projection,
+    status: "COHERENT",
+    note: answers.supplyAcquisitionMode === "SUCCESSIVE_NEEDS" ? "El suministro se configura mediante pedidos sucesivos según necesidades. El valor estimado utiliza los importes máximos expresamente indicados para el periodo inicial y sus prórrogas; las cantidades de artículos tienen carácter estimativo salvo que el expediente establezca otra cosa." : "El suministro se configura con cantidades previstas para el periodo inicial. El valor estimado incorpora únicamente los importes expresamente indicados para cada periodo y no presupone una división lineal de las prórrogas."
+  };
+}
+
+function economics(nature: ContractNature, answers: AdaptiveFlowAnswers): EconomicProjection {
+  if (nature === "SUPPLIES") return supplyEconomics(answers);
+  return serviceEconomics(answers);
+}
+
 function procedureDecision(nature: ContractNature, economic: EconomicProjection, answers: AdaptiveFlowAnswers): { procedure: ProcedureProposal; reason: string; constraint: string } {
   if (economic.status !== "COHERENT" || economic.estimatedValueExVat === undefined) return { procedure: "PENDING", reason: economic.status === "INCONSISTENT" ? "La distribución económica no cuadra con el presupuesto inicial; debe corregirse antes de proponer el procedimiento." : "Falta cerrar el valor estimado, incluidas las prórrogas, para proponer el procedimiento.", constraint: "Los criterios de adjudicación se decidirán después de disponer de un valor estimado coherente y determinar el procedimiento aplicable." };
   const value = economic.estimatedValueExVat;
@@ -120,18 +156,26 @@ function procedureDecision(nature: ContractNature, economic: EconomicProjection,
 
 function nextQuestion(answers: AdaptiveFlowAnswers, nature: ContractNature, lot: LotProposal, economic: EconomicProjection): AdaptiveFlowDecision["nextQuestion"] {
   if (!answers.needAndPurpose?.trim()) return { id: "needAndPurpose", label: "¿Qué necesita contratar la Administración y para qué?", help: "Describa la necesidad con lenguaje natural; no es necesario conocer el tipo jurídico del contrato." };
-  if (!answers.scopeDetail?.trim()) return { id: "scopeDetail", label: "¿Qué trabajos, entregas o prestaciones debe realizar la empresa?", help: "Indique las prestaciones principales y las que deban mantenerse durante la ejecución." };
+  if (!answers.scopeDetail?.trim()) return { id: "scopeDetail", label: nature === "SUPPLIES" ? "¿Qué materiales, artículos o familias de productos necesita suministrar la empresa?" : "¿Qué trabajos, entregas o prestaciones debe realizar la empresa?", help: nature === "SUPPLIES" ? "Describa las familias principales. Después podrá importar la relación detallada de artículos desde una tabla preparada en Excel." : "Indique las prestaciones principales y las que deban mantenerse durante la ejecución." };
   if (nature === "SERVICES" && answers.contentResponsibility === undefined && normalize(answers.scopeDetail).includes("web")) return { id: "contentResponsibility", label: "¿Quién elaborará los contenidos?", help: "Indique si la Administración aporta la información y la empresa solo la adapta y publica, o si la empresa también crea contenido sustantivo." };
-  if (lot === "PENDING") return { id: "technicalContinuity", label: "¿Las distintas prestaciones pueden ejecutarse por empresas diferentes sin problemas de coordinación?", help: "Conteste desde la realidad técnica; el sistema elaborará después la motivación jurídica de la decisión sobre lotes." };
-  if (answers.dominantComponent === undefined) return { id: "dominantComponent", label: "¿Qué prestación tiene mayor peso económico y funcional?", help: "No hacen falta porcentajes exactos; esta respuesta ayuda a identificar la prestación principal y el CPV." };
-  if (answers.initialBudgetExVat === undefined) return { id: "initialBudgetExVat", label: "¿Qué importe máximo aproximado se prevé para el periodo inicial, sin IVA?", help: "Si solo conoce una cifra aproximada, indíquela; después se comprobará su adecuación a mercado." };
-  if (answers.initialDurationMonths === undefined) return { id: "initialDurationMonths", label: "¿Cuál será la duración inicial del contrato?", help: "Indique la duración en meses. Las prórrogas se preguntarán a continuación." };
-  if (answers.extensionMonths === undefined) return { id: "extensionMonths", label: "¿Qué prórrogas se prevén?", help: "Indique la duración de cada prórroga. Por ejemplo: 12, 12." };
-  if (answers.initialOneOffCostExVat === undefined) return { id: "initialOneOffCostExVat", label: "¿Qué parte aproximada del presupuesto corresponde al coste inicial no recurrente?", help: "Por ejemplo, diseño, desarrollo y puesta en marcha. Si no lo sabe, debe estimarse y contrastarse con mercado antes de cerrar el expediente." };
-  if (answers.recurringAnnualCostExVat === undefined) return { id: "recurringAnnualCostExVat", label: "¿Cuál sería el coste anual aproximado de mantenimiento o prestación recurrente?", help: "Esta cifra permite distribuir correctamente el periodo inicial y proyectar las prórrogas sin repetir el coste de desarrollo." };
-  if (economic.status === "INCONSISTENT" && answers.economicCorrectionTarget === undefined) return { id: "economicCorrectionTarget", label: "La distribución económica no coincide con el presupuesto inicial. ¿Qué dato quiere revisar?", help: "Puede corregir el coste inicial no recurrente o el coste anual de mantenimiento. El sistema no decidirá por usted cuál de las dos cifras era errónea." };
-  if (economic.status === "INCONSISTENT" && answers.economicCorrectionTarget === "INITIAL") return { id: "initialOneOffCostExVat", label: "Revise el coste inicial no recurrente", help: "Introduzca la cifra corregida correspondiente al diseño, desarrollo y puesta en marcha." };
-  if (economic.status === "INCONSISTENT" && answers.economicCorrectionTarget === "RECURRING") return { id: "recurringAnnualCostExVat", label: "Revise el coste anual de mantenimiento o prestación recurrente", help: "Introduzca la cifra anual corregida. En nuestro ejemplo de prueba sería 2.000 € al año." };
+  if (lot === "PENDING") return { id: "technicalContinuity", label: nature === "SUPPLIES" ? "¿Los distintos grupos de artículos pueden adjudicarse y suministrarse de forma independiente?" : "¿Las distintas prestaciones pueden ejecutarse por empresas diferentes sin problemas de coordinación?", help: nature === "SUPPLIES" ? "Piense, por ejemplo, si ferretería, cerrajería, herramientas u otras familias forman grupos autónomos. El sistema utilizará esta respuesta para proponer y motivar la configuración por lotes." : "Conteste desde la realidad técnica; el sistema elaborará después la motivación jurídica de la decisión sobre lotes." };
+  if (nature === "SUPPLIES") {
+    if (answers.supplyAcquisitionMode === undefined) return { id: "supplyAcquisitionMode", label: "¿Cómo se prevé adquirir los artículos durante el contrato?", help: "Indique si se comprarán cantidades cerradas previamente definidas o si se harán pedidos sucesivos según las necesidades reales durante la vigencia del contrato." };
+    if (answers.initialBudgetExVat === undefined) return { id: "initialBudgetExVat", label: "¿Qué importe máximo se prevé para el periodo inicial del suministro, sin IVA?", help: "La relación de artículos y precios deberá contrastarse con esta cifra. Si se trata de pedidos sucesivos, esta cantidad puede funcionar como límite máximo del periodo inicial." };
+    if (answers.initialDurationMonths === undefined) return { id: "initialDurationMonths", label: "¿Cuál será la duración inicial del contrato de suministro?", help: "Indique la duración en meses." };
+    if (answers.extensionMonths === undefined) return { id: "extensionMonths", label: "¿Se prevén prórrogas?", help: "Indique la duración de cada prórroga en meses. Si no hay prórrogas, deje la lista vacía." };
+    if ((answers.extensionMonths?.length ?? 0) > 0 && answers.supplyExtensionBudgetsExVat === undefined) return { id: "supplyExtensionBudgetsExVat", label: "¿Qué importe máximo se prevé para cada prórroga, sin IVA?", help: "Indique un importe por cada prórroga, en el mismo orden y separados por punto y coma. No se calcularán mediante una simple división lineal del presupuesto inicial." };
+  } else {
+    if (answers.dominantComponent === undefined) return { id: "dominantComponent", label: "¿Qué prestación tiene mayor peso económico y funcional?", help: "No hacen falta porcentajes exactos; esta respuesta ayuda a identificar la prestación principal y el CPV." };
+    if (answers.initialBudgetExVat === undefined) return { id: "initialBudgetExVat", label: "¿Qué importe máximo aproximado se prevé para el periodo inicial, sin IVA?", help: "Si solo conoce una cifra aproximada, indíquela; después se comprobará su adecuación a mercado." };
+    if (answers.initialDurationMonths === undefined) return { id: "initialDurationMonths", label: "¿Cuál será la duración inicial del contrato?", help: "Indique la duración en meses. Las prórrogas se preguntarán a continuación." };
+    if (answers.extensionMonths === undefined) return { id: "extensionMonths", label: "¿Qué prórrogas se prevén?", help: "Indique la duración de cada prórroga. Por ejemplo: 12, 12." };
+    if (answers.initialOneOffCostExVat === undefined) return { id: "initialOneOffCostExVat", label: "¿Qué parte aproximada del presupuesto corresponde al coste inicial no recurrente?", help: "Por ejemplo, diseño, desarrollo y puesta en marcha. Si no lo sabe, debe estimarse y contrastarse con mercado antes de cerrar el expediente." };
+    if (answers.recurringAnnualCostExVat === undefined) return { id: "recurringAnnualCostExVat", label: "¿Cuál sería el coste anual aproximado de mantenimiento o prestación recurrente?", help: "Esta cifra permite distribuir correctamente el periodo inicial y proyectar las prórrogas sin repetir el coste de desarrollo." };
+    if (economic.status === "INCONSISTENT" && answers.economicCorrectionTarget === undefined) return { id: "economicCorrectionTarget", label: "La distribución económica no coincide con el presupuesto inicial. ¿Qué dato quiere revisar?", help: "Puede corregir el coste inicial no recurrente o el coste anual de mantenimiento. El sistema no decidirá por usted cuál de las dos cifras era errónea." };
+    if (economic.status === "INCONSISTENT" && answers.economicCorrectionTarget === "INITIAL") return { id: "initialOneOffCostExVat", label: "Revise el coste inicial no recurrente", help: "Introduzca la cifra corregida correspondiente al diseño, desarrollo y puesta en marcha." };
+    if (economic.status === "INCONSISTENT" && answers.economicCorrectionTarget === "RECURRING") return { id: "recurringAnnualCostExVat", label: "Revise el coste anual de mantenimiento o prestación recurrente", help: "Introduzca la cifra anual corregida." };
+  }
   if (answers.requiresNonFormulaQualityAssessment === undefined) return { id: "requiresNonFormulaQualityAssessment", label: "¿Hay alguna característica cualitativa que sea imprescindible valorar y que no pueda medirse con una fórmula objetiva?", help: "No se pregunta todavía por un porcentaje. La respuesta sirve para comprobar la compatibilidad con el procedimiento y abrir, si procede, la rama de criterios sometidos a juicio de valor." };
   return null;
 }
@@ -146,23 +190,23 @@ function procedureLabel(procedure: ProcedureProposal): string {
 export class AdaptiveProcurementFlow {
   public analyze(answers: AdaptiveFlowAnswers): AdaptiveFlowDecision {
     const nature = inferNature(answers);
-    const lots = lotDecision(answers);
-    const economic = economics(answers);
+    const lots = lotDecision(answers, nature.nature);
+    const economic = economics(nature.nature, answers);
     const procedure = procedureDecision(nature.nature, economic, answers);
     const cpv = cpvDecision(nature.nature, answers);
     const proposals: string[] = [];
     const warnings: string[] = [];
     if (nature.nature !== "UNKNOWN") proposals.push(`Naturaleza contractual propuesta: ${nature.nature === "SERVICES" ? "servicios" : "suministros"}.`);
-    if (lots.proposal === "SINGLE_LOT") proposals.push("Propuesta: lote único, con motivación de coordinación técnica pendiente de validación humana.");
+    if (lots.proposal === "SINGLE_LOT") proposals.push(nature.nature === "SUPPLIES" ? "Propuesta: lote único, pendiente de validar y motivar con las características reales de las familias de artículos." : "Propuesta: lote único, con motivación de coordinación técnica pendiente de validación humana.");
     if (lots.proposal === "MULTIPLE_LOTS") proposals.push("Propuesta: estudiar varios lotes funcionalmente autónomos y motivar su configuración concreta.");
     const primaryCpv = cpv.find(item => item.role === "PRIMARY");
     if (primaryCpv) proposals.push(`CPV principal propuesto: ${primaryCpv.code}.`);
     if (procedure.procedure !== "PENDING") proposals.push(`Procedimiento propuesto: ${procedureLabel(procedure.procedure)}.`);
-    if (economic.status === "PROVISIONAL") warnings.push("La distribución económica está pendiente; no se proyectan prórrogas mediante una simple división lineal.");
+    if (economic.status === "PROVISIONAL") warnings.push(nature.nature === "SUPPLIES" ? economic.note : "La distribución económica está pendiente; no se proyectan prórrogas mediante una simple división lineal.");
     if (economic.status === "INCONSISTENT") warnings.push("La distribución económica no coincide con el presupuesto inicial y debe corregirse antes de fijar el valor estimado.");
     if (answers.technicalContinuity === "UNKNOWN") warnings.push("No hay hechos suficientes para cerrar la decisión sobre lotes; debe recabarse información técnica adicional.");
     const legalGrounds: LegalGround[] = [
-      { article: "LCSP art. 17", rule: "La clasificación del contrato de servicios se basa en la naturaleza de la prestación principal descrita.", source: "LCSP", verification: "CURRENT_LAW_REQUIRED" },
+      { article: nature.nature === "SUPPLIES" ? "LCSP art. 16" : "LCSP art. 17", rule: nature.nature === "SUPPLIES" ? "La clasificación como suministro se basa en la adquisición o arrendamiento de productos o bienes muebles en los términos legalmente previstos." : "La clasificación del contrato de servicios se basa en la naturaleza de la prestación principal descrita.", source: "LCSP", verification: "CURRENT_LAW_REQUIRED" },
       { article: "LCSP arts. 99.3 y 116.4", rule: "La división en lotes debe analizarse y la decisión de no dividir debe motivarse en el expediente.", source: "LCSP", verification: "CURRENT_LAW_REQUIRED" },
       { article: "Reglamento (CE) 2195/2002 y Reglamento (CE) 213/2008", rule: "El objeto y, cuando proceda, cada lote deben clasificarse mediante CPV.", source: "CPV", verification: "CURRENT_LAW_REQUIRED" },
       { article: "LCSP art. 101", rule: "El valor estimado se expresa sin IVA e incluye, cuando proceda, prórrogas, opciones y modificaciones previstas.", source: "LCSP", verification: "CURRENT_LAW_REQUIRED" },
