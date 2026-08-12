@@ -8,17 +8,24 @@ var work=document.getElementById("work");
 var status=document.getElementById("sessionStatus");
 function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
 function money(v){return typeof v==="number"?v.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" €":"Pendiente";}
-function humanNature(v){return v==="SERVICES"?"Servicios":v==="SUPPLIES"?"Suministros":"Pendiente de clasificar";}
+function humanNature(v){return v==="SERVICES"?"Servicios":v==="SUPPLIES"?"Suministros":v==="WORKS"?"Obras":"Pendiente de clasificar";}
 function humanLots(v){return v==="SINGLE_LOT"?"Lote único propuesto":v==="MULTIPLE_LOTS"?"Varios lotes propuestos":"Pendiente de análisis";}
 function humanProcedure(v){return v==="OPEN_SIMPLIFIED_ABBREVIATED_CANDIDATE"?"Abierto simplificado abreviado — propuesta":v==="OPEN_SIMPLIFIED_CANDIDATE"?"Abierto simplificado — propuesta":v==="OPEN_PROCEDURE_REVIEW_REQUIRED"?"Procedimiento a revisar según cuantía y régimen aplicable":"Pendiente";}
 function option(value,label){return '<option value="'+esc(value)+'">'+esc(label)+'</option>';}
+function yesNo(){return '<select id="ans"><option value="">Seleccione</option><option value="false">No</option><option value="true">Sí</option></select>';}
 function inputFor(q){
 if(q.id==="contentResponsibility")return '<select id="ans"><option value="">Seleccione</option>'+option("ADMIN_SUPPLIES_CONTRACTOR_ADAPTS","La Administración aporta la información y la empresa la adapta/publica")+option("CONTRACTOR_CREATES","La empresa también crea contenido sustantivo")+option("NOT_APPLICABLE","No procede")+'</select>';
 if(q.id==="technicalContinuity")return '<select id="ans"><option value="">Seleccione</option>'+option("SAME_CONTRACTOR_PREFERRED","Es preferible una misma empresa / gestión conjunta")+option("SEPARABLE","Pueden ejecutarse o suministrarse separadamente")+option("UNKNOWN","No lo sé")+'</select>';
+if(q.id==="serviceMeansAvailability")return '<select id="ans"><option value="">Seleccione</option>'+option("INSUFFICIENT","No, los medios propios son insuficientes")+option("AVAILABLE","Sí, existen medios propios suficientes")+option("UNKNOWN","No lo sé todavía")+'</select>';
+if(q.id==="serviceDataHandling")return '<select id="ans"><option value="">Seleccione</option>'+option("NONE","No tendrá acceso a datos personales")+option("ACCESS","Podrá acceder incidentalmente a datos personales")+option("PROCESSING","Tratará datos personales por cuenta de la Administración")+'</select>';
+if(q.id==="serviceEconomicPattern")return '<select id="ans"><option value="">Seleccione</option>'+option("ONE_OFF_PLUS_RECURRING","Coste inicial + prestación periódica/recurrente")+option("RECURRENT","Prestación recurrente durante toda la vigencia")+option("SINGLE_RESULT","Resultado o prestación única")+'</select>';
 if(q.id==="dominantComponent")return '<select id="ans"><option value="">Seleccione</option>'+option("INITIAL_DEVELOPMENT","Predomina la prestación inicial/desarrollo")+option("RECURRENT_SERVICE","Predomina el servicio recurrente")+option("GOODS","Predomina la adquisición de bienes")+option("BALANCED","Peso parecido")+option("UNKNOWN","No lo sé")+'</select>';
 if(q.id==="supplyAcquisitionMode")return '<select id="ans"><option value="">Seleccione</option>'+option("SUCCESSIVE_NEEDS","Pedidos sucesivos según las necesidades reales")+option("CLOSED_QUANTITIES","Cantidades cerradas previamente definidas")+'</select>';
+if(q.id==="worksProjectStatus")return '<select id="ans"><option value="">Seleccione</option>'+option("APPROVED","Proyecto aprobado")+option("DRAFT_EXISTS","Existe proyecto o borrador pendiente de aprobación")+option("NEEDS_DRAFTING","Todavía debe redactarse el proyecto")+'</select>';
+if(q.id==="worksLandAvailability")return '<select id="ans"><option value="">Seleccione</option>'+option("AVAILABLE","Sí, está disponible")+option("PENDING","Pendiente de comprobar/disponer")+option("NOT_APPLICABLE","No procede por la naturaleza de la actuación")+'</select>';
+if(q.id==="worksSafetyDocument")return '<select id="ans"><option value="">Seleccione</option>'+option("STUDY","Estudio de seguridad y salud")+option("BASIC_STUDY","Estudio básico de seguridad y salud")+option("PENDING","Pendiente de determinar")+'</select>';
 if(q.id==="economicCorrectionTarget")return '<select id="ans"><option value="">Seleccione qué dato quiere revisar</option>'+option("INITIAL","Coste inicial de diseño, desarrollo y puesta en marcha")+option("RECURRING","Coste anual de mantenimiento, actualización y soporte")+'</select>';
-if(q.id==="requiresNonFormulaQualityAssessment")return '<select id="ans"><option value="">Seleccione</option><option value="false">No</option><option value="true">Sí</option></select>';
+if(q.id==="requiresNonFormulaQualityAssessment"||q.id==="worksPriceReviewExpected")return yesNo();
 if(q.id==="extensionMonths")return '<input id="ans" placeholder="Ej.: 12, 12. Si no hay prórrogas, escriba 0">';
 if(q.id==="supplyExtensionBudgetsExVat")return '<input id="ans" placeholder="Ej.: 6.000; 6.000">';
 if(["initialBudgetExVat","initialDurationMonths","initialOneOffCostExVat","recurringAnnualCostExVat"].includes(q.id))return '<input id="ans" inputmode="decimal" placeholder="Ej.: 8.000 € o 8000">';
@@ -37,7 +44,7 @@ if(!Number.isFinite(n))throw new Error("Indique una cifra válida. Puede escribi
 return n;
 }
 function parseValue(id,rawValue){
-if(id==="requiresNonFormulaQualityAssessment")return rawValue==="true";
+if(id==="requiresNonFormulaQualityAssessment"||id==="worksPriceReviewExpected")return rawValue==="true";
 if(id==="extensionMonths"){if(rawValue.trim()==="0")return [];return rawValue.split(",").map(function(x){return Number(x.trim());}).filter(function(x){return Number.isFinite(x)&&x>0;});}
 if(id==="supplyExtensionBudgetsExVat")return rawValue.split(";").map(function(x){return parseSpanishNumber(x.trim());});
 if(["initialBudgetExVat","initialDurationMonths","initialOneOffCostExVat","recurringAnnualCostExVat"].includes(id))return parseSpanishNumber(rawValue);
