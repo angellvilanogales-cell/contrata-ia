@@ -6,6 +6,7 @@ import type { IntakeMode, IntakeQuestionId } from "../../application/intake/lb6/
 import { AdaptiveProcurementFlow, type AdaptiveFlowAnswers } from "../../application/intake/lb7/AdaptiveProcurementFlow";
 import type { EventAnswerId, EventFeature } from "../../application/intake/lb7/EventServicesProfile";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
+import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
 import { HashChainAuditLog } from "../../infrastructure/operations/lb7/HashChainAuditLog";
 import { ADAPTIVE_FLOW_SCRIPT } from "../lb7/AdaptiveFlowScript";
@@ -17,100 +18,53 @@ import { SPECIALIZED_WORKFLOW_UI } from "../lb7/SpecializedWorkflowUi";
 import { SUPPLY_CATALOGUE_SCRIPT } from "../lb7/SupplyCatalogueScript";
 
 const MAX_JSON_BYTES = 12 * 1024 * 1024;
+const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
 
 function buildOperationalOrchestrator(): LB6Orchestrator {
-  const root = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
   return new LB6Orchestrator({
-    repository: new FileCaseRepository(path.join(root, "cases")),
-    audit: new HashChainAuditLog(path.join(root, "audit", "security.jsonl"))
+    repository: new FileCaseRepository(path.join(DATA_ROOT, "cases")),
+    audit: new HashChainAuditLog(path.join(DATA_ROOT, "audit", "security.jsonl"))
   });
 }
 
 const orchestrator = buildOperationalOrchestrator();
 const security = new SecurityPolicy();
 const adaptiveFlow = new AdaptiveProcurementFlow();
+const adaptiveCases = new AdaptiveCaseStore(path.join(DATA_ROOT, "adaptive-cases"));
 
 function sendJson(response: ServerResponse, status: number, value: unknown): void {
   const body = Buffer.from(JSON.stringify(value));
   response.writeHead(status, { "content-type": "application/json; charset=utf-8", "content-length": body.length });
   response.end(body);
 }
-
 function sendText(response: ServerResponse, status: number, bodyText: string, contentType: string, cacheControl = "no-cache"): void {
   const body = Buffer.from(bodyText);
   response.writeHead(status, { "content-type": contentType, "content-length": body.length, "cache-control": cacheControl });
   response.end(body);
 }
-
 function redirect(response: ServerResponse, location: string, cookie?: string): void {
   if (cookie) response.setHeader("set-cookie", cookie);
   response.writeHead(303, { location, "cache-control": "no-store" });
   response.end();
 }
-
 function sendBinary(response: ServerResponse, status: number, data: Uint8Array, contentType: string, fileName: string): void {
   const body = Buffer.from(data);
-  response.writeHead(status, {
-    "content-type": contentType,
-    "content-length": body.length,
-    "content-disposition": `attachment; filename="${fileName}"`
-  });
+  response.writeHead(status, { "content-type": contentType, "content-length": body.length, "content-disposition": `attachment; filename="${fileName}"` });
   response.end(body);
 }
-
 async function readBody(request: IncomingMessage): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const chunk of request) {
-    const value = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    size += value.length;
-    if (size > MAX_JSON_BYTES) throw new Error("Solicitud demasiado grande.");
-    chunks.push(value);
-  }
+  const chunks: Buffer[] = []; let size = 0;
+  for await (const chunk of request) { const value = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk); size += value.length; if (size > MAX_JSON_BYTES) throw new Error("Solicitud demasiado grande."); chunks.push(value); }
   return Buffer.concat(chunks);
 }
-
-async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
-  const body = await readBody(request);
-  if (body.length === 0) return {};
-  return JSON.parse(body.toString("utf8")) as Record<string, unknown>;
-}
-
-async function readForm(request: IncomingMessage): Promise<URLSearchParams> {
-  const body = await readBody(request);
-  return new URLSearchParams(body.toString("utf8"));
-}
-
+async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> { const body = await readBody(request); if (body.length === 0) return {}; return JSON.parse(body.toString("utf8")) as Record<string, unknown>; }
+async function readForm(request: IncomingMessage): Promise<URLSearchParams> { const body = await readBody(request); return new URLSearchParams(body.toString("utf8")); }
 function routeParts(pathname: string): string[] { return pathname.split("/").filter(Boolean); }
-
-function statusForError(error: Error): number {
-  if (/autenticación|credencial|sesión segura/i.test(error.message)) return 401;
-  if (/permiso insuficiente/i.test(error.message)) return 403;
-  if (/no encontrado/i.test(error.message)) return 404;
-  if (/demasiado grande/i.test(error.message)) return 413;
-  return 400;
-}
-
-function requireRole(request: IncomingMessage, minimum: ApplicationRole) {
-  const actor = security.authenticate(request);
-  security.require(actor, minimum);
-  return actor;
-}
-
-function eventFeatures(value: unknown): readonly EventFeature[] {
-  if (!Array.isArray(value)) return [];
-  return value.map(String) as EventFeature[];
-}
-
-function eventAnswers(value: unknown): Readonly<Partial<Record<EventAnswerId, unknown>>> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  return value as Readonly<Partial<Record<EventAnswerId, unknown>>>;
-}
-
-function adaptiveAnswers(value: unknown): AdaptiveFlowAnswers {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  return value as AdaptiveFlowAnswers;
-}
+function statusForError(error: Error): number { if (/autenticación|credencial|sesión segura/i.test(error.message)) return 401; if (/permiso insuficiente/i.test(error.message)) return 403; if (/no encontrado/i.test(error.message)) return 404; if (/demasiado grande/i.test(error.message)) return 413; return 400; }
+function requireRole(request: IncomingMessage, minimum: ApplicationRole) { const actor = security.authenticate(request); security.require(actor, minimum); return actor; }
+function eventFeatures(value: unknown): readonly EventFeature[] { if (!Array.isArray(value)) return []; return value.map(String) as EventFeature[]; }
+function eventAnswers(value: unknown): Readonly<Partial<Record<EventAnswerId, unknown>>> { if (!value || typeof value !== "object" || Array.isArray(value)) return {}; return value as Readonly<Partial<Record<EventAnswerId, unknown>>>; }
+function adaptiveAnswers(value: unknown): AdaptiveFlowAnswers { if (!value || typeof value !== "object" || Array.isArray(value)) return {}; return value as AdaptiveFlowAnswers; }
 
 export function createLB6Server(): http.Server {
   return http.createServer(async (request, response) => {
@@ -118,179 +72,49 @@ export function createLB6Server(): http.Server {
     try {
       const url = new URL(request.url ?? "/", "http://localhost");
       const parts = routeParts(url.pathname);
+      if (request.method === "GET" && url.pathname === "/") { sendText(response, 200, MAIN_PILOT_UI, "text/html; charset=utf-8"); return; }
+      if (request.method === "GET" && url.pathname === "/adaptive") { sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/adaptive.js") { sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/supply-catalogue.js") { sendText(response, 200, SUPPLY_CATALOGUE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
+      if (request.method === "POST" && url.pathname === "/adaptive/login") { const form = await readForm(request); const token = String(form.get("token") ?? "").trim(); if (!token) throw new Error("Falta la credencial de acceso."); security.authenticateToken(token); redirect(response, "/adaptive", security.sessionCookie(token)); return; }
+      if (request.method === "POST" && url.pathname === "/adaptive/logout") { redirect(response, "/adaptive", security.clearSessionCookie()); return; }
+      if (request.method === "GET" && url.pathname === "/specialized") { sendText(response, 200, SPECIALIZED_WORKFLOW_UI, "text/html; charset=utf-8"); return; }
+      if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
+      if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
+      if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 7, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, timestamp: new Date().toISOString() }); return; }
 
-      if (request.method === "GET" && url.pathname === "/") {
-        sendText(response, 200, MAIN_PILOT_UI, "text/html; charset=utf-8");
-        return;
+      if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); const created = adaptiveCases.create(); sendJson(response, 201, created); return; }
+      if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) {
+        const caseId = decodeURIComponent(parts[3]);
+        if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; }
+        if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); const saved = adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue); sendJson(response, 200, saved); return; }
       }
-      if (request.method === "GET" && url.pathname === "/adaptive") {
-        sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8", "no-store");
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/adaptive.js") {
-        sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store");
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/supply-catalogue.js") {
-        sendText(response, 200, SUPPLY_CATALOGUE_SCRIPT, "application/javascript; charset=utf-8", "no-store");
-        return;
-      }
-      if (request.method === "POST" && url.pathname === "/adaptive/login") {
-        const form = await readForm(request);
-        const token = String(form.get("token") ?? "").trim();
-        if (!token) throw new Error("Falta la credencial de acceso.");
-        security.authenticateToken(token);
-        redirect(response, "/adaptive", security.sessionCookie(token));
-        return;
-      }
-      if (request.method === "POST" && url.pathname === "/adaptive/logout") {
-        redirect(response, "/adaptive", security.clearSessionCookie());
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/specialized") {
-        sendText(response, 200, SPECIALIZED_WORKFLOW_UI, "text/html; charset=utf-8");
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/manifest.webmanifest") {
-        sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600");
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/sw.js") {
-        sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache");
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") {
-        sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400");
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/api/health") {
-        sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 7, pwa: true, specializedWorkflow: true, adaptiveFlow: true, timestamp: new Date().toISOString() });
-        return;
-      }
-      if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") {
-        requireRole(request, "OPERATOR");
-        const body = await readJson(request);
-        sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers)));
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/api/questions") {
-        requireRole(request, "VIEWER");
-        sendJson(response, 200, LB6_QUESTIONS);
-        return;
-      }
-      if (request.method === "GET" && url.pathname === "/api/questionnaire") {
-        requireRole(request, "OPERATOR");
-        const file = orchestrator.questionnaire();
-        sendBinary(response, 200, file.data, file.mimeType, file.fileName);
-        return;
-      }
-      if (request.method === "POST" && url.pathname === "/api/questionnaire/import") {
-        const actor = requireRole(request, "OPERATOR");
-        const body = await readJson(request);
-        const base64 = String(body.base64 ?? "");
-        if (!base64) throw new Error("Falta el contenido base64 de la ficha.");
-        const result = orchestrator.importQuestionnaire(Buffer.from(base64, "base64"), body.caseId ? String(body.caseId) : undefined, actor.id);
-        sendJson(response, 200, result);
-        return;
-      }
-      if (request.method === "POST" && url.pathname === "/api/cases") {
-        const actor = requireRole(request, "OPERATOR");
-        const body = await readJson(request);
-        const mode = (body.mode ?? "GUIDED") as IntakeMode;
-        const created = orchestrator.createCase(mode, undefined, actor.id);
-        sendJson(response, 201, created);
-        return;
-      }
-      if (request.method === "POST" && url.pathname === "/api/admin/backup") {
-        const actor = requireRole(request, "ADMIN");
-        sendJson(response, 200, { location: orchestrator.backup(actor.id) });
-        return;
-      }
+      if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers))); return; }
+      if (request.method === "GET" && url.pathname === "/api/questions") { requireRole(request, "VIEWER"); sendJson(response, 200, LB6_QUESTIONS); return; }
+      if (request.method === "GET" && url.pathname === "/api/questionnaire") { requireRole(request, "OPERATOR"); const file = orchestrator.questionnaire(); sendBinary(response, 200, file.data, file.mimeType, file.fileName); return; }
+      if (request.method === "POST" && url.pathname === "/api/questionnaire/import") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const base64 = String(body.base64 ?? ""); if (!base64) throw new Error("Falta el contenido base64 de la ficha."); const result = orchestrator.importQuestionnaire(Buffer.from(base64, "base64"), body.caseId ? String(body.caseId) : undefined, actor.id); sendJson(response, 200, result); return; }
+      if (request.method === "POST" && url.pathname === "/api/cases") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const mode = (body.mode ?? "GUIDED") as IntakeMode; const created = orchestrator.createCase(mode, undefined, actor.id); sendJson(response, 201, created); return; }
+      if (request.method === "POST" && url.pathname === "/api/admin/backup") { const actor = requireRole(request, "ADMIN"); sendJson(response, 200, { location: orchestrator.backup(actor.id) }); return; }
 
       if (parts[0] === "api" && parts[1] === "cases" && parts[2]) {
         const id = decodeURIComponent(parts[2]);
-        if (request.method === "GET" && parts.length === 3) {
-          requireRole(request, "VIEWER");
-          sendJson(response, 200, { caseValue: orchestrator.getCase(id), progress: orchestrator.progress(id) });
-          return;
-        }
-        if (request.method === "POST" && parts[3] === "answers") {
-          const actor = requireRole(request, "OPERATOR");
-          const body = await readJson(request);
-          const updated = orchestrator.answer(id, String(body.questionId) as IntakeQuestionId, body.value, actor.id);
-          sendJson(response, 200, { caseValue: updated, progress: orchestrator.progress(id) });
-          return;
-        }
-        if (request.method === "POST" && parts[3] === "event-services") {
-          const actor = requireRole(request, "OPERATOR");
-          const body = await readJson(request);
-          const updated = orchestrator.configureEventServices(id, eventFeatures(body.features), eventAnswers(body.answers), actor.id);
-          let review;
-          try { review = orchestrator.review(id); } catch { review = undefined; }
-          sendJson(response, 200, { caseValue: updated, review, eventConfigured: true });
-          return;
-        }
-        if (request.method === "POST" && parts[3] === "pre-legal-review") {
-          const actor = requireRole(request, "REVIEWER");
-          const body = await readJson(request);
-          const updated = orchestrator.configurePreLegalReview(id, body as unknown as PreLegalReviewInput, actor.id);
-          let review;
-          try { review = orchestrator.review(id); } catch { review = undefined; }
-          sendJson(response, 200, { caseValue: updated, review, preLegalConfigured: true });
-          return;
-        }
-        if (request.method === "GET" && parts[3] === "questionnaire") {
-          requireRole(request, "OPERATOR");
-          const file = orchestrator.questionnaire(id);
-          sendBinary(response, 200, file.data, file.mimeType, file.fileName);
-          return;
-        }
-        if (request.method === "GET" && parts[3] === "review") {
-          requireRole(request, "VIEWER");
-          sendJson(response, 200, orchestrator.review(id));
-          return;
-        }
-        if (request.method === "POST" && parts[3] === "validate") {
-          const actor = requireRole(request, "REVIEWER");
-          const body = await readJson(request);
-          const validatedBy = String(body.validatedBy ?? actor.id).trim() || actor.id;
-          sendJson(response, 200, orchestrator.validate(id, validatedBy));
-          return;
-        }
-        if (request.method === "POST" && parts[3] === "generate") {
-          const actor = requireRole(request, "OPERATOR");
-          const rendered = orchestrator.generate(id, actor.id);
-          sendJson(response, 200, {
-            manifest: {
-              expedienteId: id,
-              validation: rendered.package.globalValidation,
-              coherenceFingerprint: rendered.package.coherenceFingerprint,
-              preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })()
-            },
-            documents: [...rendered.editable, ...rendered.pdf].map(file => ({
-              documentId: file.documentId,
-              fileName: file.fileName,
-              mimeType: file.mimeType,
-              base64: Buffer.from(file.data).toString("base64")
-            }))
-          });
-          return;
-        }
+        if (request.method === "GET" && parts.length === 3) { requireRole(request, "VIEWER"); sendJson(response, 200, { caseValue: orchestrator.getCase(id), progress: orchestrator.progress(id) }); return; }
+        if (request.method === "POST" && parts[3] === "answers") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const updated = orchestrator.answer(id, String(body.questionId) as IntakeQuestionId, body.value, actor.id); sendJson(response, 200, { caseValue: updated, progress: orchestrator.progress(id) }); return; }
+        if (request.method === "POST" && parts[3] === "event-services") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const updated = orchestrator.configureEventServices(id, eventFeatures(body.features), eventAnswers(body.answers), actor.id); let review; try { review = orchestrator.review(id); } catch { review = undefined; } sendJson(response, 200, { caseValue: updated, review, eventConfigured: true }); return; }
+        if (request.method === "POST" && parts[3] === "pre-legal-review") { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const updated = orchestrator.configurePreLegalReview(id, body as unknown as PreLegalReviewInput, actor.id); let review; try { review = orchestrator.review(id); } catch { review = undefined; } sendJson(response, 200, { caseValue: updated, review, preLegalConfigured: true }); return; }
+        if (request.method === "GET" && parts[3] === "questionnaire") { requireRole(request, "OPERATOR"); const file = orchestrator.questionnaire(id); sendBinary(response, 200, file.data, file.mimeType, file.fileName); return; }
+        if (request.method === "GET" && parts[3] === "review") { requireRole(request, "VIEWER"); sendJson(response, 200, orchestrator.review(id)); return; }
+        if (request.method === "POST" && parts[3] === "validate") { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const validatedBy = String(body.validatedBy ?? actor.id).trim() || actor.id; sendJson(response, 200, orchestrator.validate(id, validatedBy)); return; }
+        if (request.method === "POST" && parts[3] === "generate") { const actor = requireRole(request, "OPERATOR"); const rendered = orchestrator.generate(id, actor.id); sendJson(response, 200, { manifest: { expedienteId: id, validation: rendered.package.globalValidation, coherenceFingerprint: rendered.package.coherenceFingerprint, preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })() }, documents: [...rendered.editable, ...rendered.pdf].map(file => ({ documentId: file.documentId, fileName: file.fileName, mimeType: file.mimeType, base64: Buffer.from(file.data).toString("base64") })) }); return; }
       }
-
       sendJson(response, 404, { error: "Ruta no encontrada." });
-    } catch (error) {
-      const value = error instanceof Error ? error : new Error(String(error));
-      sendJson(response, statusForError(value), { error: value.message });
-    }
+    } catch (error) { const value = error instanceof Error ? error : new Error(String(error)); sendJson(response, statusForError(value), { error: value.message }); }
   });
 }
 
 export async function startLB6Server(port = Number(process.env.PORT ?? 3000)): Promise<http.Server> {
   const server = createLB6Server();
-  await new Promise<void>((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(port, "127.0.0.1", () => resolve());
-  });
+  await new Promise<void>((resolve, reject) => { server.once("error", reject); server.listen(port, "127.0.0.1", () => resolve()); });
   return server;
 }
