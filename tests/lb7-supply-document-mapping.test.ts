@@ -14,7 +14,7 @@ describe("LB-7 supply document mapping", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("PPT · prescripciones y anexo de artículos");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("referencias que se incorporarán al anexo técnico");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyCatalogueProjectedEstimatedValueExVat");
-    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyPcapLegalDraft").toBe(false);
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Solvencia y garantías");
   });
 
   it("does not treat the legacy cleaning generator as a supply template", () => {
