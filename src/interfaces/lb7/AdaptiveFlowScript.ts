@@ -6,6 +6,7 @@ try{answers=JSON.parse(raw);}catch(e){answers={};sessionStorage.removeItem("cont
 if(answers.economicCorrectionTarget!==undefined&&answers.economicCorrectionTarget!=="INITIAL"&&answers.economicCorrectionTarget!=="RECURRING"){delete answers.economicCorrectionTarget;sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));}
 var work=document.getElementById("work");
 var status=document.getElementById("sessionStatus");
+function notifySaved(kind){document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:kind||"answer"}}));}
 function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
 function money(v){return typeof v==="number"?v.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" €":"Pendiente";}
 function humanNature(v){return v==="SERVICES"?"Servicios":v==="SUPPLIES"?"Suministros":v==="WORKS"?"Obras":"Pendiente de clasificar";}
@@ -74,6 +75,7 @@ if(target.id==="saveEconomicFix"){
     answers.recurringAnnualCostExVat=parseSpanishNumber(recurringEl.value);
     delete answers.economicCorrectionTarget;
     sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));
+    notifySaved("economic-fix");
     if(fixStatus)fixStatus.textContent="Corrección guardada. Recalculando…";
     await analyze();
   }catch(e){if(fixStatus)fixStatus.textContent=e.message;else alert(e.message);}
@@ -90,10 +92,11 @@ if(target.id==="saveAnswer"){
     answers[id]=parseValue(id,el.value.trim());
     if((id==="initialOneOffCostExVat"||id==="recurringAnnualCostExVat")&&answers.economicCorrectionTarget)delete answers.economicCorrectionTarget;
     sessionStorage.setItem("contrataIaAdaptiveAnswers",JSON.stringify(answers));
+    notifySaved(id);
     await analyze();
   }catch(e){alert(e.message);}
 }
 });
-document.getElementById("resetFlow").addEventListener("click",function(){answers={};sessionStorage.removeItem("contrataIaAdaptiveAnswers");sessionStorage.removeItem("contrataIaSupplyCatalogue");analyze();});
+document.getElementById("resetFlow").addEventListener("click",function(){answers={};sessionStorage.removeItem("contrataIaAdaptiveAnswers");sessionStorage.removeItem("contrataIaSupplyCatalogue");notifySaved("reset");analyze();});
 analyze();
 })();`;
