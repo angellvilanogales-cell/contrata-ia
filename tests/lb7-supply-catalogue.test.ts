@@ -23,4 +23,12 @@ describe("LB-7 supply catalogue branch", () => {
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Precio unitario");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Formato leído");
   });
+
+  it("groups articles and subtotals by lot", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Cada lote se muestra y calcula de forma independiente");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Lote 1 — lote único");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Sin lote asignado");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Importe estimado total");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("artículos sin lote asignado");
+  });
 });
