@@ -1,0 +1,31 @@
+export const SUPPLY_FINALIZATION_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");
+if(!work)return;
+var answersKey="contrataIaAdaptiveAnswers";
+var catalogueKey="contrataIaSupplyCatalogue";
+function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function readJson(storage,key){try{return JSON.parse(storage.getItem(key)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,answersKey);if(Object.keys(a).length)return a;a=readJson(localStorage,answersKey);if(Object.keys(a).length)sessionStorage.setItem(answersKey,JSON.stringify(a));return a;}
+function readCatalogue(){var c=readJson(sessionStorage,catalogueKey);if(Array.isArray(c.items)&&c.items.length)return c;c=readJson(localStorage,catalogueKey);if(Array.isArray(c.items)&&c.items.length)sessionStorage.setItem(catalogueKey,JSON.stringify(c));return c;}
+function saveAnswers(a,kind){var raw=JSON.stringify(a);sessionStorage.setItem(answersKey,raw);localStorage.setItem(answersKey,raw);document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:kind||"supply-finalization"}}));}
+function readyForBlock(){var a=readAnswers();return a.supplyLegalBlockValidated===true&&!!a.supplyPcapLegalDraft;}
+function check(label,ok,detail){return '<li><strong>'+esc(label)+':</strong> '+(ok?'✓':'⚠')+' '+esc(detail)+'</li>';}
+function buildCard(){var a=readAnswers(),c=readCatalogue();var catalogueOk=Array.isArray(c.items)&&c.items.length>0&&Number(c.total)>0;var budgetOk=Number.isFinite(Number(a.initialBudgetExVat))&&Number(a.initialBudgetExVat)>0;var durationOk=Number.isFinite(Number(a.initialDurationMonths))&&Number(a.initialDurationMonths)>0;var criteriaOk=!!a.supplyAwardCriteriaMode;var deliveryOk=Number.isFinite(Number(a.supplyDeliveryDeadlineDays))&&Number(a.supplyDeliveryDeadlineDays)>0;var placesOk=a.supplyDeliveryPlacesDefined!==undefined;var replacementOk=a.supplyReplacementRequired!==undefined;var legalOk=a.supplyLegalBlockValidated===true&&!!a.supplyPcapLegalDraft;var allOk=catalogueOk&&budgetOk&&durationOk&&criteriaOk&&deliveryOk&&placesOk&&replacementOk&&legalOk;
+var html='<div id="supplyFinalizationCard" class="card"><h3>4. Comprobaciones finales y preparación documental</h3><p>Contrata-IA comprueba automáticamente si dispone ya de los datos estructurales necesarios para preparar la documentación del expediente.</p><ul>';
+html+=check('Objeto y naturaleza',true,'Suministro identificado y rama específica aplicada.');
+html+=check('Catálogo por lote',catalogueOk,catalogueOk?String(c.items.length)+' artículos importados; importe base '+Number(c.total).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+' € sin IVA.':'Falta una relación válida de artículos.');
+html+=check('Presupuesto',budgetOk,budgetOk?Number(a.initialBudgetExVat).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+' € sin IVA.':'Falta presupuesto inicial válido.');
+html+=check('Duración y prórrogas',durationOk,durationOk?'Periodo inicial de '+Number(a.initialDurationMonths)+' meses y prórrogas estructuradas en el expediente.':'Falta duración inicial válida.');
+html+=check('Criterios de adjudicación',criteriaOk,criteriaOk?(a.supplyAwardCriteriaMode==='PRICE_ONLY'?'Solo precio.':'Varios criterios objetivos cuantificables mediante fórmula.'):'Falta validar la estructura de criterios.');
+html+=check('Condiciones técnicas de entrega',deliveryOk&&placesOk&&replacementOk,deliveryOk&&placesOk&&replacementOk?'Plazo de entrega, centros y régimen de sustitución definidos.':'Queda alguna condición básica de entrega pendiente.');
+html+=check('Solvencia, garantías y condición especial',legalOk,legalOk?'Conclusión jurídica validada y motivación conservada para el PCAP.':'Falta validar el bloque jurídico.');
+html+='</ul>';
+if(allOk){if(a.supplyDocumentPreparationValidated===true){html+='<div class="info"><strong>Expediente preparado para documentación.</strong> La información está consolidada para alimentar la Memoria justificativa, el PCAP y el PPT. La siguiente fase es aplicar los modelos documentales de suministro y realizar la revisión normativa final antes de generar los ficheros editables.</div><div class="info"><strong>Importante:</strong> esta validación de integridad no sustituye la revisión jurídica ni la comprobación de la normativa vigente y del modelo de pliego aplicable.</div>';}else{html+='<div class="info"><strong>No se detectan datos estructurales esenciales pendientes.</strong> Puede cerrar esta fase y preparar el paquete documental.</div><button id="validateSupplyDocumentPreparation" type="button">Validar expediente para preparación documental</button>';}}else{html+='<div class="warning"><strong>El expediente todavía no debe pasar a generación documental.</strong> Complete únicamente los elementos marcados con ⚠. No se volverán a preguntar decisiones ya deducidas o validadas.</div>';}
+html+='</div>';return html;}
+function ensure(){var existing=document.getElementById("supplyFinalizationCard");if(!readyForBlock()){if(existing)existing.remove();return;}if(existing)return;var q=document.getElementById("supplyQualificationCard");if(q)q.insertAdjacentHTML("afterend",buildCard());else work.insertAdjacentHTML("beforeend",buildCard());}
+function rerender(){var old=document.getElementById("supplyFinalizationCard");if(old)old.remove();ensure();}
+work.addEventListener("click",function(event){var t=event.target;if(!t||t.id!=="validateSupplyDocumentPreparation")return;var a=readAnswers();a.supplyDocumentPreparationValidated=true;a.supplyDocumentPreparationStatus="READY_FOR_TEMPLATE_MAPPING";saveAnswers(a,"supply-document-preparation-validated");rerender();});
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(rerender,0);});
+var observer=new MutationObserver(function(){ensure();});observer.observe(work,{childList:true,subtree:true});ensure();
+})();`;
