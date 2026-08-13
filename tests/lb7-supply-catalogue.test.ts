@@ -27,8 +27,22 @@ describe("LB-7 supply catalogue branch", () => {
   it("groups articles and subtotals by lot", () => {
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Cada lote se muestra y calcula de forma independiente");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Lote 1 — lote único");
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Sin lote asignado");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Importe estimado total");
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("artículos sin lote asignado");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("lotGroups");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("lotTotal");
+  });
+
+  it("blocks continuation until catalogue and declared budget are reconciled", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Debe conciliarse el presupuesto antes de continuar");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Usar importe de la tabla");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Mantener presupuesto declarado");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("supplyBudgetDifferenceJustified");
+  });
+
+  it("opens the award-criteria branch after economic reconciliation", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Continuar expediente · criterios de adjudicación");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Solo precio");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Varios criterios objetivos cuantificables mediante fórmula");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Rama específica de suministro abierta");
   });
 });
