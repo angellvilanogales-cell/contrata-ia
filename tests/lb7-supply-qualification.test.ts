@@ -3,20 +3,21 @@ import { SUPPLY_QUALIFICATION_SCRIPT } from "../src/interfaces/lb7/SupplyQualifi
 import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
 describe("LB-7 supply qualification branch", () => {
-  it("asks user-friendly capability, guarantee and execution questions", () => {
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("¿Para ejecutar correctamente este suministro necesita exigir a la empresa alguna capacidad o experiencia específica");
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("No, es un suministro ordinario de mercado");
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("¿Existe algún riesgo de ejecución que aconseje exigir una garantía específica adicional?");
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("¿Qué tipo de condición especial de ejecución encaja mejor con este suministro?");
+  it("derives solvency and guarantee consequences instead of asking the user", () => {
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("Propuesta jurídica automática según el procedimiento seleccionado");
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("no se exigirá a los licitadores la acreditación de solvencia económica y financiera ni técnica o profesional");
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("no se requerirá en la tramitación abreviada");
+    expect(SUPPLY_QUALIFICATION_SCRIPT).not.toContain("¿Para ejecutar correctamente este suministro necesita exigir a la empresa alguna capacidad o experiencia específica");
   });
 
-  it("keeps unknown answers provisional instead of inventing facts", () => {
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("No lo sé todavía");
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("La solvencia queda provisionalmente pendiente");
-    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("PENDING_VALIDATION");
+  it("proposes a special execution condition and asks only for human validation or correction", () => {
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("Condición especial de ejecución propuesta");
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("correcta gestión y retirada de embalajes y residuos");
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("Validar propuesta");
+    expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("Necesito corregirla");
   });
 
-  it("requires human validation and current-law verification before documents", () => {
+  it("keeps current-law verification before documents", () => {
     expect(SUPPLY_QUALIFICATION_SCRIPT).toContain("validación humana y verificación normativa vigente");
     expect(ADAPTIVE_FLOW_UI).toContain('/supply-qualification.js');
   });
