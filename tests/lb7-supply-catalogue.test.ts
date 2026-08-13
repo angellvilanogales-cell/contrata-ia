@@ -15,4 +15,12 @@ describe("LB-7 supply catalogue branch", () => {
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("La propuesta automática solo sirve como ayuda inicial");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Tornillería y elementos de fijación");
   });
+
+  it("accepts ODS without reading its binary ZIP bytes as CSV text", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain(".csv,.ods");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("odsContentXml");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("DecompressionStream");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Precio unitario");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Formato leído");
+  });
 });
