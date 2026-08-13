@@ -17,6 +17,7 @@ import { PWA_ICON_SVG, PWA_MANIFEST, PWA_SERVICE_WORKER } from "../lb7/PwaAssets
 import { SecurityPolicy, type ApplicationRole } from "../lb7/SecurityPolicy";
 import { SPECIALIZED_WORKFLOW_UI } from "../lb7/SpecializedWorkflowUi";
 import { SUPPLY_CATALOGUE_SCRIPT } from "../lb7/SupplyCatalogueScript";
+import { SUPPLY_ECONOMIC_PERIOD_SCRIPT } from "../lb7/SupplyEconomicPeriodScript";
 import { SUPPLY_FINALIZATION_SCRIPT } from "../lb7/SupplyFinalizationScript";
 import { SUPPLY_QUALIFICATION_SCRIPT } from "../lb7/SupplyQualificationScript";
 
@@ -51,6 +52,7 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/adaptive.js") { sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/adaptive-persistence.js") { sendText(response, 200, ADAPTIVE_PERSISTENCE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-catalogue.js") { sendText(response, 200, SUPPLY_CATALOGUE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/supply-economic-period.js") { sendText(response, 200, SUPPLY_ECONOMIC_PERIOD_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-qualification.js") { sendText(response, 200, SUPPLY_QUALIFICATION_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-finalization.js") { sendText(response, 200, SUPPLY_FINALIZATION_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "POST" && url.pathname === "/adaptive/login") { const form = await readForm(request); const token = String(form.get("token") ?? "").trim(); if (!token) throw new Error("Falta la credencial de acceso."); security.authenticateToken(token); redirect(response, "/adaptive", security.sessionCookie(token)); return; }
