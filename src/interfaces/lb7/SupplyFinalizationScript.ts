@@ -1,6 +1,7 @@
 import { SUPPLY_DOCUMENT_MAPPING_SCRIPT } from "./SupplyDocumentMappingScript";
 import { SUPPLY_LEGAL_CLOSURE_SCRIPT } from "./SupplyLegalClosureScript";
 import { SUPPLY_STATE_CONSISTENCY_SCRIPT } from "./SupplyStateConsistencyScript";
+import { SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT } from "./SupplyAwardCriteriaVisibilityHotfixScript";
 
 export const SUPPLY_FINALIZATION_SCRIPT = `"use strict";
 (function(){
@@ -35,4 +36,4 @@ function rerender(){var old=document.getElementById("supplyFinalizationCard");if
 work.addEventListener("click",function(event){var t=event.target;if(!t||t.id!=="validateSupplyDocumentPreparation")return;var a=readAnswers();a.supplyDocumentPreparationValidated=true;a.supplyDocumentPreparationStatus="READY_FOR_TEMPLATE_MAPPING";saveAnswers(a,"supply-document-preparation-validated");rerender();});
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(rerender,0);});
 var observer=new MutationObserver(function(){ensure();});observer.observe(work,{childList:true,subtree:true});ensure();
-})();` + SUPPLY_DOCUMENT_MAPPING_SCRIPT + SUPPLY_LEGAL_CLOSURE_SCRIPT + SUPPLY_STATE_CONSISTENCY_SCRIPT;
+})();` + SUPPLY_DOCUMENT_MAPPING_SCRIPT + SUPPLY_LEGAL_CLOSURE_SCRIPT + SUPPLY_STATE_CONSISTENCY_SCRIPT + SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT;
