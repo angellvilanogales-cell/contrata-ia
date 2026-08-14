@@ -23,8 +23,16 @@ describe("LB-7 supply document mapping", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("READY_FOR_OFFICIAL_TEMPLATE_SELECTION");
   });
 
-  it("keeps price-only award criteria under legal verification", () => {
-    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Control jurídico pendiente sobre el criterio único de precio");
-    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("pluralidad de criterios automáticos");
+  it("keeps price-only award criteria as a case-specific motivated option", () => {
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Precio como criterio único: motivación reforzada disponible");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("CONTR/2026/240267");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("145.3.f");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("CASE_SPECIFIC_MOTIVATION_REQUIRES_FINAL_LEGAL_CHECK");
+  });
+
+  it("uses the validated Spanish-number parser for lot subtotals", () => {
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("function parseNumber");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("function lotAmount");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("subtotal=Number(c.total)");
   });
 });
