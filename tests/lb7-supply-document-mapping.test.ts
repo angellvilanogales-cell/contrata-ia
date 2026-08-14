@@ -13,7 +13,9 @@ describe("LB-7 supply document mapping", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("PCAP · Anexo I y cláusulas variables");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("PPT · prescripciones y anexo de artículos");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("referencias que se incorporarán al anexo técnico");
-    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyCatalogueProjectedEstimatedValueExVat");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyCatalogueProjectedTotalConsumptionExVat");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyMaximumApprovedBudgetExVat");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Valor estimado: pendiente de cálculo jurídico final");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Solvencia y garantías");
   });
 
@@ -34,5 +36,11 @@ describe("LB-7 supply document mapping", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("function parseNumber");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("function lotAmount");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("subtotal=Number(c.total)");
+  });
+
+  it("maps needs-based budget and modification safeguards", () => {
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("presupuesto máximo aprobado opera como límite económico para toda la vigencia");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("una prórroga no produce incremento automático del presupuesto");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("no se incorporarán nuevos artículos con precios unitarios no previstos");
   });
 });
