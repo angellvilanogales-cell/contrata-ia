@@ -29,6 +29,6 @@ describe("Paso 11 - ODT oficial parametrizado", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("supplyCurrentTenderBudgetExVat");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("supplyMaximumApprovedBudgetExVat");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("supplyEstimatedValueExVat");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("INITIAL_PBL_DISTINCT_FROM_DA33_MAXIMUM_BUDGET").not;
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).not.toContain("DA33_PBL_EQUALS_MAXIMUM_APPROVED_BUDGET");
   });
 });
