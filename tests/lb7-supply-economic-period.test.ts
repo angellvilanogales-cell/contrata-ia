@@ -16,7 +16,7 @@ describe("LB-7 supply catalogue temporal horizon", () => {
     expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedExtensionConsumptionExVat");
     expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedTotalConsumptionExVat");
     expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedEstimatedValueExVat=undefined");
-    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("no constituye por sí sola presupuesto máximo ni valor estimado");
+    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("No constituye por sí sola presupuesto máximo ni valor estimado del contrato");
   });
 
   it("blocks document readiness until temporal projection is validated", () => {
