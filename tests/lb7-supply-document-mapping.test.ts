@@ -5,7 +5,7 @@ import { SUPPLY_FINALIZATION_SCRIPT } from "../src/interfaces/lb7/SupplyFinaliza
 describe("LB-7 supply document mapping", () => {
   it("opens only after document preparation validation", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain('supplyDocumentPreparationStatus==="READY_FOR_TEMPLATE_MAPPING"');
-    expect(SUPPLY_FINALIZATION_SCRIPT).toContain("SUPPLY_DOCUMENT_MAPPING_SCRIPT");
+    expect(SUPPLY_FINALIZATION_SCRIPT).toContain("5. Mapeo documental del suministro");
   });
 
   it("maps the single source of truth to Memoria, PCAP and PPT", () => {
@@ -15,7 +15,7 @@ describe("LB-7 supply document mapping", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("referencias que se incorporarán al anexo técnico");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyCatalogueProjectedTotalConsumptionExVat");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyMaximumApprovedBudgetExVat");
-    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Valor estimado: pendiente de cálculo jurídico final");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("pendiente de cálculo jurídico final conforme a las opciones y modificaciones");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Solvencia y garantías");
   });
 
@@ -25,11 +25,12 @@ describe("LB-7 supply document mapping", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("READY_FOR_OFFICIAL_TEMPLATE_SELECTION");
   });
 
-  it("keeps price-only award criteria as a case-specific motivated option", () => {
+  it("keeps price-only award criteria as a case-specific motivated option subject to human validation", () => {
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Precio como criterio único: motivación reforzada disponible");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("Precio como criterio único: motivación específica validada");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("CONTR/2026/240267");
     expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("145.3.f");
-    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("CASE_SPECIFIC_MOTIVATION_REQUIRES_FINAL_LEGAL_CHECK");
+    expect(SUPPLY_DOCUMENT_MAPPING_SCRIPT).toContain("supplyPriceOnlyMotivationValidated===true");
   });
 
   it("uses the validated Spanish-number parser for lot subtotals", () => {
