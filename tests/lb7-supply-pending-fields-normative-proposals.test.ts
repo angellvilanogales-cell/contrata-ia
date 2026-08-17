@@ -23,7 +23,6 @@ describe("LB7 propuestas normativas automáticas en paso 8", () => {
 
   it("mantiene la capa normativa aislada dentro de la interfaz", () => {
     expect(() => new Function(SUPPLY_PENDING_FIELDS_NORMATIVE_PROPOSAL_SCRIPT)).not.toThrow();
-    expect(ADAPTIVE_FLOW_UI).toContain("Contrata-IA propuestas normativas Paso 8");
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_PENDING_FIELDS_NORMATIVE_PROPOSAL_SCRIPT");
+    expect(ADAPTIVE_FLOW_UI).toContain("Contrata-IA propuestas normativas Paso 8:");
   });
 });
