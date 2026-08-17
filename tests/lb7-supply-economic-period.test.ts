@@ -10,11 +10,13 @@ describe("LB-7 supply catalogue temporal horizon", () => {
     expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("Todo el período inicial del contrato");
   });
 
-  it("projects initial duration and each extension from the validated reference period", () => {
+  it("projects initial duration and each extension from the validated reference period without turning projection into budget or estimated value", () => {
     expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("base*initial/ref");
     expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("base*m/ref");
-    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyExtensionBudgetsExVat");
-    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedEstimatedValueExVat");
+    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedExtensionConsumptionExVat");
+    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedTotalConsumptionExVat");
+    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("supplyCatalogueProjectedEstimatedValueExVat=undefined");
+    expect(SUPPLY_ECONOMIC_PERIOD_SCRIPT).toContain("no constituye por sí sola presupuesto máximo ni valor estimado");
   });
 
   it("blocks document readiness until temporal projection is validated", () => {
