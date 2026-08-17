@@ -21,13 +21,20 @@ describe("Paso 11.1 - ODT oficial parametrizado estructuralmente", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Destinos estructurales no reconocidos");
   });
 
-  it("rellena la tabla oficial de anualidades", () => {
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("TABLE_NS");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("PARTIDA PRESUPUESTARIA");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("cells[0].textContent=String(vals[r].year)");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("cells[1].textContent=money(vals[r].amount)");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("cells[2].textContent=String(a.supplyCurrentBudgetApplication||\"\")");
+  it("localiza y rellena la tabla oficial de anualidades aunque las cabeceras estén fragmentadas", () => {
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("firstFollowingTable");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Anualidades (IVA incluido)");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[0],String(vals[k].year))");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[1],money(vals[k].amount))");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[2],String(a.supplyCurrentBudgetApplication||\"\"))");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("2a-tabla-anualidades");
+  });
+
+  it("localiza el porcentaje del apartado 14 por contenido y no por guion o inicio exacto", () => {
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("function findContains");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("function setContains");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Porcentaje máximo del precio del contrato al que pueda afectar");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("14-porcentaje");
   });
 
   it("preserva la estabilidad del flujo y mantiene el paso 11 aislado", () => {
