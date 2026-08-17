@@ -28,6 +28,6 @@ describe("Suministro DA 33 - PBL inicial, presupuesto máximo y Paso 10", () => 
     expect(SUPPLY_OFFICIAL_PCAP_INSERTION_CONTROL_SCRIPT).toContain("2025_12_17_pcap_suministro_abierto_simplificado_abreviado_autofinanciada.odt");
     expect(SUPPLY_OFFICIAL_PCAP_INSERTION_CONTROL_SCRIPT).toContain("Anexo I · apartado 14");
     expect(SUPPLY_OFFICIAL_PCAP_INSERTION_CONTROL_SCRIPT).toContain("COPY_OFFICIAL_ODT_AND_REPLACE_ONLY_ANNEX_I_VARIABLE_DESTINATIONS");
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_OFFICIAL_PCAP_INSERTION_CONTROL_SCRIPT");
+    expect(ADAPTIVE_FLOW_UI).toContain("Contrata-IA Paso 10 inserción PCAP oficial:");
   });
 });
