@@ -1,25 +1,25 @@
-import { readFileSync } from "node:fs";
-import { test } from "node:test";
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
+import { SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT } from "../src/interfaces/lb7/SupplyAwardCriteriaVisibilityHotfixScript";
 
-const source = readFileSync("src/interfaces/lb7/SupplyAwardCriteriaVisibilityHotfixScript.ts", "utf8");
+describe("LB7 supply mapping order 5.1 / 5.2", () => {
+  it("does not use a self-triggering MutationObserver", () => {
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).not.toContain("new MutationObserver");
+  });
 
-test("el hotfix de criterios no usa MutationObserver autorreferente", () => {
-  assert.equal(source.includes("new MutationObserver"), false);
-});
+  it("reconstructs 5.1 when the economic closure is already validated", () => {
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("5.1 Cierre jurídico-económico");
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("ensureClosure");
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("supplyEstimatedValueValidated");
+  });
 
-test("reconstruye 5.1 cuando el cierre económico ya está validado", () => {
-  assert.match(source, /5\.1 Cierre jurídico-económico/);
-  assert.match(source, /ensureClosure/);
-  assert.match(source, /supplyEstimatedValueValidated/);
-});
+  it("inserts 5.2 after 5.1 when the closure exists", () => {
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain('closure.insertAdjacentHTML("afterend",html)');
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("5.2 Control jurídico de los criterios de adjudicación");
+  });
 
-test("5.2 se inserta después del 5.1 cuando este existe", () => {
-  assert.match(source, /closure\.insertAdjacentHTML\("afterend",html\)/);
-  assert.match(source, /5\.2 Control jurídico de los criterios de adjudicación/);
-});
-
-test("el mapeo no mantiene precio único como cerrado durante el conflicto", () => {
-  assert.match(source, /configuración reabierta por control jurídico/);
-  assert.match(source, /Precio como criterio único: revisión jurídica requerida/);
+  it("does not present price-only as closed while the specific review is pending", () => {
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("Precio como criterio único pendiente de validación específica en el apartado 5.2");
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("Precio como criterio único: validación específica pendiente");
+    expect(SUPPLY_AWARD_CRITERIA_VISIBILITY_HOTFIX_SCRIPT).toContain("Resuelva el apartado 5.2 antes de generar documentación");
+  });
 });
