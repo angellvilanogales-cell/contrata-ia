@@ -1,20 +1,27 @@
-import { readFileSync } from "node:fs";
-import { strict as assert } from "node:assert";
+import { describe, expect, it } from "vitest";
+import { SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT } from "../src/interfaces/lb7/SupplyOfficialTemplateParameterizationScript";
+import { SUPPLY_FINALIZATION_SCRIPT } from "../src/interfaces/lb7/SupplyFinalizationScript";
 
-const source = readFileSync("src/interfaces/lb7/SupplyOfficialTemplateParameterizationScript.ts", "utf8");
-const finalization = readFileSync("src/interfaces/lb7/SupplyFinalizationScript.ts", "utf8");
+describe("LB7 supply official template parameterization", () => {
+  it("maps the official Annex I destinations without inventing economic data", () => {
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("7. Parametrización del Anexo I del DPCAF / PCAP oficial");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 1");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 2");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 3");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 7");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 8");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 10");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Anexo I · apartado 14");
+  });
 
-assert.match(source, /7\. Parametrización del Anexo I del DPCAF \/ PCAP oficial/);
-assert.match(source, /Anexo I · apartado 1/);
-assert.match(source, /Anexo I · apartado 2/);
-assert.match(source, /Anexo I · apartado 3/);
-assert.match(source, /Anexo I · apartado 7/);
-assert.match(source, /Anexo I · apartado 8/);
-assert.match(source, /Anexo I · apartado 10/);
-assert.match(source, /Anexo I · apartado 14/);
-assert.match(source, /No se copiará automáticamente el presupuesto máximo de toda la vigencia/);
-assert.match(source, /parámetros de ofertas anormalmente bajas/);
-assert.match(source, /no se inferirá/i);
-assert.match(finalization, /SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT/);
+  it("keeps current PBL and budget allocation under explicit validation", () => {
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("No se reutiliza automáticamente el PBL de versiones anteriores ni se copia por identidad el presupuesto máximo");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("Las anualidades y aplicaciones presupuestarias anteriores no se reutilizan automáticamente");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("parámetros de ofertas anormalmente bajas");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PARAMETERIZATION_SCRIPT).toContain("no se inventarán parámetros ni criterios de desempate");
+  });
 
-console.log("lb7-supply-official-template-parameterization: ok");
+  it("is present in the composed finalization script", () => {
+    expect(SUPPLY_FINALIZATION_SCRIPT).toContain("7. Parametrización del Anexo I del DPCAF / PCAP oficial");
+  });
+});
