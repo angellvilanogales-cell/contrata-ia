@@ -28,8 +28,8 @@ describe("LB-7 supply catalogue branch", () => {
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Cada lote se muestra y calcula de forma independiente");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Lote 1 — lote único");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Importe estimado total");
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("lotGroups");
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("lotTotal");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("function groupItems");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("function lotTable");
   });
 
   it("blocks continuation until catalogue and declared budget are reconciled", () => {
@@ -40,9 +40,10 @@ describe("LB-7 supply catalogue branch", () => {
   });
 
   it("opens the award-criteria branch after economic reconciliation", () => {
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Continuar expediente · criterios de adjudicación");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("1. Criterios de adjudicación");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("supplyCriteriaMode");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Solo precio");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Varios criterios objetivos cuantificables mediante fórmula");
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Rama específica de suministro abierta");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Rama de suministro avanzada");
   });
 });
