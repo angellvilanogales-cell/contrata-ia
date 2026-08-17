@@ -9,15 +9,15 @@ describe("LB7 suministro - paso 9 borrador editable", () => {
     expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).not.toContain("MutationObserver");
   });
 
-  it("mantiene el paso 9 fuera del script estable 4-7", () => {
+  it("mantiene el paso 9 fuera del script estable 4-7 y embebido en la interfaz", () => {
     expect(SUPPLY_FINALIZATION_SCRIPT).not.toContain("9. Primer borrador editable del Anexo I");
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT");
+    expect(ADAPTIVE_FLOW_UI).toContain("Contrata-IA Paso 9 borrador editable:");
   });
 
   it("genera un DOCX real y limita expresamente el alcance al Anexo I", () => {
     expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("_Anexo_I_Borrador_Contrata-IA.docx");
-    expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("ANNEX_I_PARAMETERIZED_DRAFT_NOT_FULL_OFFICIAL_PCAP");
+    expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("_Anexo_I_Borrador_Corregido_Contrata-IA.docx");
+    expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("ANNEX_I_PARAMETERIZED_DRAFT_CORRECTED_NOT_FULL_OFFICIAL_PCAP");
     expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("no sustituye las cláusulas generales del modelo oficial");
   });
 
