@@ -21,12 +21,15 @@ describe("Paso 11.1 - ODT oficial parametrizado estructuralmente", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Destinos estructurales no reconocidos");
   });
 
-  it("localiza y rellena la tabla oficial de anualidades aunque las cabeceras estén fragmentadas", () => {
+  it("rellena anualidades tanto en tabla ODF como en filas visuales tabuladas", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("firstFollowingTable");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("fillAnnualitiesAsParagraphs");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("setTabbedParagraph");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("text:tab");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Anualidades (IVA incluido)");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("TRAMITACIÓN DEL GASTO");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[0],String(vals[k].year))");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[1],money(vals[k].amount))");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[2],String(a.supplyCurrentBudgetApplication||\"\"))");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("setTabbedParagraph(rowParas[k],[String(vals[k].year),money(vals[k].amount),String(a.supplyCurrentBudgetApplication||\"\")])");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("2a-tabla-anualidades");
   });
 
