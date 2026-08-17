@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT } from "../src/interfaces/lb7/SupplyOfficialPcapOdtGeneratorScript";
 import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
-describe("Paso 11 - ODT oficial parametrizado", () => {
+describe("Paso 11.1 - ODT oficial parametrizado estructuralmente", () => {
   it("compila el módulo aislado sin error de sintaxis", () => {
     expect(() => new Function(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT)).not.toThrow();
   });
@@ -12,9 +12,22 @@ describe("Paso 11 - ODT oficial parametrizado", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("content.xml");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("1.C. CONTRATO EN FUNCIÓN DE LAS NECESIDADES");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Importe total (IVA excluido):");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Valor estimado del contrato:");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("14. MODIFICACIONES DEL CONTRATO");
-    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Destinos no reconocidos");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Método de cálculo:");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Plazo total (en meses):");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("7.B. PARÁMETROS OBJETIVOS PARA CONSIDERAR UNA OFERTA ANORMALMENTE BAJA");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Condición especial de ejecución de tipo ambiental o social");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Penalidades por cumplimiento defectuoso:");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("2. Mayores necesidades reales respecto de las estimadas inicialmente");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Destinos estructurales no reconocidos");
+  });
+
+  it("rellena la tabla oficial de anualidades", () => {
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("TABLE_NS");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("PARTIDA PRESUPUESTARIA");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("cells[0].textContent=String(vals[r].year)");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("cells[1].textContent=money(vals[r].amount)");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("cells[2].textContent=String(a.supplyCurrentBudgetApplication||\"\")");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("2a-tabla-anualidades");
   });
 
   it("preserva la estabilidad del flujo y mantiene el paso 11 aislado", () => {
