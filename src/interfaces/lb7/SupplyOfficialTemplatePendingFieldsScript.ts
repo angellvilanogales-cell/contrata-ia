@@ -20,15 +20,18 @@ var ve=Number(a.supplyEstimatedValueExVat||0);
 var pbl=Number(a.supplyCurrentTenderBudgetExVat||0);
 var vat=Number(a.supplyCurrentTenderVatRate||0);
 var total=Number(a.supplyCurrentTenderBudgetInclVat||0);
+var proposedPbl=pbl>0?pbl:budget;
+var proposedVat=vat>0?vat:21;
+var proposedTotal=Math.round(proposedPbl*(1+proposedVat/100)*100)/100;
 var html='<div id="supplyOfficialTemplatePendingFieldsCard" class="card" style="margin-top:14px"><h3>8. Cierre de campos pendientes del Anexo I</h3>';
-html+='<div class="info"><strong>Magnitudes económicas separadas.</strong> Presupuesto máximo DA 33.ª: '+money(budget)+' sin IVA · Valor estimado: '+money(ve)+' sin IVA. El PBL se valida de forma independiente y se expresa también con IVA incluido.</div>';
+html+='<div class="info"><strong>Configuración económica DA 33.ª del expediente.</strong> El presupuesto base/máximo aprobado para toda la vigencia es '+money(budget)+' sin IVA. Con IVA al '+proposedVat.toLocaleString("es-ES",{maximumFractionDigits:2})+' % equivale a '+money(proposedTotal)+' IVA incluido. El valor estimado permanece como magnitud jurídica distinta: '+money(ve)+' sin IVA.</div>';
 if(completed(a)){
 html+='<div class="info"><strong>Paso 8 completado.</strong> Los campos pendientes del Anexo I han quedado validados. El expediente queda preparado para el primer borrador editable sobre el modelo oficial.</div>';
-html+='<ul><li><strong>PBL:</strong> '+money(pbl)+' sin IVA · '+money(total)+' IVA incluido.</li><li><strong>Aplicación presupuestaria:</strong> '+esc(a.supplyCurrentBudgetApplication||"")+'.</li><li><strong>Oferta anormalmente baja:</strong> parámetros objetivos validados.</li><li><strong>Desempate:</strong> '+esc(a.supplyTieBreakMode==="LEGAL_ART_147_2"?"aplicación supletoria del artículo 147.2 LCSP":"criterios específicos validados")+'.</li><li><strong>Penalidades específicas:</strong> '+esc(a.supplySpecificPenaltiesMode==="NONE"?"no se añaden penalidades particulares adicionales":"penalidades particulares validadas")+'.</li></ul></div>';
+html+='<ul><li><strong>PBL / presupuesto máximo DA 33.ª:</strong> '+money(pbl)+' sin IVA · '+money(total)+' IVA incluido.</li><li><strong>Aplicación presupuestaria:</strong> '+esc(a.supplyCurrentBudgetApplication||"")+'.</li><li><strong>Oferta anormalmente baja:</strong> parámetros objetivos validados.</li><li><strong>Desempate:</strong> '+esc(a.supplyTieBreakMode==="LEGAL_ART_147_2"?"aplicación supletoria del artículo 147.2 LCSP":"criterios específicos validados")+'.</li><li><strong>Penalidades específicas:</strong> '+esc(a.supplySpecificPenaltiesMode==="NONE"?"no se añaden penalidades particulares adicionales":"penalidades particulares validadas")+'.</li></ul></div>';
 return html;
 }
 html+='<div class="warning"><strong>Complete únicamente los cuatro bloques pendientes.</strong> No se reutilizan automáticamente las cifras económicas históricas del expediente.</div>';
-html+='<h4>8.1 PBL vigente</h4><p class="muted">El PBL se mantiene separado del presupuesto máximo DA 33.ª y del valor estimado.</p><label><strong>PBL sin IVA (€)</strong></label><input id="pendingPblExVat" inputmode="decimal" value="'+esc(pbl>0?pbl:"")+'"><label><strong>IVA (%)</strong></label><input id="pendingPblVatRate" inputmode="decimal" value="'+esc(vat>0?vat:"")+'"><p class="muted">El total con IVA se calcula al validar.</p>';
+html+='<h4>8.1 PBL / presupuesto máximo vigente</h4><p class="muted">Para este expediente DA 33.ª, el PBL sin IVA responde a la misma cuantía presupuestaria ya validada como presupuesto máximo para toda la vigencia. La magnitud que permanece separada es el valor estimado.</p><label><strong>PBL sin IVA (€)</strong></label><input id="pendingPblExVat" inputmode="decimal" value="'+esc(proposedPbl)+'" readonly><label><strong>IVA (%)</strong></label><input id="pendingPblVatRate" inputmode="decimal" value="'+esc(proposedVat)+'"><div class="info"><strong>Propuesta calculada:</strong> '+money(proposedPbl)+' sin IVA · '+money(proposedTotal)+' IVA incluido.</div>';
 html+='<h4>8.2 Aplicación presupuestaria y anualidades</h4><label><strong>Aplicación presupuestaria</strong></label><input id="pendingBudgetApplication" value="'+esc(a.supplyCurrentBudgetApplication||"")+'"><label><strong>Anualidades</strong></label><textarea id="pendingBudgetAnnualities" placeholder="Ej.: 2026 = 1.000,00">'+esc(annualitiesToText(a))+'</textarea><p class="muted">Una anualidad por línea con formato AAAA = importe.</p>';
 html+='<h4>8.3 Oferta anormalmente baja y desempate</h4><label><strong>Parámetros objetivos de anormalidad</strong></label><textarea id="pendingAbnormallyLowParameters" placeholder="Regla objetiva que se trasladará al Anexo I">'+esc(a.supplyAbnormallyLowParametersText||"")+'</textarea><label><strong>Desempate</strong></label><select id="pendingTieBreakMode"><option value="">Seleccione</option><option value="LEGAL_ART_147_2"'+(a.supplyTieBreakMode==="LEGAL_ART_147_2"?" selected":"")+'>Aplicar supletoriamente el artículo 147.2 LCSP</option><option value="SPECIFIC"'+(a.supplyTieBreakMode==="SPECIFIC"?" selected":"")+'>Establecer criterios específicos vinculados al objeto</option></select><textarea id="pendingTieBreakSpecificText" placeholder="Solo si establece criterios específicos">'+esc(a.supplyTieBreakSpecificText||"")+'</textarea>';
 html+='<h4>8.4 Penalidades específicas</h4><select id="pendingPenaltiesMode"><option value="">Seleccione</option><option value="NONE"'+(a.supplySpecificPenaltiesMode==="NONE"?" selected":"")+'>No añadir penalidades específicas adicionales</option><option value="SPECIFIC"'+(a.supplySpecificPenaltiesMode==="SPECIFIC"?" selected":"")+'>Añadir penalidades específicas</option></select><textarea id="pendingPenaltiesText" placeholder="Solo si se añaden penalidades específicas">'+esc(a.supplySpecificPenaltiesText||"")+'</textarea>';
@@ -43,7 +46,9 @@ var a=readAnswers();if(!ready(a)){alert("Debe validarse primero el mapa estructu
 var pblEl=byId("pendingPblExVat");var vatEl=byId("pendingPblVatRate");var appEl=byId("pendingBudgetApplication");var annEl=byId("pendingBudgetAnnualities");var abnormalEl=byId("pendingAbnormallyLowParameters");var tieEl=byId("pendingTieBreakMode");var tieTextEl=byId("pendingTieBreakSpecificText");var penaltiesEl=byId("pendingPenaltiesMode");var penaltiesTextEl=byId("pendingPenaltiesText");
 if(!pblEl||!vatEl||!appEl||!annEl||!abnormalEl||!tieEl||!tieTextEl||!penaltiesEl||!penaltiesTextEl){alert("No se han podido recuperar todos los campos del Paso 8.");return;}
 var pbl=parseNumber(pblEl.value);var vatRate=parseNumber(vatEl.value);var app=appEl.value.trim();var annualities=parseAnnualities(annEl.value);var abnormal=abnormalEl.value.trim();var tie=tieEl.value;var tieText=tieTextEl.value.trim();var penalties=penaltiesEl.value;var penaltiesText=penaltiesTextEl.value.trim();
-if(!Number.isFinite(pbl)||pbl<=0){alert("Debe indicar un PBL sin IVA superior a cero.");return;}
+var budget=Number(a.supplyMaximumApprovedBudgetExVat||0);
+if(!Number.isFinite(pbl)||pbl<=0){alert("Debe existir un PBL sin IVA superior a cero.");return;}
+if(budget>0&&Math.abs(pbl-budget)>0.01){alert("En este expediente DA 33.ª el PBL sin IVA debe coincidir con el presupuesto máximo aprobado para toda la vigencia.");return;}
 if(!Number.isFinite(vatRate)||vatRate<0||vatRate>100){alert("Debe indicar un IVA válido entre 0 y 100.");return;}
 if(!app||!annualities){alert("Debe indicar aplicación presupuestaria y anualidades válidas con formato AAAA = importe.");return;}
 if(!abnormal){alert("Debe definir los parámetros objetivos de oferta anormalmente baja.");return;}
@@ -56,6 +61,7 @@ a.supplyCurrentTenderBudgetExVat=Math.round(pbl*100)/100;
 a.supplyCurrentTenderVatRate=vatRate;
 a.supplyCurrentTenderBudgetInclVat=incl;
 a.supplyCurrentTenderBudgetValidated=true;
+a.supplyCurrentTenderBudgetRelationship="DA33_PBL_EQUALS_MAXIMUM_APPROVED_BUDGET";
 a.supplyCurrentBudgetApplication=app;
 a.supplyCurrentBudgetAnnualities=annualities;
 a.supplyCurrentBudgetAllocationValidated=true;
