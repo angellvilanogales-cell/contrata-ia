@@ -7,12 +7,23 @@ function source(): string {
 }
 
 describe("LB-7 cierre integral del Anexo I oficial", () => {
-  it("acota las sustituciones al Anexo I real y termina antes del Anexo II", () => {
+  it("acota las sustituciones del cuerpo al Anexo I real y termina antes del Anexo II", () => {
     const value = source();
     expect(value).toContain("function getAnnexIRange()");
     expect(value).toContain('norm(all[i].textContent)!==\"ANEXO I\"');
     expect(value).toContain('et===\"ANEXO II\"');
     expect(value).toContain("nodes=all.slice(bounds.start,bounds.end)");
+  });
+
+  it("hace 11.2 acumulativo y vuelve a completar la portada oficial", () => {
+    const value = source();
+    expect(value).toContain("coverNodes=all.slice(0,bounds.start)");
+    expect(value).toContain("function setCover(");
+    expect(value).toContain('setCover([\"Expediente:\"]');
+    expect(value).toContain('setCover([\"Título:\",\"Titulo:\"]');
+    expect(value).toContain('Código NUTS del lugar principal de ejecución:');
+    expect(value).toContain('ES618');
+    expect(value).toContain('C0-cpv');
   });
 
   it("ancla la modificación DA33 a su propia causa y no aplica el 20 por ciento a la causa 1", () => {
@@ -46,10 +57,31 @@ describe("LB-7 cierre integral del Anexo I oficial", () => {
     expect(value).toContain("La ejecución del contrato requiere el tratamiento por la persona contratista de datos personales por cuenta de la persona responsable del tratamiento: No");
   });
 
-  it("audita una lista cerrada de destinos reales y mantiene el catálogo como bloqueante explícito", () => {
+  it("vuelca la relación real desde contrataIaSupplyCatalogue en la tabla oficial", () => {
+    const value = source();
+    expect(value).toContain('catalogueKey=\"contrataIaSupplyCatalogue\"');
+    expect(value).toContain("function readCatalogue()");
+    expect(value).toContain("function fillObjectSpecifications()");
+    expect(value).toContain("A1-catalogue-table");
+    expect(value).toContain("item.referencia");
+    expect(value).toContain("item.denominacion");
+    expect(value).toContain("item.cantidad");
+    expect(value).toContain("item.precio");
+    expect(value).toContain("qtyTotal");
+    expect(value).toContain("amountTotal");
+  });
+
+  it("solo mantiene el catálogo como bloqueante cuando el volcado real falla", () => {
+    const value = source();
+    expect(value).toContain("var catalogueFilled=fillObjectSpecifications()");
+    expect(value).toContain('if(!catalogueFilled)unresolved.push(\"especificaciones del objeto: catálogo no disponible, con incidencias o no insertable en la tabla oficial\")');
+    expect(value).not.toContain('unresolved.push(\"especificaciones del objeto: volcado estructural de las 98 referencias');
+    expect(value).toContain("supplyAnnexICatalogueInserted");
+  });
+
+  it("audita una lista cerrada de destinos reales", () => {
     const value = source();
     expect(value).toContain("var audit=[");
-    expect(value).toContain("especificaciones del objeto: volcado estructural de las 98 referencias, cantidades e importes desde el catálogo validado");
     expect(value).toContain("supplyAnnexIUnresolvedFields");
     expect(value).toContain("PENDING_HUMAN_COMPLETION");
     expect(value).toContain("Bloqueantes reales pendientes");
