@@ -17,7 +17,7 @@ describe("selección del modelo oficial de suministro", () => {
   });
 
   it("queda integrado después del mapeo documental", () => {
-    expect(SUPPLY_FINALIZATION_SCRIPT).toContain("SUPPLY_OFFICIAL_TEMPLATE_SELECTION_SCRIPT");
+    expect(SUPPLY_FINALIZATION_SCRIPT).toContain("6. Selección y verificación del modelo oficial DPCAF / PCAP");
     expect(SUPPLY_OFFICIAL_TEMPLATE_SELECTION_SCRIPT).toContain("supplyDocumentMappingValidated===true");
     expect(SUPPLY_OFFICIAL_TEMPLATE_SELECTION_SCRIPT).toContain("OFFICIAL_MODEL_VALIDATED_READY_FOR_PARAMETERIZATION");
   });
