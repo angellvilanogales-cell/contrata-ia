@@ -4,7 +4,7 @@ import { SUPPLY_FINALIZATION_SCRIPT } from "../src/interfaces/lb7/SupplyFinaliza
 
 describe("LB7 supply Annex I pending fields", () => {
   it("keeps PBL, DA33 maximum budget and estimated value as separate magnitudes", () => {
-    expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).toContain("Regla de consistencia económica");
+    expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).toContain("Magnitudes económicas separadas");
     expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).toContain("supplyMaximumApprovedBudgetExVat");
     expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).toContain("supplyCurrentTenderBudgetExVat");
     expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).toContain("supplyEstimatedValueExVat");
@@ -17,8 +17,9 @@ describe("LB7 supply Annex I pending fields", () => {
     expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).toContain("supplySpecificPenaltiesMode");
   });
 
-  it("is integrated after structural parameterization", () => {
-    expect(SUPPLY_FINALIZATION_SCRIPT).toContain("SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT");
+  it("remains isolated until composition and CI validation are complete", () => {
+    expect(SUPPLY_FINALIZATION_SCRIPT).not.toContain("8. Cierre de campos pendientes del Anexo I");
     expect(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT).not.toContain("MutationObserver");
+    expect(() => new Function(SUPPLY_OFFICIAL_TEMPLATE_PENDING_FIELDS_SCRIPT)).not.toThrow();
   });
 });
