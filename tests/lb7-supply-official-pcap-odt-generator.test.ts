@@ -31,4 +31,12 @@ describe("Paso 11 - ODT oficial parametrizado", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("supplyEstimatedValueExVat");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).not.toContain("DA33_PBL_EQUALS_MAXIMUM_APPROVED_BUDGET");
   });
+
+  it("construye una cabecera central ZIP válida y se autoverifica antes de descargar", () => {
+    const validCentralHeader = "put16(20),put16(20),put16(2048),put16(0),put16(0),put16(0x5c21),put32(crc)";
+    const corruptCentralHeader = "put16(20),put16(20),put16(2048),put16(0),put16(0),put16(0),put16(0x5c21),put32(crc)";
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain(validCentralHeader);
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).not.toContain(corruptCentralHeader);
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("var output=writeStoredZip(entries);await readZip(output)");
+  });
 });
