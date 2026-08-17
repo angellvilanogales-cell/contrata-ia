@@ -21,16 +21,24 @@ describe("Paso 11.1 - ODT oficial parametrizado estructuralmente", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Destinos estructurales no reconocidos");
   });
 
-  it("rellena anualidades tanto en tabla ODF como en filas visuales tabuladas", () => {
+  it("rellena anualidades tanto en tabla ODF como con cabeceras visuales fragmentadas", () => {
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("firstFollowingTable");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("fillAnnualitiesAsParagraphs");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("yearHeaderIndex");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("amountHeaderIndex");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("headerEndIndex=Math.max(yearHeaderIndex,amountHeaderIndex,budgetHeaderIndex)");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("setTabbedParagraph");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("text:tab");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("Anualidades (IVA incluido)");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("TRAMITACIÓN DEL GASTO");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("clearCellAndSet(dataRows[k].cells[0],String(vals[k].year))");
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("setTabbedParagraph(rowParas[k],[String(vals[k].year),money(vals[k].amount),String(a.supplyCurrentBudgetApplication||\"\")])");
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).not.toContain('if(ht.indexOf("AÑO")>=0&&ht.indexOf("IMPORTE")>=0){headerIndex=h');
     expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain("2a-tabla-anualidades");
+  });
+
+  it("preserva la expresión regular de espacios al compilar el script embebido", () => {
+    expect(SUPPLY_OFFICIAL_PCAP_ODT_GENERATOR_SCRIPT).toContain('replace(/\\s+/g," ")');
   });
 
   it("localiza el porcentaje del apartado 14 por contenido y no por guion o inicio exacto", () => {
