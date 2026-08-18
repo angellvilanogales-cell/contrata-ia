@@ -2,15 +2,17 @@ import { describe, expect, it } from "vitest";
 import { SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT } from "../src/interfaces/lb7/SupplySection14DeterministicRepairScript";
 import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
-describe("Paso 11.2.2A - reconstrucción del apartado 14 por límites de sección", () => {
+describe("Paso 11.2.2A - reconstrucción del apartado 14 por límites reales", () => {
   it("compila de forma aislada", () => {
     expect(() => new Function(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT)).not.toThrow();
   });
 
-  it("delimita el apartado sin depender de numeración automática", () => {
+  it("ignora el índice y localiza el bloque real por contenido", () => {
     expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).toContain("MODIFICACIONES DEL CONTRATO");
+    expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).toContain("POSIBILIDAD DE MODIFICACIÓN DEL CONTRATO");
     expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).toContain("TRATAMIENTO DE DATOS PERSONALES");
-    expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).toContain("locateBounds");
+    expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).toContain("candidateCount");
+    expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).not.toContain("endAnnex");
     expect(SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT).not.toContain("findNumbered");
   });
 
