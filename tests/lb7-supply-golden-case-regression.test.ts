@@ -66,6 +66,12 @@ describe("Paso 11.6 - regresión automática del caso dorado CONTR-2026-240267",
     }
   });
 
+  it("muestra 11.5 aunque esté pendiente tras la calibración", () => {
+    expect(SUPPLY_GOLDEN_CASE_REGISTRY_SCRIPT).toContain("supplyCrossDocumentFinalCalibrationDone===true");
+    expect(SUPPLY_GOLDEN_CASE_REGISTRY_SCRIPT).toContain("Paso 11.5 todavía bloqueado");
+    expect(SUPPLY_GOLDEN_CASE_REGISTRY_SCRIPT).toContain("Repita ahora 11.4.3");
+  });
+
   it("exige auditoría final sin bloqueantes y validación humana", () => {
     expect(SUPPLY_GOLDEN_CASE_001.finalAudit.requiredBlockers).toBe(0);
     expect(SUPPLY_GOLDEN_CASE_001.finalAudit.requiresHumanValidation).toBe(true);
