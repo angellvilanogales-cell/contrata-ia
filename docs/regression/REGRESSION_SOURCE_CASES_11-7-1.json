@@ -1,0 +1,44 @@
+{
+  "version": "REGRESSION-SOURCE-CASES-11.7.1-v1",
+  "status": "SOURCE_DOCUMENTS_AVAILABLE",
+  "legalValidation": "PENDING",
+  "acceptanceRule": "La disponibilidad de documentación primaria no equivale a validación jurídica. Cada expediente debe superar contraste documental, auditoría sin bloqueantes y validación humana propia.",
+  "nextCase": "REG-SUPPLY-002",
+  "cases": [
+    {
+      "id": "REG-SUPPLY-002",
+      "expediente": "CONTR 2025 0000466864",
+      "shortName": "Panda Antivirus - AVRA",
+      "documents": ["MEMORIA", "PCAP", "PPT"],
+      "legalValidation": "PENDING"
+    },
+    {
+      "id": "REG-SUPPLY-003",
+      "expediente": "CONTR 2025 0000489703",
+      "shortName": "Equipamiento para aulas digitales",
+      "documents": ["MEMORIA", "PCAP", "PPT"],
+      "legalValidation": "PENDING"
+    },
+    {
+      "id": "REG-SUPPLY-004",
+      "expediente": "470/2025",
+      "shortName": "SAS - nebulización y oxigenoterapia",
+      "documents": ["MEMORIA", "PCAP", "PPT", "ANEXOS"],
+      "legalValidation": "PENDING"
+    },
+    {
+      "id": "REG-SUPPLY-005",
+      "expediente": "CONTR 2024 0001239412",
+      "shortName": "Tablets y plataforma de gestión",
+      "documents": ["MEMORIA", "PCAP", "PPT"],
+      "legalValidation": "PENDING"
+    },
+    {
+      "id": "REG-SUPPLY-006",
+      "expediente": "CF050-21-058",
+      "shortName": "VEIASA - licencias Windows Server",
+      "documents": ["MEMORIA", "PCAP", "PPT", "INFORME"],
+      "legalValidation": "PENDING"
+    }
+  ]
+}
