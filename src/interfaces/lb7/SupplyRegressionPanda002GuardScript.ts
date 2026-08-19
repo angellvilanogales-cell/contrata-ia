@@ -1,0 +1,26 @@
+import { PANDA_REGRESSION_BASELINE, PANDA_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase002PandaGuard";
+
+const PANDA_REGRESSION_JSON = JSON.stringify(PANDA_REGRESSION_BASELINE);
+
+export const SUPPLY_REGRESSION_PANDA_002_GUARD_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");if(!work)return;
+var key="contrataIaAdaptiveAnswers";
+var VERSION=${JSON.stringify(PANDA_REGRESSION_VERSION)};
+var BASELINE=${PANDA_REGRESSION_JSON};
+function readJson(s,k){try{return JSON.parse(s.getItem(k)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,key);if(Object.keys(a).length)return a;return readJson(localStorage,key);}
+function save(a){var raw=JSON.stringify(a);sessionStorage.setItem(key,raw);localStorage.setItem(key,raw);document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:"panda-regression-11.7.3"}}));}
+function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function manifest(){return {version:VERSION,caseId:BASELINE.caseId,goldenCaseId:BASELINE.goldenCaseId,status:BASELINE.passed?"AUTOMATIC_REGRESSION_ACTIVE":"AUTOMATIC_REGRESSION_BLOCKED",passed:BASELINE.passed,blockers:BASELINE.blockers,checks:BASELINE.checks,requiresSourceExtractionHumanValidation:true,sourceExtractionHumanValidated:true,acceptanceRule:"Cualquier reaparición de DA 33.ª, prórrogas heredadas, causa de modificación por mayores necesidades, VE inflado por el 20 % reductor o condición especial del golden debe bloquear la regresión.",registeredAt:new Date().toISOString()};}
+function downloadJson(data){var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Contrata-IA_REG-SUPPLY-002_Panda_Regression_11-7-3.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
+function rows(){return BASELINE.checks.map(function(c){return '<tr><td>'+esc(c.id)+'</td><td>'+(c.ok?'✓ Pasa':'✗ Bloquea')+'</td><td>'+esc(c.purpose)+'</td></tr>';}).join("");}
+function card(){var a=readAnswers();if(a.supplyRegressionPanda002ExtractionValidated!==true)return "";var registered=a.supplyRegressionPanda002AutomaticGuardRegistered===true;var html='<div id="supplyRegressionPanda002GuardCard" class="card" style="margin-top:14px"><h3>11.7.3 Regresión automática Panda vs. golden</h3>';
+if(BASELINE.passed){html+='<div class="info"><strong>Protección automática activa.</strong> La línea base Panda supera '+BASELINE.checks.length+' comprobaciones y presenta 0 bloqueantes. Esta regresión se ejecuta en CI y debe fallar si el motor vuelve a aplicar reglas propias del golden case.</div>';}else{html+='<div class="warning"><strong>Regresión bloqueada.</strong> Existen '+BASELINE.blockers.length+' incoherencias en la propia línea base. No debe registrarse ni avanzar.</div>';}
+html+='<div class="warning"><strong>Guardas críticas:</strong> DA 33.ª desactivada; sin prórrogas; VE=PBL; modificación del 20 % por reducción de financiación y no por mayores necesidades; transparencia fiscal como condición especial; precios unitarios y precio 100 puntos preservados.</div><table style="width:100%;border-collapse:collapse"><thead><tr><th>Check</th><th>Resultado</th><th>Qué protege</th></tr></thead><tbody>'+rows()+'</tbody></table>';
+if(!registered&&BASELINE.passed){html+='<button id="registerPanda002AutomaticGuard" type="button">Registrar regresión automática 11.7.3</button>';}else if(registered){html+='<div class="info"><strong>11.7.3 registrado.</strong> Versión '+esc(VERSION)+'. Panda queda protegido como caso de regresión validado, pero no como golden case.</div><button id="downloadPanda002AutomaticGuard" type="button" class="secondary">Descargar manifiesto 11.7.3 JSON</button>';}
+html+='</div>';return html;}
+function ensure(){var old=document.getElementById("supplyRegressionPanda002GuardCard");if(old)old.remove();var anchor=document.getElementById("supplyRegressionPanda002Card");if(anchor){var html=card();if(html)anchor.insertAdjacentHTML("afterend",html);}}
+document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerPanda002AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionPanda002ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.2.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionPanda002AutomaticGuardRegistered=true;a.supplyRegressionPanda002AutomaticGuardVersion=VERSION;a.supplyRegressionPanda002AutomaticGuardManifest=m;a.supplyRegressionPanda002Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SUPPLY-003";save(a);downloadJson(m);ensure();alert("Regresión automática Panda 11.7.3 registrada. REG-SUPPLY-002 queda protegido en CI sin convertirse en golden case.");return;}if(e.target.id==="downloadPanda002AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionPanda002AutomaticGuardManifest||manifest());return;}},true);
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
+})();`;
