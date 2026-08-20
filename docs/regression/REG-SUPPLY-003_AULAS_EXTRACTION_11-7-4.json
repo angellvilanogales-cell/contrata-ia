@@ -1,0 +1,28 @@
+{
+  "version": "REG-SUPPLY-003-AULAS-EXTRACTION-11.7.4-v1",
+  "id": "REG-SUPPLY-003",
+  "expediente": "CONTR 2025 0000489703",
+  "shortName": "Equipamiento para aulas digitales",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceDocuments": ["MEMORIA", "MEMORIA_COMPLEMENTARIA", "PCAP", "PPT"],
+  "facts": {
+    "contractType": "SUMINISTRO",
+    "procedure": "ABIERTO",
+    "sara": true,
+    "lots": true,
+    "lotCount": 9,
+    "needsBasedDA33": true,
+    "europeanFunds": true,
+    "economicMode": "PRECIOS_UNITARIOS",
+    "awardMode": "CRITERIOS_MULTIPLES",
+    "plannedModification": true,
+    "extensions": true
+  },
+  "contrastWithGolden": {
+    "same": ["SUMINISTRO", "DA33_ACTIVA", "PRECIOS_UNITARIOS", "PRORROGA", "MODIFICACION_PREVISTA"],
+    "different": ["NUEVE_LOTES_EN_LUGAR_DE_LOTE_UNICO", "PROCEDIMIENTO_ABIERTO_EN_LUGAR_DE_SIMPLIFICADO_ABREVIADO", "SARA", "FONDOS_EUROPEOS", "CRITERIOS_MULTIPLES_EN_LUGAR_DE_PRECIO_UNICO"]
+  },
+  "acceptanceRule": "11.7.4 solo congela rasgos funcionales previamente identificados en las fuentes y la matriz de cobertura. Importes, CPV por lote, fórmulas, ponderaciones, duración exacta, detalle de prórrogas, causa concreta de modificación, condiciones especiales y garantías requieren extracción documental específica y validación separada.",
+  "humanValidationRequired": true,
+  "humanValidated": false
+}
