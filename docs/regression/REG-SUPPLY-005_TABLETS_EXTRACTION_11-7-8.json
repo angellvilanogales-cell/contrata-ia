@@ -1,0 +1,24 @@
+{
+  "version": "REG-SUPPLY-005-TABLETS-EXTRACTION-11.7.8-v1",
+  "id": "REG-SUPPLY-005",
+  "expediente": "CONTR 2024 0001239412",
+  "shortName": "Tablets y plataforma de gestión",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceDocuments": ["MEMORIA", "PCAP", "PPT"],
+  "facts": {
+    "contractType": "SUMINISTRO",
+    "complexSupplyWithPlatformComponent": true,
+    "procedure": "ABIERTO",
+    "lots": false,
+    "needsBasedDA33": true,
+    "economicMode": "PRECIOS_UNITARIOS",
+    "awardMode": "CRITERIOS_MULTIPLES",
+    "formulaEvaluatedCriteria": true,
+    "plannedModification": true,
+    "extensions": true
+  },
+  "acceptanceRule": "11.7.8 congela únicamente la cobertura documental ya identificada. La presencia de una plataforma de gestión no autoriza por sí sola a recalificar el contrato como servicio o mixto ni a inferir su peso económico. Los detalles finos requieren extracción y validación humana específica.",
+  "humanValidationRequired": true,
+  "humanValidated": false,
+  "nextStep": "11.7.9 automatic regression after human validation"
+}
