@@ -1,0 +1,24 @@
+{
+  "version": "REG-SERVICE-005-CARL-DOCUMENT-CLOSURE-11.8.5-v1",
+  "caseId": "REG-SERVICE-005",
+  "expediente": "ADM-2024-0004 (CONTR/2024/636510)",
+  "status": "DOCUMENTARY_CLOSURE_WITH_OPEN_ITEMS",
+  "policy": {
+    "confirmed": "Dato materialmente acreditado y apto para protección de regresión.",
+    "confirmedPartial": "Existe evidencia suficiente del extremo, pero falta parte de su contenido material.",
+    "pendingSourceEvidence": "No se congela ni se rellena por inferencia; requiere fuente primaria adicional y validación humana.",
+    "notApplicable": "El extremo no aplica a la configuración acreditada del expediente."
+  },
+  "criticalOpenItems": [
+    "DA 33.ª",
+    "literalidad del sistema de determinación del precio",
+    "garantías",
+    "condiciones especiales de ejecución",
+    "penalidades",
+    "umbrales exactos de solvencia",
+    "detalle y fórmulas de los 20 puntos no económicos restantes",
+    "causa y redacción literal de la modificación prevista del 20 %"
+  ],
+  "closureRule": "Registrar 11.8.5 no convierte los pendientes en cerrados, no declara completitud documental total y no eleva REG-SERVICE-005 a golden case.",
+  "humanValidationRequired": true
+}
