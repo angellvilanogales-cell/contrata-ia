@@ -1,8 +1,9 @@
 import { SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE_FINE } from "../../regression/ServiceRegressionCase007MaintenanceSevilleFineExtraction";
+import { SERVICE_REGRESSION_MAINTENANCE_007_GUARD_SCRIPT } from "./ServiceRegressionMaintenance007GuardScript";
 
 const CASE_JSON = JSON.stringify(SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE_FINE);
 
-export const SERVICE_REGRESSION_MAINTENANCE_007_FINE_EXTRACTION_SCRIPT = `"use strict";
+const MAINTENANCE_007_FINE_EXTRACTION_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -34,3 +35,5 @@ function ensure(){var old=document.getElementById("serviceRegressionMaintenance0
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateMaintenance007FineExtraction"){var a=readAnswers();if(a.serviceRegressionMaintenance007ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.9.");return;}var m=manifest(true);a.serviceRegressionMaintenance007FineExtractionValidated=true;a.serviceRegressionMaintenance007FineExtractionVersion=VERSION;a.serviceRegressionMaintenance007FineExtractionManifest=m;a.serviceRegressionMaintenance007FineStatus="FINE_EVIDENCE_ENVELOPE_HUMAN_VALIDATED_WITH_BLOCKING_SOURCE_INCONSISTENCY";a.serviceRegressionNextRecommendedStep="11.9.2";save(a);downloadJson(m);ensure();alert("Extracción fina 11.9.1 validada. La contradicción del límite de lotes continúa bloqueada y no se ha resuelto por inferencia.");return;}if(e.target.id==="downloadMaintenance007FineExtraction"){var a2=readAnswers();downloadJson(a2.serviceRegressionMaintenance007FineExtractionManifest||manifest(true));return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_MAINTENANCE_007_FINE_EXTRACTION_SCRIPT = MAINTENANCE_007_FINE_EXTRACTION_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_MAINTENANCE_007_GUARD_SCRIPT;
