@@ -1,0 +1,40 @@
+{
+  "version": "REG-SERVICE-007-MAINTENANCE-SEVILLE-EXTRACTION-11.9-v1",
+  "caseId": "REG-SERVICE-007",
+  "expediente": "CONTR 2026 38892",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceBasis": ["MEMORIA", "PCAP", "PPT"],
+  "verifiedFacts": {
+    "contractType": "SERVICIO",
+    "procedure": "ABIERTO",
+    "sara": true,
+    "lots": true,
+    "lotCount": 4,
+    "gmaoRequiredAsTechnicalMeans": true,
+    "insufficientOwnMeansJustified": true
+  },
+  "sourceInconsistencies": [
+    {
+      "id": "LOT-PRESENTATION-LIMIT-AMBIGUITY",
+      "severity": "BLOCKING_FOR_FREEZE",
+      "statementA": "Limitación de presentación de lotes: No existe limitación.",
+      "statementB": "Número máximo de lotes para los que una misma persona licitadora puede presentar oferta: Dos lotes.",
+      "treatment": "No congelar la regla definitiva hasta revisión humana de la fuente."
+    }
+  ],
+  "pendingBeforeFurtherFreeze": [
+    "PBL, IVA y valor estimado exactos",
+    "duración y prórrogas",
+    "sistema de precio",
+    "DA 33.ª",
+    "modificación prevista",
+    "criterios y ponderaciones",
+    "juicio de valor",
+    "garantías",
+    "solvencia económica",
+    "subrogación",
+    "condiciones especiales y penalidades",
+    "limitación definitiva de lotes ofertables"
+  ],
+  "humanValidationRequired": true
+}
