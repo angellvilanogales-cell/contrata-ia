@@ -1,8 +1,9 @@
 import { SERVICE_REGRESSION_CASE_005_CARL_ANNEX_I_CLOSURE } from "../../regression/ServiceRegressionCase005CarlAnnexIClosure";
+import { SERVICE_REGRESSION_CARL_005_DOCUMENT_CLOSURE_SCRIPT } from "./ServiceRegressionCarl005DocumentClosureScript";
 
 const CASE_JSON = JSON.stringify(SERVICE_REGRESSION_CASE_005_CARL_ANNEX_I_CLOSURE);
 
-export const SERVICE_REGRESSION_CARL_005_ANNEX_I_CLOSURE_SCRIPT = `"use strict";
+const CARL_ANNEX_I_REVIEW_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -33,3 +34,5 @@ function ensure(){var old=document.getElementById("serviceRegressionCarl005Annex
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateCarl005AnnexIReview"){var a=readAnswers();if(a.serviceRegressionCarl005FineGuardRegistered!==true){alert("Primero debe estar registrada la regresión documental 11.8.3.");return;}var m=manifest(true);a.serviceRegressionCarl005AnnexIReviewValidated=true;a.serviceRegressionCarl005AnnexIReviewVersion=VERSION;a.serviceRegressionCarl005AnnexIReviewManifest=m;a.serviceRegressionCarl005AnnexIReviewStatus="ANNEX_I_EVIDENCE_REVIEW_HUMAN_VALIDATED";a.serviceRegressionNextRecommendedStep="11.8.5";save(a);downloadJson(m);ensure();alert("Revisión de evidencia 11.8.4 validada. Los campos no recuperados siguen abiertos y no se consideran completados.");return;}if(e.target.id==="downloadCarl005AnnexIReview"){var a2=readAnswers();downloadJson(a2.serviceRegressionCarl005AnnexIReviewManifest||manifest(true));return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_CARL_005_ANNEX_I_CLOSURE_SCRIPT = CARL_ANNEX_I_REVIEW_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_CARL_005_DOCUMENT_CLOSURE_SCRIPT;
