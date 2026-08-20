@@ -1,8 +1,9 @@
 import { CARL_FINE_REGRESSION_BASELINE, CARL_FINE_REGRESSION_VERSION } from "../../regression/ServiceRegressionCase005CarlFineGuard";
+import { SERVICE_REGRESSION_CARL_005_ANNEX_I_CLOSURE_SCRIPT } from "./ServiceRegressionCarl005AnnexIClosureScript";
 
 const BASELINE_JSON = JSON.stringify(CARL_FINE_REGRESSION_BASELINE);
 
-export const SERVICE_REGRESSION_CARL_005_FINE_GUARD_SCRIPT = `"use strict";
+const CARL_FINE_GUARD_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -24,3 +25,5 @@ function ensure(){var old=document.getElementById("serviceRegressionCarl005FineG
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerCarl005FineGuard"){var a=readAnswers();if(a.serviceRegressionCarl005FineExtractionValidated!==true){alert("Primero debe validarse la extracción fina 11.8.2.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.serviceRegressionCarl005FineGuardRegistered=true;a.serviceRegressionCarl005FineGuardVersion=VERSION;a.serviceRegressionCarl005FineGuardManifest=m;a.serviceRegressionCarl005FineStatus="SECOND_LEVEL_AUTOMATIC_REGRESSION_ACTIVE";a.serviceRegressionNextRecommendedStep="11.8.4";save(a);downloadJson(m);ensure();alert("Regresión documental CARL 11.8.3 registrada. El caso queda protegido en segundo nivel sin convertirse en golden case.");return;}if(e.target.id==="downloadCarl005FineGuard"){var a2=readAnswers();downloadJson(a2.serviceRegressionCarl005FineGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_CARL_005_FINE_GUARD_SCRIPT = CARL_FINE_GUARD_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_CARL_005_ANNEX_I_CLOSURE_SCRIPT;
