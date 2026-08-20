@@ -1,8 +1,9 @@
 import { VEIASA_REGRESSION_BASELINE, VEIASA_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase006VeiasaWindowsGuard";
+import { SERVICE_REGRESSION_CARL_005_EXTRACTION_SCRIPT } from "./ServiceRegressionCarl005ExtractionScript";
 
 const BASELINE_JSON = JSON.stringify(VEIASA_REGRESSION_BASELINE);
 
-export const SUPPLY_REGRESSION_VEIASA_006_GUARD_SCRIPT = `"use strict";
+const VEIASA_GUARD_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -24,3 +25,5 @@ function ensure(){var old=document.getElementById("supplyRegressionVeiasa006Guar
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerVeiasa006AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionVeiasa006ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.10.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionVeiasa006AutomaticGuardRegistered=true;a.supplyRegressionVeiasa006AutomaticGuardVersion=VERSION;a.supplyRegressionVeiasa006AutomaticGuardManifest=m;a.supplyRegressionVeiasa006Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SERVICE-005";save(a);downloadJson(m);ensure();alert("Regresión automática VEIASA 11.7.11 registrada. REG-SUPPLY-006 queda protegido sin convertirse en golden case.");return;}if(e.target.id==="downloadVeiasa006AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionVeiasa006AutomaticGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SUPPLY_REGRESSION_VEIASA_006_GUARD_SCRIPT = VEIASA_GUARD_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_CARL_005_EXTRACTION_SCRIPT;
