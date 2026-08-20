@@ -1,8 +1,9 @@
 import { SERVICE_REGRESSION_CASE_005_CARL_FINE } from "../../regression/ServiceRegressionCase005CarlFineExtraction";
+import { SERVICE_REGRESSION_CARL_005_FINE_GUARD_SCRIPT } from "./ServiceRegressionCarl005FineGuardScript";
 
 const CASE_JSON = JSON.stringify(SERVICE_REGRESSION_CASE_005_CARL_FINE);
 
-export const SERVICE_REGRESSION_CARL_005_FINE_EXTRACTION_SCRIPT = `"use strict";
+const CARL_FINE_EXTRACTION_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -25,7 +26,7 @@ html+=row("Duración","12 meses + prórroga máxima 12 meses","Inicio previsto 1
 html+=row("PBL sin IVA",money(f.pblExVat),"Memoria");
 html+=row("IVA 21 %",money(f.vatAmount),"Memoria");
 html+=row("PBL con IVA",money(f.pblIncVat),"Memoria");
-html+=row("Valor estimado",money(f.estimatedValueExVat),"Incluye prórroga y modificación prevista del 20 %");
+html+=row("Valor estimado",money(f.estimatedValueExVat),"Dato declarado por la fuente; incluye prórroga y modificación prevista del 20 %");
 html+=row("Criterios","100 puntos · solo fórmulas","Oferta económica: máximo 80 puntos");
 html+=row("Pago","Mensualidades naturales vencidas","Memoria");
 html+=row("Coste laboral ref. 2025",money(f.laborCostReference2025),"Subrogación y costes salariales");
@@ -38,3 +39,5 @@ function ensure(){var old=document.getElementById("serviceRegressionCarl005FineE
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateCarl005FineExtraction"){var a=readAnswers();if(a.serviceRegressionCarl005AutomaticGuardRegistered!==true){alert("Primero debe estar registrada la regresión CARL 11.8.1.");return;}var m=manifest(true);a.serviceRegressionCarl005FineExtractionValidated=true;a.serviceRegressionCarl005FineExtractionVersion=VERSION;a.serviceRegressionCarl005FineExtractionManifest=m;a.serviceRegressionCarl005FineStatus="FINE_SOURCE_EXTRACTION_HUMAN_VALIDATED";a.serviceRegressionNextRecommendedStep="11.8.3";save(a);downloadJson(m);ensure();alert("Extracción fina CARL 11.8.2 validada. El caso queda listo para regresión documental de segundo nivel.");return;}if(e.target.id==="downloadCarl005FineExtraction"){var a2=readAnswers();downloadJson(a2.serviceRegressionCarl005FineExtractionManifest||manifest(true));return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_CARL_005_FINE_EXTRACTION_SCRIPT = CARL_FINE_EXTRACTION_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_CARL_005_FINE_GUARD_SCRIPT;
