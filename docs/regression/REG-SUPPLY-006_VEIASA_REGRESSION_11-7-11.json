@@ -1,0 +1,50 @@
+{
+  "version": "REG-SUPPLY-006-VEIASA-GUARD-11.7.11-v1",
+  "caseId": "REG-SUPPLY-006",
+  "expediente": "CF050-21-058",
+  "status": "AUTOMATIC_REGRESSION_READY_PENDING_RUNTIME_REGISTRATION",
+  "sourceExtractionStep": "11.7.10",
+  "sourceExtractionHumanValidated": true,
+  "protectedFacts": {
+    "contractType": "SUMINISTRO",
+    "procedure": "ABIERTO_SIMPLIFICADO",
+    "lots": false,
+    "needsBasedDA33": false,
+    "economicMode": "PRECIO_GLOBAL",
+    "awardMode": "PRECIO_UNICO",
+    "extensions": false,
+    "plannedModification": false
+  },
+  "checks": [
+    "VEIASA-SUPPLY",
+    "VEIASA-PROCEDURE",
+    "VEIASA-ONE-LOT",
+    "VEIASA-DA33-OFF",
+    "VEIASA-GLOBAL-PRICE",
+    "VEIASA-PRICE-ONLY",
+    "VEIASA-NO-EXTENSIONS",
+    "VEIASA-NO-PLANNED-MODIFICATION"
+  ],
+  "forbiddenGoldenInheritance": [
+    "DA33_ACTIVE",
+    "DA33_MAXIMUM_BUDGET",
+    "UNIT_PRICES",
+    "EXTENSIONS_12_12",
+    "DA33_NEEDS_INCREASE_MODIFICATION",
+    "FERRETERIA_CATALOGUE_98_REFERENCES",
+    "FORCE_GOLDEN_ECONOMIC_AMOUNTS"
+  ],
+  "deliberatelyNotFrozenYet": [
+    "importe exacto del PBL y del valor estimado",
+    "CPV exacto",
+    "duración exacta",
+    "plazo de entrega o implantación",
+    "garantía definitiva",
+    "solvencia y habilitación",
+    "fórmula exacta de valoración económica",
+    "condiciones especiales de ejecución",
+    "obligaciones técnicas y niveles de soporte"
+  ],
+  "acceptanceRule": "La regresión solo puede registrarse tras validación humana de 11.7.10 y con cero bloqueantes. VEIASA debe permanecer sin DA 33.ª, con precio global, sin prórroga y sin modificación prevista, sin heredar reglas del golden case.",
+  "nextCaseAfterRegistration": "REG-SERVICE-005"
+}
