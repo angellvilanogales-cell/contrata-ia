@@ -1,8 +1,9 @@
 import { SAS470_REGRESSION_BASELINE, SAS470_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase004Sas470Guard";
+import { SUPPLY_REGRESSION_TABLETS_005_EXTRACTION_SCRIPT } from "./SupplyRegressionTablets005ExtractionScript";
 
 const BASELINE_JSON = JSON.stringify(SAS470_REGRESSION_BASELINE);
 
-export const SUPPLY_REGRESSION_SAS_004_GUARD_SCRIPT = `"use strict";
+const SUPPLY_REGRESSION_SAS_004_GUARD_BASE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -24,3 +25,5 @@ function ensure(){var old=document.getElementById("supplyRegressionSas004GuardCa
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerSas004AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionSas004ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.6.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionSas004AutomaticGuardRegistered=true;a.supplyRegressionSas004AutomaticGuardVersion=VERSION;a.supplyRegressionSas004AutomaticGuardManifest=m;a.supplyRegressionSas004Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SUPPLY-005";save(a);downloadJson(m);ensure();alert("Regresión automática SAS 470/2025 11.7.7 registrada. REG-SUPPLY-004 queda protegido sin convertirse en golden case.");return;}if(e.target.id==="downloadSas004AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionSas004AutomaticGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SUPPLY_REGRESSION_SAS_004_GUARD_SCRIPT = SUPPLY_REGRESSION_SAS_004_GUARD_BASE_SCRIPT + "\n" + SUPPLY_REGRESSION_TABLETS_005_EXTRACTION_SCRIPT;
