@@ -1,0 +1,22 @@
+{
+  "version": "REG-SERVICE-005-CARL-EXTRACTION-11.8-v1",
+  "id": "REG-SERVICE-005",
+  "expediente": "ADM-2024-0004 (CONTR/2024/636510)",
+  "shortName": "Limpieza sede Consejo Andaluz de Relaciones Laborales",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceDocuments": ["MEMORIA", "PCAP", "PPT"],
+  "facts": {
+    "contractType": "SERVICIO",
+    "serviceCategory": "LIMPIEZA",
+    "procedure": "ABIERTO_SIMPLIFICADO",
+    "ordinarySimplified": true,
+    "mainCpv": "90919200-4",
+    "accessoryCpvs": ["39830000-9", "42995000-7"],
+    "insufficientOwnMeans": true,
+    "personnelSubrogation": true,
+    "accessoryCleaningMaterialsAndMachineryIncluded": true
+  },
+  "humanValidationRequired": true,
+  "humanValidated": false,
+  "acceptanceRule": "Solo se congela el núcleo documental directamente soportado por Memoria, PCAP y PPT. La presencia de productos, maquinaria y uniformes de limpieza no permite recalificar automáticamente el contrato como suministro. Lotes, DA 33.ª, sistema económico, importes, duración, prórrogas, modificación, criterios, solvencia, garantías y detalle económico de subrogación quedan pendientes de extracción específica."
+}
