@@ -1,45 +1,49 @@
-import { strict as assert } from "node:assert";
+import { describe, expect, it } from "vitest";
 import { SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE_ECONOMICS } from "../src/regression/ServiceRegressionCase007MaintenanceSevilleEconomics";
 
-const e = SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE_ECONOMICS;
+describe("LB-7 service maintenance economics regression 11.9.3", () => {
+  const e = SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE_ECONOMICS;
 
-assert.equal(e.id, "REG-SERVICE-007");
-assert.equal(e.step, "11.9.3");
-assert.equal(e.currency, "EUR");
-assert.equal(e.sourceValuePolicy.declaredValuesAreAuthoritativeEvidence, true);
-assert.equal(e.sourceValuePolicy.doNotNormalizeDeclaredRounding, true);
-assert.equal(e.sourceValuePolicy.arithmeticChecksAreDiagnosticOnly, true);
+  it("preserves the source-declared estimated values and diagnostic rounding differences", () => {
+    expect(e.id).toBe("REG-SERVICE-007");
+    expect(e.step).toBe("11.9.3");
+    expect(e.currency).toBe("EUR");
+    expect(e.sourceValuePolicy.declaredValuesAreAuthoritativeEvidence).toBe(true);
+    expect(e.sourceValuePolicy.doNotNormalizeDeclaredRounding).toBe(true);
+    expect(e.sourceValuePolicy.arithmeticChecksAreDiagnosticOnly).toBe(true);
 
-assert.equal(e.estimatedValue.modificationArticle204Percent, 20);
-assert.equal(e.estimatedValue.extensionMonths, 24);
-assert.equal(e.estimatedValue.lots.length, 4);
+    expect(e.estimatedValue.modificationArticle204Percent).toBe(20);
+    expect(e.estimatedValue.extensionMonths).toBe(24);
+    expect(e.estimatedValue.lots).toHaveLength(4);
+    expect(e.estimatedValue.lots.map((lot) => lot.declaredEstimatedValueCents)).toEqual([
+      34_915_294,
+      22_543_526,
+      45_112_162,
+      79_828_134,
+    ]);
+    expect(e.estimatedValue.declaredTotals.tenderAmountExVatCents).toBe(82_908_688);
+    expect(e.estimatedValue.declaredTotals.modificationCents).toBe(16_581_738);
+    expect(e.estimatedValue.declaredTotals.extensionCents).toBe(82_908_688);
+    expect(e.estimatedValue.declaredTotals.estimatedValueCents).toBe(182_399_114);
 
-assert.deepEqual(
-  e.estimatedValue.lots.map((lot) => lot.declaredEstimatedValueCents),
-  [34_915_294, 22_543_526, 45_112_162, 79_828_134],
-);
-assert.equal(e.estimatedValue.declaredTotals.tenderAmountExVatCents, 82_908_688);
-assert.equal(e.estimatedValue.declaredTotals.modificationCents, 16_581_738);
-assert.equal(e.estimatedValue.declaredTotals.extensionCents, 82_908_688);
-assert.equal(e.estimatedValue.declaredTotals.estimatedValueCents, 182_399_114);
+    expect(e.estimatedValue.lots[1].declaredMinusArithmeticCents).toBe(1);
+    expect(e.estimatedValue.lots[3].declaredMinusArithmeticCents).toBe(1);
+    expect(e.estimatedValue.diagnostic.sumDeclaredLotEstimatedValuesCents).toBe(182_399_116);
+    expect(e.estimatedValue.diagnostic.declaredGlobalEstimatedValueCents).toBe(182_399_114);
+    expect(e.estimatedValue.diagnostic.lotSumMinusDeclaredGlobalCents).toBe(2);
+    expect(e.estimatedValue.diagnostic.treatment).toBe("PRESERVE_SOURCE_DECLARATIONS_DO_NOT_AUTOCORRECT");
+  });
 
-assert.equal(e.estimatedValue.lots[1].declaredMinusArithmeticCents, 1);
-assert.equal(e.estimatedValue.lots[3].declaredMinusArithmeticCents, 1);
-assert.equal(e.estimatedValue.diagnostic.sumDeclaredLotEstimatedValuesCents, 182_399_116);
-assert.equal(e.estimatedValue.diagnostic.declaredGlobalEstimatedValueCents, 182_399_114);
-assert.equal(e.estimatedValue.diagnostic.lotSumMinusDeclaredGlobalCents, 2);
-assert.equal(e.estimatedValue.diagnostic.treatment, "PRESERVE_SOURCE_DECLARATIONS_DO_NOT_AUTOCORRECT");
+  it("preserves the declared VAT-included annualities and the fields still open for later steps", () => {
+    expect(e.annualitiesVatIncluded.rows).toHaveLength(12);
+    expect(e.annualitiesVatIncluded.declaredTotalCents).toBe(100_319_513);
+    expect(e.annualitiesVatIncluded.budgetApplication).toBe("1439030000 G/32L/21200/41 01");
+    expect(e.annualitiesVatIncluded.expenditureProcessing).toBe("ORDINARIA");
+    expect(e.annualitiesVatIncluded.rows.reduce((sum, row) => sum + row.amountCents, 0)).toBe(
+      e.annualitiesVatIncluded.declaredTotalCents,
+    );
 
-assert.equal(e.annualitiesVatIncluded.rows.length, 12);
-assert.equal(e.annualitiesVatIncluded.declaredTotalCents, 100_319_513);
-assert.equal(e.annualitiesVatIncluded.budgetApplication, "1439030000 G/32L/21200/41 01");
-assert.equal(e.annualitiesVatIncluded.expenditureProcessing, "ORDINARIA");
-assert.equal(
-  e.annualitiesVatIncluded.rows.reduce((sum, row) => sum + row.amountCents, 0),
-  e.annualitiesVatIncluded.declaredTotalCents,
-);
-
-assert.ok(e.deliberatelyStillOpen.some((x) => x.includes("criterios de adjudicación")));
-assert.ok(e.deliberatelyStillOpen.some((x) => x.includes("juicio de valor")));
-
-console.log("OK lb7-service-maintenance-economics-11-9-3");
+    expect(e.deliberatelyStillOpen.some((x) => x.includes("criterios de adjudicación"))).toBe(true);
+    expect(e.deliberatelyStillOpen.some((x) => x.includes("juicio de valor"))).toBe(true);
+  });
+});
