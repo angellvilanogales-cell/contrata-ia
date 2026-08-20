@@ -1,8 +1,9 @@
 import { CARL_DOCUMENT_CLOSURE_11_8_5 } from "../../regression/ServiceRegressionCase005CarlDocumentClosure";
+import { SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_SCRIPT } from "./ServiceRegressionMaintenance007ExtractionScript";
 
 const CASE_JSON = JSON.stringify(CARL_DOCUMENT_CLOSURE_11_8_5);
 
-export const SERVICE_REGRESSION_CARL_005_DOCUMENT_CLOSURE_SCRIPT = `"use strict";
+const CARL_DOCUMENT_CLOSURE_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -23,3 +24,5 @@ function ensure(){var old=document.getElementById("serviceRegressionCarl005Docum
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateCarl005DocumentClosure"){var a=readAnswers();if(a.serviceRegressionCarl005AnnexIReviewValidated!==true){alert("Primero debe validarse la revisión de evidencia 11.8.4.");return;}var m=manifest(true);a.serviceRegressionCarl005DocumentClosureValidated=true;a.serviceRegressionCarl005DocumentClosureVersion=VERSION;a.serviceRegressionCarl005DocumentClosureManifest=m;a.serviceRegressionCarl005DocumentClosureStatus="DOCUMENTARY_CLOSURE_HUMAN_VALIDATED_WITH_OPEN_ITEMS";a.serviceRegressionNextRecommendedStep="11.9";save(a);downloadJson(m);ensure();alert("Cierre documental CARL 11.8.5 validado. Los pendientes de fuente permanecen abiertos.");return;}if(e.target.id==="downloadCarl005DocumentClosure"){var a2=readAnswers();downloadJson(a2.serviceRegressionCarl005DocumentClosureManifest||manifest(true));return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_CARL_005_DOCUMENT_CLOSURE_SCRIPT = CARL_DOCUMENT_CLOSURE_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_SCRIPT;
