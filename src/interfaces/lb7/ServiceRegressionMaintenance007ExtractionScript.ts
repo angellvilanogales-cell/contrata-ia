@@ -1,8 +1,9 @@
 import { SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE } from "../../regression/ServiceRegressionCase007MaintenanceSeville";
+import { SERVICE_REGRESSION_MAINTENANCE_007_FINE_EXTRACTION_SCRIPT } from "./ServiceRegressionMaintenance007FineExtractionScript";
 
 const CASE_JSON = JSON.stringify(SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE);
 
-export const SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_SCRIPT = `"use strict";
+const SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -32,3 +33,5 @@ function ensure(){var old=document.getElementById("serviceRegressionMaintenance0
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateMaintenance007Extraction"){var a=readAnswers();if(a.serviceRegressionCarl005DocumentClosureValidated!==true){alert("Primero debe validarse el cierre documental CARL 11.8.5.");return;}var m=manifest(true);a.serviceRegressionMaintenance007ExtractionValidated=true;a.serviceRegressionMaintenance007ExtractionVersion=VERSION;a.serviceRegressionMaintenance007ExtractionManifest=m;a.serviceRegressionMaintenance007Status="SOURCE_EXTRACTION_HUMAN_VALIDATED_WITH_SOURCE_INCONSISTENCY";a.serviceRegressionNextRecommendedStep="11.9.1";save(a);downloadJson(m);ensure();alert("Extracción 11.9 validada. La contradicción sobre limitación de lotes permanece abierta y no se considera resuelta.");return;}if(e.target.id==="downloadMaintenance007Extraction"){var a2=readAnswers();downloadJson(a2.serviceRegressionMaintenance007ExtractionManifest||manifest(true));return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_SCRIPT = SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_MAINTENANCE_007_FINE_EXTRACTION_SCRIPT;
