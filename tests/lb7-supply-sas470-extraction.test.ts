@@ -44,6 +44,6 @@ describe("Paso 11.7.6 - REG-SUPPLY-004 SAS 470/2025", () => {
     expect(SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT).toContain("11.7.6 REG-SUPPLY-004 · SAS 470/2025");
     expect(SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT).toContain("supplyRegressionAulas003AutomaticGuardRegistered");
     expect(SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT).toContain("Validar extracción documental 11.7.6");
-    expect(SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT).toContain("no convierte").toBe(false);
+    expect(SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT).toContain("El caso queda listo para construir su regresión específica");
   });
 });
