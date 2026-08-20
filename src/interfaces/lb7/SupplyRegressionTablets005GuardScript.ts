@@ -1,5 +1,6 @@
 import { TABLETS_REGRESSION_BASELINE, TABLETS_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase005TabletsPlatformGuard";
 import { SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT } from "./SupplyRegressionVeiasa006ExtractionScript";
+import { SUPPLY_REGRESSION_VEIASA_006_GUARD_SCRIPT } from "./SupplyRegressionVeiasa006GuardScript";
 
 const BASELINE_JSON = JSON.stringify(TABLETS_REGRESSION_BASELINE);
 
@@ -26,4 +27,4 @@ document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
 
-export const SUPPLY_REGRESSION_TABLETS_005_GUARD_SCRIPT = TABLETS_GUARD_CORE_SCRIPT + "\n" + SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT;
+export const SUPPLY_REGRESSION_TABLETS_005_GUARD_SCRIPT = TABLETS_GUARD_CORE_SCRIPT + "\n" + SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT + "\n" + SUPPLY_REGRESSION_VEIASA_006_GUARD_SCRIPT;
