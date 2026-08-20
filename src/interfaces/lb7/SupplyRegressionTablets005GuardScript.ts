@@ -1,8 +1,9 @@
 import { TABLETS_REGRESSION_BASELINE, TABLETS_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase005TabletsPlatformGuard";
+import { SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT } from "./SupplyRegressionVeiasa006ExtractionScript";
 
 const BASELINE_JSON = JSON.stringify(TABLETS_REGRESSION_BASELINE);
 
-export const SUPPLY_REGRESSION_TABLETS_005_GUARD_SCRIPT = `"use strict";
+const TABLETS_GUARD_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -24,3 +25,5 @@ function ensure(){var old=document.getElementById("supplyRegressionTablets005Gua
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerTablets005AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionTablets005ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.8.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionTablets005AutomaticGuardRegistered=true;a.supplyRegressionTablets005AutomaticGuardVersion=VERSION;a.supplyRegressionTablets005AutomaticGuardManifest=m;a.supplyRegressionTablets005Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SUPPLY-006";save(a);downloadJson(m);ensure();alert("Regresión automática Tablets + plataforma 11.7.9 registrada. REG-SUPPLY-005 queda protegido sin convertirse en golden case.");return;}if(e.target.id==="downloadTablets005AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionTablets005AutomaticGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SUPPLY_REGRESSION_TABLETS_005_GUARD_SCRIPT = TABLETS_GUARD_CORE_SCRIPT + "\n" + SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT;
