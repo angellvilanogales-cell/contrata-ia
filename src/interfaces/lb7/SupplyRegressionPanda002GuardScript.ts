@@ -1,4 +1,5 @@
 import { PANDA_REGRESSION_BASELINE, PANDA_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase002PandaGuard";
+import { SUPPLY_REGRESSION_AULAS_003_EXTRACTION_SCRIPT } from "./SupplyRegressionAulas003ExtractionScript";
 
 const PANDA_REGRESSION_JSON = JSON.stringify(PANDA_REGRESSION_BASELINE);
 
@@ -23,4 +24,5 @@ html+='</div>';return html;}
 function ensure(){var old=document.getElementById("supplyRegressionPanda002GuardCard");if(old)old.remove();var anchor=document.getElementById("supplyRegressionPanda002Card");if(anchor){var html=card();if(html)anchor.insertAdjacentHTML("afterend",html);}}
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerPanda002AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionPanda002ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.2.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionPanda002AutomaticGuardRegistered=true;a.supplyRegressionPanda002AutomaticGuardVersion=VERSION;a.supplyRegressionPanda002AutomaticGuardManifest=m;a.supplyRegressionPanda002Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SUPPLY-003";save(a);downloadJson(m);ensure();alert("Regresión automática Panda 11.7.3 registrada. REG-SUPPLY-002 queda protegido en CI sin convertirse en golden case.");return;}if(e.target.id==="downloadPanda002AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionPanda002AutomaticGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
-})();`;
+})();
+${SUPPLY_REGRESSION_AULAS_003_EXTRACTION_SCRIPT}`;
