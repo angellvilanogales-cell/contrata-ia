@@ -1,0 +1,41 @@
+{
+  "version": "REG-SERVICE-005-CARL-FINE-GUARD-11.8.3-v1",
+  "caseId": "REG-SERVICE-005",
+  "status": "SECOND_LEVEL_AUTOMATIC_REGRESSION_READY_PENDING_RUNTIME_REGISTRATION",
+  "protectedScope": [
+    "contrato mixto servicios+suministros con prestación principal de servicios",
+    "90 % servicios / 10 % suministros accesorios",
+    "sin lotes",
+    "abierto simplificado ordinario",
+    "no SARA",
+    "12 meses + prórroga máxima 12 meses",
+    "PBL 44.170,33 € sin IVA",
+    "IVA 9.275,77 €",
+    "PBL total 53.446,10 €",
+    "VE fuente 106.008,80 €",
+    "modificación prevista 20 %",
+    "100 puntos mediante fórmulas; hasta 80 puntos oferta económica",
+    "pago por mensualidades naturales vencidas",
+    "coste laboral 24.697,91 €",
+    "costes directos 36.161,30 € e indirectos 8.009,03 €"
+  ],
+  "sourceValueGuard": {
+    "field": "estimatedValueExVat",
+    "value": 106008.80,
+    "rule": "SOURCE_DECLARED_VALUE_ONLY",
+    "explanation": "Se congela como dato declarado por la fuente del CARL, no como fórmula generalizable para otros expedientes."
+  },
+  "stillPending": [
+    "20 puntos restantes de criterios",
+    "fórmulas exactas",
+    "sistema de precio literal",
+    "solvencia",
+    "garantías",
+    "condiciones especiales",
+    "penalidades",
+    "causa exacta de la modificación",
+    "detalle completo de subrogación",
+    "DA 33.ª"
+  ],
+  "humanValidationPrerequisite": "11.8.2"
+}
