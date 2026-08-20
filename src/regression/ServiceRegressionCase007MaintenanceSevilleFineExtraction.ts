@@ -11,6 +11,7 @@ export const SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE_FINE = {
     object: SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE.facts.object,
     procedure: "ABIERTO",
     sara: true,
+    lots: true,
     lotCount: 4,
     lotNames: SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE.facts.lotNames,
     cpvs: SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE.facts.mainAndRelatedCpvs,
