@@ -1,0 +1,21 @@
+import { strict as assert } from "node:assert";
+import { SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE } from "../src/regression/ServiceRegressionCase007MaintenanceSeville";
+
+const c = SERVICE_REGRESSION_CASE_007_MAINTENANCE_SEVILLE;
+assert.equal(c.id, "REG-SERVICE-007");
+assert.equal(c.step, "11.9");
+assert.equal(c.expediente, "CONTR 2026 38892");
+assert.equal(c.facts.contractType, "SERVICIO");
+assert.equal(c.facts.procedure, "ABIERTO");
+assert.equal(c.facts.sara, true);
+assert.equal(c.facts.lots, true);
+assert.equal(c.facts.lotCount, 4);
+assert.equal(c.facts.gmaoRequiredAsTechnicalMeans, true);
+assert.equal(c.facts.insufficientOwnMeansJustified, true);
+assert.equal(c.sourceInconsistencies.length, 1);
+assert.equal(c.sourceInconsistencies[0].severity, "BLOCKING_FOR_FREEZE");
+assert.ok(c.sourceInconsistencies[0].statementA.includes("No existe limitación"));
+assert.ok(c.sourceInconsistencies[0].statementB.includes("Dos lotes"));
+assert.ok(c.deliberatelyNotFrozenYet.includes("regla definitiva sobre máximo de lotes ofertables por licitador"));
+assert.equal(c.humanValidationRequired, true);
+console.log("OK lb7-service-maintenance-seville-11-9");
