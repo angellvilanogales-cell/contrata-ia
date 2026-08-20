@@ -1,8 +1,9 @@
 import { SERVICE_REGRESSION_CASE_005_CARL_CLEANING } from "../../regression/ServiceRegressionCase005CarlCleaning";
+import { SERVICE_REGRESSION_CARL_005_GUARD_SCRIPT } from "./ServiceRegressionCarl005GuardScript";
 
 const CASE_JSON = JSON.stringify(SERVICE_REGRESSION_CASE_005_CARL_CLEANING);
 
-export const SERVICE_REGRESSION_CARL_005_EXTRACTION_SCRIPT = `"use strict";
+const SERVICE_REGRESSION_CARL_005_EXTRACTION_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -32,3 +33,5 @@ function ensure(){var old=document.getElementById("serviceRegressionCarl005Extra
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateCarl005Extraction"){var a=readAnswers();if(a.supplyRegressionVeiasa006AutomaticGuardRegistered!==true){alert("Primero debe estar registrada la regresión VEIASA 11.7.11.");return;}var m=manifest(true);a.serviceRegressionCarl005ExtractionValidated=true;a.serviceRegressionCarl005ExtractionVersion=VERSION;a.serviceRegressionCarl005ExtractionManifest=m;a.serviceRegressionCarl005Status="SOURCE_EXTRACTION_HUMAN_VALIDATED";a.serviceRegressionNextRecommendedStep="11.8.1";save(a);downloadJson(m);ensure();alert("Extracción de servicios 11.8 validada. REG-SERVICE-005 queda listo para su regresión automática específica.");return;}if(e.target.id==="downloadCarl005Extraction"){var a2=readAnswers();downloadJson(a2.serviceRegressionCarl005ExtractionManifest||manifest(true));return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_CARL_005_EXTRACTION_SCRIPT = SERVICE_REGRESSION_CARL_005_EXTRACTION_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_CARL_005_GUARD_SCRIPT;
