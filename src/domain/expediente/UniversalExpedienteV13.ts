@@ -211,7 +211,11 @@ export function evaluateUniversalExpediente(
   const domainCompleteness = {} as Record<UniversalDomainName, boolean>;
 
   for (const [domain, fields] of Object.entries(fieldsByDomain) as Array<[UniversalDomainName, EvidenceField<unknown>[]]>) {
-    domainCompleteness[domain] = fields.every(field => evaluateField(field, blockers));
+    let complete = true;
+    for (const field of fields) {
+      if (!evaluateField(field, blockers)) complete = false;
+    }
+    domainCompleteness[domain] = complete;
   }
 
   if (isPromotableEvidenceField(expediente.lots.lots) && expediente.lots.lots.value) {
