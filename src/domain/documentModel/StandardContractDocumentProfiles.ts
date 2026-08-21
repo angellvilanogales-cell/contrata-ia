@@ -1,5 +1,6 @@
 import { ContractDocumentModelProfileRegistry } from "./ContractDocumentModelProfile";
 import { DocumentType } from "./DocumentType";
+import { TipoProcedimiento } from "../procedimiento/TipoProcedimiento";
 import { ServicePcapDefinition } from "./definitions/ServicePcapDefinition";
 import { ServicePptDefinition } from "./definitions/ServicePptDefinition";
 import { SupplyPcapAnnexDefinition } from "./definitions/SupplyPcapAnnexDefinition";
@@ -13,11 +14,13 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
     contractType: "SERVICE",
     documentType: DocumentType.PCAP,
     coverage: "FULL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO],
     sourceIds: ["PCAP_SERVICES_OPEN_2025_12", "REG-SERVICE-007_MAINTENANCE_SEVILLE"],
     definition: ServicePcapDefinition,
     generationAllowed: true,
     notes: [
       "Modelo completo contrastado con PCAP de servicios recomendado por la Comisión Consultiva de Contratación Pública.",
+      "Su aplicación automática queda limitada al procedimiento abierto acreditado por la fuente del modelo.",
       "Los campos del Anexo I deben proceder del expediente canónico y conservar sus validaciones y conflictos.",
     ],
   });
