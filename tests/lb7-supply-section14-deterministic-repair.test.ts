@@ -1,6 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT } from "../src/interfaces/lb7/SupplySection14DeterministicRepairScript";
-import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
 describe("Paso 11.2.2A - reconstrucción del apartado 14 por límites reales", () => {
   it("compila de forma aislada", () => {
@@ -38,10 +39,10 @@ describe("Paso 11.2.2A - reconstrucción del apartado 14 por límites reales", (
   });
 
   it("sigue integrado entre la auditoría integral y el cierre PBL", () => {
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT");
-    const audit = ADAPTIVE_FLOW_UI.indexOf("SUPPLY_ANNEX_I_COMPREHENSIVE_AUDIT_SCRIPT");
-    const repair = ADAPTIVE_FLOW_UI.indexOf("SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT");
-    const pbl = ADAPTIVE_FLOW_UI.indexOf("SUPPLY_PBL_BREAKDOWN_PROPOSAL_SCRIPT");
+    const uiSource = fs.readFileSync(path.resolve("src/interfaces/lb7/AdaptiveFlowUi.ts"), "utf8");
+    const audit = uiSource.indexOf("${SUPPLY_ANNEX_I_COMPREHENSIVE_AUDIT_SCRIPT}");
+    const repair = uiSource.indexOf("${SUPPLY_SECTION_14_DETERMINISTIC_REPAIR_SCRIPT}");
+    const pbl = uiSource.indexOf("${SUPPLY_PBL_BREAKDOWN_PROPOSAL_SCRIPT}");
     expect(audit).toBeGreaterThanOrEqual(0);
     expect(repair).toBeGreaterThan(audit);
     expect(pbl).toBeGreaterThan(repair);
