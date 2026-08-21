@@ -2,10 +2,11 @@ import {
   MAINTENANCE_007_ECONOMICS_REGRESSION_RESULT,
   MAINTENANCE_007_ECONOMICS_REGRESSION_VERSION,
 } from "../../regression/ServiceRegressionCase007MaintenanceSevilleEconomicsGuard";
+import { SERVICE_REGRESSION_MAINTENANCE_007_DOCUMENT_CLOSURE_SCRIPT } from "./ServiceRegressionMaintenance007DocumentClosureScript";
 
 const BASELINE_JSON = JSON.stringify(MAINTENANCE_007_ECONOMICS_REGRESSION_RESULT);
 
-export const SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_GUARD_SCRIPT = `"use strict";
+const MAINTENANCE_007_ECONOMICS_GUARD_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -29,3 +30,5 @@ function ensure(){var old=document.getElementById("serviceRegressionMaintenance0
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerMaintenance007EconomicsGuard"){var a=readAnswers();if(a.serviceRegressionMaintenance007EconomicsValidated!==true){alert("Primero debe validarse la evidencia económica 11.9.3.");return;}if(!BASELINE.passed){alert("La guarda económica presenta bloqueantes internos y no puede registrarse.");return;}var m=manifest();a.serviceRegressionMaintenance007EconomicsGuardRegistered=true;a.serviceRegressionMaintenance007EconomicsGuardVersion=VERSION;a.serviceRegressionMaintenance007EconomicsGuardManifest=m;a.serviceRegressionMaintenance007EconomicsGuardStatus=BASELINE.status;a.serviceRegressionNextRecommendedStep="11.9.5";save(a);downloadJson(m);ensure();alert("Guarda económica 11.9.4 registrada. No se han normalizado redondeos ni cerrado campos jurídicos sin fuente primaria.");return;}if(e.target.id==="downloadMaintenance007EconomicsGuard"){var a2=readAnswers();downloadJson(a2.serviceRegressionMaintenance007EconomicsGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_GUARD_SCRIPT = MAINTENANCE_007_ECONOMICS_GUARD_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_MAINTENANCE_007_DOCUMENT_CLOSURE_SCRIPT;
