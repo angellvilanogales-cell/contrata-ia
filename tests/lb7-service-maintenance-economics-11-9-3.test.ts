@@ -8,9 +8,11 @@ describe("LB-7 service maintenance economics regression 11.9.3", () => {
     expect(e.id).toBe("REG-SERVICE-007");
     expect(e.step).toBe("11.9.3");
     expect(e.currency).toBe("EUR");
+    expect(e.status).toBe("ECONOMIC_SOURCE_VALUES_FROZEN_PENDING_HUMAN_VALIDATION");
     expect(e.sourceValuePolicy.declaredValuesAreAuthoritativeEvidence).toBe(true);
     expect(e.sourceValuePolicy.doNotNormalizeDeclaredRounding).toBe(true);
     expect(e.sourceValuePolicy.arithmeticChecksAreDiagnosticOnly).toBe(true);
+    expect(e.sourceValuePolicy.humanValidationRequired).toBe(true);
 
     expect(e.estimatedValue.modificationArticle204Percent).toBe(20);
     expect(e.estimatedValue.extensionMonths).toBe(24);
@@ -31,6 +33,9 @@ describe("LB-7 service maintenance economics regression 11.9.3", () => {
     expect(e.estimatedValue.diagnostic.sumDeclaredLotEstimatedValuesCents).toBe(182_399_116);
     expect(e.estimatedValue.diagnostic.declaredGlobalEstimatedValueCents).toBe(182_399_114);
     expect(e.estimatedValue.diagnostic.lotSumMinusDeclaredGlobalCents).toBe(2);
+    expect(e.estimatedValue.diagnostic.sumDeclaredLotEstimatedValuesCents).not.toBe(
+      e.estimatedValue.diagnostic.declaredGlobalEstimatedValueCents,
+    );
     expect(e.estimatedValue.diagnostic.treatment).toBe("PRESERVE_SOURCE_DECLARATIONS_DO_NOT_AUTOCORRECT");
   });
 
@@ -39,6 +44,7 @@ describe("LB-7 service maintenance economics regression 11.9.3", () => {
     expect(e.annualitiesVatIncluded.declaredTotalCents).toBe(100_319_513);
     expect(e.annualitiesVatIncluded.budgetApplication).toBe("1439030000 G/32L/21200/41 01");
     expect(e.annualitiesVatIncluded.expenditureProcessing).toBe("ORDINARIA");
+    expect(e.annualitiesVatIncluded.rows.every((row) => row.budgetApplication === e.annualitiesVatIncluded.budgetApplication)).toBe(true);
     expect(e.annualitiesVatIncluded.rows.reduce((sum, row) => sum + row.amountCents, 0)).toBe(
       e.annualitiesVatIncluded.declaredTotalCents,
     );
