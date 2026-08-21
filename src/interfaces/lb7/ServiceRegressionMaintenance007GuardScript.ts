@@ -1,8 +1,9 @@
 import { MAINTENANCE_007_REGRESSION_RESULT, MAINTENANCE_007_REGRESSION_VERSION } from "../../regression/ServiceRegressionCase007MaintenanceSevilleGuard";
+import { SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_SCRIPT } from "./ServiceRegressionMaintenance007EconomicsScript";
 
 const BASELINE_JSON = JSON.stringify(MAINTENANCE_007_REGRESSION_RESULT);
 
-export const SERVICE_REGRESSION_MAINTENANCE_007_GUARD_SCRIPT = `"use strict";
+const MAINTENANCE_007_GUARD_CORE_SCRIPT = `"use strict";
 (function(){
 var work=document.getElementById("work");if(!work)return;
 var key="contrataIaAdaptiveAnswers";
@@ -24,3 +25,5 @@ function ensure(){var old=document.getElementById("serviceRegressionMaintenance0
 document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerMaintenance007AutomaticGuard"){var a=readAnswers();if(a.serviceRegressionMaintenance007FineExtractionValidated!==true){alert("Primero debe validarse la extracción documental fina 11.9.1.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes internos y no puede registrarse.");return;}var m=manifest();a.serviceRegressionMaintenance007AutomaticGuardRegistered=true;a.serviceRegressionMaintenance007AutomaticGuardVersion=VERSION;a.serviceRegressionMaintenance007AutomaticGuardManifest=m;a.serviceRegressionMaintenance007Status="AUTOMATIC_REGRESSION_ACTIVE_WITH_SOURCE_CONFLICT_GUARD";a.serviceRegressionNextRecommendedStep="11.9.3";save(a);downloadJson(m);ensure();alert("Regresión automática 11.9.2 registrada. La contradicción sobre límite de lotes permanece abierta y protegida frente a resolución automática.");return;}if(e.target.id==="downloadMaintenance007AutomaticGuard"){var a2=readAnswers();downloadJson(a2.serviceRegressionMaintenance007AutomaticGuardManifest||manifest());return;}},true);
 document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
 })();`;
+
+export const SERVICE_REGRESSION_MAINTENANCE_007_GUARD_SCRIPT = MAINTENANCE_007_GUARD_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_SCRIPT;
