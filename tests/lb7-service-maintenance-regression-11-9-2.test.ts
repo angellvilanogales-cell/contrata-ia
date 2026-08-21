@@ -1,26 +1,28 @@
-import { strict as assert } from "node:assert";
+import { describe, expect, it } from "vitest";
 import { MAINTENANCE_007_REGRESSION_RESULT } from "../src/regression/ServiceRegressionCase007MaintenanceSevilleGuard";
 
-const r = MAINTENANCE_007_REGRESSION_RESULT;
+describe("LB-7 service maintenance regression guard 11.9.2", () => {
+  const r = MAINTENANCE_007_REGRESSION_RESULT;
 
-assert.equal(r.caseId, "REG-SERVICE-007");
-assert.equal(r.step, "11.9.2");
-assert.equal(r.passed, true);
-assert.equal(r.blockers.length, 0);
-assert.equal(r.checks.length, 8);
-assert.equal(r.protectedScope.contractType, "SERVICIO");
-assert.equal(r.protectedScope.procedure, "ABIERTO");
-assert.equal(r.protectedScope.sara, true);
-assert.equal(r.protectedScope.lots, true);
-assert.equal(r.protectedScope.lotCount, 4);
-assert.equal(r.protectedScope.lotNames.length, 4);
-assert.equal(r.protectedScope.cpvs.length, 6);
-assert.equal(r.protectedScope.gmaoRequiredAsTechnicalMeans, true);
-assert.equal(r.blockingSourceInconsistency.unresolved, true);
-assert.equal(r.blockingSourceInconsistency.severity, "BLOCKING_FOR_RULE_FREEZE");
-assert.ok(r.forbiddenInheritance.includes("MAXIMO_DOS_LOTES_COMO_REGLA_RESUELTA"));
-assert.ok(r.forbiddenInheritance.includes("SIN_LIMITACION_DE_LOTES_COMO_REGLA_RESUELTA"));
-assert.ok(r.deliberatelyNotFrozenYet.some((x) => x.includes("PBL")));
-assert.equal(r.requiresFineExtractionHumanValidation, true);
-
-console.log("OK lb7-service-maintenance-regression-11-9-2");
+  it("protects the maintenance baseline without resolving the source contradiction", () => {
+    expect(r.caseId).toBe("REG-SERVICE-007");
+    expect(r.step).toBe("11.9.2");
+    expect(r.passed).toBe(true);
+    expect(r.blockers).toHaveLength(0);
+    expect(r.checks).toHaveLength(8);
+    expect(r.protectedScope.contractType).toBe("SERVICIO");
+    expect(r.protectedScope.procedure).toBe("ABIERTO");
+    expect(r.protectedScope.sara).toBe(true);
+    expect(r.protectedScope.lots).toBe(true);
+    expect(r.protectedScope.lotCount).toBe(4);
+    expect(r.protectedScope.lotNames).toHaveLength(4);
+    expect(r.protectedScope.cpvs).toHaveLength(6);
+    expect(r.protectedScope.gmaoRequiredAsTechnicalMeans).toBe(true);
+    expect(r.blockingSourceInconsistency.unresolved).toBe(true);
+    expect(r.blockingSourceInconsistency.severity).toBe("BLOCKING_FOR_RULE_FREEZE");
+    expect(r.forbiddenInheritance).toContain("MAXIMO_DOS_LOTES_COMO_REGLA_RESUELTA");
+    expect(r.forbiddenInheritance).toContain("SIN_LIMITACION_DE_LOTES_COMO_REGLA_RESUELTA");
+    expect(r.deliberatelyNotFrozenYet.some((x) => x.includes("PBL"))).toBe(true);
+    expect(r.requiresFineExtractionHumanValidation).toBe(true);
+  });
+});
