@@ -49,7 +49,7 @@ describe("Bloque 13 - frontera documental universal", () => {
     const result = buildUniversalDocumentContext(universal, new Date("2026-08-21T12:00:00Z"));
 
     expect(result.ready).toBe(true);
-    expect(result.context?.version).toBe("UNIVERSAL-DOCUMENT-CONTEXT-13.1-v1");
+    expect(result.context?.version).toBe("UNIVERSAL-DOCUMENT-CONTEXT-13.2-v1");
     expect(result.context?.request.metadata.universalAuthority).toBe(true);
     expect(result.context?.request.metadata.universalSchemaVersion).toBe(universal.schemaVersion);
   });
