@@ -1,6 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SUPPLY_PCAP_GLOBAL_CLOSURE_SCRIPT } from "../src/interfaces/lb7/SupplyPcapGlobalClosureScript";
-import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
 describe("Paso 11.3 - cierre global del PCAP", () => {
   it("compila de forma aislada", () => {
@@ -27,9 +28,10 @@ describe("Paso 11.3 - cierre global del PCAP", () => {
   });
 
   it("está integrado después del cierre del PBL", () => {
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_PCAP_GLOBAL_CLOSURE_SCRIPT");
-    expect(ADAPTIVE_FLOW_UI.indexOf("SUPPLY_PCAP_GLOBAL_CLOSURE_SCRIPT")).toBeGreaterThan(
-      ADAPTIVE_FLOW_UI.indexOf("SUPPLY_PBL_BREAKDOWN_PROPOSAL_SCRIPT"),
-    );
+    const uiSource = fs.readFileSync(path.resolve("src/interfaces/lb7/AdaptiveFlowUi.ts"), "utf8");
+    const pbl = uiSource.indexOf("${SUPPLY_PBL_BREAKDOWN_PROPOSAL_SCRIPT}");
+    const closure = uiSource.indexOf("${SUPPLY_PCAP_GLOBAL_CLOSURE_SCRIPT}");
+    expect(pbl).toBeGreaterThanOrEqual(0);
+    expect(closure).toBeGreaterThan(pbl);
   });
 });
