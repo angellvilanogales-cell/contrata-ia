@@ -36,7 +36,7 @@ describe("Pasos 11.7 y 11.7.1 - matriz multicaso y fuentes reales", () => {
   it("identifica los cinco expedientes reales incorporados", () => {
     const exp = new Set(REGRESSION_SOURCE_CASES.map((c) => c.source?.expediente));
     expect(exp).toEqual(new Set([
-      "CONTR 2025 0000466864",
+      "CONTR 2025 466864 (2025/001003)",
       "CONTR 2025 0000489703",
       "470/2025",
       "CONTR 2024 0001239412",
