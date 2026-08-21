@@ -1,5 +1,6 @@
 import { CPVEngine } from "./CPVEngine";
 import { ProcedimientoEngine } from "./ProcedimientoEngine";
+import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
 import { CanonicalExpedienteState } from "../domain/expediente/CanonicalExpedienteState";
 import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
 import { promoteEngineProposal, promoteNormativeEngineDecision } from "./CanonicalEnginePromotion";
@@ -24,6 +25,20 @@ function toLegacyContext(state: CanonicalExpedienteState): ExpedienteContext {
   return context;
 }
 
+function toMainCpvDecision(decision: ReturnType<CPVEngine["ejecutar"]>): DecisionJuridica<string> {
+  const mapped = new DecisionJuridica<string>();
+  mapped.resultado = decision.resultado?.[0]?.codigo;
+  mapped.explicacion = decision.explicacion;
+  mapped.articulos = [...decision.articulos];
+  mapped.normativa = [...decision.normativa];
+  mapped.informes = [...decision.informes];
+  mapped.jurisprudencia = [...decision.jurisprudencia];
+  mapped.reglasAplicadas = [...decision.reglasAplicadas];
+  mapped.confianza = decision.confianza;
+  mapped.observaciones = [...decision.observaciones];
+  return mapped;
+}
+
 export class CanonicalExpedienteEngine {
   constructor(
     private readonly cpvEngine: CPVEngine,
@@ -37,22 +52,15 @@ export class CanonicalExpedienteEngine {
 
     if (context.objeto.trim().length > 0) {
       const cpvDecision = this.cpvEngine.ejecutar(context);
-      const cpvPrincipal = cpvDecision.resultado?.[0]?.codigo;
       fields = {
         ...fields,
-        cpvMain: promoteEngineProposal(
-          {
-            ...cpvDecision,
-            resultado: cpvPrincipal,
-          } as typeof cpvDecision & { resultado?: string },
-          {
-            key: "cpvMain",
-            motor: "CPVEngine",
-            sourceId: "CPVEngine:CPV-001",
-            requiresHumanValidation: true,
-            diagnostics: ["El CPV es una propuesta automática y no se promueve sin validación humana."],
-          },
-        ),
+        cpvMain: promoteEngineProposal(toMainCpvDecision(cpvDecision), {
+          key: "cpvMain",
+          motor: "CPVEngine",
+          sourceId: "CPVEngine:CPV-001",
+          requiresHumanValidation: true,
+          diagnostics: ["El CPV es una propuesta automática y no se promueve sin validación humana."],
+        }),
       };
       executed.push("CPVEngine");
     }
