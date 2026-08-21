@@ -19,6 +19,6 @@ describe("Paso 11.9.4 - interfaz de guarda económica mantenimiento", () => {
     expect(SERVICE_REGRESSION_MAINTENANCE_007_GUARD_SCRIPT).toContain("11.9.3 Evidencia económica");
     expect(SERVICE_REGRESSION_MAINTENANCE_007_GUARD_SCRIPT).toContain("11.9.4 Guarda económica automática");
     expect(SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_GUARD_SCRIPT).toContain("serviceRegressionMaintenance007EconomicsValidated");
-    expect(SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_GUARD_SCRIPT).toContain("no se han normalizado redondeos ni cerrado campos jurídicos sin fuente primaria");
+    expect(SERVICE_REGRESSION_MAINTENANCE_007_ECONOMICS_GUARD_SCRIPT).toContain("No se han normalizado redondeos ni cerrado campos jurídicos sin fuente primaria");
   });
 });
