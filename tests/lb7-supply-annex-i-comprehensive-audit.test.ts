@@ -1,6 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SUPPLY_ANNEX_I_COMPREHENSIVE_AUDIT_SCRIPT } from "../src/interfaces/lb7/SupplyAnnexIComprehensiveAuditScript";
-import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
 describe("Paso 11.2.2 - auditoría integral del Anexo I", () => {
   it("compila de forma aislada", () => {
@@ -39,7 +40,8 @@ describe("Paso 11.2.2 - auditoría integral del Anexo I", () => {
   });
 
   it("queda integrado después de la auditoría 11.2.1", () => {
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_ANNEX_I_COMPREHENSIVE_AUDIT_SCRIPT");
-    expect(ADAPTIVE_FLOW_UI).toContain("Contrata-IA Paso 11.2.2 auditoría integral");
+    const uiSource = fs.readFileSync(path.resolve("src/interfaces/lb7/AdaptiveFlowUi.ts"), "utf8");
+    expect(uiSource).toContain("SUPPLY_ANNEX_I_COMPREHENSIVE_AUDIT_SCRIPT");
+    expect(uiSource).toContain("Contrata-IA Paso 11.2.2 auditoría integral");
   });
 });
