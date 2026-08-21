@@ -45,10 +45,14 @@ for (const requiredId of required) {
 }
 
 const expediente = (manifest.components ?? []).find(component => component.id === "expediente");
-if (expediente?.canonicalPath !== "src/domain/expediente/CanonicalExpedienteState.ts") {
-  errors.push("expediente authority must be CanonicalExpedienteState.ts");
+if (expediente?.canonicalPath !== "src/domain/expediente/UniversalExpedienteV13.ts") {
+  errors.push("expediente authority must be UniversalExpedienteV13.ts");
+}
+if (expediente?.contract !== "UniversalExpedienteV13") {
+  errors.push("expediente contract must be UniversalExpedienteV13");
 }
 for (const legacyExpedientePath of [
+  "src/domain/expediente/CanonicalExpedienteState.ts",
   "src/domain/expediente/Expediente.ts",
   "src/domain/expediente/ExpedienteContext.ts",
   "src/domain/expediente/ExpedienteContexto.ts",
