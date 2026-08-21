@@ -18,7 +18,7 @@ describe("LB7 suministro - paso 9 borrador editable", () => {
     expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("_Anexo_I_Borrador_Corregido_Contrata-IA.docx");
     expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("ANNEX_I_PARAMETERIZED_DRAFT_CORRECTED_NOT_FULL_OFFICIAL_PCAP");
-    expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("no sustituye las cláusulas generales del modelo oficial");
+    expect(SUPPLY_OFFICIAL_ANNEX_DRAFT_SCRIPT).toContain("No sustituye las cláusulas generales del modelo oficial");
   });
 
   it("solo se habilita después del cierre completo del paso 8", () => {
