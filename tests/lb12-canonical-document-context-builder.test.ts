@@ -10,7 +10,7 @@ function validated<T>(key: string, value: T): EvidenceField<T> {
     key,
     value,
     status: "HUMAN_VALIDATED",
-    sources: [{ kind: "USER_INPUT", sourceId: "lb12.6-test" }],
+    sources: [{ kind: "USER_INPUT", sourceId: "lb12.7-test" }],
     humanValidationRequired: true,
     humanValidated: true,
   };
@@ -18,7 +18,7 @@ function validated<T>(key: string, value: T): EvidenceField<T> {
 
 function completeServiceState(): CanonicalExpedienteState {
   return {
-    id: "EXP-12.6-SERVICE",
+    id: "EXP-12.7-SERVICE",
     lifecycleState: EstadoExpediente.PUBLICIDAD_VALIDADA,
     blockers: [],
     warnings: ["Advertencia preservada"],
@@ -40,12 +40,12 @@ function completeServiceState(): CanonicalExpedienteState {
   };
 }
 
-describe("Bloque 12.6 - contexto documental desde expediente canónico", () => {
+describe("Bloque 12.7 - contexto documental desde expediente canónico", () => {
   it("construye el DocumentContext LB-5 sin perder los datos canónicos validados", () => {
     const result = buildCanonicalDocumentContext(completeServiceState(), new Date("2026-08-21T12:00:00Z"));
 
     expect(result.ready).toBe(true);
-    expect(result.context?.expedienteNumber).toBe("EXP-12.6-SERVICE");
+    expect(result.context?.expedienteNumber).toBe("EXP-12.7-SERVICE");
     expect(result.context?.procedure.value).toBe(ProcedureType.OPEN);
     expect(result.context?.contractType.value).toBe("SERVICE");
     expect(result.context?.cpv.value).toBe("50000000-5");
@@ -57,15 +57,56 @@ describe("Bloque 12.6 - contexto documental desde expediente canónico", () => {
       extensionMonths: 12,
       modificationPercent: 20,
     });
-    expect(result.context?.version).toBe("CANONICAL-DOCUMENT-CONTEXT-12.6-v1");
+    expect(result.context?.version).toBe("CANONICAL-DOCUMENT-CONTEXT-12.7-v1");
   });
 
-  it("no inventa umbrales ni plazos que todavía no existen como resultados canónicos", () => {
+  it("no inventa umbrales ni plazos cuando no se aportan resultados jurídicos promocionables", () => {
     const result = buildCanonicalDocumentContext(completeServiceState());
 
     expect(result.context?.thresholds.value).toBeUndefined();
     expect(result.context?.deadlines.value).toBeUndefined();
-    expect(result.warnings.some(warning => warning.includes("Umbrales y plazos"))).toBe(true);
+    expect(result.warnings.some(warning => warning.includes("Umbral jurídico"))).toBe(true);
+    expect(result.warnings.some(warning => warning.includes("Plazos jurídicos"))).toBe(true);
+  });
+
+  it("incorpora umbral y plazos cuando llegan como evidencia humana validada", () => {
+    const result = buildCanonicalDocumentContext(
+      completeServiceState(),
+      new Date("2026-08-21T12:00:00Z"),
+      {
+        threshold: validated("threshold", 143000),
+        deadlines: validated("deadlines", {
+          ofertasDias: 35,
+          adjudicacionDias: 15,
+          formalizacionDias: 15,
+          subsanacionDias: 3,
+          recursoDias: 15,
+          ejecucionDias: 0,
+          justificacion: "Regla validada",
+          normativa: "LCSP",
+          articulo: "156",
+          confidence: 100,
+        }),
+      },
+    );
+
+    expect(result.ready).toBe(true);
+    expect(result.context?.thresholds.value).toBe(143000);
+    expect(result.context?.deadlines.value).toMatchObject({ ofertasDias: 35, articulo: "156" });
+  });
+
+  it("bloquea un resultado jurídico suplementario todavía no validado", () => {
+    const deadlineProposal: EvidenceField<any> = {
+      key: "deadlines",
+      value: { ofertasDias: 35 },
+      status: "SYSTEM_PROPOSAL",
+      sources: [{ kind: "NORMATIVE_RULE", sourceId: "rule" }],
+      humanValidationRequired: true,
+      humanValidated: false,
+    };
+    const result = buildCanonicalDocumentContext(completeServiceState(), new Date(), { deadlines: deadlineProposal });
+    expect(result.ready).toBe(false);
+    expect(result.blockers).toContain("El resultado de plazos aportado no es promocionable.");
   });
 
   it("bloquea la construcción si existe un campo jurídico pendiente", () => {
