@@ -16,6 +16,7 @@ export interface CanonicalExpedienteFields {
   modificationPercent: EvidenceField<number>;
   awardCriteria: EvidenceField<readonly string[]>;
   solvency: EvidenceField<readonly string[]>;
+  publicity?: EvidenceField<string>;
 }
 
 export interface CanonicalExpedienteState {
