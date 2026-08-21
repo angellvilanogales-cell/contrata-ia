@@ -20,7 +20,8 @@ import {
   UniversalTraceability,
 } from "./UniversalExpedienteDomains";
 
-export const UNIVERSAL_EXPEDIENTE_SCHEMA_VERSION = "13.0.0-alpha.2" as const;
+export const UNIVERSAL_EXPEDIENTE_SCHEMA_VERSION = "13.0.0" as const;
+export const BLOCK_13_STATUS = "UNIVERSAL_EXPEDIENTE_STABLE" as const;
 
 export interface UniversalProcessingEvidence {
   processingType: EvidenceField<string>;
