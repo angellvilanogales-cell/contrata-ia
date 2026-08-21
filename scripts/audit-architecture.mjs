@@ -8,7 +8,7 @@ const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 
 const required = [
   "configuration", "events", "rules", "inference", "knowledge",
-  "legalReasoning", "cpv", "procedure", "documents", "export", "ai"
+  "legalReasoning", "cpv", "procedure", "expediente", "documents", "export", "ai"
 ];
 
 const errors = [];
@@ -42,6 +42,20 @@ for (const component of manifest.components ?? []) {
 
 for (const requiredId of required) {
   if (!ids.has(requiredId)) errors.push(`missing canonical responsibility: ${requiredId}`);
+}
+
+const expediente = (manifest.components ?? []).find(component => component.id === "expediente");
+if (expediente?.canonicalPath !== "src/domain/expediente/CanonicalExpedienteState.ts") {
+  errors.push("expediente authority must be CanonicalExpedienteState.ts");
+}
+for (const legacyExpedientePath of [
+  "src/domain/expediente/Expediente.ts",
+  "src/domain/expediente/ExpedienteContext.ts",
+  "src/domain/expediente/ExpedienteContexto.ts",
+]) {
+  if (!expediente?.legacyPaths?.includes(legacyExpedientePath)) {
+    errors.push(`legacy expediente model must be declared compatibility-only: ${legacyExpedientePath}`);
+  }
 }
 
 const mainSource = fs.readFileSync(path.join(root, "src/main.ts"), "utf8");
