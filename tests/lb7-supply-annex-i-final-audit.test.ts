@@ -1,6 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SUPPLY_ANNEX_I_AUDIT_FINAL_HOTFIX_SCRIPT } from "../src/interfaces/lb7/SupplyAnnexIAuditFinalHotfixScript";
-import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
 describe("LB-7 cierre final real del Anexo I", () => {
   it("corrige el sistema de determinación del precio por contenido y no por prefijo rígido", () => {
@@ -18,6 +19,7 @@ describe("LB-7 cierre final real del Anexo I", () => {
   it("solo declara cierre cuando no quedan bloqueantes reales", () => {
     expect(SUPPLY_ANNEX_I_AUDIT_FINAL_HOTFIX_SCRIPT).toContain('supplyAnnexIUnresolvedFields=r.unresolved');
     expect(SUPPLY_ANNEX_I_AUDIT_FINAL_HOTFIX_SCRIPT).toContain('supplyAnnexIFinalAuditValidated=r.unresolved.length===0');
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_ANNEX_I_AUDIT_FINAL_HOTFIX_SCRIPT");
+    const uiSource = fs.readFileSync(path.resolve("src/interfaces/lb7/AdaptiveFlowUi.ts"), "utf8");
+    expect(uiSource).toContain("SUPPLY_ANNEX_I_AUDIT_FINAL_HOTFIX_SCRIPT");
   });
 });
