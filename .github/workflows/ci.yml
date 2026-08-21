@@ -133,7 +133,26 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm test
+      - name: Run Vitest diagnostic
+        shell: bash
+        run: |
+          mkdir -p artifacts/vitest-diagnostic
+          set +e
+          npx vitest run --reporter=json --outputFile=artifacts/vitest-diagnostic/report.json
+          code=$?
+          echo "$code" > artifacts/vitest-diagnostic/exit-code.txt
+          exit 0
+      - name: Preserve Vitest diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-diagnostic
+          path: artifacts/vitest-diagnostic
+          if-no-files-found: error
+          retention-days: 1
+      - name: Preserve test failure status
+        shell: bash
+        run: exit "$(cat artifacts/vitest-diagnostic/exit-code.txt)"
 
   build:
     name: Production build and end-to-end smoke tests
