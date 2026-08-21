@@ -1,6 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_CALIBRATION_SCRIPT } from "../src/interfaces/lb7/SupplyCrossDocumentFinalAuditCalibrationScript";
-import { ADAPTIVE_FLOW_UI } from "../src/interfaces/lb7/AdaptiveFlowUi";
 
 describe("Paso 11.4.3A - calibración final", () => {
   it("compila de forma aislada", () => {
@@ -27,9 +28,11 @@ describe("Paso 11.4.3A - calibración final", () => {
   });
 
   it("queda integrado después del 11.4.3", () => {
-    expect(ADAPTIVE_FLOW_UI).toContain("SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_CALIBRATION_SCRIPT");
-    const audit = ADAPTIVE_FLOW_UI.indexOf("SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_SCRIPT");
-    const calibration = ADAPTIVE_FLOW_UI.indexOf("SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_CALIBRATION_SCRIPT");
+    const uiSource = fs.readFileSync(path.resolve("src/interfaces/lb7/AdaptiveFlowUi.ts"), "utf8");
+    expect(uiSource).toContain("SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_CALIBRATION_SCRIPT");
+    const audit = uiSource.indexOf("${SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_SCRIPT}");
+    const calibration = uiSource.indexOf("${SUPPLY_CROSS_DOCUMENT_FINAL_AUDIT_CALIBRATION_SCRIPT}");
+    expect(audit).toBeGreaterThanOrEqual(0);
     expect(calibration).toBeGreaterThan(audit);
   });
 });
