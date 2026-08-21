@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "architectureVersion": "2.1.0",
+  "architectureVersion": "2.2.0",
   "runtimeEntrypoint": "src/main.ts",
   "components": [
     {"id":"configuration","contract":"ApplicationConfiguration","canonicalPath":"src/architecture/runtime/EnvironmentConfiguration.ts","legacyPaths":[]},
@@ -11,7 +11,7 @@
     {"id":"legalReasoning","contract":"LegalReasonerPort","canonicalPath":"src/domain/legal/LegalReasoner.ts","legacyPaths":[]},
     {"id":"cpv","contract":"CPVEnginePort","canonicalPath":"src/domain/cpv/CPVEngine.ts","legacyPaths":["src/engines/CPVEngine.ts"]},
     {"id":"procedure","contract":"ProcedureResolverPort","canonicalPath":"src/domain/resolvers/ProcedureResolver.ts","legacyPaths":[]},
-    {"id":"expediente","contract":"CanonicalExpedienteState","canonicalPath":"src/domain/expediente/CanonicalExpedienteState.ts","legacyPaths":["src/domain/expediente/Expediente.ts","src/domain/expediente/ExpedienteContext.ts","src/domain/expediente/ExpedienteContexto.ts"]},
+    {"id":"expediente","contract":"UniversalExpedienteV13","canonicalPath":"src/domain/expediente/UniversalExpedienteV13.ts","legacyPaths":["src/domain/expediente/CanonicalExpedienteState.ts","src/domain/expediente/Expediente.ts","src/domain/expediente/ExpedienteContext.ts","src/domain/expediente/ExpedienteContexto.ts"]},
     {"id":"documents","contract":"DocumentGeneratorPort","canonicalPath":"src/application/documents/DocumentGenerator.ts","legacyPaths":["src/generators/BaseDocumentGenerator.ts"]},
     {"id":"export","contract":"DocumentExporterPort","canonicalPath":"src/application/export/ExportManager.ts","legacyPaths":[]},
     {"id":"ai","contract":"AIServicePort","canonicalPath":"src/infrastructure/ai/AIManager.ts","legacyPaths":[]}
