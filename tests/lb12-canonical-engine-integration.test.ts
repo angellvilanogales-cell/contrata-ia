@@ -45,21 +45,22 @@ function state(): CanonicalExpedienteState {
   };
 }
 
+function engine(): CanonicalExpedienteEngine {
+  const repository = new KnowledgeRepository();
+  const cpv = new CPVEntry();
+  cpv.codigo = "90910000-9";
+  cpv.descripcion = "Servicios de limpieza";
+  cpv.palabrasClave = ["limpieza", "oficinas"];
+  repository.registrarCPV(cpv);
+  return new CanonicalExpedienteEngine(
+    new CPVEngine(new KnowledgeManager(repository)),
+    new ProcedimientoEngine(),
+  );
+}
+
 describe("Bloque 12.2 - integración canónica de motores existentes", () => {
   it("convierte la salida probabilística de CPVEngine en propuesta pendiente de validación", () => {
-    const repository = new KnowledgeRepository();
-    const cpv = new CPVEntry();
-    cpv.codigo = "90910000-9";
-    cpv.descripcion = "Servicios de limpieza";
-    cpv.palabrasClave = ["limpieza", "oficinas"];
-    repository.registrarCPV(cpv);
-
-    const engine = new CanonicalExpedienteEngine(
-      new CPVEngine(new KnowledgeManager(repository)),
-      new ProcedimientoEngine(),
-    );
-
-    const result = engine.ejecutarIdentificacion(state());
+    const result = engine().ejecutarIdentificacion(state());
     expect(result.executed).toContain("CPVEngine");
     expect(result.executed).not.toContain("ProcedimientoEngine");
     expect(result.state.fields.cpvMain.value).toBe("90910000-9");
@@ -87,5 +88,23 @@ describe("Bloque 12.2 - integración canónica de motores existentes", () => {
     expect(field.legalBasis).toContain("art. 156 LCSP");
     expect(field.humanValidationRequired).toBe(true);
     expect(field.humanValidated).toBe(false);
+  });
+
+  it("no ejecuta solvencia ni publicidad si el procedimiento sigue siendo una propuesta no validada", () => {
+    const s = state();
+    s.fields.procedure = {
+      key: "procedure",
+      value: "ABIERTO",
+      status: "SYSTEM_PROPOSAL",
+      sources: [{ kind: "NORMATIVE_RULE", sourceId: "PROC-001" }],
+      humanValidationRequired: true,
+      humanValidated: false,
+      legalBasis: ["art. 156 LCSP"],
+    };
+
+    const result = engine().ejecutarRegimen(s);
+    expect(result.executed).toEqual([]);
+    expect(result.state.fields.solvency).toBe(s.fields.solvency);
+    expect(result.state.fields.publicity).toBeUndefined();
   });
 });
