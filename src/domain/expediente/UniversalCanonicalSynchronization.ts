@@ -4,7 +4,8 @@ import { UniversalExpedienteV13 } from "./UniversalExpedienteV13";
 
 export type UniversalSynchronizationStatus =
   | "SYNCED_EXACT"
-  | "SKIPPED_ALREADY_POPULATED"
+  | "ALIGNED_EXACT"
+  | "BLOCKED_EXACT_DIVERGENCE"
   | "BLOCKED_NON_ISOMORPHIC";
 
 export interface UniversalSynchronizationRecord {
@@ -26,7 +27,8 @@ function rekey<T>(field: EvidenceField<T>, key: string): EvidenceField<T> {
 
 /**
  * Sincroniza únicamente equivalencias semánticas exactas entre la vista
- * canónica heredada y los dominios universales. Nunca completa por analogía.
+ * canónica heredada y los dominios universales. Nunca completa por analogía
+ * ni resuelve divergencias eligiendo silenciosamente una de las dos fuentes.
  */
 export function synchronizeCanonicalIntoUniversal(
   expediente: UniversalExpedienteV13,
@@ -36,28 +38,36 @@ export function synchronizeCanonicalIntoUniversal(
   const canonical = expediente.canonical;
 
   let economic = expediente.economic;
+  const sourceVe = canonical.fields.estimatedValueCents;
+  const targetVe = economic.legalEstimatedValueCents;
 
-  if (economic.legalEstimatedValueCents.status === "PENDING") {
+  if (targetVe.status === "PENDING") {
     economic = {
       ...economic,
-      legalEstimatedValueCents: rekey(
-        canonical.fields.estimatedValueCents,
-        "economic.legalEstimatedValueCents",
-      ),
+      legalEstimatedValueCents: rekey(sourceVe, "economic.legalEstimatedValueCents"),
     };
     records.push({
-      sourceKey: canonical.fields.estimatedValueCents.key,
+      sourceKey: sourceVe.key,
       targetKey: "economic.legalEstimatedValueCents",
       status: "SYNCED_EXACT",
       reason: "El valor estimado jurídico es la misma magnitud expresada en céntimos.",
     });
-  } else {
+  } else if (sourceVe.value === targetVe.value) {
     records.push({
-      sourceKey: canonical.fields.estimatedValueCents.key,
+      sourceKey: sourceVe.key,
       targetKey: "economic.legalEstimatedValueCents",
-      status: "SKIPPED_ALREADY_POPULATED",
-      reason: "El dominio universal ya contiene evidencia propia y no se sobrescribe.",
+      status: "ALIGNED_EXACT",
+      reason: "Ambas vistas contienen el mismo valor estimado jurídico; se conserva la evidencia universal existente.",
     });
+  } else {
+    const reason = `Divergencia entre VE canónico (${String(sourceVe.value)}) y VE jurídico universal (${String(targetVe.value)}); requiere revisión de fuente y validación humana.`;
+    records.push({
+      sourceKey: sourceVe.key,
+      targetKey: "economic.legalEstimatedValueCents",
+      status: "BLOCKED_EXACT_DIVERGENCE",
+      reason,
+    });
+    blockers.push(reason);
   }
 
   const nonIsomorphic: Array<[string, string, string]> = [
@@ -85,7 +95,6 @@ export function synchronizeCanonicalIntoUniversal(
 
   for (const [sourceKey, targetKey, reason] of nonIsomorphic) {
     records.push({ sourceKey, targetKey, status: "BLOCKED_NON_ISOMORPHIC", reason });
-    blockers.push(`Sincronización no automática ${sourceKey} -> ${targetKey}: ${reason}`);
   }
 
   return {
@@ -96,9 +105,8 @@ export function synchronizeCanonicalIntoUniversal(
 }
 
 /**
- * Reconstruye la vista canónica heredada exclusivamente desde la copia
- * de compatibilidad incluida en el universal. Esta función centraliza el
- * acceso para motores antiguos y evita escrituras externas directas.
+ * Vista de compatibilidad para motores anteriores al Bloque 13.
+ * La autoridad de arquitectura sigue siendo UniversalExpedienteV13.
  */
 export function canonicalCompatibilityView(
   expediente: UniversalExpedienteV13,
