@@ -23,24 +23,24 @@ function declared<T>(key: string, value: T, actionId: string): EvidenceField<T> 
 function appendSource(expediente: UniversalExpedienteV13, source: EvidenceReference): UniversalExpedienteV13 {
   const current = expediente.traceability.sourceRegistry;
   if (current.some(item => item.kind === source.kind && item.sourceId === source.sourceId)) return expediente;
-  return {
-    ...expediente,
-    traceability: {
-      ...expediente.traceability,
-      sourceRegistry: [...current, source],
-    },
-  };
+  return { ...expediente, traceability: { ...expediente.traceability, sourceRegistry: [...current, source] } };
 }
 
-function setKnownField(
-  expediente: UniversalExpedienteV13,
-  fieldKey: string,
-  value: unknown,
-  actionId: string,
-): UniversalExpedienteV13 {
+function setKnownField(expediente: UniversalExpedienteV13, fieldKey: string, value: unknown, actionId: string): UniversalExpedienteV13 {
   switch (fieldKey) {
     case "object":
       return { ...expediente, canonical: { ...expediente.canonical, fields: { ...expediente.canonical.fields, object: declared("object", String(value), actionId) } } };
+    case "lots.divisionIntoLots": {
+      const divided = Boolean(value);
+      const canonicalFields = divided || expediente.canonical.fields.lots.status !== "PENDING"
+        ? expediente.canonical.fields
+        : { ...expediente.canonical.fields, lots: declared("lots", ["Lote único"], actionId) };
+      return {
+        ...expediente,
+        canonical: { ...expediente.canonical, fields: canonicalFields },
+        lots: { ...expediente.lots, divisionIntoLots: declared(fieldKey, divided, actionId) },
+      };
+    }
     case "lots":
       return { ...expediente, canonical: { ...expediente.canonical, fields: { ...expediente.canonical.fields, lots: declared("lots", value as readonly string[], actionId) } } };
     case "durationMonths":
@@ -53,6 +53,8 @@ function setKnownField(
       return { ...expediente, economic: { ...expediente.economic, maximumApprovedBudgetCents: declared(fieldKey, Number(value), actionId) } };
     case "economic.referenceConsumption":
       return { ...expediente, economic: { ...expediente.economic, referenceConsumption: declared(fieldKey, String(value), actionId) } };
+    case "economic.legalEstimatedValueCents":
+      return { ...expediente, economic: { ...expediente.economic, legalEstimatedValueCents: declared(fieldKey, Number(value), actionId) } };
     case "processing.processingType":
       return { ...expediente, processing: { ...expediente.processing, processingType: declared(fieldKey, String(value), actionId) } };
     case "regulation.harmonizedRegulation":
@@ -71,23 +73,11 @@ function setKnownField(
 export class UniversalAdaptiveAnswerApplier {
   constructor(private readonly planner = new UniversalAdaptiveQuestionEngine()) {}
 
-  public apply(
-    expediente: UniversalExpedienteV13,
-    action: UniversalAdaptiveAction,
-    value: unknown,
-  ): AdaptiveAnswerApplicationResult {
-    if (action.kind !== "ASK_USER" || !action.fieldKey) {
-      throw new Error("Solo pueden aplicarse respuestas a acciones ASK_USER con campo de destino explícito.");
-    }
-
+  public apply(expediente: UniversalExpedienteV13, action: UniversalAdaptiveAction, value: unknown): AdaptiveAnswerApplicationResult {
+    if (action.kind !== "ASK_USER" || !action.fieldKey) throw new Error("Solo pueden aplicarse respuestas a acciones ASK_USER con campo de destino explícito.");
     let updated = setKnownField(expediente, action.fieldKey, value, action.id);
     const source = { kind: "USER_INPUT" as const, sourceId: `adaptive:${action.id}` };
     updated = appendSource(updated, source);
-
-    return {
-      expediente: updated,
-      next: this.planner.next(updated),
-      updatedFieldKey: action.fieldKey,
-    };
+    return { expediente: updated, next: this.planner.next(updated), updatedFieldKey: action.fieldKey };
   }
 }
