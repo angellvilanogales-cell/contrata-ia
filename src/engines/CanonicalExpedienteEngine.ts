@@ -1,8 +1,12 @@
 import { CPVEngine } from "./CPVEngine";
 import { ProcedimientoEngine } from "./ProcedimientoEngine";
+import { SolvenciaEngine } from "./SolvenciaEngine";
+import { PublicidadEngine } from "./PublicidadEngine";
 import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
 import { CanonicalExpedienteState } from "../domain/expediente/CanonicalExpedienteState";
 import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
+import { isPromotableEvidenceField } from "../domain/expediente/EvidenceField";
+import { TipoProcedimiento } from "../domain/procedimiento/TipoProcedimiento";
 import { promoteEngineProposal, promoteNormativeEngineDecision } from "./CanonicalEnginePromotion";
 
 export interface CanonicalEngineRunResult {
@@ -22,6 +26,9 @@ function toLegacyContext(state: CanonicalExpedienteState): ExpedienteContext {
   context.prorrogas = state.fields.extensionMonths.value ?? 0;
   context.divisionLotes = (state.fields.lots.value?.length ?? 0) > 1;
   context.criterios = state.fields.awardCriteria.value ? [...state.fields.awardCriteria.value] : [];
+  if (state.fields.procedure.value && isPromotableEvidenceField(state.fields.procedure)) {
+    context.procedimiento = state.fields.procedure.value as TipoProcedimiento;
+  }
   return context;
 }
 
@@ -39,10 +46,26 @@ function toMainCpvDecision(decision: ReturnType<CPVEngine["ejecutar"]>): Decisio
   return mapped;
 }
 
+function toSolvencyListDecision(decision: DecisionJuridica<string>): DecisionJuridica<readonly string[]> {
+  const mapped = new DecisionJuridica<readonly string[]>();
+  mapped.resultado = decision.resultado ? [decision.resultado] : [];
+  mapped.explicacion = decision.explicacion;
+  mapped.articulos = [...decision.articulos];
+  mapped.normativa = [...decision.normativa];
+  mapped.informes = [...decision.informes];
+  mapped.jurisprudencia = [...decision.jurisprudencia];
+  mapped.reglasAplicadas = [...decision.reglasAplicadas];
+  mapped.confianza = decision.confianza;
+  mapped.observaciones = [...decision.observaciones];
+  return mapped;
+}
+
 export class CanonicalExpedienteEngine {
   constructor(
     private readonly cpvEngine: CPVEngine,
     private readonly procedimientoEngine: ProcedimientoEngine,
+    private readonly solvenciaEngine = new SolvenciaEngine(),
+    private readonly publicidadEngine = new PublicidadEngine(),
   ) {}
 
   public ejecutarIdentificacion(state: CanonicalExpedienteState): CanonicalEngineRunResult {
@@ -81,10 +104,47 @@ export class CanonicalExpedienteEngine {
     }
 
     return {
-      state: {
-        ...state,
-        fields,
-      },
+      state: { ...state, fields },
+      context,
+      executed,
+    };
+  }
+
+  public ejecutarRegimen(state: CanonicalExpedienteState): CanonicalEngineRunResult {
+    const context = toLegacyContext(state);
+    const executed: string[] = [];
+    let fields = state.fields;
+
+    if (!context.procedimiento || !isPromotableEvidenceField(state.fields.procedure)) {
+      return { state, context, executed };
+    }
+
+    const solvenciaDecision = this.solvenciaEngine.ejecutar(context);
+    fields = {
+      ...fields,
+      solvency: promoteNormativeEngineDecision(toSolvencyListDecision(solvenciaDecision), {
+        key: "solvency",
+        motor: "SolvenciaEngine",
+        sourceId: solvenciaDecision.reglasAplicadas[0] ?? "solvencia.rules.json",
+        requiresHumanValidation: true,
+      }),
+    };
+    executed.push("SolvenciaEngine");
+
+    const publicidadDecision = this.publicidadEngine.ejecutar(context);
+    fields = {
+      ...fields,
+      publicity: promoteNormativeEngineDecision(publicidadDecision, {
+        key: "publicity",
+        motor: "PublicidadEngine",
+        sourceId: publicidadDecision.reglasAplicadas[0] ?? "publicidad.rules.json",
+        requiresHumanValidation: true,
+      }),
+    };
+    executed.push("PublicidadEngine");
+
+    return {
+      state: { ...state, fields },
       context,
       executed,
     };
