@@ -73,7 +73,8 @@ export class CanonicalExpedienteEngine {
     const executed: string[] = [];
     let fields = state.fields;
 
-    if (context.objeto.trim().length > 0) {
+    // Un motor automático no degrada una decisión ya promocionable/validada.
+    if (context.objeto.trim().length > 0 && !isPromotableEvidenceField(state.fields.cpvMain)) {
       const cpvDecision = this.cpvEngine.ejecutar(context);
       fields = {
         ...fields,
@@ -88,7 +89,9 @@ export class CanonicalExpedienteEngine {
       executed.push("CPVEngine");
     }
 
-    if (context.valorEstimado > 0 && context.tipoContrato.trim().length > 0) {
+    if (context.valorEstimado > 0
+      && context.tipoContrato.trim().length > 0
+      && !isPromotableEvidenceField(state.fields.procedure)) {
       const procedimientoDecision = this.procedimientoEngine.ejecutar(context);
       fields = {
         ...fields,
