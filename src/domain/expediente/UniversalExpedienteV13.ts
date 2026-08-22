@@ -69,8 +69,17 @@ export function createUniversalExpedienteFromCanonical(canonical: CanonicalExped
   };
 }
 
+const VE_COMPONENT_KEYS = new Set([
+  "economic.initialEstimatedValueBaseCents",
+  "economic.extensionAmountExVatCents",
+  "economic.modificationAmountExVatCents",
+  "economic.optionsAmountExVatCents",
+  "economic.otherEstimatedValueComponentsCents",
+]);
+
 function domainFields(expediente: UniversalExpedienteV13): Record<UniversalDomainName, EvidenceField<unknown>[]> {
-  const economic = Object.values(expediente.economic) as EvidenceField<unknown>[];
+  const veAlreadyKnown = isPromotableEvidenceField(expediente.economic.legalEstimatedValueCents) || isPromotableEvidenceField(expediente.canonical.fields.estimatedValueCents);
+  const economic = (Object.values(expediente.economic) as EvidenceField<unknown>[]).filter(field => !(veAlreadyKnown && VE_COMPONENT_KEYS.has(field.key)));
   const filteredEconomic = expediente.canonical.fields.contractType.value === "SUPPLY"
     ? economic
     : economic.filter(field => !["economic.referenceConsumption", "economic.projectedConsumption", "economic.maximumApprovedBudgetCents"].includes(field.key));
