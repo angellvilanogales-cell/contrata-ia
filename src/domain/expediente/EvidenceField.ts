@@ -48,13 +48,18 @@ export function createPendingEvidenceField<T>(key: string): EvidenceField<T> {
   };
 }
 
-export function isPromotableEvidenceField<T>(field: EvidenceField<T>): boolean {
+/**
+ * Promotion is status-based and independent of the concrete value type. Using
+ * EvidenceField<unknown> deliberately permits heterogeneous universal field
+ * collections without weakening the evidence semantics.
+ */
+export function isPromotableEvidenceField(field: EvidenceField<unknown>): boolean {
   if (field.status === "SOURCE_CONFLICT" || field.status === "PENDING") return false;
   if (field.humanValidationRequired && !field.humanValidated) return false;
   return true;
 }
 
-export function assertNoSilentConflictResolution<T>(field: EvidenceField<T>): void {
+export function assertNoSilentConflictResolution(field: EvidenceField<unknown>): void {
   if (field.status !== "SOURCE_CONFLICT") return;
   if (!field.conflict || field.conflict.treatment !== "DO_NOT_AUTO_RESOLVE") {
     throw new Error(`El campo ${field.key} contiene una contradicción sin tratamiento bloqueante.`);
