@@ -5,6 +5,9 @@ import { LB6Orchestrator } from "../../application/intake/lb6/LB6Orchestrator";
 import type { IntakeMode, IntakeQuestionId } from "../../application/intake/lb6/IntakeModel";
 import { AdaptiveProcurementFlow, type AdaptiveFlowAnswers } from "../../application/intake/lb7/AdaptiveProcurementFlow";
 import type { EventAnswerId, EventFeature } from "../../application/intake/lb7/EventServicesProfile";
+import { UniversalOfficialTemplateRegistry } from "../../application/intake/lb19/UniversalOfficialTemplateRegistry";
+import { evaluateUniversalApplicationIntegration } from "../../application/intake/lb21/UniversalApplicationIntegration";
+import { bridgeLegacyIntakeCaseToUniversal } from "../../application/intake/lb21/UniversalLegacyCaseBridge";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -28,6 +31,7 @@ const orchestrator = buildOperationalOrchestrator();
 const security = new SecurityPolicy();
 const adaptiveFlow = new AdaptiveProcurementFlow();
 const adaptiveCases = new AdaptiveCaseStore(path.join(DATA_ROOT, "adaptive-cases"));
+const universalTemplateRegistry = new UniversalOfficialTemplateRegistry();
 function sendJson(response: ServerResponse, status: number, value: unknown): void { const body = Buffer.from(JSON.stringify(value)); response.writeHead(status, { "content-type": "application/json; charset=utf-8", "content-length": body.length }); response.end(body); }
 function sendText(response: ServerResponse, status: number, bodyText: string, contentType: string, cacheControl = "no-cache"): void { const body = Buffer.from(bodyText); response.writeHead(status, { "content-type": contentType, "content-length": body.length, "cache-control": cacheControl }); response.end(body); }
 function redirect(response: ServerResponse, location: string, cookie?: string): void { if (cookie) response.setHeader("set-cookie", cookie); response.writeHead(303, { location, "cache-control": "no-store" }); response.end(); }
@@ -61,7 +65,7 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 7, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 21, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, timestamp: new Date().toISOString() }); return; }
       if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); sendJson(response, 201, adaptiveCases.create()); return; }
       if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) { const caseId = decodeURIComponent(parts[3]); if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; } if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue)); return; } }
       if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers))); return; }
@@ -73,13 +77,34 @@ export function createLB6Server(): http.Server {
       if (parts[0] === "api" && parts[1] === "cases" && parts[2]) {
         const id = decodeURIComponent(parts[2]);
         if (request.method === "GET" && parts.length === 3) { requireRole(request, "VIEWER"); sendJson(response, 200, { caseValue: orchestrator.getCase(id), progress: orchestrator.progress(id) }); return; }
+        if (request.method === "GET" && parts[3] === "universal-readiness") {
+          requireRole(request, "VIEWER");
+          const caseValue = orchestrator.getCase(id);
+          const migration = bridgeLegacyIntakeCaseToUniversal(caseValue);
+          const procurementDate = url.searchParams.get("date") ?? new Date().toISOString().slice(0, 10);
+          const integration = evaluateUniversalApplicationIntegration(
+            migration.expediente,
+            universalTemplateRegistry,
+            procurementDate,
+            ["DPCAF", "PCAP", "PPT"],
+          );
+          sendJson(response, 200, {
+            caseId: id,
+            procurementDate,
+            migratedFields: migration.migratedFields,
+            skippedLegacyAnswers: migration.skippedLegacyAnswers,
+            diagnostics: migration.diagnostics,
+            integration,
+          });
+          return;
+        }
         if (request.method === "POST" && parts[3] === "answers") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const updated = orchestrator.answer(id, String(body.questionId) as IntakeQuestionId, body.value, actor.id); sendJson(response, 200, { caseValue: updated, progress: orchestrator.progress(id) }); return; }
         if (request.method === "POST" && parts[3] === "event-services") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const updated = orchestrator.configureEventServices(id, eventFeatures(body.features), eventAnswers(body.answers), actor.id); let review; try { review = orchestrator.review(id); } catch { review = undefined; } sendJson(response, 200, { caseValue: updated, review, eventConfigured: true }); return; }
         if (request.method === "POST" && parts[3] === "pre-legal-review") { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const updated = orchestrator.configurePreLegalReview(id, body as unknown as PreLegalReviewInput, actor.id); let review; try { review = orchestrator.review(id); } catch { review = undefined; } sendJson(response, 200, { caseValue: updated, review, preLegalConfigured: true }); return; }
         if (request.method === "GET" && parts[3] === "questionnaire") { requireRole(request, "OPERATOR"); const file = orchestrator.questionnaire(id); sendBinary(response, 200, file.data, file.mimeType, file.fileName); return; }
         if (request.method === "GET" && parts[3] === "review") { requireRole(request, "VIEWER"); sendJson(response, 200, orchestrator.review(id)); return; }
         if (request.method === "POST" && parts[3] === "validate") { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const validatedBy = String(body.validatedBy ?? actor.id).trim() || actor.id; sendJson(response, 200, orchestrator.validate(id, validatedBy)); return; }
-        if (request.method === "POST" && parts[3] === "generate") { const actor = requireRole(request, "OPERATOR"); const rendered = orchestrator.generate(id, actor.id); sendJson(response, 200, { manifest: { expedienteId: id, validation: rendered.package.globalValidation, coherenceFingerprint: rendered.package.coherenceFingerprint, preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })() }, documents: [...rendered.editable, ...rendered.pdf].map(file => ({ documentId: file.documentId, fileName: file.fileName, mimeType: file.mimeType, base64: Buffer.from(file.data).toString("base64") })) }); return; }
+        if (request.method === "POST" && parts[3] === "generate") { const actor = requireRole(request, "OPERATOR"); const rendered = orchestrator.generate(id, actor.id); sendJson(response, 200, { manifest: { expedienteId: id, legacyPipeline: true, productionEligible: false, replacement: `/api/cases/${encodeURIComponent(id)}/universal-readiness`, validation: rendered.package.globalValidation, coherenceFingerprint: rendered.package.coherenceFingerprint, preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })() }, documents: [...rendered.editable, ...rendered.pdf].map(file => ({ documentId: file.documentId, fileName: file.fileName, mimeType: file.mimeType, base64: Buffer.from(file.data).toString("base64") })) }); return; }
       }
       sendJson(response, 404, { error: "Ruta no encontrada." });
     } catch (error) { const value = error instanceof Error ? error : new Error(String(error)); sendJson(response, statusForError(value), { error: value.message }); }
