@@ -16,6 +16,85 @@ export interface UniversalAdaptiveAdvanceResult {
   blockers: readonly string[];
 }
 
+function pendingEconomicQuestion(expediente: UniversalExpedienteV13, missingFields: readonly string[]): UniversalAdaptiveAction | null {
+  const field = missingFields[0];
+  if (!field) return null;
+
+  if (field === "economic.initialEstimatedValueBaseCents") {
+    return {
+      kind: "ASK_USER",
+      id: "ask:ve-initial-base",
+      fieldKey: field,
+      question: "¿Cuál es el importe inicial que debe computarse en el valor estimado, sin IVA?",
+      help: "Indique el importe económico de la prestación inicial. No se copiará automáticamente desde el PBL ni desde el presupuesto máximo si no consta que sean la misma magnitud.",
+      reason: "El motor económico necesita una base inicial expresa para calcular el VE sin crear equivalencias jurídicas silenciosas.",
+      priority: "NORMAL",
+    };
+  }
+
+  if (field === "economic.extensionAmountExVatCents") {
+    return {
+      kind: "ASK_USER",
+      id: "ask:ve-extension-amount",
+      fieldKey: field,
+      question: `Se han previsto ${String(expediente.canonical.fields.extensionMonths.value ?? "varios")} meses de prórroga. ¿Cuál es el importe económico total de esas prórrogas, sin IVA?`,
+      help: "No se extrapola el importe desde los meses de duración. Debe aportarse el importe económico previsto o procedente de la fuente correspondiente.",
+      reason: "Una duración temporal positiva no determina por sí sola el valor económico de la prórroga.",
+      priority: "NORMAL",
+    };
+  }
+
+  if (field === "economic.modificationAmountExVatCents") {
+    const modificationPercent = expediente.canonical.fields.modificationPercent;
+    if (modificationPercent.status === "PENDING") {
+      return {
+        kind: "ASK_USER",
+        id: "ask:modification-percent-for-ve",
+        fieldKey: modificationPercent.key,
+        question: "¿Se prevén modificaciones y cuál es su porcentaje máximo computable?",
+        help: "Indique 0 si no se prevén. Si existe un porcentaje positivo y una base económica validada, el sistema propondrá el importe aritmético para validación humana.",
+        reason: "El porcentaje de modificación es necesario antes de poder proponer su componente económico.",
+        priority: "NORMAL",
+      };
+    }
+    return {
+      kind: "ASK_USER",
+      id: "ask:ve-modification-amount",
+      fieldKey: field,
+      question: "¿Cuál es el importe máximo de las modificaciones que debe computarse en el valor estimado, sin IVA?",
+      help: "Aporte el importe cuando el porcentaje no pueda aplicarse con seguridad sobre la base económica disponible.",
+      reason: "No existe una base suficientemente acreditada para derivar automáticamente el importe de modificación.",
+      priority: "NORMAL",
+    };
+  }
+
+  if (field === "economic.optionsAmountExVatCents") {
+    return {
+      kind: "ASK_USER",
+      id: "ask:ve-options-amount",
+      fieldKey: field,
+      question: "¿Existen opciones u otros derechos económicos previstos que deban computarse en el valor estimado y cuál es su importe sin IVA?",
+      help: "Indique 0 si no existen opciones computables.",
+      reason: "Las opciones solo se incorporan al VE cuando existe un importe económico explícito.",
+      priority: "NORMAL",
+    };
+  }
+
+  if (field === "economic.otherEstimatedValueComponentsCents") {
+    return {
+      kind: "ASK_USER",
+      id: "ask:ve-other-components",
+      fieldKey: field,
+      question: "¿Existe algún otro componente económico que deba integrarse en el valor estimado y cuál es su importe sin IVA?",
+      help: "Indique 0 si no existe ningún otro componente computable.",
+      reason: "El motor no incorpora conceptos económicos no declarados.",
+      priority: "NORMAL",
+    };
+  }
+
+  return null;
+}
+
 export class UniversalAdaptiveOrchestrator {
   constructor(
     private readonly planner: UniversalAdaptiveQuestionEngine,
@@ -29,12 +108,15 @@ export class UniversalAdaptiveOrchestrator {
     const automaticSteps: AdaptiveAutomaticStep[] = [];
 
     for (let index = 0; index < this.maxAutomaticSteps; index += 1) {
+      let economicMissingFields: readonly string[] = [];
       if (this.economicBridge) {
         const economic = this.economicBridge.tryAdvance(current);
+        current = economic.expediente;
+        economicMissingFields = economic.missingFields;
         if (economic.blockers.length > 0) {
           return {
-            expediente: economic.expediente,
-            next: this.planner.next(economic.expediente),
+            expediente: current,
+            next: this.planner.next(current),
             automaticSteps,
             blockers: economic.blockers,
           };
@@ -45,13 +127,18 @@ export class UniversalAdaptiveOrchestrator {
             engine: "UniversalEconomicEngine",
             executed: economic.executedEngines,
           });
-          current = economic.expediente;
           continue;
         }
       }
 
       const action = this.planner.next(current);
       if (action.kind !== "RUN_ENGINE") {
+        if (action.id === "ask:estimated-value") {
+          const economicQuestion = pendingEconomicQuestion(current, economicMissingFields);
+          if (economicQuestion) {
+            return { expediente: current, next: economicQuestion, automaticSteps, blockers: [] };
+          }
+        }
         return { expediente: current, next: action, automaticSteps, blockers: [] };
       }
 
