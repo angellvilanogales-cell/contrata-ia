@@ -1,3 +1,4 @@
+import { EvidenceField } from "../../../domain/expediente/EvidenceField";
 import { UniversalExpedienteV13 } from "../../../domain/expediente/UniversalExpedienteV13";
 import { UniversalAdaptiveActionExecutor } from "./UniversalAdaptiveActionExecutor";
 import { UniversalAdaptiveAction, UniversalAdaptiveQuestionEngine } from "./UniversalAdaptiveQuestionEngine";
@@ -95,6 +96,28 @@ function pendingEconomicQuestion(expediente: UniversalExpedienteV13, missingFiel
   return null;
 }
 
+function derivedEconomicValidation(
+  expediente: UniversalExpedienteV13,
+  derivedFields: readonly string[],
+): UniversalAdaptiveAction | null {
+  for (const key of derivedFields) {
+    if (!key.startsWith("economic.")) continue;
+    const property = key.slice("economic.".length);
+    const field = (expediente.economic as unknown as Record<string, EvidenceField<unknown>>)[property];
+    if (!field) continue;
+    if (field.status === "SYSTEM_PROPOSAL" && field.humanValidationRequired && !field.humanValidated) {
+      return {
+        kind: "VALIDATE_HUMAN",
+        id: `validate:${key}`,
+        fieldKey: key,
+        reason: `El componente económico ${key} ha sido calculado como propuesta y debe validarse antes de utilizarlo en el valor estimado.`,
+        priority: "HIGH",
+      };
+    }
+  }
+  return null;
+}
+
 export class UniversalAdaptiveOrchestrator {
   constructor(
     private readonly planner: UniversalAdaptiveQuestionEngine,
@@ -109,10 +132,12 @@ export class UniversalAdaptiveOrchestrator {
 
     for (let index = 0; index < this.maxAutomaticSteps; index += 1) {
       let economicMissingFields: readonly string[] = [];
+      let economicDerivedFields: readonly string[] = [];
       if (this.economicBridge) {
         const economic = this.economicBridge.tryAdvance(current);
         current = economic.expediente;
         economicMissingFields = economic.missingFields;
+        economicDerivedFields = economic.derivedFields;
         if (economic.blockers.length > 0) {
           return {
             expediente: current,
@@ -120,6 +145,10 @@ export class UniversalAdaptiveOrchestrator {
             automaticSteps,
             blockers: economic.blockers,
           };
+        }
+        const validation = derivedEconomicValidation(current, economicDerivedFields);
+        if (validation) {
+          return { expediente: current, next: validation, automaticSteps, blockers: [] };
         }
         if (economic.executed) {
           automaticSteps.push({
