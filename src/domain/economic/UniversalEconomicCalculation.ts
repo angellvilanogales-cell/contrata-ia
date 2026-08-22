@@ -44,6 +44,15 @@ export interface EconomicLotResult {
   diagnostic?: EconomicDifferenceDiagnostic;
 }
 
+export interface EconomicLotComponentTotals {
+  initialAmountExVatCents: number;
+  extensionAmountExVatCents: number;
+  modificationAmountExVatCents: number;
+  optionsAmountExVatCents: number;
+  otherEstimatedValueComponentsCents: number;
+  arithmeticEstimatedValueCents: number;
+}
+
 export interface EconomicCalculationResult {
   arithmeticEstimatedValueCents: number;
   declaredEstimatedValueCents?: number;
@@ -51,6 +60,7 @@ export interface EconomicCalculationResult {
   selectedValueOrigin: "DECLARED_SOURCE" | "DERIVED_CALCULATION";
   diagnostic?: EconomicDifferenceDiagnostic;
   lots: readonly EconomicLotResult[];
+  lotComponentTotals?: EconomicLotComponentTotals;
   lotDeclaredSumCents?: number;
   lotDeclaredSumDiagnostic?: EconomicDifferenceDiagnostic;
   supplyNeeds?: {
@@ -96,13 +106,40 @@ function difference(declaredCents: number, arithmeticCents: number): EconomicDif
   };
 }
 
+function lotComponentTotals(lots: readonly EconomicLotInput[]): EconomicLotComponentTotals | undefined {
+  if (lots.length === 0) return undefined;
+  return lots.reduce<EconomicLotComponentTotals>((totals, lot) => {
+    const initial = assertMoney(lot.initialAmountExVatCents, `lot ${lot.lotId} initialAmountExVatCents`);
+    const extension = assertMoney(lot.extensionAmountExVatCents, `lot ${lot.lotId} extensionAmountExVatCents`);
+    const modification = assertMoney(lot.modificationAmountExVatCents, `lot ${lot.lotId} modificationAmountExVatCents`);
+    const options = assertMoney(lot.optionsAmountExVatCents, `lot ${lot.lotId} optionsAmountExVatCents`);
+    const other = assertMoney(lot.otherEstimatedValueComponentsCents, `lot ${lot.lotId} otherEstimatedValueComponentsCents`);
+    return {
+      initialAmountExVatCents: totals.initialAmountExVatCents + initial,
+      extensionAmountExVatCents: totals.extensionAmountExVatCents + extension,
+      modificationAmountExVatCents: totals.modificationAmountExVatCents + modification,
+      optionsAmountExVatCents: totals.optionsAmountExVatCents + options,
+      otherEstimatedValueComponentsCents: totals.otherEstimatedValueComponentsCents + other,
+      arithmeticEstimatedValueCents: totals.arithmeticEstimatedValueCents + initial + extension + modification + options + other,
+    };
+  }, {
+    initialAmountExVatCents: 0,
+    extensionAmountExVatCents: 0,
+    modificationAmountExVatCents: 0,
+    optionsAmountExVatCents: 0,
+    otherEstimatedValueComponentsCents: 0,
+    arithmeticEstimatedValueCents: 0,
+  });
+}
+
 export function calculateUniversalEconomics(input: EconomicCalculationInput): EconomicCalculationResult {
   const arithmetic = arithmeticEstimatedValue(input);
   const declared = input.declaredEstimatedValueCents === undefined
     ? undefined
     : assertMoney(input.declaredEstimatedValueCents, "declaredEstimatedValueCents");
 
-  const lots = (input.lots ?? []).map(lot => {
+  const inputLots = input.lots ?? [];
+  const lots = inputLots.map(lot => {
     const lotArithmetic = arithmeticEstimatedValue(lot);
     const lotDeclared = lot.declaredEstimatedValueCents === undefined
       ? undefined
@@ -121,11 +158,16 @@ export function calculateUniversalEconomics(input: EconomicCalculationInput): Ec
   const lotDeclaredSumCents = declaredLotValues.length === lots.length && lots.length > 0
     ? declaredLotValues.reduce((sum, value) => sum + value, 0)
     : undefined;
+  const componentTotals = lotComponentTotals(inputLots);
 
   const diagnostics: string[] = [
     "Las prórrogas se incorporan por su importe económico explícito; nunca se extrapolan automáticamente desde su duración en meses.",
     "Las modificaciones, opciones y otros componentes del valor estimado se agregan solo cuando existe un importe económico explícito.",
   ];
+
+  if (componentTotals) {
+    diagnostics.push("Los totales por lotes se calculan como comprobación aritmética independiente; no sustituyen importes globales declarados por una fuente.");
+  }
 
   if (input.contractKind === "SUPPLY") {
     diagnostics.push(
@@ -140,6 +182,7 @@ export function calculateUniversalEconomics(input: EconomicCalculationInput): Ec
     selectedValueOrigin: declared === undefined ? "DERIVED_CALCULATION" : "DECLARED_SOURCE",
     diagnostic: declared === undefined ? undefined : difference(declared, arithmetic),
     lots,
+    lotComponentTotals: componentTotals,
     lotDeclaredSumCents,
     lotDeclaredSumDiagnostic:
       declared !== undefined && lotDeclaredSumCents !== undefined
