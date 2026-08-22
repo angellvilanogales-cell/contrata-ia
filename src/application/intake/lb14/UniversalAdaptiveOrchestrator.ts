@@ -1,6 +1,7 @@
 import { UniversalExpedienteV13 } from "../../../domain/expediente/UniversalExpedienteV13";
 import { UniversalAdaptiveActionExecutor } from "./UniversalAdaptiveActionExecutor";
 import { UniversalAdaptiveAction, UniversalAdaptiveQuestionEngine } from "./UniversalAdaptiveQuestionEngine";
+import { UniversalEconomicAdaptiveBridge } from "./UniversalEconomicAdaptiveBridge";
 
 export interface AdaptiveAutomaticStep {
   actionId: string;
@@ -20,6 +21,7 @@ export class UniversalAdaptiveOrchestrator {
     private readonly planner: UniversalAdaptiveQuestionEngine,
     private readonly executor: UniversalAdaptiveActionExecutor,
     private readonly maxAutomaticSteps = 8,
+    private readonly economicBridge?: UniversalEconomicAdaptiveBridge,
   ) {}
 
   public advance(expediente: UniversalExpedienteV13): UniversalAdaptiveAdvanceResult {
@@ -27,6 +29,27 @@ export class UniversalAdaptiveOrchestrator {
     const automaticSteps: AdaptiveAutomaticStep[] = [];
 
     for (let index = 0; index < this.maxAutomaticSteps; index += 1) {
+      if (this.economicBridge) {
+        const economic = this.economicBridge.tryAdvance(current);
+        if (economic.blockers.length > 0) {
+          return {
+            expediente: economic.expediente,
+            next: this.planner.next(economic.expediente),
+            automaticSteps,
+            blockers: economic.blockers,
+          };
+        }
+        if (economic.executed) {
+          automaticSteps.push({
+            actionId: "run:economic-value",
+            engine: "UniversalEconomicEngine",
+            executed: economic.executedEngines,
+          });
+          current = economic.expediente;
+          continue;
+        }
+      }
+
       const action = this.planner.next(current);
       if (action.kind !== "RUN_ENGINE") {
         return { expediente: current, next: action, automaticSteps, blockers: [] };
