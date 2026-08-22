@@ -5,6 +5,7 @@ import {
   RealTemplateMappingProfile,
   RealTemplateSourceEvidence,
 } from "../src/application/intake/lb22/UniversalRealTemplateMappingRegistry";
+import { evaluateUniversalRealTemplateMappingClosure } from "../src/application/intake/lb22/UniversalRealTemplateMappingClosure";
 import {
   JDA_SUPPLY_ASA_DERIVED_EDITABLE_EXAMPLE,
   JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE,
@@ -13,10 +14,7 @@ import {
 
 describe("LB22 - modelos oficiales y mapeos reales", () => {
   it("verifica la estructura desde el PDF oficial de referencia pero no lo promociona a activo editable", () => {
-    const result = qualifyRealTemplateMapping(
-      JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE,
-      [JDA_SUPPLY_ASA_REFERENCE_SOURCE],
-    );
+    const result = qualifyRealTemplateMapping(JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE, [JDA_SUPPLY_ASA_REFERENCE_SOURCE]);
     expect(result.structurallyVerified).toBe(true);
     expect(result.productionEligible).toBe(false);
     expect(result.mappingSpec).toBeNull();
@@ -103,5 +101,17 @@ describe("LB22 - modelos oficiales y mapeos reales", () => {
     expect(coverage.ready).toBe(false);
     expect(coverage.referenceOnlyProfiles).toEqual([JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE.profileId]);
     expect(coverage.blockers.join(" ")).toMatch(/original editable oficial/i);
+  });
+
+  it("cierra la ingeniería de LB22 sin falsear que el catálogo ya sea productivo", () => {
+    const closure = evaluateUniversalRealTemplateMappingClosure(
+      [{ contractType: "SUPPLY", documentKind: "PCAP" }],
+      [JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE],
+      [JDA_SUPPLY_ASA_REFERENCE_SOURCE],
+    );
+    expect(closure.engineeringReady).toBe(true);
+    expect(closure.productionReady).toBe(false);
+    expect(closure.structurallyVerifiedProfiles).toEqual([JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE.profileId]);
+    expect(closure.productionBlockers.join(" ")).toMatch(/original editable oficial/i);
   });
 });
