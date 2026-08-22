@@ -34,15 +34,17 @@ function toLegacyContext(state: CanonicalExpedienteState): ExpedienteContext {
 
 function toMainCpvDecision(decision: ReturnType<CPVEngine["ejecutar"]>): DecisionJuridica<string> {
   const mapped = new DecisionJuridica<string>();
-  mapped.resultado = decision.resultado?.[0]?.codigo;
+  const mainCode = decision.resultado?.[0]?.codigo;
+  mapped.resultado = mainCode ?? "";
   mapped.explicacion = decision.explicacion;
   mapped.articulos = [...decision.articulos];
   mapped.normativa = [...decision.normativa];
   mapped.informes = [...decision.informes];
   mapped.jurisprudencia = [...decision.jurisprudencia];
   mapped.reglasAplicadas = [...decision.reglasAplicadas];
-  mapped.confianza = decision.confianza;
+  mapped.confianza = mainCode ? decision.confianza : 0;
   mapped.observaciones = [...decision.observaciones];
+  if (!mainCode) mapped.observaciones.push("CPVEngine no produjo código principal promocionable.");
   return mapped;
 }
 
@@ -73,7 +75,6 @@ export class CanonicalExpedienteEngine {
     const executed: string[] = [];
     let fields = state.fields;
 
-    // Un motor automático no degrada una decisión ya promocionable/validada.
     if (context.objeto.trim().length > 0 && !isPromotableEvidenceField(state.fields.cpvMain)) {
       const cpvDecision = this.cpvEngine.ejecutar(context);
       fields = {
@@ -89,9 +90,7 @@ export class CanonicalExpedienteEngine {
       executed.push("CPVEngine");
     }
 
-    if (context.valorEstimado > 0
-      && context.tipoContrato.trim().length > 0
-      && !isPromotableEvidenceField(state.fields.procedure)) {
+    if (context.valorEstimado > 0 && context.tipoContrato.trim().length > 0 && !isPromotableEvidenceField(state.fields.procedure)) {
       const procedimientoDecision = this.procedimientoEngine.ejecutar(context);
       fields = {
         ...fields,
@@ -106,11 +105,7 @@ export class CanonicalExpedienteEngine {
       executed.push("ProcedimientoEngine");
     }
 
-    return {
-      state: { ...state, fields },
-      context,
-      executed,
-    };
+    return { state: { ...state, fields }, context, executed };
   }
 
   public ejecutarRegimen(state: CanonicalExpedienteState): CanonicalEngineRunResult {
@@ -118,9 +113,7 @@ export class CanonicalExpedienteEngine {
     const executed: string[] = [];
     let fields = state.fields;
 
-    if (!context.procedimiento || !isPromotableEvidenceField(state.fields.procedure)) {
-      return { state, context, executed };
-    }
+    if (!context.procedimiento || !isPromotableEvidenceField(state.fields.procedure)) return { state, context, executed };
 
     const solvenciaDecision = this.solvenciaEngine.ejecutar(context);
     fields = {
@@ -146,10 +139,6 @@ export class CanonicalExpedienteEngine {
     };
     executed.push("PublicidadEngine");
 
-    return {
-      state: { ...state, fields },
-      context,
-      executed,
-    };
+    return { state: { ...state, fields }, context, executed };
   }
 }
