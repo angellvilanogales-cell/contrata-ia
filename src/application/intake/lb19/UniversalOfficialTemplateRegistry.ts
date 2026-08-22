@@ -59,10 +59,6 @@ function activeOn(record: UniversalOfficialTemplateRegistryRecord, date: number)
   return date >= from && date <= to;
 }
 
-/**
- * Bloques 19.1-19.3 - registro de modelos oficiales con procedencia, versión y
- * vigencia. No selecciona por parecido ni resuelve automáticamente solapes.
- */
 export class UniversalOfficialTemplateRegistry {
   private readonly records: UniversalOfficialTemplateRegistryRecord[];
 
@@ -136,7 +132,9 @@ export class UniversalOfficialTemplateRegistry {
         blockers: [`Existen ${candidates.length} modelos oficiales validados y simultáneamente vigentes para ${contractType}/${documentKind} en ${procurementDate}; el solape requiere resolución humana.`],
       };
     }
-    return { ready: true, record: candidates[0], blockers: [] };
+    const selected = candidates[0];
+    if (!selected) return { ready: false, record: null, blockers: ["No se pudo resolver el modelo oficial seleccionado."] };
+    return { ready: true, record: selected, blockers: [] };
   }
 }
 
