@@ -52,12 +52,13 @@ function updateLot(
   sourceId: string,
 ): UniversalLot {
   const current = lot.estimatedValueCents;
+  const selectedLotValue = calculation.declaredEstimatedValueCents ?? calculation.arithmeticEstimatedValueCents;
   if (current.status === "PENDING") {
     return {
       ...lot,
       estimatedValueCents: proposal(
         current.key,
-        calculation.selectedEstimatedValueCents ?? calculation.arithmeticEstimatedValueCents,
+        selectedLotValue,
         `${sourceId}:lot:${lot.id}`,
         [
           `VE aritmético del lote: ${calculation.arithmeticEstimatedValueCents} céntimos.`,
