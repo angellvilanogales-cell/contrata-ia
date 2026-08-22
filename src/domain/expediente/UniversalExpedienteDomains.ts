@@ -16,6 +16,11 @@ export interface UniversalUnitPrice {
   unitPriceCents: number;
 }
 
+/**
+ * Componentes económicos explícitos del valor estimado. No son sinónimos de PBL,
+ * presupuesto máximo ni duración temporal; se conservan separados para evitar
+ * extrapolaciones o equivalencias jurídicas silenciosas.
+ */
 export interface UniversalEconomicEvidence {
   vatPercent: EvidenceField<number>;
   budgetApplication: EvidenceField<string>;
@@ -26,6 +31,11 @@ export interface UniversalEconomicEvidence {
   referenceConsumption: EvidenceField<string>;
   projectedConsumption: EvidenceField<string>;
   maximumApprovedBudgetCents: EvidenceField<number>;
+  initialEstimatedValueBaseCents: EvidenceField<number>;
+  extensionAmountExVatCents: EvidenceField<number>;
+  modificationAmountExVatCents: EvidenceField<number>;
+  optionsAmountExVatCents: EvidenceField<number>;
+  otherEstimatedValueComponentsCents: EvidenceField<number>;
   legalEstimatedValueCents: EvidenceField<number>;
 }
 
