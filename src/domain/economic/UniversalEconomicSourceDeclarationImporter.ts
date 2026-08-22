@@ -1,5 +1,5 @@
 import { EvidenceField, EvidenceReference } from "../expediente/EvidenceField";
-import { UniversalAnnuality } from "../expediente/UniversalExpedienteDomains";
+import { UniversalAnnuality, UniversalEconomicEvidence } from "../expediente/UniversalExpedienteDomains";
 import { UniversalExpedienteV13 } from "../expediente/UniversalExpedienteV13";
 import { AnnualityAuditResult, auditAnnualities } from "./UniversalEconomicAudit";
 import {
@@ -60,7 +60,7 @@ function declaredField<T>(
   };
 }
 
-function canImport<T>(field: EvidenceField<T>, key: string, blockers: string[]): boolean {
+function canImport(field: EvidenceField<unknown>, key: string, blockers: string[]): boolean {
   if (field.status === "PENDING") return true;
   if (field.status === "SOURCE_DECLARED" && !field.humanValidated) return true;
   if (field.status === "SOURCE_CONFLICT") {
@@ -86,7 +86,6 @@ export function importEconomicSourceDeclaration(
   const importedFields: string[] = [];
   const source = sourceReference(declaration);
 
-  const contractBlocker = validateContractKind(expediente, declaration.contractKind);
   const calculation = calculateUniversalEconomics({
     contractKind: declaration.contractKind,
     initialAmountExVatCents: declaration.initialAmountExVatCents,
@@ -101,25 +100,25 @@ export function importEconomicSourceDeclaration(
     ? auditAnnualities(declaration.annualities, declaration.annualitiesDeclaredTotalCents)
     : undefined;
 
+  const contractBlocker = validateContractKind(expediente, declaration.contractKind);
   if (contractBlocker) {
     return { expediente, importedFields, blockers: [contractBlocker], calculation, annualityAudit };
   }
 
-  let economic = { ...expediente.economic };
+  const economic = { ...expediente.economic };
+  const economicFields = economic as unknown as Record<string, EvidenceField<unknown>>;
   let canonical = { ...expediente.canonical, fields: { ...expediente.canonical.fields } };
 
-  const assignEconomic = <K extends keyof typeof economic>(
-    key: K,
-    value: NonNullable<(typeof economic)[K]["value"]>,
+  const assignEconomic = (
+    key: keyof UniversalEconomicEvidence,
+    value: unknown,
     diagnostics?: readonly string[],
   ): void => {
-    const field = economic[key] as EvidenceField<NonNullable<(typeof economic)[K]["value"]>>;
-    if (!canImport(field, String(field.key), blockers)) return;
-    economic = {
-      ...economic,
-      [key]: declaredField(String(field.key), value, source, diagnostics),
-    };
-    importedFields.push(String(field.key));
+    const current = economicFields[String(key)];
+    if (!current) throw new Error(`Campo económico universal desconocido: ${String(key)}`);
+    if (!canImport(current, current.key, blockers)) return;
+    economicFields[String(key)] = declaredField(current.key, value, source, diagnostics);
+    importedFields.push(current.key);
   };
 
   assignEconomic("initialEstimatedValueBaseCents", declaration.initialAmountExVatCents);
@@ -157,7 +156,7 @@ export function importEconomicSourceDeclaration(
   }
 
   const canonicalPbl = canonical.fields.baseTenderBudgetCents;
-  if (canImport(canonicalPbl, canonicalPbl.key, blockers)) {
+  if (canImport(canonicalPbl as EvidenceField<unknown>, canonicalPbl.key, blockers)) {
     canonical = {
       ...canonical,
       fields: {
@@ -169,7 +168,7 @@ export function importEconomicSourceDeclaration(
   }
 
   const canonicalVe = canonical.fields.estimatedValueCents;
-  if (canImport(canonicalVe, canonicalVe.key, blockers)) {
+  if (canImport(canonicalVe as EvidenceField<unknown>, canonicalVe.key, blockers)) {
     canonical = {
       ...canonical,
       fields: {
