@@ -43,6 +43,11 @@ function pendingEconomic(): UniversalEconomicEvidence {
     referenceConsumption: createPendingEvidenceField<string>("economic.referenceConsumption"),
     projectedConsumption: createPendingEvidenceField<string>("economic.projectedConsumption"),
     maximumApprovedBudgetCents: createPendingEvidenceField<number>("economic.maximumApprovedBudgetCents"),
+    initialEstimatedValueBaseCents: createPendingEvidenceField<number>("economic.initialEstimatedValueBaseCents"),
+    extensionAmountExVatCents: createPendingEvidenceField<number>("economic.extensionAmountExVatCents"),
+    modificationAmountExVatCents: createPendingEvidenceField<number>("economic.modificationAmountExVatCents"),
+    optionsAmountExVatCents: createPendingEvidenceField<number>("economic.optionsAmountExVatCents"),
+    otherEstimatedValueComponentsCents: createPendingEvidenceField<number>("economic.otherEstimatedValueComponentsCents"),
     legalEstimatedValueCents: createPendingEvidenceField<number>("economic.legalEstimatedValueCents"),
   };
 }
