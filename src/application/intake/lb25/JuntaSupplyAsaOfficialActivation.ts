@@ -32,7 +32,7 @@ export const JDA_SUPPLY_ASA_EDITABLE_ASSET: UniversalEditableTemplateAsset = {
   slotIds: [
     "pcap.anexoI.1.objeto",
     "pcap.anexoI.1.cpv",
-    "pcap.anexoI.1A.lotes",
+    "pcap.anexoI.1A.divisionLotes",
     "pcap.anexoI.2.pbl",
     "pcap.anexoI.2.valorEstimado",
     "pcap.anexoI.3.duracion",
@@ -61,9 +61,9 @@ export const JDA_SUPPLY_ASA_PHYSICAL_BINDINGS: readonly UniversalOdtPhysicalSlot
     valueToken: "_______",
   },
   {
-    slotId: "pcap.anexoI.1A.lotes", part: "content.xml", sourceSection: "ANEXO I / 1.A", sourceLabel: "Descripción de los lotes",
-    xmlToken: '<text:p text:style-name="P410"><text:span text:style-name="T62">LOTE 1. </text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T108">_______</text:span></text:span></text:p>',
-    valueToken: "_______",
+    slotId: "pcap.anexoI.1A.divisionLotes", part: "content.xml", sourceSection: "ANEXO I / 1.A", sourceLabel: "División en lotes",
+    xmlToken: '<text:p text:style-name="P45"><text:span text:style-name="T1032">División en lotes:</text:span> Sí/No</text:p>',
+    valueToken: "Sí/No",
   },
   {
     slotId: "pcap.anexoI.2.pbl", part: "content.xml", sourceSection: "ANEXO I / 2.A", sourceLabel: "Importe total (IVA incluido)",
@@ -103,12 +103,9 @@ function euroCents(value: unknown, fieldKey: string): string {
   return new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cents / 100);
 }
 
-function lotsV1(value: unknown, fieldKey: string): string {
-  if (!Array.isArray(value) || value.length !== 1) throw new Error(`${fieldKey}: el binding V1 actual solo admite exactamente un lote; la pluralidad requiere bindings físicos adicionales.`);
-  const lot = value[0] as { name?: { value?: unknown } };
-  const name = lot?.name?.value;
-  if (typeof name !== "string" || !name.trim()) throw new Error(`${fieldKey}: el lote único debe conservar un nombre validado.`);
-  return name.trim();
+function yesNo(value: unknown, fieldKey: string): string {
+  if (typeof value !== "boolean") throw new Error(`${fieldKey}: se requiere una decisión booleana validada.`);
+  return value ? "Sí" : "No";
 }
 
 function priceOnlyCriterionV1(value: unknown, fieldKey: string): string {
@@ -131,9 +128,9 @@ function specialConditions(value: unknown, fieldKey: string): string {
 export const JDA_SUPPLY_ASA_RENDERER_CONFIGURATION: UniversalOdtRendererConfiguration = {
   bindingsByTemplateId: { [JDA_SUPPLY_ASA_TEMPLATE_ID]: JDA_SUPPLY_ASA_PHYSICAL_BINDINGS },
   formattersBySlotId: {
+    "pcap.anexoI.1A.divisionLotes": yesNo,
     "pcap.anexoI.2.pbl": euroCents,
     "pcap.anexoI.2.valorEstimado": euroCents,
-    "pcap.anexoI.1A.lotes": lotsV1,
     "pcap.anexoI.7.criterios": priceOnlyCriterionV1,
     "pcap.anexoI.8.condicionesEspeciales": specialConditions,
   },
@@ -142,6 +139,7 @@ export const JDA_SUPPLY_ASA_RENDERER_CONFIGURATION: UniversalOdtRendererConfigur
 export const JDA_SUPPLY_ASA_ACTIVATION_LIMITATIONS = [
   "El manifiesto y los nueve bindings físicos existentes ya están verificados contra el original exacto.",
   "El activo binario no se incorpora al repositorio como texto ni se reconstruye: el runtime debe cargar los bytes exactos cuyo SHA-256 figure en el manifiesto.",
-  "El perfil físico actual cubre únicamente los nueve slots semánticos registrados en LB22; no certifica que el resto de campos a cumplimentar del Anexo I estén todavía automatizados.",
-  "El binding de lotes se limita deliberadamente a un único lote y el de criterios al supuesto de precio 100% evaluable mediante fórmula; cualquier otro caso se bloquea.",
+  "El perfil físico actual cubre únicamente los nueve slots semánticos registrados; no certifica que el resto de campos a cumplimentar del Anexo I estén todavía automatizados.",
+  "La división en lotes se cumplimenta en su decisión Sí/No. La descripción de lotes, justificación de no división y reglas de limitación/adjudicación siguen siendo campos condicionales con cobertura física independiente pendiente.",
+  "El binding de criterios se limita deliberadamente al supuesto de precio 100% evaluable mediante fórmula; cualquier otro caso se bloquea.",
 ] as const;
