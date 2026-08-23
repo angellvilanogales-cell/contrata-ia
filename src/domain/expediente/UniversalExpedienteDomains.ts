@@ -20,6 +20,11 @@ export interface UniversalUnitPrice {
  * Componentes económicos explícitos del valor estimado. No son sinónimos de PBL,
  * presupuesto máximo ni duración temporal; se conservan separados para evitar
  * extrapolaciones o equivalencias jurídicas silenciosas.
+ *
+ * Los campos opcionales incorporados en LB27 representan decisiones documentales
+ * con semántica propia que aparecen en modelos oficiales. Son opcionales para
+ * mantener compatibilidad con expedientes universales anteriores, pero cuando un
+ * perfil documental los exige deben existir como EvidenceField promocionable.
  */
 export interface UniversalEconomicEvidence {
   vatPercent: EvidenceField<number>;
@@ -37,6 +42,10 @@ export interface UniversalEconomicEvidence {
   optionsAmountExVatCents: EvidenceField<number>;
   otherEstimatedValueComponentsCents: EvidenceField<number>;
   legalEstimatedValueCents: EvidenceField<number>;
+  needsBasedContractDa33?: EvidenceField<boolean>;
+  budgetCoversEntireContractLife?: EvidenceField<boolean>;
+  estimatedValueCalculationMethod?: EvidenceField<string>;
+  priceDeterminationRegime?: EvidenceField<string>;
 }
 
 export interface UniversalLot {
@@ -52,6 +61,7 @@ export interface UniversalLotsEvidence {
   lots: EvidenceField<readonly UniversalLot[]>;
   maxOfferableLots: EvidenceField<number>;
   maxAwardableLots: EvidenceField<number>;
+  noDivisionJustification?: EvidenceField<string>;
 }
 
 export interface UniversalAdministrativeEvidence {
@@ -60,6 +70,7 @@ export interface UniversalAdministrativeEvidence {
   competentBody: EvidenceField<string>;
   administrativeFileNumber: EvidenceField<string>;
   contractManager: EvidenceField<string>;
+  reservedContractDa4?: EvidenceField<boolean>;
 }
 
 export interface UniversalTechnicalEvidence {
@@ -84,6 +95,9 @@ export interface UniversalExecutionEvidence {
   assignmentRegime: EvidenceField<string>;
   paymentRegime: EvidenceField<string>;
   receiptAndAcceptanceRegime: EvidenceField<string>;
+  extensionStructure?: EvidenceField<string>;
+  extensionNoticeMonths?: EvidenceField<number>;
+  plannedModificationRegime?: EvidenceField<string>;
 }
 
 export interface UniversalCriteriaEvidence {
@@ -91,6 +105,7 @@ export interface UniversalCriteriaEvidence {
   economicSolvency: EvidenceField<readonly CriterioSolvencia[]>;
   technicalSolvency: EvidenceField<readonly CriterioSolvencia[]>;
   judgmentCriteriaExist: EvidenceField<boolean>;
+  singleCriterionMotivation?: EvidenceField<string>;
 }
 
 export interface UniversalTraceability {
