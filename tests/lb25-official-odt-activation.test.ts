@@ -36,6 +36,15 @@ describe("V1 activation - original ODT oficial suministro ASA", () => {
     expect(JDA_SUPPLY_ASA_EDITABLE_ASSET.slotIds).not.toContain("pcap.anexoI.1A.lotes");
   });
 
+  it("vincula el PBL canónico al importe inicial IVA excluido y no al total con IVA", () => {
+    const pbl = JDA_SUPPLY_ASA_PHYSICAL_BINDINGS.find(item => item.slotId === "pcap.anexoI.2.pbl");
+    expect(pbl?.sourceLabel).toBe("Importe total (IVA excluido)");
+    expect(pbl?.xmlToken).toContain("Importe total (IVA excluido)");
+    expect(pbl?.xmlToken).not.toContain("IVA incluido");
+    const money = JDA_SUPPLY_ASA_RENDERER_CONFIGURATION.formattersBySlotId?.["pcap.anexoI.2.pbl"];
+    expect(money?.(1_055_244, "baseTenderBudgetCents")).toBe("10.552,44");
+  });
+
   it("bloquea silenciosamente alcances todavía no certificados", () => {
     const criteria = JDA_SUPPLY_ASA_RENDERER_CONFIGURATION.formattersBySlotId?.["pcap.anexoI.7.criterios"];
     expect(criteria?.([{ nombre: "Precio", ponderacion: 100, evaluableMedianteFormula: true }], "criteria.awardCriteria")).toBe("Sí");
