@@ -8,6 +8,7 @@ import type { EventAnswerId, EventFeature } from "../../application/intake/lb7/E
 import { UniversalOfficialTemplateRegistry } from "../../application/intake/lb19/UniversalOfficialTemplateRegistry";
 import { evaluateUniversalApplicationIntegration } from "../../application/intake/lb21/UniversalApplicationIntegration";
 import { bridgeLegacyIntakeCaseToUniversal } from "../../application/intake/lb21/UniversalLegacyCaseBridge";
+import { evaluateSupplyAsaProtectedPipelineReadiness } from "../../application/intake/lb29/UniversalSupplyAsaProtectedPipeline";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -65,7 +66,7 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 21, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 29, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, timestamp: new Date().toISOString() }); return; }
       if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); sendJson(response, 201, adaptiveCases.create()); return; }
       if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) { const caseId = decodeURIComponent(parts[3]); if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; } if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue)); return; } }
       if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers))); return; }
@@ -88,6 +89,7 @@ export function createLB6Server(): http.Server {
             procurementDate,
             ["DPCAF", "PCAP", "PPT"],
           );
+          const supplyAsaPcap = evaluateSupplyAsaProtectedPipelineReadiness(migration.expediente, procurementDate, false);
           sendJson(response, 200, {
             caseId: id,
             procurementDate,
@@ -95,6 +97,7 @@ export function createLB6Server(): http.Server {
             skippedLegacyAnswers: migration.skippedLegacyAnswers,
             diagnostics: migration.diagnostics,
             integration,
+            supplyAsaPcap,
           });
           return;
         }
