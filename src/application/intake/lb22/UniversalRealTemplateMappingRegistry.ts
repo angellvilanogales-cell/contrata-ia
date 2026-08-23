@@ -52,7 +52,7 @@ const KNOWN_UNIVERSAL_FIELDS = new Set([
   "durationMonths", "extensionMonths", "modificationPercent", "awardCriteria", "solvency", "publicity",
   "processing.processingType", "processing.urgency", "processing.emergency",
   "regulation.harmonizedRegulation", "regulation.europeanFunding", "regulation.threshold", "regulation.deadlines",
-  "economic.vatPercent", "economic.budgetApplication", "economic.annualities", "economic.fundingSource",
+  "economic.vatPercent", "economic.budgetApplication", "economic.annualities", "economic.annualityBudgetRows", "economic.fundingSource",
   "economic.priceRevisionRegime", "economic.unitPrices", "economic.referenceConsumption", "economic.projectedConsumption",
   "economic.maximumApprovedBudgetCents", "economic.initialEstimatedValueBaseCents", "economic.extensionAmountExVatCents",
   "economic.modificationAmountExVatCents", "economic.optionsAmountExVatCents", "economic.otherEstimatedValueComponentsCents",
