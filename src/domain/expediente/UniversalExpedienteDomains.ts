@@ -42,6 +42,8 @@ export interface UniversalEconomicEvidence {
   optionsAmountExVatCents: EvidenceField<number>;
   otherEstimatedValueComponentsCents: EvidenceField<number>;
   legalEstimatedValueCents: EvidenceField<number>;
+  initialVatAmountCents?: EvidenceField<number>;
+  initialPblVatIncludedCents?: EvidenceField<number>;
   needsBasedContractDa33?: EvidenceField<boolean>;
   budgetCoversEntireContractLife?: EvidenceField<boolean>;
   estimatedValueCalculationMethod?: EvidenceField<string>;
