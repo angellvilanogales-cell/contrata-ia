@@ -23,6 +23,13 @@ export interface UniversalOdtPhysicalSlotBinding {
    * En modelos reales debe usarse para conservar el elemento/span y su estilo.
    */
   valueToken?: string;
+  /**
+   * TEXT es el modo por defecto y escapa XML. RAW_XML solo se admite con un
+   * formatter explícito y sirve para sustituir un fragmento ODF completo por
+   * otro fragmento estructural controlado. Nunca serializa entrada de usuario
+   * directamente como XML.
+   */
+  escapeMode?: "TEXT" | "RAW_XML";
   sourceSection: string;
   sourceLabel: string;
 }
@@ -121,6 +128,10 @@ function validateBinding(binding: UniversalOdtPhysicalSlotBinding, partText: str
  * numeración ni estructura. En activos reales el binding usa un anclaje XML
  * único y un valueToken interior: se sustituye solo el texto del hueco y se
  * preservan los spans/estilos administrativos del modelo oficial.
+ *
+ * Para fragmentos ODF estructurados se permite RAW_XML únicamente cuando existe
+ * un formatter explícito del slot. Ese formatter es responsable de devolver una
+ * estructura cerrada y controlada; nunca se usa defaultFormat en RAW_XML.
  */
 export class UniversalOdtProductionRenderer implements UniversalEditableTemplateRendererPort {
   public constructor(
@@ -161,14 +172,22 @@ export class UniversalOdtProductionRenderer implements UniversalEditableTemplate
       seenBindings.add(binding.slotId);
       const partText = Buffer.from(getEntry(entries, binding.part).bytes).toString("utf8");
       validateBinding(binding, partText);
+      if (binding.escapeMode === "RAW_XML" && !this.configuration.formattersBySlotId?.[binding.slotId]) {
+        throw new Error(`El binding RAW_XML ${binding.slotId} exige un formateador explícito.`);
+      }
     }
 
     const appliedSlots: string[] = [];
     for (const value of request.values) {
       const binding = bindings.find(item => item.slotId === value.slotId);
       if (!binding) throw new Error(`No existe binding físico para el slot ${value.slotId}.`);
-      const formatter = this.configuration.formattersBySlotId?.[value.slotId] ?? defaultFormat;
-      const renderedValue = xmlEscape(formatter(value.value, value.sourceFieldKey));
+      const explicitFormatter = this.configuration.formattersBySlotId?.[value.slotId];
+      if (binding.escapeMode === "RAW_XML" && !explicitFormatter) {
+        throw new Error(`El binding RAW_XML ${binding.slotId} no puede usar serialización automática.`);
+      }
+      const formatter = explicitFormatter ?? defaultFormat;
+      const formattedValue = formatter(value.value, value.sourceFieldKey);
+      const renderedValue = binding.escapeMode === "RAW_XML" ? formattedValue : xmlEscape(formattedValue);
       const entry = getEntry(entries, binding.part);
       const partText = Buffer.from(entry.bytes).toString("utf8");
       validateBinding(binding, partText);
