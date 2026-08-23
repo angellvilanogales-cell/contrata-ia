@@ -8,12 +8,18 @@ import {
 } from "../src/application/intake/lb31/JuntaSupplyAsaRemainingPhysicalClosure";
 
 describe("LB31 - cierre seguro de bloqueos físicos restantes", () => {
-  it("incorpora la decisión de contratación reservada como binding textual exacto", () => {
+  it("incorpora la decisión de contratación reservada preservando la estructura de spans", () => {
     expect(JDA_SUPPLY_ASA_LB31_EDITABLE_ASSET.slotIds).toContain("pcap.anexoI.1B.contratoReservado");
     expect(JDA_SUPPLY_ASA_LB31_EDITABLE_ASSET.slotIds.length).toBe(JDA_SUPPLY_ASA_LB31_PHYSICAL_BINDINGS.length);
+    const binding = JDA_SUPPLY_ASA_LB31_PHYSICAL_BINDINGS.find(item => item.slotId === "pcap.anexoI.1B.contratoReservado");
+    expect(binding?.escapeMode).toBe("RAW_XML");
     const formatter = JDA_SUPPLY_ASA_LB31_RENDERER_CONFIGURATION.formattersBySlotId?.["pcap.anexoI.1B.contratoReservado"];
-    expect(formatter?.(false, "administrative.reservedContractDa4")).toBe("No");
-    expect(formatter?.(true, "administrative.reservedContractDa4")).toBe("Sí");
+    const no = formatter?.(false, "administrative.reservedContractDa4") ?? "";
+    const yes = formatter?.(true, "administrative.reservedContractDa4") ?? "";
+    expect(no).toContain("> No<");
+    expect(yes).toContain("> Sí<");
+    expect(no.match(/Fuente_20_de_20_párrafo_20_predeter\./g)?.length).toBe(3);
+    expect(yes.match(/Fuente_20_de_20_párrafo_20_predeter\./g)?.length).toBe(3);
   });
 
   it("no inventa un slot de motivación que no existe en el modelo oficial", () => {
