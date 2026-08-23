@@ -8,7 +8,7 @@ import {
   JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD,
 } from "../src/application/intake/lb29/UniversalSupplyAsaProtectedPipeline";
 import { JDA_SUPPLY_ASA_VERIFIED_MANIFEST } from "../src/application/intake/lb25/JuntaSupplyAsaOfficialActivation";
-import { JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET } from "../src/application/intake/lb28/JuntaSupplyAsaExpandedPhysicalProfile";
+import { JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET } from "../src/application/intake/lb34/JuntaSupplyAsaModificationSection";
 
 function pendingCanonical(): CanonicalExpedienteState {
   return {
@@ -34,13 +34,14 @@ function pendingCanonical(): CanonicalExpedienteState {
   };
 }
 
-describe("LB29 - pipeline universal protegido suministro ASA", () => {
-  it("registra el activo oficial exacto y no una copia derivada", () => {
+describe("LB29/LB34 - pipeline universal protegido suministro ASA", () => {
+  it("registra el activo oficial exacto con el inventario físico final", () => {
     expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.status).toBe("HUMAN_VALIDATED");
-    expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.templateId).toBe(JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.templateId);
+    expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.templateId).toBe(JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId);
     expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.contentHash).toBe(JDA_SUPPLY_ASA_VERIFIED_MANIFEST.contentHash);
     expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.styleFingerprint).toBe(JDA_SUPPLY_ASA_VERIFIED_MANIFEST.styleFingerprint);
-    expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.slotIds).toEqual(JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.slotIds);
+    expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.slotIds).toEqual(JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.slotIds);
+    expect(JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD.slotIds).toContain("pcap.anexoI.14.da33.limites");
   });
 
   it("bloquea expedientes incompletos antes de considerar bytes o generación", () => {
