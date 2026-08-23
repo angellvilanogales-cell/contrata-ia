@@ -25,6 +25,11 @@ export const JDA_SUPPLY_ASA_REFERENCE_SOURCE: RealTemplateSourceEvidence = {
  * existen en el expediente universal y cuya correspondencia documental se ha
  * podido verificar. No se inventan huecos para textos que el dominio todavía
  * no representa de forma exacta.
+ *
+ * Importante: la decisión de división en lotes se mapea a la pregunta expresa
+ * "División en lotes: Sí/No". No se escribe nunca un supuesto "LOTE 1" cuando
+ * divisionIntoLots=false; la descripción de lotes es contenido condicional y
+ * requiere cobertura física propia cuando proceda.
  */
 export const JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE: RealTemplateMappingProfile = {
   profileId: "realmap:jda:supply:asa:pcap:anexo-i:reference-v5",
@@ -43,7 +48,7 @@ export const JDA_SUPPLY_ASA_PCAP_ANEXO_I_REFERENCE_PROFILE: RealTemplateMappingP
   slots: [
     { slotId: "pcap.anexoI.1.objeto", fieldKey: "object", required: true, sourceSection: "ANEXO I / 1", sourceLabel: "Objeto del contrato" },
     { slotId: "pcap.anexoI.1.cpv", fieldKey: "cpvMain", required: true, sourceSection: "ANEXO I / 1", sourceLabel: "Código CPV" },
-    { slotId: "pcap.anexoI.1A.lotes", fieldKey: "lots.lots", required: true, sourceSection: "ANEXO I / 1.A", sourceLabel: "Descripción de los lotes" },
+    { slotId: "pcap.anexoI.1A.divisionLotes", fieldKey: "lots.divisionIntoLots", required: true, sourceSection: "ANEXO I / 1.A", sourceLabel: "División en lotes" },
     { slotId: "pcap.anexoI.2.pbl", fieldKey: "baseTenderBudgetCents", required: true, sourceSection: "ANEXO I / 2", sourceLabel: "Presupuesto base de licitación" },
     { slotId: "pcap.anexoI.2.valorEstimado", fieldKey: "economic.legalEstimatedValueCents", required: true, sourceSection: "ANEXO I / 2", sourceLabel: "Valor estimado" },
     { slotId: "pcap.anexoI.3.duracion", fieldKey: "durationMonths", required: true, sourceSection: "ANEXO I / 3", sourceLabel: "Duración del contrato" },
