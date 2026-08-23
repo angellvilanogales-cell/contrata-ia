@@ -11,22 +11,26 @@ import {
  * alterar estructura ODF ni inventar huecos documentales.
  *
  * La inspección del content.xml del ODT oficial exacto acreditó que la decisión
- * «Contrato reservado DA 4ª LCSP» es texto Sí/No, no un control de formulario.
- * Por tanto puede parametrizarse con el mismo mecanismo conservador usado para
- * DA 33ª y otros valores textuales, preservando spans y estilos.
+ * «Contrato reservado DA 4ª LCSP» está repartida en varios spans de texto
+ * (" Sí/" + "N" + "o"). Se sustituye el fragmento completo por otro con la
+ * misma estructura de spans mediante RAW_XML controlado; así no se colapsan ni
+ * reconstruyen estilos del modelo.
  */
+const RESERVED_DA4_FRAGMENT = '<text:span text:style-name="T217">:</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T200"> Sí/</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T201">N</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T200">o</text:span></text:span></text:p>';
+
 export const JDA_SUPPLY_ASA_RESERVED_DA4_BINDING: UniversalOdtPhysicalSlotBinding = {
   slotId: "pcap.anexoI.1B.contratoReservado",
   part: "content.xml",
   sourceSection: "ANEXO I / 1.B",
   sourceLabel: "Contrato reservado DA 4ª LCSP",
-  xmlToken: '<text:span text:style-name="T217">:</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T200"> Sí/</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T201">N</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T200">o</text:span></text:span></text:p>',
-  valueToken: "Sí/</text:span></text:span><text:span text:style-name=\"Fuente_20_de_20_párrafo_20_predeter.\"><text:span text:style-name=\"T201\">N</text:span></text:span><text:span text:style-name=\"Fuente_20_de_20_párrafo_20_predeter.\"><text:span text:style-name=\"T200\">o",
+  xmlToken: RESERVED_DA4_FRAGMENT,
+  escapeMode: "RAW_XML",
 };
 
 const reservedDa4: UniversalTemplateValueFormatter = (value, fieldKey) => {
   if (typeof value !== "boolean") throw new Error(`${fieldKey}: se requiere una decisión booleana validada.`);
-  return value ? "Sí" : "No";
+  const firstText = value ? " Sí" : " No";
+  return `<text:span text:style-name="T217">:</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T200">${firstText}</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T201"></text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T200"></text:span></text:span></text:p>`;
 };
 
 export const JDA_SUPPLY_ASA_LB31_EDITABLE_ASSET = {
