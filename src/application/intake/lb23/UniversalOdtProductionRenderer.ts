@@ -15,8 +15,14 @@ export interface UniversalEditableTemplateBinaryStore {
 export interface UniversalOdtPhysicalSlotBinding {
   slotId: string;
   part: "content.xml" | "styles.xml";
-  /** Fragmento XML exacto y único dentro del modelo oficial original. */
+  /** Fragmento XML exacto y único que ancla físicamente el hueco en el original. */
   xmlToken: string;
+  /**
+   * Subcadena dentro de xmlToken que se sustituye por el valor. Si se omite se
+   * sustituye xmlToken completo (compatibilidad con bindings sintéticos LB23).
+   * En modelos reales debe usarse para conservar el elemento/span y su estilo.
+   */
+  valueToken?: string;
   sourceSection: string;
   sourceLabel: string;
 }
@@ -95,10 +101,26 @@ function replacePart(entries: readonly OdtZipEntry[], part: string, nextText: st
   return entries.map(entry => entry.name === part ? { ...entry, bytes: Buffer.from(nextText, "utf8") } : entry);
 }
 
+function validateBinding(binding: UniversalOdtPhysicalSlotBinding, partText: string): void {
+  if (!binding.xmlToken.length || !binding.sourceSection.trim() || !binding.sourceLabel.trim()) {
+    throw new Error(`Binding físico incompleto para ${binding.slotId}.`);
+  }
+  const occurrences = countOccurrences(partText, binding.xmlToken);
+  if (occurrences !== 1) {
+    throw new Error(`El anclaje físico de ${binding.slotId} aparece ${occurrences} veces en ${binding.part}; se exige coincidencia exacta y única.`);
+  }
+  const valueToken = binding.valueToken ?? binding.xmlToken;
+  const valueOccurrences = countOccurrences(binding.xmlToken, valueToken);
+  if (!valueToken.length || valueOccurrences !== 1) {
+    throw new Error(`El valueToken de ${binding.slotId} debe aparecer exactamente una vez dentro de su anclaje físico.`);
+  }
+}
+
 /**
- * LB23.1-LB23.4. Renderer ODT que modifica el paquete original, sin regenerar
- * estilos, numeración ni estructura. Cada slot de producción necesita un
- * binding físico verificado contra el XML del original oficial.
+ * Renderer ODT que modifica el paquete original sin regenerar estilos,
+ * numeración ni estructura. En activos reales el binding usa un anclaje XML
+ * único y un valueToken interior: se sustituye solo el texto del hueco y se
+ * preservan los spans/estilos administrativos del modelo oficial.
  */
 export class UniversalOdtProductionRenderer implements UniversalEditableTemplateRendererPort {
   public constructor(
@@ -137,12 +159,8 @@ export class UniversalOdtProductionRenderer implements UniversalEditableTemplate
     for (const binding of bindings) {
       if (seenBindings.has(binding.slotId)) throw new Error(`Binding físico duplicado: ${binding.slotId}.`);
       seenBindings.add(binding.slotId);
-      if (!binding.xmlToken.length || !binding.sourceSection.trim() || !binding.sourceLabel.trim()) {
-        throw new Error(`Binding físico incompleto para ${binding.slotId}.`);
-      }
       const partText = Buffer.from(getEntry(entries, binding.part).bytes).toString("utf8");
-      const occurrences = countOccurrences(partText, binding.xmlToken);
-      if (occurrences !== 1) throw new Error(`El token físico de ${binding.slotId} aparece ${occurrences} veces en ${binding.part}; se exige coincidencia exacta y única.`);
+      validateBinding(binding, partText);
     }
 
     const appliedSlots: string[] = [];
@@ -153,8 +171,10 @@ export class UniversalOdtProductionRenderer implements UniversalEditableTemplate
       const renderedValue = xmlEscape(formatter(value.value, value.sourceFieldKey));
       const entry = getEntry(entries, binding.part);
       const partText = Buffer.from(entry.bytes).toString("utf8");
-      if (countOccurrences(partText, binding.xmlToken) !== 1) throw new Error(`El token de ${value.slotId} dejó de ser único antes de aplicarse.`);
-      entries = replacePart(entries, binding.part, partText.replace(binding.xmlToken, renderedValue));
+      validateBinding(binding, partText);
+      const valueToken = binding.valueToken ?? binding.xmlToken;
+      const anchoredReplacement = binding.xmlToken.replace(valueToken, renderedValue);
+      entries = replacePart(entries, binding.part, partText.replace(binding.xmlToken, anchoredReplacement));
       appliedSlots.push(value.slotId);
     }
 
