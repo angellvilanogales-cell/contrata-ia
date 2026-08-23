@@ -28,12 +28,19 @@ describe("V1 activation - original ODT oficial suministro ASA", () => {
     }
   });
 
+  it("renderiza la decisión de no división sin inventar un LOTE 1", () => {
+    const division = JDA_SUPPLY_ASA_RENDERER_CONFIGURATION.formattersBySlotId?.["pcap.anexoI.1A.divisionLotes"];
+    expect(division?.(false, "lots.divisionIntoLots")).toBe("No");
+    expect(division?.(true, "lots.divisionIntoLots")).toBe("Sí");
+    expect(() => division?.([], "lots.divisionIntoLots")).toThrow(/decisión booleana validada/);
+    expect(JDA_SUPPLY_ASA_EDITABLE_ASSET.slotIds).not.toContain("pcap.anexoI.1A.lotes");
+  });
+
   it("bloquea silenciosamente alcances todavía no certificados", () => {
     const criteria = JDA_SUPPLY_ASA_RENDERER_CONFIGURATION.formattersBySlotId?.["pcap.anexoI.7.criterios"];
-    const lots = JDA_SUPPLY_ASA_RENDERER_CONFIGURATION.formattersBySlotId?.["pcap.anexoI.1A.lotes"];
     expect(criteria?.([{ nombre: "Precio", ponderacion: 100, evaluableMedianteFormula: true }], "criteria.awardCriteria")).toBe("Sí");
     expect(() => criteria?.([{ nombre: "Precio", ponderacion: 80, evaluableMedianteFormula: true }, { nombre: "Plazo", ponderacion: 20, evaluableMedianteFormula: true }], "criteria.awardCriteria")).toThrow(/criterio único precio/);
-    expect(() => lots?.([], "lots.lots")).toThrow(/exactamente un lote/);
     expect(JDA_SUPPLY_ASA_ACTIVATION_LIMITATIONS.join(" ")).toMatch(/resto de campos.*todavía automatizados/i);
+    expect(JDA_SUPPLY_ASA_ACTIVATION_LIMITATIONS.join(" ")).toMatch(/justificación de no división/i);
   });
 });
