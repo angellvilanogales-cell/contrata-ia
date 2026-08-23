@@ -10,6 +10,13 @@ export interface UniversalAnnuality {
   vatIncluded: boolean;
 }
 
+export interface UniversalAnnualityBudgetRow {
+  year: number;
+  amountCents: number;
+  budgetApplication: string;
+  vatIncluded: boolean;
+}
+
 export interface UniversalUnitPrice {
   concept: string;
   unit: string;
@@ -21,10 +28,11 @@ export interface UniversalUnitPrice {
  * presupuesto máximo ni duración temporal; se conservan separados para evitar
  * extrapolaciones o equivalencias jurídicas silenciosas.
  *
- * Los campos opcionales incorporados en LB27 representan decisiones documentales
- * con semántica propia que aparecen en modelos oficiales. Son opcionales para
- * mantener compatibilidad con expedientes universales anteriores, pero cuando un
- * perfil documental los exige deben existir como EvidenceField promocionable.
+ * Los campos opcionales incorporados desde LB27 representan decisiones
+ * documentales con semántica propia que aparecen en modelos oficiales. Son
+ * opcionales para mantener compatibilidad con expedientes universales anteriores,
+ * pero cuando un perfil documental los exige deben existir como EvidenceField
+ * promocionable.
  */
 export interface UniversalEconomicEvidence {
   vatPercent: EvidenceField<number>;
@@ -48,6 +56,12 @@ export interface UniversalEconomicEvidence {
   budgetCoversEntireContractLife?: EvidenceField<boolean>;
   estimatedValueCalculationMethod?: EvidenceField<string>;
   priceDeterminationRegime?: EvidenceField<string>;
+  /**
+   * Filas documentales exactas Año/Importe/Partida Presupuestaria. No se derivan
+   * silenciosamente uniendo annualities y budgetApplication porque la partida
+   * puede variar por anualidad y esa correspondencia debe quedar acreditada.
+   */
+  annualityBudgetRows?: EvidenceField<readonly UniversalAnnualityBudgetRow[]>;
 }
 
 export interface UniversalLot {
