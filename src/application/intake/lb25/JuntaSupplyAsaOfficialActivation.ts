@@ -66,8 +66,8 @@ export const JDA_SUPPLY_ASA_PHYSICAL_BINDINGS: readonly UniversalOdtPhysicalSlot
     valueToken: "Sí/No",
   },
   {
-    slotId: "pcap.anexoI.2.pbl", part: "content.xml", sourceSection: "ANEXO I / 2.A", sourceLabel: "Importe total (IVA incluido)",
-    xmlToken: '<text:p text:style-name="P401"><text:span text:style-name="T62">Importe total (IVA incluido): <text:s/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T108">_______</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T110">euros.</text:span></text:span></text:p>',
+    slotId: "pcap.anexoI.2.pbl", part: "content.xml", sourceSection: "ANEXO I / 2.A", sourceLabel: "Importe total (IVA excluido)",
+    xmlToken: '<text:p text:style-name="P400"><text:span text:style-name="T62">Importe total (IVA excluido): </text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T108">_______</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T110">euros.</text:span></text:span></text:p>',
     valueToken: "_______",
   },
   {
@@ -140,6 +140,7 @@ export const JDA_SUPPLY_ASA_ACTIVATION_LIMITATIONS = [
   "El manifiesto y los nueve bindings físicos existentes ya están verificados contra el original exacto.",
   "El activo binario no se incorpora al repositorio como texto ni se reconstruye: el runtime debe cargar los bytes exactos cuyo SHA-256 figure en el manifiesto.",
   "El perfil físico actual cubre únicamente los nueve slots semánticos registrados; no certifica que el resto de campos a cumplimentar del Anexo I estén todavía automatizados.",
+  "El campo canónico baseTenderBudgetCents se vincula al importe inicial IVA excluido, manteniendo separados IVA, PBL IVA incluido y presupuesto máximo DA 33.ª conforme a las fuentes del caso real.",
   "La división en lotes se cumplimenta en su decisión Sí/No. La descripción de lotes, justificación de no división y reglas de limitación/adjudicación siguen siendo campos condicionales con cobertura física independiente pendiente.",
   "El binding de criterios se limita deliberadamente al supuesto de precio 100% evaluable mediante fórmula; cualquier otro caso se bloquea.",
 ] as const;
