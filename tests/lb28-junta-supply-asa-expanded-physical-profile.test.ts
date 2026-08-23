@@ -31,7 +31,8 @@ describe("LB28 - ampliación física del Anexo I oficial", () => {
   it("formatea únicamente decisiones y magnitudes compatibles con el perfil certificado", () => {
     const formatters = JDA_SUPPLY_ASA_EXPANDED_RENDERER_CONFIGURATION.formattersBySlotId!;
     expect(formatters["pcap.anexoI.1C.da33"]?.(true, "economic.needsBasedContractDa33")).toBe("Sí");
-    expect(formatters["pcap.anexoI.2A.iva"]?.(221_601, "economic.initialVatAmountCents")).toBe("2.216,01");
+    // Intl es-ES no agrupa cuatro cifras en todos los runtimes ICU; se preservan siempre dos decimales y coma decimal.
+    expect(formatters["pcap.anexoI.2A.iva"]?.(221_601, "economic.initialVatAmountCents")).toBe("2216,01");
     expect(formatters["pcap.anexoI.2A.pblIncVat"]?.(1_276_845, "economic.initialPblVatIncludedCents")).toBe("12.768,45");
     expect(formatters["pcap.anexoI.3.posibilidadProrroga"]?.(24, "extensionMonths")).toBe("Sí");
     expect(formatters["pcap.anexoI.3.preavisoProrroga"]?.(2, "execution.extensionNoticeMonths")).toBe("2 meses");
