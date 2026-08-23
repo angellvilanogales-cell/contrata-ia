@@ -8,28 +8,28 @@ import { JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY } from "../lb23/JuntaOfficialEdit
 import { UniversalEditableTemplateBinaryStore, UniversalOdtProductionRenderer } from "../lb23/UniversalOdtProductionRenderer";
 import { JDA_SUPPLY_ASA_VERIFIED_MANIFEST } from "../lb25/JuntaSupplyAsaOfficialActivation";
 import {
-  JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET,
-  JDA_SUPPLY_ASA_EXPANDED_RENDERER_CONFIGURATION,
-  JDA_SUPPLY_ASA_LB28_REMAINING_PHYSICAL_BLOCKERS,
-  JDA_SUPPLY_ASA_PRODUCTION_MAPPING_PROFILE,
-} from "../lb28/JuntaSupplyAsaExpandedPhysicalProfile";
+  JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET,
+  JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE,
+  JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION,
+  evaluateJdaSupplyAsaLb34PhysicalClosure,
+} from "../lb34/JuntaSupplyAsaModificationSection";
 
 export const JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD: UniversalOfficialTemplateRegistryRecord = {
   registryId: "jda:pcap:supply:asa:2025-12-17:v1",
-  templateId: JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.templateId,
-  sourceId: JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.sourceId,
+  templateId: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId,
+  sourceId: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.sourceId,
   sourceLocator: JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY.locator,
   contractType: "SUPPLY",
   documentKind: "PCAP",
   format: "ODT",
-  mediaType: JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.mediaType,
+  mediaType: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.mediaType,
   contentHash: JDA_SUPPLY_ASA_VERIFIED_MANIFEST.contentHash,
   styleFingerprint: JDA_SUPPLY_ASA_VERIFIED_MANIFEST.styleFingerprint,
-  slotIds: [...JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.slotIds],
+  slotIds: [...JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.slotIds],
   effectiveFrom: "2025-12-17",
   status: "HUMAN_VALIDATED",
   validatedBy: JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY.validatedBy ?? "SOURCE_REVIEW_2026-08-23",
-  validationNote: "Original ODT aportado, inspeccionado y contrastado físicamente; hashes y bindings registrados en LB25/LB28.",
+  validationNote: "Original ODT aportado e inspeccionado; hashes y bindings físicos finales LB31-LB34 verificados contra el modelo de diciembre de 2025.",
 };
 
 export type SupplyAsaProtectedPipelineStage =
@@ -53,14 +53,14 @@ function templateRegistry(): UniversalOfficialTemplateRegistry {
 }
 
 function mappingQualification() {
-  return qualifyRealTemplateMapping(JDA_SUPPLY_ASA_PRODUCTION_MAPPING_PROFILE, [JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY]);
+  return qualifyRealTemplateMapping(JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE, [JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY]);
 }
 
 /**
- * LB29 - puerta única del escenario PCAP suministro ASA. No usa el generador
- * legacy como fallback. Aunque exista un modelo oficial válido, cualquier hueco
- * físico pendiente sigue bloqueando producción para evitar un PCAP parcialmente
- * parametrizado presentado como definitivo.
+ * Puerta única del escenario PCAP suministro ASA. No usa el generador legacy
+ * como fallback. Desde LB34 la cobertura física declarada del Anexo I está
+ * cerrada para el primer caso real, quedando como condición externa la presencia
+ * en runtime de los bytes exactos del original oficial y la evidencia universal.
  */
 export function evaluateSupplyAsaProtectedPipelineReadiness(
   expediente: UniversalExpedienteV13,
@@ -70,7 +70,7 @@ export function evaluateSupplyAsaProtectedPipelineReadiness(
   const registry = templateRegistry();
   const selected = registry.select("SUPPLY", "PCAP", procurementDate);
   if (!selected.ready || !selected.record) {
-    return { ready: false, stage: "NEEDS_OFFICIAL_TEMPLATE", blockers: selected.blockers, templateId: JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.templateId, legacyGenerationAllowed: false };
+    return { ready: false, stage: "NEEDS_OFFICIAL_TEMPLATE", blockers: selected.blockers, templateId: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId, legacyGenerationAllowed: false };
   }
 
   const qualification = mappingQualification();
@@ -84,8 +84,9 @@ export function evaluateSupplyAsaProtectedPipelineReadiness(
     return { ready: false, stage: "NEEDS_UNIVERSAL_EVIDENCE", blockers: mapping.blockers, templateId: selected.record.templateId, legacyGenerationAllowed: false };
   }
 
-  if (JDA_SUPPLY_ASA_LB28_REMAINING_PHYSICAL_BLOCKERS.length > 0) {
-    return { ready: false, stage: "NEEDS_PHYSICAL_COVERAGE", blockers: JDA_SUPPLY_ASA_LB28_REMAINING_PHYSICAL_BLOCKERS, templateId: selected.record.templateId, legacyGenerationAllowed: false };
+  const physical = evaluateJdaSupplyAsaLb34PhysicalClosure();
+  if (!physical.fullPhysicalCoverageReady) {
+    return { ready: false, stage: "NEEDS_PHYSICAL_COVERAGE", blockers: physical.blockers.map(item => item.finding), templateId: selected.record.templateId, legacyGenerationAllowed: false };
   }
 
   if (!binaryAvailable) {
@@ -102,17 +103,13 @@ export interface SupplyAsaProtectedPipelineRenderResult {
   auditBlockers: readonly string[];
 }
 
-/**
- * Ejecución del pipeline real. La función queda operativa desde LB29 y se activa
- * automáticamente cuando la cobertura física de LB28 sea completa y el runtime
- * suministre los bytes exactos. No existe parámetro de bypass de producción.
- */
+/** Ejecución del pipeline real sobre el activo oficial exacto y perfil físico LB34. */
 export async function renderSupplyAsaProtectedPcap(
   expediente: UniversalExpedienteV13,
   procurementDate: string,
   binaryStore: UniversalEditableTemplateBinaryStore,
 ): Promise<SupplyAsaProtectedPipelineRenderResult> {
-  const source = await binaryStore.get(JDA_SUPPLY_ASA_EXPANDED_EDITABLE_ASSET.templateId);
+  const source = await binaryStore.get(JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId);
   const readiness = evaluateSupplyAsaProtectedPipelineReadiness(expediente, procurementDate, Boolean(source));
   if (!readiness.ready) return { readiness, document: null, auditReady: false, auditBlockers: readiness.blockers };
 
@@ -126,7 +123,7 @@ export async function renderSupplyAsaProtectedPcap(
   const mapping = buildUniversalDocumentMappingPackage(expediente, catalog, [qualification.mappingSpec]);
   const asset = registryRecordToEditableAsset(selected.record);
   const assetStore: UniversalEditableTemplateStore = { async get(templateId) { return templateId === asset.templateId ? asset : null; } };
-  const renderer = new UniversalOdtProductionRenderer(binaryStore, JDA_SUPPLY_ASA_EXPANDED_RENDERER_CONFIGURATION);
+  const renderer = new UniversalOdtProductionRenderer(binaryStore, JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION);
   const rendering = await renderUniversalEditableDocuments(mapping, assetStore, renderer);
   const audit = auditUniversalEditableRendering(mapping, rendering);
   const document = rendering.documents.find(item => item.documentKind === "PCAP") ?? null;
