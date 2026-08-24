@@ -29,6 +29,8 @@ import { SUPPLY_CATALOGUE_SCRIPT } from "../lb7/SupplyCatalogueScript";
 import { SUPPLY_ECONOMIC_PERIOD_SCRIPT } from "../lb7/SupplyEconomicPeriodScript";
 import { SUPPLY_FINALIZATION_SCRIPT } from "../lb7/SupplyFinalizationScript";
 import { SUPPLY_QUALIFICATION_SCRIPT } from "../lb7/SupplyQualificationScript";
+import { UNIVERSAL_EVIDENCE_UI } from "../lb53/UniversalEvidenceUi";
+import { UNIVERSAL_EVIDENCE_SCRIPT } from "../lb53/UniversalEvidenceScript";
 
 const MAX_JSON_BYTES = 12 * 1024 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -62,17 +64,19 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/adaptive") { sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/adaptive.js") { sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/adaptive-persistence.js") { sendText(response, 200, ADAPTIVE_PERSISTENCE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/universal-evidence") { sendText(response, 200, UNIVERSAL_EVIDENCE_UI, "text/html; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/universal-evidence.js") { sendText(response, 200, UNIVERSAL_EVIDENCE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-catalogue.js") { sendText(response, 200, SUPPLY_CATALOGUE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-economic-period.js") { sendText(response, 200, SUPPLY_ECONOMIC_PERIOD_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-qualification.js") { sendText(response, 200, SUPPLY_QUALIFICATION_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-finalization.js") { sendText(response, 200, SUPPLY_FINALIZATION_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
-      if (request.method === "POST" && url.pathname === "/adaptive/login") { const form = await readForm(request); const token = String(form.get("token") ?? "").trim(); if (!token) throw new Error("Falta la credencial de acceso."); security.authenticateToken(token); redirect(response, "/adaptive", security.sessionCookie(token)); return; }
+      if (request.method === "POST" && url.pathname === "/adaptive/login") { const form = await readForm(request); const token = String(form.get("token") ?? "").trim(); if (!token) throw new Error("Falta la credencial de acceso."); security.authenticateToken(token); redirect(response, request.headers.referer?.includes("universal-evidence") ? "/universal-evidence" : "/adaptive", security.sessionCookie(token)); return; }
       if (request.method === "POST" && url.pathname === "/adaptive/logout") { redirect(response, "/adaptive", security.clearSessionCookie()); return; }
       if (request.method === "GET" && url.pathname === "/specialized") { sendText(response, 200, SPECIALIZED_WORKFLOW_UI, "text/html; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 53, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, verifiedEditableAssetStore: true, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 54, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, timestamp: new Date().toISOString() }); return; }
       if (request.method === "GET" && url.pathname === "/api/source-coverage") { requireRole(request, "VIEWER"); sendJson(response, 200, { matrix: PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluation: evaluateProcurementSourceCaseCoverage() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal-ui-manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluation: evaluateUniversalV1UiFieldManifest() }); return; }
       if (request.method === "GET" && url.pathname === "/api/runtime-assets/readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, { assets: FERRETERIA_V1_EDITABLE_ASSET_MANIFEST.map(asset => ({ assetId: asset.assetId, fileName: asset.fileName, role: asset.role, identityConfigured: Boolean(asset.expectedSha256) })), evaluation: evaluateFerreteriaV1RuntimeAssetReadiness() }); return; }
