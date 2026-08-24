@@ -57,12 +57,6 @@ function mappingQualification() {
   return qualifyRealTemplateMapping(JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE, [JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY]);
 }
 
-/**
- * Puerta única del escenario PCAP suministro ASA. No usa el generador legacy
- * como fallback. LB34 acredita que todos los bindings actualmente registrados
- * tienen soporte físico seguro; LB35 comprueba después del render que el Anexo I
- * no conserve decisiones aplicables del órgano de contratación sin resolver.
- */
 export function evaluateSupplyAsaProtectedPipelineReadiness(
   expediente: UniversalExpedienteV13,
   procurementDate: string,
@@ -70,41 +64,34 @@ export function evaluateSupplyAsaProtectedPipelineReadiness(
 ): SupplyAsaProtectedPipelineReadiness {
   const registry = templateRegistry();
   const selected = registry.select("SUPPLY", "PCAP", procurementDate);
-  if (!selected.ready || !selected.record) {
-    return { ready: false, stage: "NEEDS_OFFICIAL_TEMPLATE", blockers: selected.blockers, templateId: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId, legacyGenerationAllowed: false };
-  }
-
+  if (!selected.ready || !selected.record) return { ready: false, stage: "NEEDS_OFFICIAL_TEMPLATE", blockers: selected.blockers, templateId: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId, legacyGenerationAllowed: false };
   const qualification = mappingQualification();
-  if (!qualification.productionEligible || !qualification.mappingSpec) {
-    return { ready: false, stage: "NEEDS_OFFICIAL_TEMPLATE", blockers: qualification.blockers.length ? qualification.blockers : qualification.warnings, templateId: selected.record.templateId, legacyGenerationAllowed: false };
-  }
-
+  if (!qualification.productionEligible || !qualification.mappingSpec) return { ready: false, stage: "NEEDS_OFFICIAL_TEMPLATE", blockers: qualification.blockers.length ? qualification.blockers : qualification.warnings, templateId: selected.record.templateId, legacyGenerationAllowed: false };
   const catalog = new UniversalOfficialTemplateCatalog([registryRecordToOfficialDescriptor(selected.record)]);
   const mapping = buildUniversalDocumentMappingPackage(expediente, catalog, [qualification.mappingSpec]);
-  if (!mapping.ready) {
-    return { ready: false, stage: "NEEDS_UNIVERSAL_EVIDENCE", blockers: mapping.blockers, templateId: selected.record.templateId, legacyGenerationAllowed: false };
-  }
-
+  if (!mapping.ready) return { ready: false, stage: "NEEDS_UNIVERSAL_EVIDENCE", blockers: mapping.blockers, templateId: selected.record.templateId, legacyGenerationAllowed: false };
   const physical = evaluateJdaSupplyAsaLb34PhysicalClosure();
-  if (!physical.fullPhysicalCoverageReady) {
-    return { ready: false, stage: "NEEDS_PHYSICAL_COVERAGE", blockers: physical.blockers.map(item => item.finding), templateId: selected.record.templateId, legacyGenerationAllowed: false };
-  }
-
-  if (!binaryAvailable) {
-    return { ready: false, stage: "NEEDS_TEMPLATE_BYTES", blockers: [`No están disponibles en runtime los bytes SHA-256 ${selected.record.contentHash}.`], templateId: selected.record.templateId, legacyGenerationAllowed: false };
-  }
-
+  if (!physical.fullPhysicalCoverageReady) return { ready: false, stage: "NEEDS_PHYSICAL_COVERAGE", blockers: physical.blockers.map(item => item.finding), templateId: selected.record.templateId, legacyGenerationAllowed: false };
+  if (!binaryAvailable) return { ready: false, stage: "NEEDS_TEMPLATE_BYTES", blockers: [`No están disponibles en runtime los bytes SHA-256 ${selected.record.contentHash}.`], templateId: selected.record.templateId, legacyGenerationAllowed: false };
   return { ready: true, stage: "READY_FOR_PROTECTED_RENDER", blockers: [], templateId: selected.record.templateId, legacyGenerationAllowed: false };
 }
 
 export interface SupplyAsaProtectedPipelineRenderResult {
   readiness: SupplyAsaProtectedPipelineReadiness;
   document: UniversalRenderedEditableDocument | null;
+  packageAuditReady: boolean;
+  packageAuditBlockers: readonly string[];
+  residualAuditReady: boolean;
+  residualAuditBlockers: readonly string[];
   auditReady: boolean;
   auditBlockers: readonly string[];
 }
 
-/** Ejecución del pipeline real sobre el activo oficial exacto y perfil físico LB34 + auditoría residual LB35. */
+/**
+ * Render base protegido LB34. Se publican por separado la auditoría del paquete
+ * (integridad/mapping/render) y LB35 (residuos del Anexo I), porque LB60 completa
+ * físicamente campos source-backed adicionales antes de la auditoría residual final.
+ */
 export async function renderSupplyAsaProtectedPcap(
   expediente: UniversalExpedienteV13,
   procurementDate: string,
@@ -112,14 +99,13 @@ export async function renderSupplyAsaProtectedPcap(
 ): Promise<SupplyAsaProtectedPipelineRenderResult> {
   const source = await binaryStore.get(JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId);
   const readiness = evaluateSupplyAsaProtectedPipelineReadiness(expediente, procurementDate, Boolean(source));
-  if (!readiness.ready) return { readiness, document: null, auditReady: false, auditBlockers: readiness.blockers };
+  if (!readiness.ready) return { readiness, document: null, packageAuditReady: false, packageAuditBlockers: readiness.blockers, residualAuditReady: false, residualAuditBlockers: [], auditReady: false, auditBlockers: readiness.blockers };
 
   const registry = templateRegistry();
   const selected = registry.select("SUPPLY", "PCAP", procurementDate);
   if (!selected.record) throw new Error("Inconsistencia interna: modelo oficial no seleccionado tras superar readiness.");
   const qualification = mappingQualification();
   if (!qualification.mappingSpec) throw new Error("Inconsistencia interna: mapping oficial no disponible tras superar readiness.");
-
   const catalog = new UniversalOfficialTemplateCatalog([registryRecordToOfficialDescriptor(selected.record)]);
   const mapping = buildUniversalDocumentMappingPackage(expediente, catalog, [qualification.mappingSpec]);
   const asset = registryRecordToEditableAsset(selected.record);
@@ -129,11 +115,16 @@ export async function renderSupplyAsaProtectedPcap(
   const packageAudit = auditUniversalEditableRendering(mapping, rendering);
   const document = rendering.documents.find(item => item.documentKind === "PCAP") ?? null;
   const residualAudit = document ? auditJdaSupplyAsaRenderedOdt(document.bytes) : null;
-  const auditBlockers = [...packageAudit.blockers, ...(residualAudit?.blockers ?? [])];
+  const packageAuditBlockers = [...packageAudit.blockers];
+  const residualAuditBlockers = [...(residualAudit?.blockers ?? [])];
   return {
     readiness: { ...readiness, stage: document ? "RENDERED_AWAITING_HUMAN_AUDIT" : readiness.stage },
     document,
+    packageAuditReady: packageAudit.ready,
+    packageAuditBlockers,
+    residualAuditReady: Boolean(residualAudit?.ready),
+    residualAuditBlockers,
     auditReady: packageAudit.ready && Boolean(residualAudit?.ready),
-    auditBlockers,
+    auditBlockers: [...packageAuditBlockers, ...residualAuditBlockers],
   };
 }
