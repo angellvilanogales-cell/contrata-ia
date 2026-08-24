@@ -36,7 +36,7 @@ export const V1_RUNTIME_ASSET_MANIFEST: readonly VerifiedRuntimeAssetDescriptor[
     templateId: "case:CONTR-2026-240267:ppt:v6:editable",
     sourceId: "case:CONTR-2026-240267:ppt:v6:editable",
     fileName: "PPT Feretería SSCC SAE V6.odt",
-    sha256: "PENDING_EXACT_BINARY_SHA256",
+    sha256: "c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09",
     required: true,
   },
 ] as const;
