@@ -38,7 +38,7 @@ export const FERRETERIA_MEMORY_PHYSICAL_BINDING_INVENTORY: readonly ProtectedPhy
   { id: "memory.estimated-value-method", part: "content.xml", sourceAnchor: "Método de cálculo:", effect: "Elimina artículos nuevos y fija aumento de unidades existentes." },
   { id: "memory.rolece", part: "content.xml", sourceAnchor: "Se propone la tramitación por la vía del Procedimiento Abierto Simplificado Abreviado", effect: "Corrige régimen art. 159.6/159.4.a LCSP." },
   { id: "memory.qualification", part: "content.xml", sourceAnchor: "Esta medida legal facilita la concurrencia competitiva", effect: "Elimina habilitación específica inexistente." },
-  { id: "memory.footer-page-count", part: "styles.xml", sourceAnchor: "<text:span text:style-name=\"MT2\">7</text:span>", effect: "Actualiza denominador de pie a 9 páginas sin alterar definiciones tipográficas." },
+  { id: "memory.footer-page-count", part: "styles.xml", sourceAnchor: "<text:span text:style-name=\"MT2\">7</text:span>", effect: "Sustituye el denominador fijo por text:page-count para reflejar dinámicamente la paginación real del renderer." },
 ] as const;
 
 export const FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY: readonly ProtectedPhysicalBindingInventoryItem[] = [
@@ -88,7 +88,7 @@ function auditMemory(entries: readonly OdtZipEntry[], sourceStructuralStyle: str
   const text = visibleText(part(entries, "content.xml")); const styles = part(entries, "styles.xml"); const blockers: string[] = [];
   for (const required of ["21.793,15", "18.160,96", "3.632,19", "artículo 159.4.a", "sin incorporar artículos nuevos ni establecer precios unitarios nuevos", "no se exige habilitación empresarial o profesional específica"]) if (!text.includes(required)) blockers.push(`Memoria: falta contenido obligatorio «${required}».`);
   for (const forbidden of ["25.325,86", "Incorporación al contrato de otros artículos no contemplados", "se exime a los licitadores de la obligación de inscribirse"]) if (text.includes(forbidden)) blockers.push(`Memoria: persiste contenido incompatible «${forbidden}».`);
-  if (count(styles, '<text:span text:style-name="MT2">9</text:span>') !== 2) blockers.push("Memoria: el denominador de pie no está materializado en 9 páginas en las dos páginas maestras aplicables.");
+  if (count(styles, '<text:span text:style-name="MT2"><text:page-count>7</text:page-count></text:span>') !== 2) blockers.push("Memoria: el denominador de pie no está materializado como contador dinámico de páginas en las dos páginas maestras aplicables.");
   if (structuralStyleFingerprint(entries) !== sourceStructuralStyle) blockers.push("Memoria: se alteraron definiciones tipográficas/estilos estructurales fuera del contenido de pie permitido.");
   return { ready: blockers.length === 0, blockers } as const;
 }
@@ -116,7 +116,9 @@ export async function renderFerreteriaProtectedMemory(store: UniversalEditableTe
   content = replaceParagraph(content, "Se propone la tramitación por la vía del Procedimiento Abierto Simplificado Abreviado", MEMORY_PROCEDURE_PARAGRAPH);
   content = replaceParagraph(content, "Esta medida legal facilita la concurrencia competitiva", MEMORY_QUALIFICATION_PARAGRAPH);
   entries = replacePart(entries, "content.xml", content); let styles = part(entries, "styles.xml"); const footerToken = '<text:span text:style-name="MT2">7</text:span>';
-  if (count(styles, footerToken) !== 2) throw new Error("Memoria: el anclaje de denominador de pie V12 no aparece exactamente dos veces."); styles = styles.split(footerToken).join('<text:span text:style-name="MT2">9</text:span>'); entries = replacePart(entries, "styles.xml", styles);
+  if (count(styles, footerToken) !== 2) throw new Error("Memoria: el anclaje de denominador de pie V12 no aparece exactamente dos veces.");
+  styles = styles.split(footerToken).join('<text:span text:style-name="MT2"><text:page-count>7</text:page-count></text:span>');
+  entries = replacePart(entries, "styles.xml", styles);
   const audit = auditMemory(entries, sourceStructuralStyle); const bytes = writeOdtZip(entries);
   return { kind: "MEMORIA", fileName: "CONTR-2026-240267_Memoria_Justificativa_V14_Protegida_Contrata-IA.odt", bytes, sourceSha256: MEMORY_SOURCE_SHA, renderedSha256: hash(bytes), sourceStyleFingerprint: MEMORY_SOURCE_STYLE, renderedStyleFingerprint: computeOdtStyleFingerprint(entries), auditReady: audit.ready, auditBlockers: audit.blockers, appliedPhysicalBindings: FERRETERIA_MEMORY_PHYSICAL_BINDING_INVENTORY.map(item => item.id) };
 }
