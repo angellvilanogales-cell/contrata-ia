@@ -173,12 +173,11 @@ function materializeParagraphValue(xml: string, currentVisible: string, value: s
 }
 
 function applySecondPassMaterialization(content: string): { content: string; changed: number } {
-  const annexIStart = lastActualAnnexStart(content, "I");
-  const annexIIStart = lastActualAnnexStart(content, "II");
-  let cursor = annexIStart;
+  let cursor = lastActualAnnexStart(content, "I");
   let changed = 0;
   for (const rule of SECOND_PASS_RULES) {
-    const section = content.slice(cursor, annexIIStart + (content.length - content.length));
+    const annexIIStart = lastActualAnnexStart(content, "II");
+    const section = content.slice(cursor, annexIIStart);
     const pattern = /<text:p\b[^>]*>[\s\S]*?<\/text:p>/g;
     let found: RegExpMatchArray | undefined;
     for (const match of section.matchAll(pattern)) {
@@ -191,13 +190,8 @@ function applySecondPassMaterialization(content: string): { content: string; cha
     const oldVisible = visible(oldXml).trim();
     const newXml = materializeParagraphValue(oldXml, oldVisible, rule.value);
     content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + oldXml.length);
-    const delta = newXml.length - oldXml.length;
     cursor = absoluteStart + newXml.length;
     changed += 1;
-    if (delta !== 0) {
-      // El inicio del Anexo II se desplaza con cada materialización; se recalcula
-      // implícitamente al acotar cada búsqueda mediante el encabezado físico actual.
-    }
   }
   return { content, changed };
 }
