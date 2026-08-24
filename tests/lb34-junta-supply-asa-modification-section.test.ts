@@ -28,7 +28,7 @@ describe("LB34 - apartado 14: estabilidad a la baja y DA33 al alza", () => {
     expect(FERRETERIA_PLANNED_MODIFICATION_LEGAL_DECISION.needsDa33.requiresReservedCredit).toBe(true);
   });
 
-  it("cierra todos los bloqueos físicos del Anexo I y conserva solo hallazgos no bloqueantes", () => {
+  it("cierra los bloqueos de los bindings físicos registrados; LB35 audita después los residuos del Anexo I completo", () => {
     const result = evaluateJdaSupplyAsaLb34PhysicalClosure();
     expect(result.fullPhysicalCoverageReady).toBe(true);
     expect(result.remainingBlockingCount).toBe(0);
