@@ -55,6 +55,23 @@ function visible(xml: string): string {
   return xml.replace(/<text:tab[^>]*\/>/g, "\t").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'");
 }
 
+function paragraphStartsWithExactVisible(content: string, expected: string): number[] {
+  const starts: number[] = [];
+  const pattern = /<text:p\b[^>]*>[\s\S]*?<\/text:p>/g;
+  for (const match of content.matchAll(pattern)) {
+    if (match.index === undefined) continue;
+    if (visible(match[0]).trim() === expected) starts.push(match.index);
+  }
+  return starts;
+}
+
+function lastActualAnnexStart(content: string, roman: string): number {
+  const expected = `ANEXO ${roman}`;
+  const matches = paragraphStartsWithExactVisible(content, expected);
+  if (!matches.length) throw new Error(`PCAP: no se localiza el encabezado físico ${expected}.`);
+  return matches[matches.length - 1]!;
+}
+
 function mapParagraphs(content: string, mapper: (xml: string, visibleText: string) => string): { content: string; changed: number } {
   let changed = 0;
   const next = content.replace(/<text:p\b[^>]*>[\s\S]*?<\/text:p>/g, paragraph => {
@@ -92,8 +109,7 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
   content = replaceNamedTable(content, "Tabla4", buildAnexoITable());
   content = replaceNamedTable(content, "Tabla11", buildAnexoVTable());
 
-  const annexIIMarker = content.lastIndexOf("ANEXO II");
-  if (annexIIMarker < 0) throw new Error("PCAP: no se localiza el inicio de anexos de licitadores.");
+  const annexIIMarker = lastActualAnnexStart(content, "II");
   const prefix = content.slice(0, annexIIMarker);
   let annexes = content.slice(annexIIMarker);
   const expediente = mapParagraphs(annexes, (xml, value) => /^EXPEDIENTE:\s*_+\s*$/.test(value.trim()) ? replaceBlankValueInParagraph(xml, caseId) : xml);
@@ -112,9 +128,10 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
   const canonicalDescriptions = FERRETERIA_CANONICAL_CATALOG_98.map(item => item.description);
   const anexoICount = canonicalDescriptions.filter(description => finalText.includes(description)).length;
   if (anexoICount !== 98) blockers.push(`PCAP: no están presentes las 98 descripciones canónicas; se detectan ${anexoICount}.`);
-  const anexoVIndex = finalText.indexOf("ANEXO V");
-  const anexoVIIndex = finalText.indexOf("ANEXO VI", anexoVIndex + 1);
-  const anexoVText = anexoVIndex >= 0 ? finalText.slice(anexoVIndex, anexoVIIndex > anexoVIndex ? anexoVIIndex : undefined) : "";
+  const anexoVStart = lastActualAnnexStart(content, "V");
+  const anexoVIStart = lastActualAnnexStart(content, "VI");
+  if (anexoVIStart <= anexoVStart) throw new Error("PCAP: la secuencia física Anexo V/VI es inválida.");
+  const anexoVText = visible(content.slice(anexoVStart, anexoVIStart));
   const anexoVCount = canonicalDescriptions.filter(description => anexoVText.includes(description)).length;
   if (anexoVCount !== 98) blockers.push(`PCAP Anexo V: no están presentes las 98 referencias; se detectan ${anexoVCount}.`);
   if (/EXPEDIENTE:\s*_+/.test(visible(annexes))) blockers.push("PCAP: quedan expedientes sin propagar en anexos II-XIII.");
