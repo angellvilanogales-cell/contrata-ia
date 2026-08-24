@@ -8,6 +8,7 @@ import { auditFerreteriaCatalogProjectionParity, projectCanonicalCatalogToPcapAn
 
 const DEFAULT_CASE_ID = "CONTR/2026/240267";
 const DEFAULT_TITLE = "SUMINISTRO DE MATERIALES DE FERRETERÍA PARA LAS INSTALACIONES LOS EDIFICIOS DONDE SE UBICAN LOS SERVICIOS CENTRALES DEL SERVICIO ANDALUZ DE EMPLEO Y SUS OFICINAS ANEXAS";
+const PARAGRAPH_PATTERN = /<text:p\b(?![^>]*\/>)[^>]*>[\s\S]*?<\/text:p>/g;
 
 export interface FerreteriaPcapFinalPostProcessResult {
   bytes: Uint8Array;
@@ -59,8 +60,7 @@ function visible(xml: string): string {
 
 function paragraphStartsWithExactVisible(content: string, expected: string): number[] {
   const starts: number[] = [];
-  const pattern = /<text:p\b[^>]*>[\s\S]*?<\/text:p>/g;
-  for (const match of content.matchAll(pattern)) {
+  for (const match of content.matchAll(PARAGRAPH_PATTERN)) {
     if (match.index === undefined) continue;
     if (visible(match[0]).trim() === expected) starts.push(match.index);
   }
@@ -76,7 +76,7 @@ function lastActualAnnexStart(content: string, roman: string): number {
 
 function mapParagraphs(content: string, mapper: (xml: string, visibleText: string) => string): { content: string; changed: number } {
   let changed = 0;
-  const next = content.replace(/<text:p\b[^>]*>[\s\S]*?<\/text:p>/g, paragraph => {
+  const next = content.replace(PARAGRAPH_PATTERN, paragraph => {
     const mapped = mapper(paragraph, visible(paragraph));
     if (mapped !== paragraph) changed += 1;
     return mapped;
@@ -163,11 +163,8 @@ function materializeParagraphValue(xml: string, currentVisible: string, value: s
   if (/Sí\s*\/\s*No/i.test(currentVisible)) {
     const replaced = xml.replace(/Sí\s*\/\s*No/i, escaped);
     if (replaced !== xml) return replaced;
-    // Algunos Sí/No del modelo están fragmentados entre spans. Si no existe el
-    // token continuo en XML, reconstruimos únicamente el contenido del párrafo
-    // conservando su estilo de párrafo; no se tocan automatic-styles ni styles.xml.
-    const opening = xml.match(/^<text:p\b[^>]*>/)?.[0];
-    if (!opening) throw new Error("LB74: párrafo ODF sin apertura.");
+    const opening = xml.match(/^<text:p\b(?![^>]*\/>)[^>]*>/)?.[0];
+    if (!opening) throw new Error("LB77: párrafo ODF real sin apertura.");
     const finalVisible = currentVisible.replace(/Sí\s*\/\s*No/i, value);
     return `${opening}${xmlEscape(finalVisible)}</text:p>`;
   }
@@ -185,9 +182,8 @@ function applySecondPassMaterialization(content: string): { content: string; cha
   for (const rule of SECOND_PASS_RULES) {
     const annexIIStart = lastActualAnnexStart(content, "II");
     const section = content.slice(cursor, annexIIStart);
-    const pattern = /<text:p\b[^>]*>[\s\S]*?<\/text:p>/g;
     let found: RegExpMatchArray | undefined;
-    for (const match of section.matchAll(pattern)) {
+    for (const match of section.matchAll(PARAGRAPH_PATTERN)) {
       const value = visible(match[0]).trim();
       if (rule.pattern.test(value) && isUnresolvedVisible(value)) { found = match; break; }
     }
