@@ -1,12 +1,9 @@
 import { FerreteriaCatalogItem, validateFerreteriaCanonicalCatalog } from "../lb39/FerreteriaCanonicalCatalog";
 
 /**
- * LB41 — activación controlada del PPT editable real del expediente CONTR/2026/240267.
- *
- * La fuente localizada es el ODT V6 real del expediente. No se presume que sea un
- * modelo institucional genérico reutilizable para cualquier suministro. Se activa
- * inicialmente como referencia editable de caso para inventario físico, catálogo y
- * validación cruzada PCAP/PPT.
+ * LB41/LB57 — activación controlada del PPT editable real del expediente CONTR/2026/240267.
+ * La identidad de la fuente aportada está verificada, sin presumir que el mismo binario
+ * esté todavía instalado y verificado en un runtime de producción.
  */
 export const FERRETERIA_PPT_V6_EDITABLE_SOURCE = {
   caseId: "CONTR/2026/240267",
@@ -15,6 +12,9 @@ export const FERRETERIA_PPT_V6_EDITABLE_SOURCE = {
   sourceFileName: "PPT Feretería SSCC SAE V6.odt",
   sourceRole: "REAL_CASE_REFERENCE",
   editableSourceLocated: true,
+  sourceBinaryIdentityVerified: true,
+  sourceBinarySha256: "c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09",
+  sourceStyleFingerprint: "sha256:deadf7c2a176c83de774fad7022a0ac1d5adfcca514d8c0cddeb0b01029d1390",
   exactRuntimeBinaryVerified: false,
   structure: {
     pageCount: 7,
@@ -30,13 +30,6 @@ export const FERRETERIA_PPT_V6_EDITABLE_SOURCE = {
   },
 } as const;
 
-/**
- * La frase V6 "no exhaustivo ni limitativo" es incompatible con el cierre jurídico
- * adoptado para la modificación prevista DA 33.ª si se interpreta como catálogo
- * abierto. La única variabilidad admitida por el perfil del caso afecta al número de
- * unidades de referencias ya incluidas. Nuevos artículos o nuevos precios unitarios
- * quedan fuera de la modificación prevista.
- */
 export const FERRETERIA_PPT_CATALOG_SCOPE_DECISION = {
   originalWording: "El listado de productos y sus cantidades estimadas tienen carácter meramente orientativo, no exhaustivo ni limitativo.",
   correctedWording: "Las cantidades estimadas tienen carácter meramente orientativo y podrán variar al alza o a la baja según las necesidades reales. La relación de referencias delimita los artículos objeto del suministro y no habilita la incorporación de artículos nuevos mediante la modificación prevista.",
@@ -58,14 +51,10 @@ export function evaluateFerreteriaPptPipelineReadiness(args: {
 }): FerreteriaPptPipelineReadiness {
   const blockers: string[] = [];
   if (!args.exactBinaryAvailable) {
-    blockers.push("Falta cargar en runtime el binario exacto del PPT V6 para calcular identidad, huella de estilos y bindings físicos reproducibles.");
+    blockers.push("Falta cargar en runtime el binario exacto del PPT V6 para bindings físicos reproducibles.");
     return { ready: false, stage: "NEEDS_EXACT_BINARY", blockers };
   }
-
   const catalog = validateFerreteriaCanonicalCatalog(args.catalog);
-  if (!catalog.ready) {
-    return { ready: false, stage: "NEEDS_CANONICAL_CATALOG", blockers: catalog.blockers };
-  }
-
+  if (!catalog.ready) return { ready: false, stage: "NEEDS_CANONICAL_CATALOG", blockers: catalog.blockers };
   return { ready: true, stage: "READY_FOR_PHYSICAL_MAPPING", blockers: [] };
 }
