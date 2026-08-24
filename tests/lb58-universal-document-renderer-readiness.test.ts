@@ -5,9 +5,9 @@ import {
   universalV1RendererBlockers,
 } from "../src/application/intake/lb58/UniversalDocumentRendererReadiness";
 
-describe("LB58 - registro explícito de renderers universales V1", () => {
-  it("mantiene PCAP listo sin elevar falsamente Memoria o PPT", () => {
-    expect(universalV1ProtectedRendererState()).toEqual({ PCAP: true, MEMORIA: false, PPT: false });
+describe("LB58/LB59 - registro explícito de renderers universales V1", () => {
+  it("reconoce los tres renderers protegidos tras cerrar inventarios físicos LB59", () => {
+    expect(universalV1ProtectedRendererState()).toEqual({ PCAP: true, MEMORIA: true, PPT: true });
   });
 
   it("reconoce que las tres identidades fuente están verificadas", () => {
@@ -16,10 +16,9 @@ describe("LB58 - registro explícito de renderers universales V1", () => {
     expect(UNIVERSAL_V1_DOCUMENT_RENDERER_CAPABILITIES.PPT.exactSourceIdentityVerified).toBe(true);
   });
 
-  it("explica los bloqueos concretos de Memoria y PPT", () => {
-    const blockers = universalV1RendererBlockers().join(" ");
-    expect(blockers).toMatch(/MEMORIA:.*inventario físico/i);
-    expect(blockers).toMatch(/PPT:.*98 referencias/i);
-    expect(blockers).toMatch(/artículos nuevos.*precios unitarios nuevos/i);
+  it("cierra bloqueos de renderer sin falsificar aceptación humana", () => {
+    expect(universalV1RendererBlockers()).toEqual([]);
+    expect(Object.values(UNIVERSAL_V1_DOCUMENT_RENDERER_CAPABILITIES).every(item => item.physicalMappingReady)).toBe(true);
+    expect(Object.values(UNIVERSAL_V1_DOCUMENT_RENDERER_CAPABILITIES).every(item => item.humanAcceptanceStillRequired)).toBe(true);
   });
 });
