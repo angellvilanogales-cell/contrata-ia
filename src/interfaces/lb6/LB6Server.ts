@@ -11,6 +11,8 @@ import { bridgeLegacyIntakeCaseToUniversal } from "../../application/intake/lb21
 import { evaluateSupplyAsaProtectedPipelineReadiness } from "../../application/intake/lb29/UniversalSupplyAsaProtectedPipeline";
 import { PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluateProcurementSourceCaseCoverage } from "../../application/intake/lb50/ProcurementSourceCaseCoverageMatrix";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluateUniversalV1UiFieldManifest } from "../../application/intake/lb51/UniversalV1UiFieldManifest";
+import { UniversalEvidenceCaseService } from "../../application/intake/lb53/UniversalEvidenceCaseService";
+import type { UniversalUiDraftMutation } from "../../application/intake/lb53/UniversalUiEvidenceDraft";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -35,6 +37,7 @@ const orchestrator = buildOperationalOrchestrator();
 const security = new SecurityPolicy();
 const adaptiveFlow = new AdaptiveProcurementFlow();
 const adaptiveCases = new AdaptiveCaseStore(path.join(DATA_ROOT, "adaptive-cases"));
+const universalEvidenceCases = new UniversalEvidenceCaseService(adaptiveCases);
 const universalTemplateRegistry = new UniversalOfficialTemplateRegistry();
 function sendJson(response: ServerResponse, status: number, value: unknown): void { const body = Buffer.from(JSON.stringify(value)); response.writeHead(status, { "content-type": "application/json; charset=utf-8", "content-length": body.length }); response.end(body); }
 function sendText(response: ServerResponse, status: number, bodyText: string, contentType: string, cacheControl = "no-cache"): void { const body = Buffer.from(bodyText); response.writeHead(status, { "content-type": contentType, "content-length": body.length, "cache-control": cacheControl }); response.end(body); }
@@ -69,12 +72,19 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 52, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, verifiedEditableAssetStore: true, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 53, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, verifiedEditableAssetStore: true, timestamp: new Date().toISOString() }); return; }
       if (request.method === "GET" && url.pathname === "/api/source-coverage") { requireRole(request, "VIEWER"); sendJson(response, 200, { matrix: PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluation: evaluateProcurementSourceCaseCoverage() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal-ui-manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluation: evaluateUniversalV1UiFieldManifest() }); return; }
       if (request.method === "GET" && url.pathname === "/api/runtime-assets/readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, { assets: FERRETERIA_V1_EDITABLE_ASSET_MANIFEST.map(asset => ({ assetId: asset.assetId, fileName: asset.fileName, role: asset.role, identityConfigured: Boolean(asset.expectedSha256) })), evaluation: evaluateFerreteriaV1RuntimeAssetReadiness() }); return; }
       if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); sendJson(response, 201, adaptiveCases.create()); return; }
-      if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) { const caseId = decodeURIComponent(parts[3]); if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; } if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue)); return; } }
+      if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) {
+        const caseId = decodeURIComponent(parts[3]);
+        if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; }
+        if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue)); return; }
+        if (request.method === "GET" && parts[4] === "universal-evidence" && parts.length === 5) { requireRole(request, "VIEWER"); sendJson(response, 200, { caseId, evidence: universalEvidenceCases.list(caseId) }); return; }
+        if (request.method === "PUT" && parts[4] === "universal-evidence" && parts.length === 5) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const mutation: UniversalUiDraftMutation = { fieldPath: String(body.fieldPath ?? ""), value: body.value, ...(body.sourceId ? { sourceId: String(body.sourceId) } : {}), ...(body.note ? { note: String(body.note) } : {}) }; sendJson(response, 200, universalEvidenceCases.declare(caseId, mutation, actor.id)); return; }
+        if (request.method === "POST" && parts[4] === "universal-evidence" && parts[5] === "validate" && parts.length === 6) { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); sendJson(response, 200, universalEvidenceCases.validate(caseId, String(body.fieldPath ?? ""), actor.id)); return; }
+      }
       if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers))); return; }
       if (request.method === "GET" && url.pathname === "/api/questions") { requireRole(request, "VIEWER"); sendJson(response, 200, LB6_QUESTIONS); return; }
       if (request.method === "GET" && url.pathname === "/api/questionnaire") { requireRole(request, "OPERATOR"); const file = orchestrator.questionnaire(); sendBinary(response, 200, file.data, file.mimeType, file.fileName); return; }
