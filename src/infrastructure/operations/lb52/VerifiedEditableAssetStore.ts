@@ -70,7 +70,7 @@ export const FERRETERIA_V1_EDITABLE_ASSET_MANIFEST: readonly VerifiedEditableAss
   {
     assetId: "ferreteria:ppt:v6:odt",
     fileName: "PPT Feretería SSCC SAE V6.odt",
-    expectedSha256: null,
+    expectedSha256: "c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09",
     mediaType: "application/vnd.oasis.opendocument.text",
     role: "REAL_CASE_EDITABLE",
   },
