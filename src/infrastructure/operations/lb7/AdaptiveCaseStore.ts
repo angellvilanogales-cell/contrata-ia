@@ -2,11 +2,13 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { AdaptiveFlowAnswers } from "../../../application/intake/lb7/AdaptiveProcurementFlow";
+import type { EvidenceField } from "../../../domain/expediente/EvidenceField";
 
 export interface AdaptiveStoredCase {
   readonly caseId: string;
   readonly answers: AdaptiveFlowAnswers;
   readonly supplyCatalogue?: unknown;
+  readonly universalEvidence?: Readonly<Record<string, EvidenceField<unknown>>>;
   readonly createdAt: string;
   readonly updatedAt: string;
 }
@@ -27,6 +29,7 @@ export class AdaptiveCaseStore {
     const value: AdaptiveStoredCase = {
       caseId: `EXP-${randomUUID()}`,
       answers: {},
+      universalEvidence: {},
       createdAt: now,
       updatedAt: now
     };
@@ -38,20 +41,27 @@ export class AdaptiveCaseStore {
     const file = this.fileFor(caseId);
     if (!fs.existsSync(file)) throw new Error("Expediente adaptativo no encontrado.");
     const parsed = JSON.parse(fs.readFileSync(file, "utf8")) as AdaptiveStoredCase;
-    return parsed;
+    return { ...parsed, universalEvidence: parsed.universalEvidence ?? {} };
   }
 
-  public save(caseId: string, answers: AdaptiveFlowAnswers, supplyCatalogue?: unknown): AdaptiveStoredCase {
+  public save(caseId: string, answers: AdaptiveFlowAnswers, supplyCatalogue?: unknown, universalEvidence?: Readonly<Record<string, EvidenceField<unknown>>>): AdaptiveStoredCase {
     const current = this.get(caseId);
     const value: AdaptiveStoredCase = {
       caseId: current.caseId,
       answers,
       supplyCatalogue: supplyCatalogue === undefined ? current.supplyCatalogue : supplyCatalogue,
+      universalEvidence: universalEvidence === undefined ? current.universalEvidence : universalEvidence,
       createdAt: current.createdAt,
       updatedAt: new Date().toISOString()
     };
     this.write(value);
     return value;
+  }
+
+  public saveUniversalEvidence(caseId: string, field: EvidenceField<unknown>): AdaptiveStoredCase {
+    const current = this.get(caseId);
+    const universalEvidence = { ...(current.universalEvidence ?? {}), [field.key]: field };
+    return this.save(caseId, current.answers, undefined, universalEvidence);
   }
 
   private fileFor(caseId: string): string {
