@@ -163,6 +163,13 @@ function materializeParagraphValue(xml: string, currentVisible: string, value: s
   if (/Sí\s*\/\s*No/i.test(currentVisible)) {
     const replaced = xml.replace(/Sí\s*\/\s*No/i, escaped);
     if (replaced !== xml) return replaced;
+    // Algunos Sí/No del modelo están fragmentados entre spans. Si no existe el
+    // token continuo en XML, reconstruimos únicamente el contenido del párrafo
+    // conservando su estilo de párrafo; no se tocan automatic-styles ni styles.xml.
+    const opening = xml.match(/^<text:p\b[^>]*>/)?.[0];
+    if (!opening) throw new Error("LB74: párrafo ODF sin apertura.");
+    const finalVisible = currentVisible.replace(/Sí\s*\/\s*No/i, value);
+    return `${opening}${xmlEscape(finalVisible)}</text:p>`;
   }
   const placeholder = xml.match(/_{3,}/)?.[0];
   if (placeholder) return xml.replace(placeholder, escaped);
