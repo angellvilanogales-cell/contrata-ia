@@ -13,6 +13,7 @@ import {
   JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION,
   evaluateJdaSupplyAsaLb34PhysicalClosure,
 } from "../lb34/JuntaSupplyAsaModificationSection";
+import { auditJdaSupplyAsaRenderedOdt } from "../lb35/JuntaSupplyAsaAnexoIResidualAudit";
 
 export const JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD: UniversalOfficialTemplateRegistryRecord = {
   registryId: "jda:pcap:supply:asa:2025-12-17:v1",
@@ -29,7 +30,7 @@ export const JDA_SUPPLY_ASA_PRODUCTION_REGISTRY_RECORD: UniversalOfficialTemplat
   effectiveFrom: "2025-12-17",
   status: "HUMAN_VALIDATED",
   validatedBy: JDA_SUPPLY_ASA_OFFICIAL_ODT_DISCOVERY.validatedBy ?? "SOURCE_REVIEW_2026-08-23",
-  validationNote: "Original ODT aportado e inspeccionado; hashes y bindings físicos finales LB31-LB34 verificados contra el modelo de diciembre de 2025.",
+  validationNote: "Original ODT aportado e inspeccionado; hashes y bindings físicos LB31-LB34 verificados contra el modelo de diciembre de 2025. LB35 exige además auditoría residual posterior al render antes de considerar completo el Anexo I.",
 };
 
 export type SupplyAsaProtectedPipelineStage =
@@ -58,9 +59,9 @@ function mappingQualification() {
 
 /**
  * Puerta única del escenario PCAP suministro ASA. No usa el generador legacy
- * como fallback. Desde LB34 la cobertura física declarada del Anexo I está
- * cerrada para el primer caso real, quedando como condición externa la presencia
- * en runtime de los bytes exactos del original oficial y la evidencia universal.
+ * como fallback. LB34 acredita que todos los bindings actualmente registrados
+ * tienen soporte físico seguro; LB35 comprueba después del render que el Anexo I
+ * no conserve decisiones aplicables del órgano de contratación sin resolver.
  */
 export function evaluateSupplyAsaProtectedPipelineReadiness(
   expediente: UniversalExpedienteV13,
@@ -103,7 +104,7 @@ export interface SupplyAsaProtectedPipelineRenderResult {
   auditBlockers: readonly string[];
 }
 
-/** Ejecución del pipeline real sobre el activo oficial exacto y perfil físico LB34. */
+/** Ejecución del pipeline real sobre el activo oficial exacto y perfil físico LB34 + auditoría residual LB35. */
 export async function renderSupplyAsaProtectedPcap(
   expediente: UniversalExpedienteV13,
   procurementDate: string,
@@ -125,12 +126,14 @@ export async function renderSupplyAsaProtectedPcap(
   const assetStore: UniversalEditableTemplateStore = { async get(templateId) { return templateId === asset.templateId ? asset : null; } };
   const renderer = new UniversalOdtProductionRenderer(binaryStore, JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION);
   const rendering = await renderUniversalEditableDocuments(mapping, assetStore, renderer);
-  const audit = auditUniversalEditableRendering(mapping, rendering);
+  const packageAudit = auditUniversalEditableRendering(mapping, rendering);
   const document = rendering.documents.find(item => item.documentKind === "PCAP") ?? null;
+  const residualAudit = document ? auditJdaSupplyAsaRenderedOdt(document.bytes) : null;
+  const auditBlockers = [...packageAudit.blockers, ...(residualAudit?.blockers ?? [])];
   return {
     readiness: { ...readiness, stage: document ? "RENDERED_AWAITING_HUMAN_AUDIT" : readiness.stage },
     document,
-    auditReady: audit.ready,
-    auditBlockers: audit.blockers,
+    auditReady: packageAudit.ready && Boolean(residualAudit?.ready),
+    auditBlockers,
   };
 }
