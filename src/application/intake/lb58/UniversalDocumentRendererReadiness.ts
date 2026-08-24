@@ -10,11 +10,11 @@ export interface UniversalDocumentRendererCapability {
 }
 
 /**
- * LB58 — estado explícito de los renderers del paquete universal V1.
+ * LB58/LB59 — estado explícito de los renderers del paquete universal V1.
  *
- * No se deduce readiness por disponer de un ODT real o de una candidata corregida.
- * Un renderer productivo exige identidad binaria fuente, inventario físico reproducible
- * y, cuando corresponda, aceptación humana de la candidata documental corregida.
+ * LB59 incorpora inventarios físicos source-backed y renderers protegidos para
+ * Memoria V12 y PPT V6. La preparación técnica del renderer no equivale a
+ * aceptación humana del documento ni a instalación de los bytes en un servidor.
  */
 export const UNIVERSAL_V1_DOCUMENT_RENDERER_CAPABILITIES: Readonly<Record<UniversalV1DocumentKind, UniversalDocumentRendererCapability>> = {
   PCAP: {
@@ -27,25 +27,19 @@ export const UNIVERSAL_V1_DOCUMENT_RENDERER_CAPABILITIES: Readonly<Record<Univer
   },
   MEMORIA: {
     kind: "MEMORIA",
-    protectedRendererReady: false,
+    protectedRendererReady: true,
     exactSourceIdentityVerified: true,
-    physicalMappingReady: false,
+    physicalMappingReady: true,
     humanAcceptanceStillRequired: true,
-    blockers: [
-      "MEMORIA: falta cerrar el inventario físico reproducible que conecte la evidencia universal con los párrafos y tablas del ODT V12/V13.",
-      "MEMORIA: la V13 corregida es candidata editable real, pero su aceptación humana sigue separada del cierre técnico del renderer.",
-    ],
+    blockers: [],
   },
   PPT: {
     kind: "PPT",
-    protectedRendererReady: false,
+    protectedRendererReady: true,
     exactSourceIdentityVerified: true,
-    physicalMappingReady: false,
+    physicalMappingReady: true,
     humanAcceptanceStillRequired: true,
-    blockers: [
-      "PPT: la identidad binaria del V6 ya está verificada, pero falta convertir su estructura real y el catálogo de 98 referencias en bindings físicos universales reproducibles.",
-      "PPT: debe mantenerse protegida la regla de catálogo cerrado: variación de unidades sí; artículos nuevos o precios unitarios nuevos no mediante la modificación prevista.",
-    ],
+    blockers: [],
   },
 } as const;
 
