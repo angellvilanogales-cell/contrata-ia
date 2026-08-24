@@ -16,6 +16,7 @@ import type { UniversalUiDraftMutation } from "../../application/intake/lb53/Uni
 import { UniversalEvidenceWorkspace } from "../../application/intake/lb52/UniversalEvidenceWorkspace";
 import { VerifiedRuntimeTemplateStore } from "../../application/intake/lb53/VerifiedRuntimeTemplateStore";
 import { evaluateUniversalV1ProductionReadiness, legacyGenerationAllowed } from "../../application/intake/lb54/UniversalV1ProductionCoordinator";
+import { generateFerreteriaV1ProtectedPackage } from "../../application/intake/lb61/FerreteriaV1ProtectedPackageGenerator";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -84,7 +85,7 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 55, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 62, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, protectedV1PackageGeneration: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
       if (request.method === "GET" && url.pathname === "/api/source-coverage") { requireRole(request, "VIEWER"); sendJson(response, 200, { matrix: PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluation: evaluateProcurementSourceCaseCoverage() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal-ui-manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluation: evaluateUniversalV1UiFieldManifest() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal/manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST }); return; }
@@ -95,7 +96,14 @@ export function createLB6Server(): http.Server {
         if (request.method === "PUT" && parts[4] === "evidence" && parts[5] && parts.length === 6) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, universalEvidence.declare(caseId, decodeURIComponent(parts[5]), body.value, actor.id)); return; }
         if (request.method === "POST" && parts[4] === "evidence" && parts[5] && parts[6] === "validate") { const actor = requireRole(request, "REVIEWER"); sendJson(response, 200, universalEvidence.validate(caseId, decodeURIComponent(parts[5]), actor.id)); return; }
         if (request.method === "GET" && parts[4] === "production-readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates)); return; }
-        if (request.method === "POST" && parts[4] === "generate") { requireRole(request, "OPERATOR"); const gate = evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates); if (!gate.ready) { sendJson(response, 409, { error: "El paquete universal no está preparado para generación.", gate }); return; } sendJson(response, 501, { error: "La puerta universal está preparada, pero la entrega binaria conjunta exige renderers protegidos para PCAP, Memoria y PPT.", gate }); return; }
+        if (request.method === "POST" && parts[4] === "generate") {
+          requireRole(request, "OPERATOR");
+          const gate = evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates);
+          if (!gate.ready) { sendJson(response, 409, { error: "El paquete universal no está preparado para generación.", gate }); return; }
+          const pkg = await generateFerreteriaV1ProtectedPackage({ caseId, evidence: universalEvidence.get(caseId), binaryStore: verifiedTemplates });
+          sendBinary(response, 200, pkg.bytes, pkg.mediaType, pkg.fileName);
+          return;
+        }
       }
       if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); sendJson(response, 201, adaptiveCases.create()); return; }
       if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) {
