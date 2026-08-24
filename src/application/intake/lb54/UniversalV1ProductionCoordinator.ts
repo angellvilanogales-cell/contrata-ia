@@ -1,5 +1,6 @@
 import { UniversalEvidenceWorkspace } from "../lb52/UniversalEvidenceWorkspace";
 import { VerifiedRuntimeTemplateStore } from "../lb53/VerifiedRuntimeTemplateStore";
+import { universalV1ProtectedRendererState, universalV1RendererBlockers } from "../lb58/UniversalDocumentRendererReadiness";
 
 export type V1PackageStage = "NEEDS_EVIDENCE" | "NEEDS_ASSETS" | "NEEDS_DOCUMENT_RENDERERS" | "READY_FOR_BROWSER_GENERATION";
 
@@ -14,14 +15,16 @@ export interface UniversalV1ProductionReadiness {
 }
 
 /**
- * LB54: puerta de paquete productivo. No confunde el cierre documental manual del
- * caso real con disponer de renderers universales reproducibles para los tres documentos.
+ * LB54/LB58: puerta de paquete productivo. No confunde el cierre documental manual
+ * del caso real con disponer de renderers universales reproducibles para los tres documentos.
+ * El estado por defecto procede del registro explícito de capacidades LB58 y no de
+ * booleanos optimistas embebidos en esta función.
  */
 export function evaluateUniversalV1ProductionReadiness(
   caseId: string,
   evidence: UniversalEvidenceWorkspace,
   assets: VerifiedRuntimeTemplateStore,
-  rendererState: Readonly<Record<"PCAP" | "MEMORIA" | "PPT", boolean>> = { PCAP: true, MEMORIA: false, PPT: false },
+  rendererState: Readonly<Record<"PCAP" | "MEMORIA" | "PPT", boolean>> = universalV1ProtectedRendererState(),
 ): UniversalV1ProductionReadiness {
   const evidenceResult = evidence.readiness(caseId);
   if (!evidenceResult.ready) {
@@ -49,14 +52,15 @@ export function evaluateUniversalV1ProductionReadiness(
     };
   }
 
-  const missingRenderers = (Object.entries(rendererState) as Array<["PCAP" | "MEMORIA" | "PPT", boolean]>)
+  const missingKinds = (Object.entries(rendererState) as Array<["PCAP" | "MEMORIA" | "PPT", boolean]>)
     .filter(([, ready]) => !ready)
-    .map(([kind]) => `${kind}: falta renderer universal protegido reproducible.`);
-  if (missingRenderers.length) {
+    .map(([kind]) => kind);
+  if (missingKinds.length) {
+    const registeredBlockers = universalV1RendererBlockers().filter(blocker => missingKinds.some(kind => blocker.startsWith(`${kind}:`)));
     return {
       ready: false,
       stage: "NEEDS_DOCUMENT_RENDERERS",
-      blockers: missingRenderers,
+      blockers: registeredBlockers.length ? registeredBlockers : missingKinds.map(kind => `${kind}: falta renderer universal protegido reproducible.`),
       evidenceReady: true,
       assetsReady: true,
       protectedRenderers: rendererState,
