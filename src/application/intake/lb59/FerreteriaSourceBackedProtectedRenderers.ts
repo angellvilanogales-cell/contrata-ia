@@ -10,6 +10,7 @@ const MEMORY_SOURCE_SHA = "36ed482048e19bc8b1f9c4fe1b8f1bd47eb81ac9e256dd4f0488e
 const MEMORY_SOURCE_STYLE = "sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d";
 const PPT_SOURCE_SHA = "c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09";
 const PPT_SOURCE_STYLE = "sha256:deadf7c2a176c83de774fad7022a0ac1d5adfcca514d8c0cddeb0b01029d1390";
+const PPT_AUDITED_PAGE_COUNT_CACHE = 19;
 
 export interface ProtectedCaseDocumentRender {
   kind: "MEMORIA" | "PPT";
@@ -43,7 +44,8 @@ export const FERRETERIA_MEMORY_PHYSICAL_BINDING_INVENTORY: readonly ProtectedPhy
 
 export const FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY: readonly ProtectedPhysicalBindingInventoryItem[] = [
   { id: "ppt.catalogue-scope", part: "content.xml", sourceAnchor: "El listado de productos y sus cantidades estimadas tienen carácter meramente orientativo, no exhaustivo ni limitativo", effect: "Cierra catálogo: cantidades variables, referencias no ampliables por modificación prevista." },
-  { id: "ppt.catalogue-98-source-backed", part: "content.xml", sourceAnchor: "Pictures/2000033B000068B70000265537388D7DEB7BE4E8.svm", effect: "Sustituye la imagen no editable del catálogo por una tabla ODF editable con las 98 referencias canónicas y sus magnitudes declaradas." },
+  { id: "ppt.catalogue-98-source-backed", part: "content.xml", sourceAnchor: "4. DESCRIPCIÓN DE LOS MATERIALES OBJETO DEL PRESENTE CONTRATO", effect: "Sustituye íntegramente el bloque gráfico no editable entre el alcance del epígrafe 4 y el epígrafe 5 por una tabla ODF editable con las 98 referencias canónicas." },
+  { id: "ppt.footer-page-count-cache", part: "styles.xml", sourceAnchor: "<text:page-count>7</text:page-count>", effect: "Conserva el campo dinámico text:page-count y actualiza su valor cacheado a la paginación auditada tras materializar la tabla editable." },
 ] as const;
 
 function hash(bytes: Uint8Array): string { return createHash("sha256").update(bytes).digest("hex"); }
@@ -78,10 +80,10 @@ function buildEditablePptCatalogue(): string {
   return `<table:table table:name="ContrataIA_Catalogo98"><table:table-column table:number-columns-repeated="8"/><table:table-header-rows><table:table-row>${header}</table:table-row></table:table-header-rows>${rows}${totals}</table:table>`;
 }
 function replacePptImageCatalogue(content: string): string {
-  const image = paragraphContaining(content, "Pictures/2000033B000068B70000265537388D7DEB7BE4E8.svm");
+  const scope = paragraphContaining(content, "La relación de referencias delimita los artículos objeto del suministro");
   const section5 = paragraphContaining(content, "CONDICIONES DEL SUMINISTRO.");
-  if (section5.start <= image.start) throw new Error("PPT: secuencia catálogo/epígrafe 5 inválida.");
-  return content.slice(0, image.start) + `<text:p text:style-name="P21"/>${buildEditablePptCatalogue()}<text:p text:style-name="P21"/>` + content.slice(section5.start);
+  if (section5.start <= scope.end) throw new Error("PPT: secuencia alcance catálogo/epígrafe 5 inválida.");
+  return content.slice(0, scope.end) + `<text:p text:style-name="P21"/>${buildEditablePptCatalogue()}<text:p text:style-name="P21"/>` + content.slice(section5.start);
 }
 
 function auditMemory(entries: readonly OdtZipEntry[], sourceStructuralStyle: string) {
@@ -94,12 +96,13 @@ function auditMemory(entries: readonly OdtZipEntry[], sourceStructuralStyle: str
 }
 
 function auditPpt(entries: readonly OdtZipEntry[]) {
-  const text = visibleText(part(entries, "content.xml")); const blockers: string[] = [];
+  const text = visibleText(part(entries, "content.xml")); const styles = part(entries, "styles.xml"); const blockers: string[] = [];
   if (text.includes("no exhaustivo ni limitativo")) blockers.push("PPT: persiste la formulación de catálogo abierto no exhaustivo ni limitativo.");
   if (!text.includes("La relación de referencias delimita los artículos objeto del suministro")) blockers.push("PPT: falta la regla explícita de catálogo cerrado.");
   if (!text.includes("El plazo de duración será de un máximo de 24 meses")) blockers.push("PPT: falta la duración inicial validada de 24 meses.");
   if (!text.includes("duración máxima conjunta de 24 meses")) blockers.push("PPT: falta la prórroga máxima conjunta validada de 24 meses.");
   if (!part(entries, "content.xml").includes('table:name="ContrataIA_Catalogo98"')) blockers.push("PPT: el catálogo canónico no está materializado como tabla editable ODF.");
+  if (count(styles, `<text:page-count>${PPT_AUDITED_PAGE_COUNT_CACHE}</text:page-count>`) !== 1) blockers.push("PPT: el contador de páginas no conserva el valor cacheado auditado tras materializar la tabla editable.");
   const missingDescriptions = FERRETERIA_CANONICAL_CATALOG_98.filter(item => !text.includes(item.description));
   if (missingDescriptions.length) blockers.push(`PPT: faltan ${missingDescriptions.length} de las 98 referencias canónicas (primera: ${missingDescriptions[0]?.sequence}).`);
   for (const total of ["10.552,44 €", "2.216,01 €", "12.768,45 €"]) if (!text.includes(total)) blockers.push(`PPT: falta total agregado declarado ${total}.`);
@@ -128,7 +131,11 @@ export async function renderFerreteriaProtectedPpt(store: UniversalEditableTempl
   let entries = assertSource(source, FERRETERIA_PPT_TEMPLATE_ID, PPT_SOURCE_SHA, PPT_SOURCE_STYLE); let content = part(entries, "content.xml");
   content = replaceParagraph(content, "El listado de productos y sus cantidades estimadas tienen carácter meramente orientativo, no exhaustivo ni limitativo", PPT_SCOPE_PARAGRAPH);
   content = replacePptImageCatalogue(content);
-  entries = replacePart(entries, "content.xml", content); const audit = auditPpt(entries); const renderedStyle = computeOdtStyleFingerprint(entries); const bytes = writeOdtZip(entries);
+  entries = replacePart(entries, "content.xml", content);
+  let styles = part(entries, "styles.xml");
+  styles = replaceUnique(styles, "<text:page-count>7</text:page-count>", `<text:page-count>${PPT_AUDITED_PAGE_COUNT_CACHE}</text:page-count>`, "PPT contador de páginas");
+  entries = replacePart(entries, "styles.xml", styles);
+  const audit = auditPpt(entries); const renderedStyle = computeOdtStyleFingerprint(entries); const bytes = writeOdtZip(entries);
   if (renderedStyle !== PPT_SOURCE_STYLE) return { kind: "PPT", fileName: "CONTR-2026-240267_PPT_V7_Protegido_Contrata-IA.odt", bytes, sourceSha256: PPT_SOURCE_SHA, renderedSha256: hash(bytes), sourceStyleFingerprint: PPT_SOURCE_STYLE, renderedStyleFingerprint: renderedStyle, auditReady: false, auditBlockers: [...audit.blockers, "PPT: el render alteró la huella de estilos del V6."], appliedPhysicalBindings: FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id) };
   return { kind: "PPT", fileName: "CONTR-2026-240267_PPT_V7_Protegido_Contrata-IA.odt", bytes, sourceSha256: PPT_SOURCE_SHA, renderedSha256: hash(bytes), sourceStyleFingerprint: PPT_SOURCE_STYLE, renderedStyleFingerprint: renderedStyle, auditReady: audit.ready, auditBlockers: audit.blockers, appliedPhysicalBindings: FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id) };
 }
