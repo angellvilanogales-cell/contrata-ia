@@ -13,11 +13,15 @@ import { PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluateProcurementSourceCaseC
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluateUniversalV1UiFieldManifest } from "../../application/intake/lb51/UniversalV1UiFieldManifest";
 import { UniversalEvidenceCaseService } from "../../application/intake/lb53/UniversalEvidenceCaseService";
 import type { UniversalUiDraftMutation } from "../../application/intake/lb53/UniversalUiEvidenceDraft";
+import { UniversalEvidenceWorkspace } from "../../application/intake/lb52/UniversalEvidenceWorkspace";
+import { VerifiedRuntimeTemplateStore } from "../../application/intake/lb53/VerifiedRuntimeTemplateStore";
+import { evaluateUniversalV1ProductionReadiness, legacyGenerationAllowed } from "../../application/intake/lb54/UniversalV1ProductionCoordinator";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
 import { HashChainAuditLog } from "../../infrastructure/operations/lb7/HashChainAuditLog";
 import { FERRETERIA_V1_EDITABLE_ASSET_MANIFEST, evaluateFerreteriaV1RuntimeAssetReadiness } from "../../infrastructure/operations/lb52/VerifiedEditableAssetStore";
+import { UNIVERSAL_V1_JOURNEY_UI } from "../lb55/UniversalV1JourneyUi";
 import { ADAPTIVE_FLOW_SCRIPT } from "../lb7/AdaptiveFlowScript";
 import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
 import { ADAPTIVE_PERSISTENCE_SCRIPT } from "../lb7/AdaptivePersistenceScript";
@@ -34,6 +38,7 @@ import { UNIVERSAL_EVIDENCE_SCRIPT } from "../lb53/UniversalEvidenceScript";
 
 const MAX_JSON_BYTES = 12 * 1024 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
+const TEMPLATE_ROOT = path.resolve(process.env.CONTRATA_IA_TEMPLATE_DIR ?? path.join(DATA_ROOT, "templates"));
 function buildOperationalOrchestrator(): LB6Orchestrator { return new LB6Orchestrator({ repository: new FileCaseRepository(path.join(DATA_ROOT, "cases")), audit: new HashChainAuditLog(path.join(DATA_ROOT, "audit", "security.jsonl")) }); }
 const orchestrator = buildOperationalOrchestrator();
 const security = new SecurityPolicy();
@@ -41,6 +46,8 @@ const adaptiveFlow = new AdaptiveProcurementFlow();
 const adaptiveCases = new AdaptiveCaseStore(path.join(DATA_ROOT, "adaptive-cases"));
 const universalEvidenceCases = new UniversalEvidenceCaseService(adaptiveCases);
 const universalTemplateRegistry = new UniversalOfficialTemplateRegistry();
+const universalEvidence = new UniversalEvidenceWorkspace(path.join(DATA_ROOT, "universal-evidence-v1"));
+const verifiedTemplates = new VerifiedRuntimeTemplateStore(TEMPLATE_ROOT);
 function sendJson(response: ServerResponse, status: number, value: unknown): void { const body = Buffer.from(JSON.stringify(value)); response.writeHead(status, { "content-type": "application/json; charset=utf-8", "content-length": body.length }); response.end(body); }
 function sendText(response: ServerResponse, status: number, bodyText: string, contentType: string, cacheControl = "no-cache"): void { const body = Buffer.from(bodyText); response.writeHead(status, { "content-type": contentType, "content-length": body.length, "cache-control": cacheControl }); response.end(body); }
 function redirect(response: ServerResponse, location: string, cookie?: string): void { if (cookie) response.setHeader("set-cookie", cookie); response.writeHead(303, { location, "cache-control": "no-store" }); response.end(); }
@@ -64,7 +71,8 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/adaptive") { sendText(response, 200, ADAPTIVE_FLOW_UI, "text/html; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/adaptive.js") { sendText(response, 200, ADAPTIVE_FLOW_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/adaptive-persistence.js") { sendText(response, 200, ADAPTIVE_PERSISTENCE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
-      if (request.method === "GET" && url.pathname === "/universal-evidence") { sendText(response, 200, UNIVERSAL_EVIDENCE_UI, "text/html; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/universal-evidence") { sendText(response, 200, UNIVERSAL_V1_JOURNEY_UI, "text/html; charset=utf-8", "no-store"); return; }
+      if (request.method === "GET" && url.pathname === "/universal-evidence-legacy") { sendText(response, 200, UNIVERSAL_EVIDENCE_UI, "text/html; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/universal-evidence.js") { sendText(response, 200, UNIVERSAL_EVIDENCE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-catalogue.js") { sendText(response, 200, SUPPLY_CATALOGUE_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
       if (request.method === "GET" && url.pathname === "/supply-economic-period.js") { sendText(response, 200, SUPPLY_ECONOMIC_PERIOD_SCRIPT, "application/javascript; charset=utf-8", "no-store"); return; }
@@ -76,10 +84,19 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 54, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 55, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
       if (request.method === "GET" && url.pathname === "/api/source-coverage") { requireRole(request, "VIEWER"); sendJson(response, 200, { matrix: PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluation: evaluateProcurementSourceCaseCoverage() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal-ui-manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluation: evaluateUniversalV1UiFieldManifest() }); return; }
-      if (request.method === "GET" && url.pathname === "/api/runtime-assets/readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, { assets: FERRETERIA_V1_EDITABLE_ASSET_MANIFEST.map(asset => ({ assetId: asset.assetId, fileName: asset.fileName, role: asset.role, identityConfigured: Boolean(asset.expectedSha256) })), evaluation: evaluateFerreteriaV1RuntimeAssetReadiness() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/universal/manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST }); return; }
+      if (request.method === "GET" && url.pathname === "/api/runtime-assets/readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, { legacyAssets: FERRETERIA_V1_EDITABLE_ASSET_MANIFEST.map(asset => ({ assetId: asset.assetId, fileName: asset.fileName, role: asset.role, identityConfigured: Boolean(asset.expectedSha256) })), legacyEvaluation: evaluateFerreteriaV1RuntimeAssetReadiness(), verifiedPackage: verifiedTemplates.packageReadiness() }); return; }
+      if (parts[0] === "api" && parts[1] === "universal" && parts[2] === "cases" && parts[3]) {
+        const caseId = decodeURIComponent(parts[3]);
+        if (request.method === "GET" && parts[4] === "evidence" && parts.length === 5) { requireRole(request, "VIEWER"); sendJson(response, 200, universalEvidence.get(caseId)); return; }
+        if (request.method === "PUT" && parts[4] === "evidence" && parts[5] && parts.length === 6) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, universalEvidence.declare(caseId, decodeURIComponent(parts[5]), body.value, actor.id)); return; }
+        if (request.method === "POST" && parts[4] === "evidence" && parts[5] && parts[6] === "validate") { const actor = requireRole(request, "REVIEWER"); sendJson(response, 200, universalEvidence.validate(caseId, decodeURIComponent(parts[5]), actor.id)); return; }
+        if (request.method === "GET" && parts[4] === "production-readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates)); return; }
+        if (request.method === "POST" && parts[4] === "generate") { requireRole(request, "OPERATOR"); const gate = evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates); if (!gate.ready) { sendJson(response, 409, { error: "El paquete universal no está preparado para generación.", gate }); return; } sendJson(response, 501, { error: "La puerta universal está preparada, pero la entrega binaria conjunta exige renderers protegidos para PCAP, Memoria y PPT.", gate }); return; }
+      }
       if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); sendJson(response, 201, adaptiveCases.create()); return; }
       if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) {
         const caseId = decodeURIComponent(parts[3]);
@@ -103,25 +120,9 @@ export function createLB6Server(): http.Server {
           const caseValue = orchestrator.getCase(id);
           const migration = bridgeLegacyIntakeCaseToUniversal(caseValue);
           const procurementDate = url.searchParams.get("date") ?? new Date().toISOString().slice(0, 10);
-          const integration = evaluateUniversalApplicationIntegration(
-            migration.expediente,
-            universalTemplateRegistry,
-            procurementDate,
-            ["DPCAF", "PCAP", "PPT"],
-          );
+          const integration = evaluateUniversalApplicationIntegration(migration.expediente, universalTemplateRegistry, procurementDate, ["DPCAF", "PCAP", "PPT"]);
           const supplyAsaPcap = evaluateSupplyAsaProtectedPipelineReadiness(migration.expediente, procurementDate, false);
-          sendJson(response, 200, {
-            caseId: id,
-            procurementDate,
-            migratedFields: migration.migratedFields,
-            skippedLegacyAnswers: migration.skippedLegacyAnswers,
-            diagnostics: migration.diagnostics,
-            integration,
-            supplyAsaPcap,
-            sourceCoverage: evaluateProcurementSourceCaseCoverage(),
-            uiManifest: evaluateUniversalV1UiFieldManifest(),
-            runtimeAssets: evaluateFerreteriaV1RuntimeAssetReadiness(),
-          });
+          sendJson(response, 200, { caseId: id, procurementDate, migratedFields: migration.migratedFields, skippedLegacyAnswers: migration.skippedLegacyAnswers, diagnostics: migration.diagnostics, integration, supplyAsaPcap });
           return;
         }
         if (request.method === "POST" && parts[3] === "answers") { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const updated = orchestrator.answer(id, String(body.questionId) as IntakeQuestionId, body.value, actor.id); sendJson(response, 200, { caseValue: updated, progress: orchestrator.progress(id) }); return; }
@@ -130,7 +131,12 @@ export function createLB6Server(): http.Server {
         if (request.method === "GET" && parts[3] === "questionnaire") { requireRole(request, "OPERATOR"); const file = orchestrator.questionnaire(id); sendBinary(response, 200, file.data, file.mimeType, file.fileName); return; }
         if (request.method === "GET" && parts[3] === "review") { requireRole(request, "VIEWER"); sendJson(response, 200, orchestrator.review(id)); return; }
         if (request.method === "POST" && parts[3] === "validate") { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const validatedBy = String(body.validatedBy ?? actor.id).trim() || actor.id; sendJson(response, 200, orchestrator.validate(id, validatedBy)); return; }
-        if (request.method === "POST" && parts[3] === "generate") { const actor = requireRole(request, "OPERATOR"); const rendered = orchestrator.generate(id, actor.id); sendJson(response, 200, { manifest: { expedienteId: id, legacyPipeline: true, productionEligible: false, replacement: `/api/cases/${encodeURIComponent(id)}/universal-readiness`, validation: rendered.package.globalValidation, coherenceFingerprint: rendered.package.coherenceFingerprint, preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })() }, documents: [...rendered.editable, ...rendered.pdf].map(file => ({ documentId: file.documentId, fileName: file.fileName, mimeType: file.mimeType, base64: Buffer.from(file.data).toString("base64") })) }); return; }
+        if (request.method === "POST" && parts[3] === "generate") {
+          const actor = requireRole(request, "OPERATOR");
+          if (!legacyGenerationAllowed(process.env)) { sendJson(response, 410, { error: "La generación legacy está desactivada para la V1. Use /universal-evidence y el pipeline universal protegido.", productionEligible: false }); return; }
+          const rendered = orchestrator.generate(id, actor.id);
+          sendJson(response, 200, { manifest: { expedienteId: id, legacyPipeline: true, productionEligible: false, replacement: `/api/cases/${encodeURIComponent(id)}/universal-readiness`, validation: rendered.package.globalValidation, coherenceFingerprint: rendered.package.coherenceFingerprint, preLegal: (() => { try { return orchestrator.review(id).lb7; } catch { return undefined; } })() }, documents: [...rendered.editable, ...rendered.pdf].map(file => ({ documentId: file.documentId, fileName: file.fileName, mimeType: file.mimeType, base64: Buffer.from(file.data).toString("base64") })) }); return;
+        }
       }
       sendJson(response, 404, { error: "Ruta no encontrada." });
     } catch (error) { const value = error instanceof Error ? error : new Error(String(error)); sendJson(response, statusForError(value), { error: value.message }); }
