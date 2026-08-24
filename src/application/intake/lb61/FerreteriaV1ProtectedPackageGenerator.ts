@@ -278,8 +278,9 @@ export async function generateFerreteriaV1ProtectedPackage(args: {
   if (!overlay.ready) throw new Error(`La evidencia universal no puede promocionarse: ${overlay.blocked.join(" ")}`);
 
   const pcapBase = await renderSupplyAsaProtectedPcap(overlay.expediente, args.procurementDate ?? "2026-08-24", args.binaryStore);
-  if (!pcapBase.document || !pcapBase.auditReady) throw new Error(`PCAP protegido no supera su auditoría previa: ${pcapBase.auditBlockers.join(" ")}`);
+  if (!pcapBase.document || !pcapBase.packageAuditReady) throw new Error(`PCAP protegido no supera la auditoría de integridad previa a LB60: ${pcapBase.packageAuditBlockers.join(" ")}`);
   const pcap = finalizeFerreteriaPcapRenderedOdt({ bytes: pcapBase.document.bytes, caseId: args.caseId, title: TITLE });
+  if (!pcap.auditReady) throw new Error(`PCAP final no supera LB60 + LB35: ${pcap.blockers.join(" ")}`);
   const memory = await renderFerreteriaProtectedMemory(args.binaryStore);
   const ppt = await renderFerreteriaProtectedPpt(args.binaryStore);
   const crossBlockers = auditCrossDocuments(pcap.bytes, memory.bytes, ppt.bytes);
