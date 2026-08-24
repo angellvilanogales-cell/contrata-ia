@@ -15,11 +15,12 @@ describe("LB38 - alcance documental V1 CONTR/2026/240267", () => {
     expect(result.blockers.join(" ")).toMatch(/PPT/);
   });
 
-  it("registra la memoria V12 letrado como referencia PDF, no como falso editable", () => {
+  it("registra la memoria V12 letrado como referencia ODT editable auténtica aportada y verificada", () => {
     const memoria = FERRETERIA_V1_DOCUMENT_SET.find(item => item.kind === "MEMORIA")!;
-    expect(memoria.sourceName).toContain("V12_letrado.pdf");
-    expect(memoria.sourceFormat).toBe("PDF");
-    expect(memoria.productionState).toBe("NEEDS_EDITABLE_MASTER");
+    expect(memoria.sourceName).toContain("V12_letrado.odt");
+    expect(memoria.sourceFormat).toBe("ODT");
+    expect(memoria.sourceRole).toBe("REAL_CASE_REFERENCE");
+    expect(memoria.productionState).toBe("SOURCE_BACKED_EDITABLE_AVAILABLE");
   });
 
   it("reconoce el PPT V6 ODT como fuente real editable sin convertirlo automáticamente en modelo genérico", () => {
