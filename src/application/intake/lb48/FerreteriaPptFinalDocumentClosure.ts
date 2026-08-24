@@ -10,12 +10,13 @@ export const FERRETERIA_PPT_FINAL_DOCUMENT = {
   sourceName: "PPT Feretería SSCC SAE V6.odt",
   sourceRole: "REAL_CASE_REFERENCE",
   finalFileName: "CONTR-2026-240267_PPT_V7_Final_Contrata-IA.odt",
-  finalSha256: "7cf92aee119aaa14a4158aca5c2f2cf12907831988d12cf185196f257b71ddad",
-  renderedPdfPages: 6,
+  finalSha256: "c75e187b5ff43e25ad3ba2ed64c55c29b557471a2ac6348fbc33a5275c66ec7e",
+  renderedPdfPages: 7,
   catalogueRows: FERRETERIA_CANONICAL_CATALOG_98.length,
   catalogueSemantics: "CLOSED_REFERENCES_VARIABLE_QUANTITIES",
   exactV6BinaryRuntimeIdentityVerified: false,
   visualCorporateFamilyAudited: true,
+  sourcePaginationParityVerified: true,
   engineeringClosed: true,
   humanAcceptanceRequired: true,
   productionReady: false,
@@ -25,6 +26,7 @@ export function evaluateFerreteriaPptFinalClosure() {
   const blockers: string[] = [];
   if (FERRETERIA_PPT_FINAL_DOCUMENT.catalogueRows !== 98) blockers.push("El PPT no proyecta las 98 referencias canónicas.");
   if (FERRETERIA_PPT_FINAL_DOCUMENT.catalogueSemantics !== "CLOSED_REFERENCES_VARIABLE_QUANTITIES") blockers.push("El PPT reabre indebidamente el catálogo.");
+  if (!FERRETERIA_PPT_FINAL_DOCUMENT.sourcePaginationParityVerified) blockers.push("La paginación no coincide con la referencia V6.");
   return {
     engineeringClosed: blockers.length === 0,
     blockers,
