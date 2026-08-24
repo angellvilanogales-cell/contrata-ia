@@ -16,6 +16,8 @@ services:
         value: "1"
       - key: CONTRATA_IA_DATA_DIR
         value: /data/contrata-ia
+      - key: CONTRATA_IA_TEMPLATE_DIR
+        value: /data/contrata-ia/templates
       - key: CONTRATA_IA_ADMIN_TOKEN
         sync: false
     disk:
