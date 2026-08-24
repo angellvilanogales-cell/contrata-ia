@@ -41,13 +41,13 @@ export const FERRETERIA_V1_DOCUMENT_SET: readonly FerreteriaDocumentSourceStatus
   {
     kind: "MEMORIA",
     requiredForV1: true,
-    sourceName: "04_Memoría Ferretería SSCC SAE V12_letrado.pdf",
-    sourceFormat: "PDF",
+    sourceName: "04_Memoría Ferretería SSCC SAE V12_letrado.odt",
+    sourceFormat: "ODT",
     sourceRole: "REAL_CASE_REFERENCE",
-    productionState: "NEEDS_EDITABLE_MASTER",
+    productionState: "SOURCE_BACKED_EDITABLE_AVAILABLE",
     blockers: [
-      "La fuente V12 letrado disponible acredita contenido y formato visual, pero es PDF y no constituye por sí sola un activo editable de producción.",
-      "Debe localizarse o aportarse el editable auténtico de la memoria, o validarse expresamente un modelo editable institucional aplicable antes de automatizar su render.",
+      "El editable auténtico V12 ya está verificado y existe una V13 corregida con identidad de estilo preservada; falta integrar su pipeline protegido desde evidencia universal y someter la salida a comparación visual/humana.",
+      "La Memoria V13 no puede marcarse productionReady hasta que su render sea reproducible desde el aplicativo, no solo como corrección puntual del fichero fuente.",
     ],
   },
   {
@@ -60,6 +60,7 @@ export const FERRETERIA_V1_DOCUMENT_SET: readonly FerreteriaDocumentSourceStatus
     blockers: [
       "El ODT V6 es un expediente real editable y sirve para inventariar estructura y estilos, pero antes de generalizarlo debe clasificarse como modelo reutilizable o referencia de caso.",
       "Debe conectarse el catálogo canónico de 98 referencias y someterse a render y auditoría independientes del PCAP.",
+      "Debe corregirse la expresión 'no exhaustivo ni limitativo' para que la variabilidad se refiera a cantidades de referencias existentes y no permita introducir artículos nuevos al amparo de la DA 33.ª.",
     ],
   },
 ] as const;
