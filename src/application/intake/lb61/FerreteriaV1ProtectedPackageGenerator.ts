@@ -211,7 +211,15 @@ function profileSignature(record: UniversalEvidenceRecord): string[] {
 function contentText(bytes: Uint8Array): string {
   const content = readOdtZip(bytes).find(item => item.name === "content.xml");
   if (!content) return "";
-  return Buffer.from(content.bytes).toString("utf8").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  return Buffer.from(content.bytes)
+    .toString("utf8")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&quot;/g, "\"")
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ");
 }
 
 function auditCrossDocuments(pcap: Uint8Array, memory: Uint8Array, ppt: Uint8Array): string[] {
