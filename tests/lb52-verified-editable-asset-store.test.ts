@@ -49,11 +49,11 @@ describe("LB52 - activos editables verificados", () => {
     })).toThrow(/no tiene SHA-256 fuente validado/);
   });
 
-  it("mantiene explícito que el PPT V6 sigue pendiente de identidad binaria runtime", () => {
+  it("registra la identidad binaria fuente del PPT V6 sin confundirla con presencia física en runtime", () => {
     const ppt = FERRETERIA_V1_EDITABLE_ASSET_MANIFEST.find(asset => asset.assetId === "ferreteria:ppt:v6:odt")!;
-    expect(ppt.expectedSha256).toBeNull();
+    expect(ppt.expectedSha256).toBe("c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09");
     const readiness = evaluateFerreteriaV1RuntimeAssetReadiness();
-    expect(readiness.readyForProductionRuntime).toBe(false);
-    expect(readiness.pendingIdentityDescriptors).toContain("ferreteria:ppt:v6:odt");
+    expect(readiness.readyForProductionRuntime).toBe(true);
+    expect(readiness.pendingIdentityDescriptors).not.toContain("ferreteria:ppt:v6:odt");
   });
 });
