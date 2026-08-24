@@ -226,3 +226,14 @@ jobs:
           path: artifacts/lb6
           if-no-files-found: error
           retention-days: 30
+      - name: Prepare deployable V1 runtime build
+        run: |
+          npm prune --omit=dev
+          tar -czf /tmp/contrata-ia-v1-runtime-build.tgz dist package.json package-lock.json node_modules
+      - name: Preserve deployable V1 runtime build
+        uses: actions/upload-artifact@v4
+        with:
+          name: contrata-ia-v1-runtime-build
+          path: /tmp/contrata-ia-v1-runtime-build.tgz
+          if-no-files-found: error
+          retention-days: 7
