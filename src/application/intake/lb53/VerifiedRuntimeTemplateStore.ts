@@ -17,7 +17,7 @@ export interface VerifiedRuntimeAssetDescriptor {
 export const V1_RUNTIME_ASSET_MANIFEST: readonly VerifiedRuntimeAssetDescriptor[] = [
   {
     kind: "PCAP",
-    templateId: "jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt",
+    templateId: "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17",
     sourceId: "jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt",
     fileName: "2025_12_17_pcap_suministro_abierto_simplificado_abreviado_autofinanciada.odt",
     sha256: "45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc",
