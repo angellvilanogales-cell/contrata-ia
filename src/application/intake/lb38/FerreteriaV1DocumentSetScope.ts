@@ -34,7 +34,8 @@ export const FERRETERIA_V1_DOCUMENT_SET: readonly FerreteriaDocumentSourceStatus
     sourceRole: "OFFICIAL_MODEL",
     productionState: "REAL_RENDER_IN_PROGRESS",
     blockers: [
-      "Completar paridad LB37: portada, propagación de expediente/título y catálogo de 98 referencias en Anexo I y Anexo V.",
+      "Completar paridad LB37: portada y propagación de expediente/título.",
+      "Materializar desde LB43 el catálogo canónico de 98 referencias en Anexo I y Anexo V, sin copias manuales independientes.",
       "Superar comparación visual final y validación humana.",
     ],
   },
@@ -46,8 +47,8 @@ export const FERRETERIA_V1_DOCUMENT_SET: readonly FerreteriaDocumentSourceStatus
     sourceRole: "REAL_CASE_REFERENCE",
     productionState: "SOURCE_BACKED_EDITABLE_AVAILABLE",
     blockers: [
-      "El editable auténtico V12 ya está verificado y existe una V13 corregida con identidad de estilo preservada; falta integrar su pipeline protegido desde evidencia universal y someter la salida a comparación visual/humana.",
-      "La Memoria V13 no puede marcarse productionReady hasta que su render sea reproducible desde el aplicativo, no solo como corrección puntual del fichero fuente.",
+      "LB40/LB44 ya verifican el editable auténtico V12, el candidato V13 corregido y su identidad binaria; falta completar el mapping físico reproducible de los nueve bloques documentales.",
+      "La Memoria V13 no puede marcarse productionReady hasta que el aplicativo la regenere desde evidencia universal y la salida supere comparación visual/humana.",
     ],
   },
   {
@@ -58,9 +59,9 @@ export const FERRETERIA_V1_DOCUMENT_SET: readonly FerreteriaDocumentSourceStatus
     sourceRole: "REAL_CASE_REFERENCE",
     productionState: "SOURCE_BACKED_EDITABLE_AVAILABLE",
     blockers: [
-      "El ODT V6 es un expediente real editable y sirve para inventariar estructura y estilos, pero antes de generalizarlo debe clasificarse como modelo reutilizable o referencia de caso.",
-      "Debe conectarse el catálogo canónico de 98 referencias y someterse a render y auditoría independientes del PCAP.",
+      "Debe incorporarse físicamente el catálogo canónico LB43 de 98 referencias al punto 4, preservando estructura y estilos del ODT V6.",
       "Debe corregirse la expresión 'no exhaustivo ni limitativo' para que la variabilidad se refiera a cantidades de referencias existentes y no permita introducir artículos nuevos al amparo de la DA 33.ª.",
+      "Debe someterse el primer render protegido del PPT a auditoría semántica y visual independiente.",
     ],
   },
 ] as const;
