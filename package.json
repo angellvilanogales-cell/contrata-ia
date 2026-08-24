@@ -16,6 +16,7 @@
     "serve": "node dist/main.js --serve",
     "serve:pilot": "node scripts/start-pilot.mjs",
     "install:v1-runtime-assets": "node scripts/install-v1-runtime-assets.mjs",
+    "pilot:v1-preflight": "node scripts/v1-pilot-preflight.mjs",
     "demo:vertical": "node dist/main.js --vertical-demo",
     "demo:lb4": "node dist/main.js --lb4-cleaning-demo",
     "demo:lb5": "node dist/main.js --lb5-documents-demo",
