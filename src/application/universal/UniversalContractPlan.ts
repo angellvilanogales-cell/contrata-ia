@@ -15,7 +15,7 @@ const COMPONENT_BY_CAPABILITY: Partial<Record<UniversalCapability, string>> = {
   OBJECT_AND_NEED: "ObjetoEngine",
   CPV: "CPVEngine",
   LOTS: "UniversalLotsEngine",
-  ECONOMICS: "UniversalEconomicEngine",
+  ECONOMICS: "UniversalEconomicEngine + family economic profiles",
   PROCEDURE: "ProcedimientoEngine",
   SOLVENCY: "SolvenciaEngine",
   PUBLICITY: "PublicidadEngine",
@@ -26,8 +26,8 @@ const COMPONENT_BY_CAPABILITY: Partial<Record<UniversalCapability, string>> = {
   PRICE_REVISION: "UniversalPriceRevisionEngine",
   REMEDIES: "UniversalRemediesEngine",
   DOCUMENT_MODEL_SELECTION: "CanonicalDocumentProfileSelector",
-  EDITABLE_DOCUMENT_GENERATION: "UniversalDocumentGenerationGate",
-  CROSS_DOCUMENT_AUDIT: "UniversalCrossDocumentAudit",
+  EDITABLE_DOCUMENT_GENERATION: "UniversalPhysicalDocumentGenerationGate",
+  CROSS_DOCUMENT_AUDIT: "UniversalAdministrativePackageAudit",
 };
 
 function actionFor(item: CapabilityCoverage): UniversalModuleAction {
@@ -41,7 +41,11 @@ function stepFor(item: CapabilityCoverage): UniversalModuleStep {
   return { capability: item.capability, component: COMPONENT_BY_CAPABILITY[item.capability], action, coverage: item.status, humanValidationRequired: true, notes: item.notes };
 }
 
-/** Construye un plan sin convertir falta de cobertura en inferencia jurídica. */
+/**
+ * Construye el plan de módulos reutilizables. Que un componente exista no
+ * significa que pueda generar: el status por familia conserva los huecos de
+ * evidencia, modelo físico, procedimiento o régimen especial.
+ */
 export function buildUniversalContractPlan(contractType: UniversalTargetContractType): UniversalContractPlan {
   const family = getContractFamilyCoverage(contractType);
   const steps = family.capabilities.map(stepFor);
@@ -49,6 +53,8 @@ export function buildUniversalContractPlan(contractType: UniversalTargetContract
     .map(step => `Cobertura pendiente ${contractType}/${step.capability}: ${step.notes[0] ?? "módulo no implementado"}`);
   const generationStep = steps.find(step => step.capability === "EDITABLE_DOCUMENT_GENERATION");
   const modelStep = steps.find(step => step.capability === "DOCUMENT_MODEL_SELECTION");
-  const canReachDocumentGeneration = blockers.length === 0 && generationStep?.action !== "BLOCK_UNTIL_IMPLEMENTED" && modelStep?.action !== "BLOCK_UNTIL_IMPLEMENTED";
+  const canReachDocumentGeneration = blockers.length === 0
+    && generationStep?.action !== "BLOCK_UNTIL_IMPLEMENTED"
+    && modelStep?.action !== "BLOCK_UNTIL_IMPLEMENTED";
   return { contractType, requiredDocuments: family.requiredDocuments, steps, blockers, canReachDocumentGeneration };
 }
