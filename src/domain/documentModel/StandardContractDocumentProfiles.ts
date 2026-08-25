@@ -19,10 +19,10 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
     applicableProcedures: [TipoProcedimiento.ABIERTO],
     sourceIds: ["PCAP_SERVICES_OPEN_REAL_JDA_SOURCE", "REG-SERVICE-007_MAINTENANCE_SEVILLE"],
     definition: ServicePcapDefinition,
-    generationAllowed: false,
+    generationAllowed: true,
     notes: [
       "Modelo lógico completo contrastado con PCAP real de servicios abierto basado en el modelo recomendado de la Comisión Consultiva.",
-      "La fuente física actualmente acreditada en la biblioteca es PDF; la generación editable permanece bloqueada hasta verificar el ODT/DOCX general correspondiente.",
+      "generationAllowed expresa aptitud lógica del perfil; la generación física permanece bloqueada mientras no exista ODT/DOCX general verificado en EditableTemplateAssetRegistry.",
       "Los campos del Anexo I deben proceder del expediente canónico y conservar validaciones y conflictos.",
     ],
   });
@@ -41,6 +41,21 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
     ],
   });
 
+  // Perfil parcial histórico: se conserva primero para compatibilidad de consultas
+  // genéricas mediante registry.find(). La selección canónica usa findAll() y filtra
+  // por procedimiento/cobertura, por lo que el FULL_MODEL oficial ASA puede elegirse
+  // sin convertir este Anexo I en modelo general de producción.
+  registry.register({
+    id: "SUPPLY-PCAP-ANNEX-I-JDA-2025-12",
+    contractType: "SUPPLY",
+    documentType: DocumentType.PCAP,
+    coverage: "ANNEX_I_ONLY",
+    sourceIds: ["jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt", "CONTR-2026-240267_ANEXO_I"],
+    definition: SupplyPcapAnnexDefinition,
+    generationAllowed: false,
+    notes: ["Perfil parcial conservado para flujos que trabajan exclusivamente sobre el Anexo I; no sustituye al perfil completo oficial."],
+  });
+
   registry.register({
     id: "SUPPLY-PCAP-ASA-AUTOFINANCED-JDA-2025-12",
     contractType: "SUPPLY",
@@ -54,18 +69,6 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
       "Modelo oficial general ODT acreditado para suministro mediante abierto simplificado abreviado, presentación electrónica y autofinanciación.",
       "La habilitación no se extiende a otras financiaciones ni procedimientos y no convierte Memoria/PPT de ferretería en modelos universales.",
     ],
-  });
-
-  registry.register({
-    id: "SUPPLY-PCAP-ANNEX-I-JDA-2025-12",
-    contractType: "SUPPLY",
-    documentType: DocumentType.PCAP,
-    coverage: "ANNEX_I_ONLY",
-    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
-    sourceIds: ["jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt", "CONTR-2026-240267_ANEXO_I"],
-    definition: SupplyPcapAnnexDefinition,
-    generationAllowed: false,
-    notes: ["Perfil parcial conservado para flujos que trabajan exclusivamente sobre el Anexo I; no sustituye al perfil completo oficial."],
   });
 
   registry.register({
