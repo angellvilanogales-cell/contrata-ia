@@ -13,7 +13,7 @@ describe("LB59 - renderers protegidos source-backed de Memoria y PPT", () => {
     expect(result.ready).toBe(true);
     expect(result.blockers).toEqual([]);
     expect(result.memoryBindings).toBe(7);
-    expect(result.pptBindings).toBe(2);
+    expect(result.pptBindings).toBe(3);
   });
 
   it("mantiene identidades runtime separadas para Memoria y PPT", () => {
@@ -26,5 +26,6 @@ describe("LB59 - renderers protegidos source-backed de Memoria y PPT", () => {
     expect(FERRETERIA_MEMORY_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("memory.estimated-value-table");
     expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.catalogue-scope");
     expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.catalogue-98-source-backed");
+    expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.footer-page-count-cache");
   });
 });
