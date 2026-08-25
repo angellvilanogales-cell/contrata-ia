@@ -50,8 +50,10 @@ function pending(explanation: string, observations: readonly string[] = []): Dec
  * Motor histórico saneado: conserva su papel de propuesta jurídica, pero ya
  * no selecciona procedimiento por una escala única de cuantías.
  *
- * Regla de seguridad: cuando falta un dato jurídico necesario, devuelve una
- * decisión pendiente en vez de completar o presumir el dato.
+ * Las modalidades simplificadas solo se proponen cuando sus requisitos
+ * positivos están acreditados. La falta de requisitos para una modalidad
+ * opcional no bloquea el expediente: el motor puede continuar hacia una
+ * alternativa ordinaria jurídicamente más conservadora.
  */
 export class ProcedimientoEngine extends BaseEngine {
   public ejecutar(contexto: ExpedienteContext): DecisionJuridica<TipoProcedimiento> {
@@ -73,16 +75,7 @@ export class ProcedimientoEngine extends BaseEngine {
     }
 
     const minorLimit = type === "WORKS" ? MINOR_WORKS_LIMIT : MINOR_SUPPLY_SERVICE_LIMIT;
-    if (value < minorLimit) {
-      if (contexto.contratoMenorJustificado !== true) {
-        return pending(
-          "La cuantía entra en el ámbito del contrato menor, pero la cuantía por sí sola no autoriza su selección.",
-          [
-            "Debe constar la justificación motivada de la necesidad.",
-            "Debe constar que no se altera el objeto para evitar los umbrales del artículo 118 LCSP.",
-          ],
-        );
-      }
+    if (value < minorLimit && contexto.contratoMenorJustificado === true) {
       return proposed(
         contexto,
         TipoProcedimiento.CONTRATO_MENOR,
@@ -92,38 +85,29 @@ export class ProcedimientoEngine extends BaseEngine {
       );
     }
 
-    const asaLimit = type === "WORKS" ? ASA_WORKS_LIMIT : ASA_SUPPLY_SERVICE_LIMIT;
-    if (value < asaLimit) {
-      if (contexto.prestacionesIntelectuales === undefined || contexto.porcentajeJuicioValor === undefined) {
-        return pending(
-          "La cuantía permitiría estudiar la tramitación del artículo 159.6, pero faltan datos imprescindibles.",
-          [
-            "Debe declararse si existen prestaciones de carácter intelectual.",
-            "Debe declararse el porcentaje de criterios evaluables mediante juicio de valor.",
-          ],
-        );
-      }
-      if (!contexto.prestacionesIntelectuales && contexto.porcentajeJuicioValor === 0) {
-        return proposed(
-          contexto,
-          TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO,
-          type === "WORKS" ? "PROC-2026-ASA-WORKS" : "PROC-2026-ASA-SUPPLY-SERVICE",
-          "Se cumplen las condiciones cuantitativas y materiales para proponer la tramitación abreviada del artículo 159.6 LCSP.",
-          ["art. 159.6 LCSP"],
-          ["La propuesta sigue sometida a validación humana y a la comprobación del resto de requisitos del expediente."],
-        );
-      }
-    }
-
-    if (contexto.porcentajeJuicioValor === undefined || contexto.prestacionesIntelectuales === undefined) {
+    const judgment = contexto.porcentajeJuicioValor;
+    if (judgment === undefined || !Number.isFinite(judgment) || judgment < 0 || judgment > 100) {
       return pending(
-        "No puede cerrarse la procedencia del procedimiento abierto simplificado sin conocer los criterios sometidos a juicio de valor y el carácter intelectual de la prestación.",
-        ["Condición exigida por el artículo 159.1.b LCSP."],
+        "No puede cerrarse la propuesta de procedimiento sin una ponderación válida de los criterios sometidos a juicio de valor.",
+        ["El artículo 159 LCSP condiciona las modalidades simplificadas a la configuración de los criterios de adjudicación."],
       );
     }
 
-    const maxJudgment = contexto.prestacionesIntelectuales ? 45 : 25;
-    const judgmentCompatible = contexto.porcentajeJuicioValor <= maxJudgment;
+    const asaLimit = type === "WORKS" ? ASA_WORKS_LIMIT : ASA_SUPPLY_SERVICE_LIMIT;
+    if (
+      value < asaLimit
+      && contexto.prestacionesIntelectuales === false
+      && judgment === 0
+    ) {
+      return proposed(
+        contexto,
+        TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO,
+        type === "WORKS" ? "PROC-2026-ASA-WORKS" : "PROC-2026-ASA-SUPPLY-SERVICE",
+        "Se cumplen las condiciones cuantitativas y materiales acreditadas para proponer la tramitación abreviada del artículo 159.6 LCSP.",
+        ["art. 159.6 LCSP"],
+        ["La propuesta sigue sometida a validación humana y a la comprobación del resto de requisitos del expediente."],
+      );
+    }
 
     let valueCompatible = false;
     if (type === "WORKS") {
@@ -140,14 +124,22 @@ export class ProcedimientoEngine extends BaseEngine {
       );
     }
 
+    const judgmentCompatible = judgment <= 25
+      || (judgment <= 45 && contexto.prestacionesIntelectuales === true);
+
     if (valueCompatible && judgmentCompatible) {
       return proposed(
         contexto,
         TipoProcedimiento.ABIERTO_SIMPLIFICADO,
         type === "WORKS" ? "PROC-2026-OSA-WORKS" : "PROC-2026-OSA-SUPPLY-SERVICE",
-        "Se cumplen las condiciones de cuantía y de ponderación de criterios para proponer procedimiento abierto simplificado.",
+        "Se cumplen las condiciones de cuantía y de ponderación de criterios acreditadas para proponer procedimiento abierto simplificado.",
         ["art. 159.1 LCSP"],
-        ["La propuesta requiere validación humana antes de incorporarse a los pliegos."],
+        [
+          "La propuesta requiere validación humana antes de incorporarse a los pliegos.",
+          ...(value < minorLimit && contexto.contratoMenorJustificado !== true
+            ? ["La cuantía permitiría estudiar un contrato menor, pero no se ha promovido porque no consta la justificación del artículo 118 LCSP."]
+            : []),
+        ],
       );
     }
 
@@ -160,6 +152,9 @@ export class ProcedimientoEngine extends BaseEngine {
       [
         "Esta propuesta no descarta procedimientos especiales cuando concurra su supuesto legal.",
         "Debe validarse el régimen armonizado, la urgencia y cualquier circunstancia especial antes del cierre del expediente.",
+        ...(judgment > 25 && contexto.prestacionesIntelectuales === undefined
+          ? ["No se ha presumido el carácter intelectual de la prestación para ampliar el límite de juicio de valor del artículo 159.1.b LCSP."]
+          : []),
       ],
     );
   }
