@@ -5,6 +5,7 @@ import { ServicePcapDefinition } from "./definitions/ServicePcapDefinition";
 import { ServicePptDefinition } from "./definitions/ServicePptDefinition";
 import { SupplyPcapAnnexDefinition } from "./definitions/SupplyPcapAnnexDefinition";
 import { SupplyPptDefinition } from "./definitions/SupplyPptDefinition";
+import { WorksPcapDefinition } from "./definitions/WorksPcapDefinition";
 
 export function createStandardContractDocumentProfiles(): ContractDocumentModelProfileRegistry {
   const registry = new ContractDocumentModelProfileRegistry();
@@ -64,6 +65,22 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
     notes: [
       "PPT completo para el caso de suministro sucesivo de ferretería, utilizado como patrón estructural de suministros por necesidades.",
       "No se considera plantilla universal para cualquier clase de suministro sin validar la adecuación técnica al objeto concreto.",
+    ],
+  });
+
+  registry.register({
+    id: "WORKS-PCAP-OPEN-STRUCTURAL-REAL-SOURCE",
+    contractType: "WORKS",
+    documentType: DocumentType.PCAP,
+    coverage: "STRUCTURAL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO],
+    sourceIds: ["PCAP_WORKS_OPEN_REAL_USER_SOURCE", "LCSP_WORKS_231_246"],
+    definition: WorksPcapDefinition,
+    generationAllowed: false,
+    notes: [
+      "Existe fuente real de PCAP de obras que permite acreditar la familia y su estructura administrativa básica.",
+      "No se habilita generación física hasta verificar y registrar el activo editable concreto, su huella de estilo y las secciones/anexos del modelo aplicable.",
+      "El PPT de obras no se sustituye por esta estructura: debe provenir del proyecto y de las prescripciones técnicas específicas de la actuación.",
     ],
   });
 
