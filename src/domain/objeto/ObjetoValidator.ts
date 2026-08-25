@@ -4,14 +4,12 @@
  * ObjetoValidator
  * ============================================================
  *
- * Validador jurídico del objeto del contrato.
+ * Validador del objeto y de la necesidad administrativa.
  *
- * Implementa las comprobaciones derivadas de los
- * artículos 99 a 102 de la LCSP.
- *
- * En esta primera versión contiene únicamente
- * validaciones generales.
- *
+ * El objeto se contrasta principalmente con los artículos 28 y 99 LCSP.
+ * Presupuesto, valor estimado, precio y duración disponen de sus propios
+ * dominios y no deben convertir en inválida una descripción de objeto que se
+ * encuentra todavía en fase inicial del expediente.
  * ============================================================
  */
 
@@ -20,118 +18,55 @@ import { ObjetoContrato } from "./ObjetoContrato";
 export class ObjetoValidator {
 
     /**
-     * Ejecuta todas las validaciones.
+     * Ejecuta solo las validaciones que pertenecen semánticamente al objeto.
+     * No exige VE, PBL ni duración: hacerlo aquí duplicaría los motores
+     * económico y de plazo y produciría falsos bloqueos tempranos.
      */
     public validar(objeto: ObjetoContrato): string[] {
 
         const errores: string[] = [];
 
         errores.push(...this.validarTitulo(objeto));
-
         errores.push(...this.validarDescripcion(objeto));
-
         errores.push(...this.validarNecesidad(objeto));
 
-        errores.push(...this.validarValor(objeto));
-
-        errores.push(...this.validarDuracion(objeto));
-
         return errores;
 
     }
 
-    /**
-     * Comprueba el título.
-     */
     private validarTitulo(objeto: ObjetoContrato): string[] {
 
-        const errores: string[] = [];
-
         if (!objeto.titulo.trim()) {
-
-            errores.push(
-                "Debe indicarse el título del contrato."
-            );
-
+            return ["Debe indicarse el título del contrato."];
         }
 
-        return errores;
+        return [];
 
     }
 
-    /**
-     * Comprueba la descripción.
-     */
     private validarDescripcion(objeto: ObjetoContrato): string[] {
 
-        const errores: string[] = [];
+        const normalizada = objeto.descripcion.trim().replace(/\s+/g, " ");
 
-        if (objeto.descripcion.trim().length < 20) {
-
-            errores.push(
-                "La descripción del objeto resulta insuficiente."
-            );
-
+        if (!normalizada) {
+            return ["Debe describirse el objeto del contrato."];
         }
 
-        return errores;
+        if (normalizada.length < 20) {
+            return ["La descripción del objeto resulta insuficiente para delimitar la prestación."];
+        }
+
+        return [];
 
     }
 
-    /**
-     * Comprueba la necesidad.
-     */
     private validarNecesidad(objeto: ObjetoContrato): string[] {
 
-        const errores: string[] = [];
-
         if (!objeto.necesidad.trim()) {
-
-            errores.push(
-                "Debe justificarse la necesidad administrativa."
-            );
-
+            return ["Debe justificarse la necesidad administrativa conforme al artículo 28 LCSP."];
         }
 
-        return errores;
-
-    }
-
-    /**
-     * Comprueba el valor estimado.
-     */
-    private validarValor(objeto: ObjetoContrato): string[] {
-
-        const errores: string[] = [];
-
-        if (objeto.valorEstimado <= 0) {
-
-            errores.push(
-                "El valor estimado debe ser superior a cero."
-            );
-
-        }
-
-        return errores;
-
-    }
-
-    /**
-     * Comprueba la duración.
-     */
-    private validarDuracion(objeto: ObjetoContrato): string[] {
-
-        const errores: string[] = [];
-
-        if (objeto.duracionMeses <= 0) {
-
-            errores.push(
-                "Debe indicarse la duración del contrato."
-            );
-
-        }
-
-        return errores;
+        return [];
 
     }
 
