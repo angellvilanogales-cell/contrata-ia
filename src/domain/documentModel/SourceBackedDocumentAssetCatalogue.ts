@@ -23,12 +23,29 @@ export interface SourceBackedDocumentAsset {
 }
 
 /**
- * LB91.26 — inventario físico conservador.
- * Un activo de expediente concreto no se promueve a modelo general por el solo
- * hecho de estar verificado. La promoción exige fuente administrativa general
- * acreditada y validación expresa del alcance.
+ * Inventario físico conservador. Un activo de expediente concreto no se promueve
+ * a modelo general por estar verificado. La promoción exige fuente administrativa
+ * general, binario editable y alcance contractual/procedimental acreditado.
  */
 export const SOURCE_BACKED_DOCUMENT_ASSETS: readonly SourceBackedDocumentAsset[] = [
+  {
+    id: "JDA-SUPPLY-ASA-AUTOFINANCED-PCAP-OFFICIAL",
+    contractType: "SUPPLY",
+    documentType: DocumentType.PCAP,
+    scope: "GENERAL_OFFICIAL",
+    verification: "VERIFIED_EDITABLE",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    sourceId: "jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt",
+    templateId: "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17",
+    mediaType: "ODT",
+    sha256: "45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc",
+    styleFingerprint: "sha256:9eb23463f4d56abd03531cb909206ef47d749054bf284087bd45867b39e6ceee",
+    generationCandidate: true,
+    notes: [
+      "Modelo recomendado general de la Comisión Consultiva de Contratación Pública para suministro por procedimiento abierto simplificado abreviado, presentación electrónica y autofinanciación.",
+      "La acreditación alcanza este PCAP y esta combinación procedimental; no acredita Memoria/PPT universales ni otros procedimientos o financiaciones.",
+    ],
+  },
   {
     id: "FERRETERIA-PCAP-PROTECTED-EDITABLE",
     contractType: "SUPPLY",
@@ -43,7 +60,7 @@ export const SOURCE_BACKED_DOCUMENT_ASSETS: readonly SourceBackedDocumentAsset[]
     styleFingerprint: "sha256:9eb23463f4d56abd03531cb909206ef47d749054bf284087bd45867b39e6ceee",
     caseId: "CONTR/2026/240267",
     generationCandidate: true,
-    notes: ["Activo editable verificado del pipeline protegido; su existencia no acredita por sí sola cobertura universal de PCAP de suministros."],
+    notes: ["Uso protegido del modelo oficial dentro del expediente de ferretería; las decisiones particulares del Anexo I siguen siendo específicas del caso."],
   },
   {
     id: "FERRETERIA-MEMORY-V12-PROTECTED-EDITABLE",
@@ -75,7 +92,7 @@ export const SOURCE_BACKED_DOCUMENT_ASSETS: readonly SourceBackedDocumentAsset[]
     styleFingerprint: "sha256:deadf7c2a176c83de774fad7022a0ac1d5adfcca514d8c0cddeb0b01029d1390",
     caseId: "CONTR/2026/240267",
     generationCandidate: true,
-    notes: ["PPT editable verificado para ferretería; el catálogo técnico de ese expediente no se considera universal para otros suministros."],
+    notes: ["PPT editable verificado para ferretería; su catálogo técnico no se considera universal para otros suministros."],
   },
   {
     id: "SERVICE-PCAP-OPEN-REAL-SOURCE",
@@ -84,10 +101,13 @@ export const SOURCE_BACKED_DOCUMENT_ASSETS: readonly SourceBackedDocumentAsset[]
     scope: "GENERAL_OFFICIAL",
     verification: "SOURCE_ONLY",
     applicableProcedures: [TipoProcedimiento.ABIERTO],
-    sourceId: "PCAP_SERVICES_OPEN_2025_12",
+    sourceId: "PCAP_SERVICES_OPEN_REAL_JDA_SOURCE",
     mediaType: "PDF",
     generationCandidate: false,
-    notes: ["Fuente administrativa general identificada; pendiente verificar el binario editable concreto antes de habilitar generación física."],
+    notes: [
+      "Fuente real de PCAP de servicios abierto basada en el modelo recomendado de la Comisión Consultiva.",
+      "La fuente disponible en el inventario es PDF; no se habilita generación hasta recuperar y verificar el ODT/DOCX general correspondiente.",
+    ],
   },
   {
     id: "WORKS-PCAP-OPEN-REAL-SOURCE",
@@ -110,4 +130,10 @@ export function findDocumentAssets(contractType?: UniversalTargetContractType, d
 
 export function getVerifiedEditableAssets(): readonly SourceBackedDocumentAsset[] {
   return SOURCE_BACKED_DOCUMENT_ASSETS.filter(asset => asset.verification === "VERIFIED_EDITABLE");
+}
+
+export function getGeneralOfficialGenerationCandidates(): readonly SourceBackedDocumentAsset[] {
+  return SOURCE_BACKED_DOCUMENT_ASSETS.filter(asset =>
+    asset.scope === "GENERAL_OFFICIAL" && asset.verification === "VERIFIED_EDITABLE" && asset.generationCandidate,
+  );
 }
