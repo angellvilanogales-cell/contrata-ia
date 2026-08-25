@@ -1,7 +1,7 @@
 import { EvidenceField, isPromotableEvidenceField } from "../../../domain/expediente/EvidenceField";
 import { UniversalExpedienteV13 } from "../../../domain/expediente/UniversalExpedienteV13";
 
-export const BLOCK_14_ADAPTIVE_ENGINE_VERSION = "14.6.0" as const;
+export const BLOCK_14_ADAPTIVE_ENGINE_VERSION = "14.7.0" as const;
 export type AdaptiveActionKind = "ASK_USER" | "VALIDATE_HUMAN" | "RESOLVE_SOURCE_CONFLICT" | "RUN_ENGINE" | "COMPLETE";
 export type AdaptiveActionPriority = "BLOCKING" | "HIGH" | "NORMAL";
 export interface UniversalAdaptiveAction { kind: AdaptiveActionKind; id: string; fieldKey?: string; engine?: "CONTRACT_NATURE_CLASSIFIER" | "CPVEngine" | "ProcedimientoEngine" | "DeadlineDecisionEngine"; question?: string; help?: string; reason: string; priority: AdaptiveActionPriority; }
@@ -46,9 +46,17 @@ function coreEconomic(e: UniversalExpedienteV13): UniversalAdaptiveAction | null
   if(!isKnown(x.legalEstimatedValueCents) && !isKnown(f.estimatedValueCents)) return ask(x.legalEstimatedValueCents.key,"ask:estimated-value","Si ya está calculado, ¿cuál es el valor estimado jurídico del contrato, sin IVA?","Si no está calculado se mantendrá pendiente para el motor económico del Bloque 15.","El procedimiento necesita un VE jurídicamente determinado o una propuesta trazable.");
   return null;
 }
+function procedurePrerequisites(e: UniversalExpedienteV13): UniversalAdaptiveAction | null {
+  const f=e.canonical.fields;
+  const hasVe=isPromotableEvidenceField(e.economic.legalEstimatedValueCents)||isPromotableEvidenceField(f.estimatedValueCents);
+  if(isKnown(f.procedure)||!isPromotableEvidenceField(f.contractType)||!hasVe) return null;
+  if(!isKnown(e.criteria.awardCriteria)) return ask(e.criteria.awardCriteria.key,"ask:award-criteria-for-procedure","¿Qué criterios de adjudicación se utilizarán, con ponderación y forma de evaluación?","Indique nombre, ponderación y si cada criterio es evaluable mediante fórmula. El sistema calculará, sin inventarlo, el porcentaje sometido a juicio de valor.","El artículo 159 LCSP exige conocer la configuración de los criterios antes de decidir si procede una modalidad simplificada.");
+  if((f.contractType.value==="SUPPLY"||f.contractType.value==="SERVICE")&&!isKnown(e.regulation.threshold)) return ask(e.regulation.threshold.key,"ask:threshold-for-procedure","¿Qué umbral SARA aplicable consta determinado para este expediente?","Debe corresponder al tipo de poder adjudicador, clase de contrato y periodo normativo aplicable; el sistema no utilizará un umbral universal por defecto.","El artículo 159.1.a LCSP remite a los umbrales aplicables de los artículos 21.1.a y 22.1.a y a sus actualizaciones.");
+  return null;
+}
 function legalDecision(e: UniversalExpedienteV13): UniversalAdaptiveAction | null {
   const f=e.canonical.fields;
-  if(!isKnown(f.procedure) && isPromotableEvidenceField(f.contractType) && (isPromotableEvidenceField(e.economic.legalEstimatedValueCents)||isPromotableEvidenceField(f.estimatedValueCents))) return run("ProcedimientoEngine","run:procedure",f.procedure.key,"Con tipo y VE promocionables el procedimiento debe proponerse por el motor normativo.");
+  if(!isKnown(f.procedure) && isPromotableEvidenceField(f.contractType) && (isPromotableEvidenceField(e.economic.legalEstimatedValueCents)||isPromotableEvidenceField(f.estimatedValueCents)) && isPromotableEvidenceField(e.criteria.awardCriteria) && (f.contractType.value==="WORKS"||isPromotableEvidenceField(e.regulation.threshold))) return run("ProcedimientoEngine","run:procedure",f.procedure.key,"Con tipo, VE, criterios y, cuando procede, umbral SARA promocionables, el procedimiento puede proponerse por el motor normativo saneado.");
   if(isPromotableEvidenceField(f.procedure)&&isPromotableEvidenceField(e.processing.processingType)&&isPromotableEvidenceField(e.regulation.harmonizedRegulation)&&isPromotableEvidenceField(e.processing.urgency)&&isPromotableEvidenceField(e.processing.emergency)&&isPromotableEvidenceField(e.regulation.europeanFunding)&&!isKnown(e.regulation.deadlines)) return run("DeadlineDecisionEngine","run:deadlines",e.regulation.deadlines.key,"Las entradas jurídicas necesarias permiten calcular los plazos mediante el motor existente.");
   return null;
 }
@@ -88,6 +96,6 @@ export class UniversalAdaptiveQuestionEngine {
   public next(e:UniversalExpedienteV13):UniversalAdaptiveAction {
     for(const field of allEvidenceFields(e)){ const a=conflictAction(field); if(a) return a; }
     for(const field of [e.canonical.fields.contractType,e.canonical.fields.object,e.canonical.fields.cpvMain,e.economic.legalEstimatedValueCents,e.canonical.fields.procedure,e.regulation.deadlines] as EvidenceField<unknown>[]){ const a=validationAction(field); if(a) return a; }
-    return coreIdentification(e) ?? basicTermAndLots(e) ?? coreEconomic(e) ?? legalDecision(e) ?? missingLegal(e) ?? supplementaryEconomic(e) ?? administrative(e) ?? technical(e) ?? lotsDetail(e) ?? criteria(e) ?? guarantees(e) ?? execution(e) ?? {kind:"COMPLETE",id:"adaptive:complete",reason:"No queda ninguna pregunta o acción automática imprescindible para servicios y suministros en el Bloque 14.",priority:"NORMAL"};
+    return coreIdentification(e) ?? basicTermAndLots(e) ?? coreEconomic(e) ?? procedurePrerequisites(e) ?? legalDecision(e) ?? missingLegal(e) ?? supplementaryEconomic(e) ?? administrative(e) ?? technical(e) ?? lotsDetail(e) ?? criteria(e) ?? guarantees(e) ?? execution(e) ?? {kind:"COMPLETE",id:"adaptive:complete",reason:"No queda ninguna pregunta o acción automática imprescindible para servicios y suministros en el Bloque 14.",priority:"NORMAL"};
   }
 }
