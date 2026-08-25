@@ -13,14 +13,16 @@ function context(type: string, estimatedValue: number): ExpedienteContext {
 describe("LB85 - ProcedimientoEngine saneado", () => {
   it("no convierte automáticamente una cuantía de contrato menor en procedimiento menor", () => {
     const input = context("SERVICE", 12_000);
+    input.umbralSara = 216_000;
+    input.porcentajeJuicioValor = 0;
     const decision = new ProcedimientoEngine().ejecutar(input);
 
-    expect(decision.confianza).toBe(0);
-    expect(decision.resultado).toBeUndefined();
-    expect(decision.explicacion).toMatch(/cuantía por sí sola no autoriza/i);
+    expect(decision.resultado).toBe(TipoProcedimiento.ABIERTO_SIMPLIFICADO);
+    expect(decision.resultado).not.toBe(TipoProcedimiento.CONTRATO_MENOR);
+    expect(decision.observaciones.join(" ")).toMatch(/no consta la justificación del artículo 118/i);
   });
 
-  it("distingue el umbral de contrato menor de obras y exige justificación", () => {
+  it("distingue el umbral de contrato menor de obras y exige justificación positiva para promoverlo", () => {
     const input = context("WORKS", 39_999);
     input.contratoMenorJustificado = true;
     const decision = new ProcedimientoEngine().ejecutar(input);
@@ -30,7 +32,7 @@ describe("LB85 - ProcedimientoEngine saneado", () => {
     expect(decision.articulos).toContain("art. 118 LCSP");
   });
 
-  it("propone 159.6 para suministro por debajo de 60.000 solo sin prestación intelectual y con criterios de fórmula", () => {
+  it("propone 159.6 para suministro por debajo de 60.000 solo si consta que no es intelectual y todos los criterios son de fórmula", () => {
     const input = context("SUPPLY", 59_999);
     input.prestacionesIntelectuales = false;
     input.porcentajeJuicioValor = 0;
@@ -41,13 +43,24 @@ describe("LB85 - ProcedimientoEngine saneado", () => {
     expect(decision.articulos).toContain("art. 159.6 LCSP");
   });
 
-  it("no aplica 159.6 cuando faltan datos sobre prestación intelectual o juicio de valor", () => {
+  it("no inventa la ponderación de juicio de valor cuando todavía no consta", () => {
     const input = context("SERVICE", 30_000);
+    input.umbralSara = 216_000;
     const decision = new ProcedimientoEngine().ejecutar(input);
 
     expect(decision.confianza).toBe(0);
     expect(decision.resultado).toBeUndefined();
-    expect(decision.observaciones.join(" ")).toMatch(/prestaciones de carácter intelectual/i);
+    expect(decision.explicacion).toMatch(/ponderación válida/i);
+  });
+
+  it("si no consta carácter intelectual no fuerza 159.6 y puede usar 159.1 con un juicio de valor compatible", () => {
+    const input = context("SERVICE", 30_000);
+    input.umbralSara = 216_000;
+    input.porcentajeJuicioValor = 0;
+    const decision = new ProcedimientoEngine().ejecutar(input);
+
+    expect(decision.resultado).toBe(TipoProcedimiento.ABIERTO_SIMPLIFICADO);
+    expect(decision.resultado).not.toBe(TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO);
   });
 
   it("no inventa el umbral SARA para suministro o servicio", () => {
@@ -83,7 +96,7 @@ describe("LB85 - ProcedimientoEngine saneado", () => {
     expect(decision.resultado).toBe(TipoProcedimiento.ABIERTO_SIMPLIFICADO);
   });
 
-  it("cae en abierto ordinario si la ponderación de juicio de valor supera el límite del art. 159.1.b", () => {
+  it("cae en abierto ordinario si la ponderación de juicio de valor supera el límite acreditado del art. 159.1.b", () => {
     const input = context("SERVICE", 100_000);
     input.umbralSara = 216_000;
     input.prestacionesIntelectuales = false;
