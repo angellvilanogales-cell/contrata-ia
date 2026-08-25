@@ -38,4 +38,24 @@ describe("LB91.5 - ámbito contractual del recurso especial", () => {
     const result = engine.evaluate({ contractType: "SERVICE", estimatedValueExVatCents: 20_000_000, contractingEntityIsContractingAuthority: false });
     expect(result.specialProcurementAppealContractScope).toBe("PENDING");
   });
+
+  it("no presume que todo acuerdo marco o SDA entra en el artículo 44.1.b", () => {
+    const pending = engine.evaluate({
+      contractType: "SUPPLY",
+      estimatedValueExVatCents: 50_000_000,
+      contractingEntityIsContractingAuthority: true,
+      frameworkAgreementOrDynamicPurchasingSystem: true,
+    });
+    expect(pending.specialProcurementAppealContractScope).toBe("PENDING");
+    expect(pending.blockers.length).toBeGreaterThan(0);
+
+    const confirmed = engine.evaluate({
+      contractType: "SUPPLY",
+      estimatedValueExVatCents: 50_000_000,
+      contractingEntityIsContractingAuthority: true,
+      frameworkAgreementOrDynamicPurchasingSystem: true,
+      frameworkOrDpsObjectFallsWithinArticle44_1a: true,
+    });
+    expect(confirmed.specialProcurementAppealContractScope).toBe(true);
+  });
 });
