@@ -152,6 +152,64 @@ const SECOND_PASS_RULES: readonly SecondPassRule[] = [
   { id: "personal-data-treatment", pattern: /^La ejecución del contrato requiere el tratamiento por la persona contratista de datos personales/i, value: yesNoFromDecision("personal-data-treatment") },
 ] as const;
 
+const FINAL_AUTHORITY_RULES: readonly SecondPassRule[] = [
+  { id: "anexo-i-title", pattern: /^TÍTULO DEL CONTRATO:\s*_{3,}\s*$/i, value: DEFAULT_TITLE },
+  { id: "anexo-i-file", pattern: /^EXPEDIENTE:\s*_{3,}\s*$/i, value: DEFAULT_CASE_ID },
+  { id: "anexo-i-locality", pattern: /^LOCALIDAD:\s*_{3,}\s*$/i, value: "SEVILLA" },
+  { id: "extra-lot-1", pattern: /^_{3,}$/i, value: "No procede." },
+  { id: "extra-lot-2", pattern: /^_{3,}$/i, value: "No procede." },
+  { id: "lot-objective-extra", pattern: /^-\s*_{3,}$/i, value: "No procede." },
+  { id: "integrative-combinations", pattern: /^En caso afirmativo, combinación o combinaciones de lotes o grupos de lotes admitidas:/i, value: "No procede." },
+  { id: "reserved-lots", pattern: /^Uno o varios lotes\. En este caso, indicar lotes reservados:/i, value: "No procede." },
+  { id: "specific-legal-regime-final", pattern: /^1\.D\. RÉGIMEN JURÍDICO ESPECÍFICO POR RAZÓN DEL OBJETO DEL CONTRATO:/i, value: "No procede." },
+  { id: "direct-cost", pattern: /^-\s*_{3,}$/i, value: "Costes directos: 8.019,85 € (76,00 %)." },
+  { id: "indirect-cost-profit", pattern: /^-\s*_{3,}$/i, value: "Costes indirectos: 1.899,44 € (18,00 %) y beneficio industrial: 633,15 € (6,00 %)." },
+  { id: "formula-long-recovery", pattern: /^Fórmula:\s*_{3,}$/i, value: "No procede." },
+  { id: "formula-short-recovery", pattern: /^Fórmula:\s*_{3,}$/i, value: "No procede." },
+  { id: "price-variation-rules", pattern: /^Supuestos y reglas para su determinación:/i, value: "No procede." },
+  { id: "goods-as-payment-final", pattern: /^Entrega de otros bienes de la misma clase como pago de parte del precio:/i, value: "No" },
+  { id: "ten-percent-final", pattern: /^Posibilidad de incremento del número de unidades a suministrar de hasta el 10% del precio/i, value: "No" },
+  { id: "urgent-date", pattern: /^Urgente,?\s+según Resolución de fecha:/i, value: "No procede." },
+  { id: "variants-final", pattern: /^Posibilidad de variantes/i, value: "No" },
+  { id: "variants-detail", pattern: /^En caso afirmativo, indicar/i, value: "No procede." },
+  { id: "organisation-requirements", pattern: /^Requisitos relativos a la organización, destino de sus beneficios, sistemas de financiación/i, value: "No" },
+  { id: "criterion-2", pattern: /^2\.\s*_{3,}$/i, value: "No procede." },
+  { id: "criterion-3", pattern: /^3\.\s*_{3,}$/i, value: "No procede." },
+  { id: "criterion-doc-2", pattern: /^2\.\s*_{3,}$/i, value: "No procede." },
+  { id: "criterion-doc-3", pattern: /^3\.\s*_{3,}$/i, value: "No procede." },
+  { id: "abnormal-parameters", pattern: /^7\.B\. PARÁMETROS OBJETIVOS PARA CONSIDERAR UNA OFERTA ANORMALMENTE BAJA/i, value: "Artículo 85 del RGLCAP, de conformidad con el artículo 149.2 de la LCSP." },
+  { id: "tie-3", pattern: /^3\.\s*_{3,}$/i, value: "No procede." },
+  { id: "tie-4", pattern: /^4\.\s*_{3,}$/i, value: "No procede." },
+  { id: "other-special-condition", pattern: /^Otras:\s*_{3,}$/i, value: "No procede." },
+  { id: "essential-extra-1", pattern: /^-\s*_{3,}$/i, value: "No procede." },
+  { id: "essential-extra-2", pattern: /^-\s*_{3,}$/i, value: "No procede." },
+  { id: "grave-extra-1", pattern: /^-\s*_{3,}$/i, value: "No procede." },
+  { id: "grave-extra-2", pattern: /^-\s*_{3,}$/i, value: "No procede." },
+  { id: "critical-subcontracting-final", pattern: /^Determinadas tareas críticas, partes o trabajos/i, value: "No" },
+  { id: "subcontract-offer-final", pattern: /^La persona licitadora debe indicar en la oferta/i, value: "No" },
+  { id: "subcontract-servers-final", pattern: /^La persona contratista debe indicar si tiene previsto subcontratar los servidores/i, value: "No procede." },
+  { id: "subcontract-security-final", pattern: /^La ejecución del contrato debe ir acompañada de medidas de seguridad especiales/i, value: "No" },
+  { id: "subcontract-penalty-percent", pattern: /^Penalidad del\s+_{3,}\s*% del importe del subcontrato/i, value: "20" },
+  { id: "direct-subcontractor-payments-final", pattern: /^Se prevén pagos directos a subcontratistas:/i, value: "No" },
+  { id: "direct-subcontractor-regime", pattern: /^a\) Régimen de abono del precio:/i, value: "No procede." },
+  { id: "direct-subcontractor-periodicity", pattern: /^b\) Periodicidad del pago:/i, value: "No procede." },
+  { id: "direct-subcontractor-register", pattern: /^c\) Registro para presentación de facturas:/i, value: "No procede." },
+  { id: "strict-subcontractor-payment-check", pattern: /^Comprobación por el órgano de contratación del estricto cumplimiento de los pagos/i, value: "No" },
+  { id: "protected-employment-reserve", pattern: /^Reserva de un porcentaje mínimo de la ejecución de contratos en el marco de programas de empleo protegido:/i, value: "No" },
+  { id: "protected-employment-percent", pattern: /^Porcentaje reservado:/i, value: "No procede." },
+  { id: "protected-employment-controls", pattern: /^Mecanismos de control:/i, value: "No procede." },
+  { id: "defective-light", pattern: /^a\) Incumplimientos leves:/i, value: "No procede." },
+  { id: "defective-grave", pattern: /^b\) Incumplimientos graves:/i, value: "No procede." },
+  { id: "defective-very-grave", pattern: /^c\) Incumplimientos muy graves:/i, value: "No procede." },
+  { id: "payment-mode", pattern: /^Pago Único \/Pagos parciales:/i, value: "Pagos parciales" },
+  { id: "payment-periodicity", pattern: /^En caso de pagos parciales, periodicidad:/i, value: "En función de los pedidos realizados y conformados." },
+  { id: "conformity-deadline-final", pattern: /^Plazo para aprobar los documentos que acrediten la conformidad de la realización del objeto del contrato:/i, value: "Máximo 30 días naturales desde la entrega y recepción material." },
+  { id: "preparatory-a", pattern: /^a\)\s+Operaciones preparatorias susceptibles de abonos a cuenta:/i, value: "No procede." },
+  { id: "preparatory-b", pattern: /^b\)\s+Exigencia, en su caso, de un programa de trabajo:/i, value: "No procede." },
+  { id: "preparatory-c", pattern: /^c\)\s+Criterios y forma de valoración de las operaciones preparatorias:/i, value: "No procede." },
+  { id: "preparatory-d", pattern: /^d\)\s+Plan de amortización de los abonos a cuenta:/i, value: "No procede." },
+] as const;
+
 function isUnresolvedVisible(value: string): boolean {
   if (/(?:Sí\s*\/\s*No|_{3,})/i.test(value)) return true;
   const colon = value.indexOf(":");
@@ -176,10 +234,10 @@ function materializeParagraphValue(xml: string, currentVisible: string, value: s
   throw new Error(`LB73: no se sabe materializar «${currentVisible}».`);
 }
 
-function applySecondPassMaterialization(content: string): { content: string; changed: number } {
+function applyOrderedRules(content: string, rules: readonly SecondPassRule[], label: string): { content: string; changed: number } {
   let cursor = lastActualAnnexStart(content, "I");
   let changed = 0;
-  for (const rule of SECOND_PASS_RULES) {
+  for (const rule of rules) {
     const annexIIStart = lastActualAnnexStart(content, "II");
     const section = content.slice(cursor, annexIIStart);
     let found: RegExpMatchArray | undefined;
@@ -187,7 +245,7 @@ function applySecondPassMaterialization(content: string): { content: string; cha
       const value = visible(match[0]).trim();
       if (rule.pattern.test(value) && isUnresolvedVisible(value)) { found = match; break; }
     }
-    if (!found || found.index === undefined) throw new Error(`LB73: no se localiza de forma ordenada el campo residual ${rule.id}.`);
+    if (!found || found.index === undefined) throw new Error(`${label}: no se localiza de forma ordenada el campo residual ${rule.id}.`);
     const absoluteStart = cursor + found.index;
     const oldXml = found[0];
     const oldVisible = visible(oldXml).trim();
@@ -197,6 +255,23 @@ function applySecondPassMaterialization(content: string): { content: string; cha
     changed += 1;
   }
   return { content, changed };
+}
+
+function applySecondPassMaterialization(content: string): { content: string; changed: number } {
+  return applyOrderedRules(content, SECOND_PASS_RULES, "LB73");
+}
+
+function applyFinalAuthorityClosure(content: string, caseId: string, title: string): { content: string; changed: number } {
+  const runtimeRules = FINAL_AUTHORITY_RULES.map(rule => rule.id === "anexo-i-title" ? { ...rule, value: title } : rule.id === "anexo-i-file" ? { ...rule, value: caseId } : rule);
+  let next = applyOrderedRules(content, runtimeRules, "LB82");
+  const annexIStart = lastActualAnnexStart(next.content, "I");
+  const annexIIStart = lastActualAnnexStart(next.content, "II");
+  const before = next.content.slice(annexIStart, annexIIStart);
+  const fixed = before.replace("Tramitación del gasto: Ordinaria/Anticipada.", "Tramitación del gasto: Ordinaria.");
+  if (fixed !== before) {
+    next = { content: next.content.slice(0, annexIStart) + fixed + next.content.slice(annexIIStart), changed: next.changed + 1 };
+  }
+  return next;
 }
 
 function buildAnexoITable(): string {
@@ -220,7 +295,8 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
   content = replaceNamedTable(content, "Tabla4", buildAnexoITable());
   content = replaceNamedTable(content, "Tabla11", buildAnexoVTable());
   const secondPass = applySecondPassMaterialization(content);
-  content = secondPass.content;
+  const finalClosure = applyFinalAuthorityClosure(secondPass.content, caseId, title);
+  content = finalClosure.content;
 
   const annexIIMarker = lastActualAnnexStart(content, "II");
   const prefix = content.slice(0, annexIIMarker);
@@ -250,6 +326,10 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
   if (/EXPEDIENTE:\s*_+/.test(visible(annexes))) blockers.push("PCAP: quedan expedientes sin propagar en anexos II-XIII.");
   if (/TÍTULO:\s*_+/.test(visible(annexes))) blockers.push("PCAP: quedan títulos sin propagar en anexos II-XIII.");
   if (computeOdtStyleFingerprint(entries) !== sourceStyle) blockers.push("PCAP: el cierre final alteró la huella de estilos del original renderizado.");
+  const anexoIStart = lastActualAnnexStart(content, "I");
+  const anexoIIStart = lastActualAnnexStart(content, "II");
+  const preDataTreatment = visible(content.slice(anexoIStart, anexoIIStart)).split(/15\.\s+TRATAMIENTO DE DATOS/i)[0] ?? "";
+  if (/(?:Sí\s*\/\s*No|_{3,})/i.test(preDataTreatment)) blockers.push("PCAP: quedan decisiones administrativas sin materializar antes del apartado 15 del Anexo I.");
   const residual = auditJdaSupplyAsaRenderedOdt(writeOdtZip(entries));
   if (!residual.ready) blockers.push(...residual.blockers);
   const bytes = writeOdtZip(entries);
@@ -262,6 +342,6 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
     anexoIRows: 98,
     anexoVRows: anexoVCount,
     propagatedAnnexIdentityParagraphs: expediente.changed + titles.changed,
-    materializedSecondPassParagraphs: secondPass.changed,
+    materializedSecondPassParagraphs: secondPass.changed + finalClosure.changed,
   };
 }
