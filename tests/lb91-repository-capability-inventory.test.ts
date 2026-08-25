@@ -5,7 +5,7 @@ import {
   getMissingUniversalCapabilities,
 } from "../src/domain/capabilities/RepositoryCapabilityInventory";
 
-describe("LB91.3/19 - inventario antes de crear motores", () => {
+describe("LB91.3/25 - inventario antes de crear motores", () => {
   it("cubre una sola vez cada capacidad universal", () => {
     const names = REPOSITORY_CAPABILITY_INVENTORY.map(item => item.capability);
     expect(new Set(names).size).toBe(names.length);
@@ -13,7 +13,8 @@ describe("LB91.3/19 - inventario antes de crear motores", () => {
   });
 
   it("reutiliza motores saneados y perfiles familiares en lugar de crear rutas paralelas", () => {
-    expect(getCapabilityInventory("PROCEDURE").universalComponent).toBe("ProcedimientoEngine");
+    expect(getCapabilityInventory("PROCEDURE").universalComponent).toContain("ProcedimientoEngine");
+    expect(getCapabilityInventory("PROCEDURE").existingAssets).toContain("src/engines/UniversalConcessionProcedureEngine.ts");
     expect(getCapabilityInventory("CPV").universalComponent).toBe("CPVEngine");
     expect(getCapabilityInventory("ECONOMICS").universalComponent).toContain("UniversalEconomicEngine");
     expect(getCapabilityInventory("ECONOMICS").existingAssets).toContain("src/engines/UniversalWorksEconomicEngine.ts");
@@ -21,7 +22,9 @@ describe("LB91.3/19 - inventario antes de crear motores", () => {
     expect(getCapabilityInventory("LOTS").universalComponent).toBe("UniversalLotsEngine");
     expect(getCapabilityInventory("AWARD_CRITERIA").universalComponent).toBe("UniversalAwardCriteriaEngine");
     expect(getCapabilityInventory("GUARANTEES").universalComponent).toBe("UniversalGuaranteeEngine");
-    expect(getCapabilityInventory("EXECUTION").universalComponent).toBe("UniversalExecutionEngine");
+    expect(getCapabilityInventory("EXECUTION").universalComponent).toContain("UniversalExecutionEngine");
+    expect(getCapabilityInventory("EXECUTION").existingAssets).toContain("src/engines/UniversalWorksExecutionEngine.ts");
+    expect(getCapabilityInventory("EXECUTION").existingAssets).toContain("src/engines/UniversalConcessionExecutionEngine.ts");
     expect(getCapabilityInventory("MODIFICATIONS").universalComponent).toBe("UniversalModificationEngine");
     expect(getCapabilityInventory("PRICE_REVISION").universalComponent).toBe("UniversalPriceRevisionEngine");
     expect(getCapabilityInventory("REMEDIES").universalComponent).toBe("UniversalRemediesEngine");
