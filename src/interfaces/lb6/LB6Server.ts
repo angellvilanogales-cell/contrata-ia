@@ -18,9 +18,10 @@ import { VerifiedRuntimeTemplateStore } from "../../application/intake/lb53/Veri
 import { evaluateUniversalV1ProductionReadiness, legacyGenerationAllowed } from "../../application/intake/lb54/UniversalV1ProductionCoordinator";
 import { generateFerreteriaV1ProtectedPackage } from "../../application/intake/lb61/FerreteriaV1ProtectedPackageGenerator";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
-import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
+import { AdaptiveCaseStore, type AdaptiveStoredCase } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
 import { HashChainAuditLog } from "../../infrastructure/operations/lb7/HashChainAuditLog";
+import { HttpAdaptiveCaseMirror } from "../../infrastructure/operations/lb85/ExternalAdaptiveCaseMirror";
 import { FERRETERIA_V1_EDITABLE_ASSET_MANIFEST, evaluateFerreteriaV1RuntimeAssetReadiness } from "../../infrastructure/operations/lb52/VerifiedEditableAssetStore";
 import { UNIVERSAL_V1_JOURNEY_UI } from "../lb55/UniversalV1JourneyUi";
 import { ADAPTIVE_FLOW_SCRIPT } from "../lb7/AdaptiveFlowScript";
@@ -45,6 +46,8 @@ const orchestrator = buildOperationalOrchestrator();
 const security = new SecurityPolicy();
 const adaptiveFlow = new AdaptiveProcurementFlow();
 const adaptiveCases = new AdaptiveCaseStore(path.join(DATA_ROOT, "adaptive-cases"));
+const adaptiveRemote = HttpAdaptiveCaseMirror.fromEnvironment();
+let adaptiveRemoteHydratedCases = 0;
 const universalEvidenceCases = new UniversalEvidenceCaseService(adaptiveCases);
 const universalTemplateRegistry = new UniversalOfficialTemplateRegistry();
 const universalEvidence = new UniversalEvidenceWorkspace(path.join(DATA_ROOT, "universal-evidence-v1"));
@@ -62,6 +65,7 @@ function requireRole(request: IncomingMessage, minimum: ApplicationRole) { const
 function eventFeatures(value: unknown): readonly EventFeature[] { if (!Array.isArray(value)) return []; return value.map(String) as EventFeature[]; }
 function eventAnswers(value: unknown): Readonly<Partial<Record<EventAnswerId, unknown>>> { if (!value || typeof value !== "object" || Array.isArray(value)) return {}; return value as Readonly<Partial<Record<EventAnswerId, unknown>>>; }
 function adaptiveAnswers(value: unknown): AdaptiveFlowAnswers { if (!value || typeof value !== "object" || Array.isArray(value)) return {}; return value as AdaptiveFlowAnswers; }
+async function persistAdaptiveCase(value: AdaptiveStoredCase): Promise<AdaptiveStoredCase> { if (adaptiveRemote) await adaptiveRemote.persist(value); return value; }
 
 export function createLB6Server(): http.Server {
   return http.createServer(async (request, response) => {
@@ -85,7 +89,7 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 62, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, universalReadiness: true, protectedSupplyAsaPipeline: true, protectedV1PackageGeneration: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 85, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, externalAdaptivePersistence: Boolean(adaptiveRemote), externalAdaptivePersistenceHydratedCases: adaptiveRemoteHydratedCases, universalReadiness: true, protectedSupplyAsaPipeline: true, protectedV1PackageGeneration: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
       if (request.method === "GET" && url.pathname === "/api/source-coverage") { requireRole(request, "VIEWER"); sendJson(response, 200, { matrix: PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluation: evaluateProcurementSourceCaseCoverage() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal-ui-manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluation: evaluateUniversalV1UiFieldManifest() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal/manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST }); return; }
@@ -105,14 +109,14 @@ export function createLB6Server(): http.Server {
           return;
         }
       }
-      if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); sendJson(response, 201, adaptiveCases.create()); return; }
+      if (request.method === "POST" && url.pathname === "/api/adaptive/cases") { requireRole(request, "OPERATOR"); const value = adaptiveCases.create(); await persistAdaptiveCase(value); sendJson(response, 201, value); return; }
       if (parts[0] === "api" && parts[1] === "adaptive" && parts[2] === "cases" && parts[3]) {
         const caseId = decodeURIComponent(parts[3]);
         if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; }
-        if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue)); return; }
+        if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); const value = adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue); await persistAdaptiveCase(value); sendJson(response, 200, value); return; }
         if (request.method === "GET" && parts[4] === "universal-evidence" && parts.length === 5) { requireRole(request, "VIEWER"); sendJson(response, 200, { caseId, evidence: universalEvidenceCases.list(caseId) }); return; }
-        if (request.method === "PUT" && parts[4] === "universal-evidence" && parts.length === 5) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const mutation: UniversalUiDraftMutation = { fieldPath: String(body.fieldPath ?? ""), value: body.value, ...(body.sourceId ? { sourceId: String(body.sourceId) } : {}), ...(body.note ? { note: String(body.note) } : {}) }; sendJson(response, 200, universalEvidenceCases.declare(caseId, mutation, actor.id)); return; }
-        if (request.method === "POST" && parts[4] === "universal-evidence" && parts[5] === "validate" && parts.length === 6) { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); sendJson(response, 200, universalEvidenceCases.validate(caseId, String(body.fieldPath ?? ""), actor.id)); return; }
+        if (request.method === "PUT" && parts[4] === "universal-evidence" && parts.length === 5) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const mutation: UniversalUiDraftMutation = { fieldPath: String(body.fieldPath ?? ""), value: body.value, ...(body.sourceId ? { sourceId: String(body.sourceId) } : {}), ...(body.note ? { note: String(body.note) } : {}) }; const result = universalEvidenceCases.declare(caseId, mutation, actor.id); await persistAdaptiveCase(adaptiveCases.get(caseId)); sendJson(response, 200, result); return; }
+        if (request.method === "POST" && parts[4] === "universal-evidence" && parts[5] === "validate" && parts.length === 6) { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const result = universalEvidenceCases.validate(caseId, String(body.fieldPath ?? ""), actor.id); await persistAdaptiveCase(adaptiveCases.get(caseId)); sendJson(response, 200, result); return; }
       }
       if (request.method === "POST" && url.pathname === "/api/adaptive/analyze") { requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, adaptiveFlow.analyze(adaptiveAnswers(body.answers))); return; }
       if (request.method === "GET" && url.pathname === "/api/questions") { requireRole(request, "VIEWER"); sendJson(response, 200, LB6_QUESTIONS); return; }
@@ -150,4 +154,9 @@ export function createLB6Server(): http.Server {
     } catch (error) { const value = error instanceof Error ? error : new Error(String(error)); sendJson(response, statusForError(value), { error: value.message }); }
   });
 }
-export async function startLB6Server(port = Number(process.env.PORT ?? 3000)): Promise<http.Server> { const server = createLB6Server(); await new Promise<void>((resolve, reject) => { server.once("error", reject); server.listen(port, "127.0.0.1", () => resolve()); }); return server; }
+export async function startLB6Server(port = Number(process.env.PORT ?? 3000)): Promise<http.Server> {
+  if (adaptiveRemote) adaptiveRemoteHydratedCases = await adaptiveRemote.hydrate(adaptiveCases);
+  const server = createLB6Server();
+  await new Promise<void>((resolve, reject) => { server.once("error", reject); server.listen(port, "127.0.0.1", () => resolve()); });
+  return server;
+}
