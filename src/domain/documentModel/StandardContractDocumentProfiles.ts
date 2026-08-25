@@ -4,6 +4,7 @@ import { TipoProcedimiento } from "../procedimiento/TipoProcedimiento";
 import { ServicePcapDefinition } from "./definitions/ServicePcapDefinition";
 import { ServicePptDefinition } from "./definitions/ServicePptDefinition";
 import { SupplyPcapAnnexDefinition } from "./definitions/SupplyPcapAnnexDefinition";
+import { SupplyPcapFullModelDefinition } from "./definitions/SupplyPcapFullModelDefinition";
 import { SupplyPptDefinition } from "./definitions/SupplyPptDefinition";
 import { WorksPcapDefinition } from "./definitions/WorksPcapDefinition";
 
@@ -16,13 +17,13 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
     documentType: DocumentType.PCAP,
     coverage: "FULL_MODEL",
     applicableProcedures: [TipoProcedimiento.ABIERTO],
-    sourceIds: ["PCAP_SERVICES_OPEN_2025_12", "REG-SERVICE-007_MAINTENANCE_SEVILLE"],
+    sourceIds: ["PCAP_SERVICES_OPEN_REAL_JDA_SOURCE", "REG-SERVICE-007_MAINTENANCE_SEVILLE"],
     definition: ServicePcapDefinition,
-    generationAllowed: true,
+    generationAllowed: false,
     notes: [
-      "Modelo completo contrastado con PCAP de servicios recomendado por la Comisión Consultiva de Contratación Pública.",
-      "Su aplicación automática queda limitada al procedimiento abierto acreditado por la fuente del modelo.",
-      "Los campos del Anexo I deben proceder del expediente canónico y conservar sus validaciones y conflictos.",
+      "Modelo lógico completo contrastado con PCAP real de servicios abierto basado en el modelo recomendado de la Comisión Consultiva.",
+      "La fuente física actualmente acreditada en la biblioteca es PDF; la generación editable permanece bloqueada hasta verificar el ODT/DOCX general correspondiente.",
+      "Los campos del Anexo I deben proceder del expediente canónico y conservar validaciones y conflictos.",
     ],
   });
 
@@ -41,17 +42,30 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
   });
 
   registry.register({
+    id: "SUPPLY-PCAP-ASA-AUTOFINANCED-JDA-2025-12",
+    contractType: "SUPPLY",
+    documentType: DocumentType.PCAP,
+    coverage: "FULL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    sourceIds: ["jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt"],
+    definition: SupplyPcapFullModelDefinition,
+    generationAllowed: true,
+    notes: [
+      "Modelo oficial general ODT acreditado para suministro mediante abierto simplificado abreviado, presentación electrónica y autofinanciación.",
+      "La habilitación no se extiende a otras financiaciones ni procedimientos y no convierte Memoria/PPT de ferretería en modelos universales.",
+    ],
+  });
+
+  registry.register({
     id: "SUPPLY-PCAP-ANNEX-I-JDA-2025-12",
     contractType: "SUPPLY",
     documentType: DocumentType.PCAP,
     coverage: "ANNEX_I_ONLY",
-    sourceIds: ["JDA-PCAP-SUPPLY-OSA-SELF-2025-12", "CONTR-2026-240267_ANEXO_I"],
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    sourceIds: ["jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt", "CONTR-2026-240267_ANEXO_I"],
     definition: SupplyPcapAnnexDefinition,
     generationAllowed: false,
-    notes: [
-      "La fuente disponible acredita el Anexo I parametrizable, no el clausulado general completo.",
-      "No debe generarse un PCAP completo de suministros hasta registrar el modelo general oficial correspondiente.",
-    ],
+    notes: ["Perfil parcial conservado para flujos que trabajan exclusivamente sobre el Anexo I; no sustituye al perfil completo oficial."],
   });
 
   registry.register({
