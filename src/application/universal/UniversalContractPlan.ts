@@ -27,7 +27,7 @@ const COMPONENT_BY_CAPABILITY: Partial<Record<UniversalCapability, string>> = {
   REMEDIES: "UniversalRemediesEngine",
   DOCUMENT_MODEL_SELECTION: "CanonicalDocumentProfileSelector",
   EDITABLE_DOCUMENT_GENERATION: "UniversalDocumentGenerationGate",
-  CROSS_DOCUMENT_AUDIT: "ProtectedPackageCrossAudit",
+  CROSS_DOCUMENT_AUDIT: "UniversalCrossDocumentAudit",
 };
 
 function actionFor(item: CapabilityCoverage): UniversalModuleAction {
