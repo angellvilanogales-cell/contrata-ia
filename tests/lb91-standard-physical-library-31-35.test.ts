@@ -13,12 +13,12 @@ describe("LB91.31-35 - biblioteca física estándar", () => {
     expect(assets.assess(supply).ready).toBe(true);
   });
 
-  it("no presenta el PCAP de servicios como físicamente generable cuando solo hay PDF acreditado", () => {
+  it("mantiene aptitud lógica del PCAP de servicios pero bloquea generación física sin ODT/DOCX acreditado", () => {
     const profiles = createStandardContractDocumentProfiles();
     const assets = createStandardEditableTemplateAssetRegistry();
     const service = profiles.findAll("SERVICE", DocumentType.PCAP)[0];
     expect(service.coverage).toBe("FULL_MODEL");
-    expect(service.generationAllowed).toBe(false);
+    expect(service.generationAllowed).toBe(true);
     expect(assets.assess(service).ready).toBe(false);
   });
 
