@@ -4,17 +4,9 @@
  * ObjetoEngine
  * ============================================================
  *
- * Analiza el objeto del contrato conforme a los
- * artículos 99 a 102 de la LCSP.
- *
- * Este motor será el primero del sistema experto
- * que utilice:
- *
- * - Validator
- * - KnowledgeRepository
- * - InferenceEngine
- * - DecisionJuridica
- *
+ * Analiza y normaliza el objeto sin invadir los dominios económico,
+ * procedimental o documental. La necesidad se conecta con el artículo 28
+ * LCSP y la definición/división del objeto con el artículo 99 LCSP.
  * ============================================================
  */
 
@@ -28,83 +20,71 @@ export class ObjetoEngine extends BaseEngine {
 
     private readonly validator = new ObjetoValidator();
 
-    /**
-     * Analiza el objeto del contrato.
-     */
-    public async analizar(
-        objeto: ObjetoContrato
-    ): Promise<ObjetoResultado> {
+    public async analizar(objeto: ObjetoContrato): Promise<ObjetoResultado> {
 
         const resultado = new ObjetoResultado();
-
         const errores = this.validator.validar(objeto);
 
         resultado.errores.push(...errores);
-
         resultado.valido = errores.length === 0;
+        resultado.descripcionNormalizada = this.normalizar(objeto.descripcion);
+        resultado.tipoContrato = objeto.tipoContrato;
 
-        resultado.descripcionNormalizada =
-            this.normalizar(objeto.descripcion);
+        /*
+         * Art. 99.3 LCSP: debe analizarse si la naturaleza o el objeto permiten
+         * división en lotes. "Analizar" no equivale a imponer lotes y no depende
+         * del importe. La decisión concreta permanece en el dominio de lotes.
+         */
+        resultado.requiereAnalisisLotes = true;
 
-        resultado.tipoContrato =
-            objeto.tipoContrato;
+        if (objeto.valorEstimado > 0 || objeto.presupuestoBase > 0) {
+            resultado.advertencias.push(
+                "Los importes aportados no se utilizan para validar el objeto; deben comprobarse en el dominio económico correspondiente."
+            );
+        }
 
-        resultado.requiereAnalisisLotes =
-            objeto.valorEstimado > 0;
-
-        resultado.decision =
-            this.crearDecision(resultado);
+        resultado.decision = this.crearDecision(resultado);
 
         return resultado;
 
     }
 
-    /**
-     * Normaliza el texto recibido.
-     */
-    private normalizar(
-        texto: string
-    ): string {
-
-        return texto
-            .trim()
-            .replace(/\s+/g, " ");
-
+    private normalizar(texto: string): string {
+        return texto.trim().replace(/\s+/g, " ");
     }
 
-    /**
-     * Genera la decisión jurídica.
-     */
-    private crearDecision(
-        resultado: ObjetoResultado
-    ): DecisionJuridica<string> {
+    private crearDecision(resultado: ObjetoResultado): DecisionJuridica<string> {
 
-        const decision =
-            new DecisionJuridica<string>();
+        const decision = new DecisionJuridica<string>();
 
-        decision.resultado =
-            resultado.descripcionNormalizada;
-
-        decision.explicacion =
-            resultado.valido
-                ? "El objeto del contrato supera las validaciones iniciales."
-                : "El objeto presenta incidencias que deben corregirse antes de continuar.";
+        decision.explicacion = resultado.valido
+            ? "El objeto y la necesidad superan las validaciones iniciales; queda pendiente el análisis separado de lotes y del resto de dominios del expediente."
+            : "El objeto o la necesidad presentan incidencias que deben corregirse antes de promover esta propuesta.";
 
         decision.articulos.push(
-            "Artículo 99 LCSP",
-            "Artículo 100 LCSP",
-            "Artículo 101 LCSP",
-            "Artículo 102 LCSP"
+            "art. 28 LCSP",
+            "art. 99 LCSP"
         );
-
+        decision.normativa.push(
+            "Ley 9/2017, de 8 de noviembre, de Contratos del Sector Público"
+        );
         decision.reglasAplicadas.push(
-            "OBJ-001",
-            "OBJ-002",
-            "OBJ-003"
+            "OBJ-2026-NEED",
+            "OBJ-2026-SCOPE",
+            "OBJ-2026-LOTS-ANALYSIS"
         );
 
-        decision.confianza =
-            resultado.valido ? 100 : 50;
+        if (resultado.valido) {
+            decision.resultado = resultado.descripcionNormalizada;
+            decision.confianza = 100;
+        } else {
+            decision.confianza = 0;
+            decision.observaciones.push(...resultado.errores);
+        }
+
+        decision.observaciones.push(
+            "El motor no decide por sí solo la división en lotes ni valida VE, PBL, precio o duración."
+        );
 
         return decision;
 
