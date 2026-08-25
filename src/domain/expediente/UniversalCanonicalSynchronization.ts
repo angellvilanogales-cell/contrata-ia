@@ -1,5 +1,5 @@
 import { CanonicalExpedienteState } from "./CanonicalExpedienteState";
-import { EvidenceField } from "./EvidenceField";
+import { EvidenceField, isPromotableEvidenceField } from "./EvidenceField";
 import { UniversalExpedienteV13 } from "./UniversalExpedienteV13";
 
 export type UniversalSynchronizationStatus =
@@ -104,12 +104,34 @@ export function synchronizeCanonicalIntoUniversal(
   };
 }
 
+function procedureContext(expediente: UniversalExpedienteV13): CanonicalExpedienteState["procedureContext"] {
+  const result: NonNullable<CanonicalExpedienteState["procedureContext"]> = {};
+  const threshold = expediente.regulation.threshold;
+  if (isPromotableEvidenceField(threshold) && typeof threshold.value === "number" && Number.isFinite(threshold.value) && threshold.value > 0) {
+    result.umbralSara = threshold.value;
+  }
+
+  const criteria = expediente.criteria.awardCriteria;
+  if (isPromotableEvidenceField(criteria) && criteria.value) {
+    result.porcentajeJuicioValor = criteria.value
+      .filter(criterion => !criterion.evaluableMedianteFormula)
+      .reduce((sum, criterion) => sum + criterion.ponderacion, 0);
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
 /**
  * Vista de compatibilidad para motores anteriores al Bloque 13.
- * La autoridad de arquitectura sigue siendo UniversalExpedienteV13.
+ * La autoridad de arquitectura sigue siendo UniversalExpedienteV13. Solo se
+ * adjuntan como contexto auxiliar datos universales ya promocionables; nunca se
+ * degradan a hechos canónicos ni se inventan equivalencias.
  */
 export function canonicalCompatibilityView(
   expediente: UniversalExpedienteV13,
 ): CanonicalExpedienteState {
-  return expediente.canonical;
+  const context = procedureContext(expediente);
+  return context
+    ? { ...expediente.canonical, procedureContext: context }
+    : expediente.canonical;
 }
