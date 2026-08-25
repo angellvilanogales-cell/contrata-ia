@@ -3,7 +3,7 @@ services:
     name: contrata-ia-lb7-pilot
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
     branch: agent/lb7-qa-seguridad-v1
     autoDeployTrigger: checksPass
     healthCheckPath: /api/health
@@ -20,7 +20,7 @@ services:
         value: /data/contrata-ia/templates
       - key: CONTRATA_IA_ADMIN_TOKEN
         sync: false
-    disk:
-      name: contrata-ia-pilot-data
-      mountPath: /data/contrata-ia
-      sizeGB: 1
+      - key: CONTRATA_IA_PERSISTENCE_URL
+        value: https://lwfpxgqarwjrjxwijftt.supabase.co/functions/v1/contrata-ia-persistence
+      - key: CONTRATA_IA_PERSISTENCE_TOKEN
+        sync: false
