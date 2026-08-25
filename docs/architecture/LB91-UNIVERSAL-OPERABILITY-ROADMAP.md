@@ -18,10 +18,10 @@ Contrata-IA no declarará cobertura universal por la mera existencia de motores,
 - **SUPPLY**: existe caso dorado documental de suministro por necesidades/DA 33.ª y varios casos de regresión de suministros.
 - **SERVICE**: existen PCAP y memorias reales de servicios, incluido limpieza.
 - **MIXED**: existe caso real de limpieza calificado como mixto servicios+suministros, con prestación principal de servicios.
-- **WORKS**: la arquitectura reconoce el tipo contractual y existe cobertura normativa base LCSP, pero en la búsqueda de fuentes realizada al abrir LB91 no se acreditó todavía un caso real completo de obras apto para calibración documental.
-- **CONCESSION**: existe cobertura normativa base LCSP, pero no se acreditó todavía un caso real completo de concesión apto para calibración documental.
+- **WORKS**: se ha localizado un PCAP real de obras mediante procedimiento abierto. Se incorpora como fuente de calibración, sin convertirlo por sí solo en cobertura operativa completa ni en regla general.
+- **CONCESSION**: existe cobertura normativa base LCSP. La búsqueda específica realizada en las fuentes no ha recuperado todavía un expediente/pliego real de concesión suficientemente identificable para usarlo como regresión.
 
-La ausencia de caso real completo en esta búsqueda no significa que no exista en el repositorio de fuentes; significa que LB91 no lo considera acreditado hasta localizarlo y verificarlo expresamente.
+La ausencia de un caso real de concesión en esta búsqueda no significa que no exista en el repositorio de fuentes; significa que LB91 no lo considera acreditado hasta localizarlo y verificarlo expresamente. Del mismo modo, la existencia de un PCAP real de obras no habilita generación de obras hasta verificar el modelo editable, sus datos y los módulos específicos.
 
 ## Arquitectura de la matriz
 
@@ -39,7 +39,7 @@ La matriz es un **gate**, no un mecanismo de inferencia. Nunca completa automát
 2. Cierre del inventario de cobertura del repositorio y fuentes.
 3. Completar módulos transversales: recursos, criterios, garantías, ejecución, modificaciones y revisión de precios.
 4. Extender el modelo universal para hechos específicos de obras, concesiones y contratos mixtos.
-5. Incorporar casos reales de obras y concesiones y convertirlos en regresiones, no en reglas generales.
+5. Convertir el caso real de obras en regresión controlada y localizar/validar al menos un caso real de concesión, sin generalizar sus decisiones particulares.
 6. Registrar modelos documentales oficiales por tipo/procedimiento.
 7. Generalizar la generación editable y la auditoría cruzada.
 8. Ejecutar una matriz real multicaso antes de cualquier declaración de cobertura universal.
