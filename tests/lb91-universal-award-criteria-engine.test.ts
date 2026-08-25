@@ -53,6 +53,12 @@ describe("LB91.6 - criterios universales sin invención", () => {
     expect(result.blockers.some(item => item.includes("excepción"))).toBe(true);
   });
 
+  it("bloquea un único criterio no relacionado con costes", () => {
+    const result = engine.evaluate({ contractType: "WORKS", criteria: [criterion("quality", 100, "QUALITY", "JUDGMENT")] });
+    expect(result.valid).toBe(false);
+    expect(result.blockers.some(item => item.includes("artículo 146.1"))).toBe(true);
+  });
+
   it("no inventa criterios cuando el expediente no aporta ninguno", () => {
     const result = engine.evaluate({ contractType: "WORKS", criteria: [] });
     expect(result.valid).toBe(false);
