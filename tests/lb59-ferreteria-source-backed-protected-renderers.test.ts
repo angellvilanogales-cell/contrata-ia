@@ -26,6 +26,6 @@ describe("LB59 - renderers protegidos source-backed de Memoria y PPT", () => {
     expect(FERRETERIA_MEMORY_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("memory.estimated-value-table");
     expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.catalogue-scope");
     expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.catalogue-98-source-backed");
-    expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.footer-page-count-cache");
+    expect(FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id)).toContain("ppt.footer-page-count-dynamic");
   });
 });
