@@ -6,6 +6,7 @@ export interface UniversalRemediesInput {
   contractingEntityIsContractingAuthority: boolean;
   mixedPrincipalContractType?: Exclude<UniversalTargetContractType, "MIXED">;
   frameworkAgreementOrDynamicPurchasingSystem?: boolean;
+  frameworkOrDpsObjectFallsWithinArticle44_1a?: boolean;
 }
 
 export interface UniversalRemediesDecision {
@@ -43,11 +44,20 @@ export class UniversalRemediesEngine {
     }
 
     if (input.frameworkAgreementOrDynamicPurchasingSystem) {
+      if (input.frameworkOrDpsObjectFallsWithinArticle44_1a === undefined) {
+        return {
+          specialProcurementAppealContractScope: "PENDING",
+          legalBasis: ["art. 44.1.b LCSP"],
+          blockers: ["Acuerdo marco/SDA sin acreditar que su objeto comprende contratos de los tipificados en el artículo 44.1.a."],
+          notes: [],
+          humanValidationRequired: true,
+        };
+      }
       return {
-        specialProcurementAppealContractScope: true,
+        specialProcurementAppealContractScope: input.frameworkOrDpsObjectFallsWithinArticle44_1a,
         legalBasis: ["art. 44.1.b LCSP"],
         blockers: [],
-        notes: ["La conclusión presupone que el acuerdo marco/SDA tiene por objeto contratos incluidos en el art. 44.1.a; esa premisa debe conservarse como evidencia."],
+        notes: ["La conclusión se limita al ámbito contractual del acuerdo marco/SDA y conserva como hecho la clasificación de su objeto."],
         humanValidationRequired: true,
       };
     }
