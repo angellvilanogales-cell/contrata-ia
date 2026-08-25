@@ -25,11 +25,6 @@ function rekey<T>(field: EvidenceField<T>, key: string): EvidenceField<T> {
   return { ...field, key };
 }
 
-/**
- * Sincroniza únicamente equivalencias semánticas exactas entre la vista
- * canónica heredada y los dominios universales. Nunca completa por analogía
- * ni resuelve divergencias eligiendo silenciosamente una de las dos fuentes.
- */
 export function synchronizeCanonicalIntoUniversal(
   expediente: UniversalExpedienteV13,
 ): UniversalSynchronizationResult {
@@ -71,44 +66,30 @@ export function synchronizeCanonicalIntoUniversal(
   }
 
   const nonIsomorphic: Array<[string, string, string]> = [
-    [
-      canonical.fields.baseTenderBudgetCents.key,
-      "economic.maximumApprovedBudgetCents",
-      "PBL y presupuesto máximo aprobado no son conceptos intercambiables, especialmente en suministros por necesidades.",
-    ],
-    [
-      canonical.fields.awardCriteria.key,
-      "criteria.awardCriteria",
-      "La lista antigua no contiene obligatoriamente ponderación, fórmula ni clasificación formula/juicio de valor.",
-    ],
-    [
-      canonical.fields.solvency.key,
-      "criteria.economicSolvency/technicalSolvency",
-      "La lista antigua no separa solvencia económica y técnica ni conserva todos sus parámetros.",
-    ],
-    [
-      canonical.fields.lots.key,
-      "lots.lots",
-      "Los nombres antiguos de lote no contienen necesariamente CPV, PBL y VE individualizados.",
-    ],
+    [canonical.fields.baseTenderBudgetCents.key,"economic.maximumApprovedBudgetCents","PBL y presupuesto máximo aprobado no son conceptos intercambiables, especialmente en suministros por necesidades."],
+    [canonical.fields.awardCriteria.key,"criteria.awardCriteria","La lista antigua no contiene obligatoriamente ponderación, fórmula ni clasificación formula/juicio de valor."],
+    [canonical.fields.solvency.key,"criteria.economicSolvency/technicalSolvency","La lista antigua no separa solvencia económica y técnica ni conserva todos sus parámetros."],
+    [canonical.fields.lots.key,"lots.lots","Los nombres antiguos de lote no contienen necesariamente CPV, PBL y VE individualizados."],
   ];
 
   for (const [sourceKey, targetKey, reason] of nonIsomorphic) {
     records.push({ sourceKey, targetKey, status: "BLOCKED_NON_ISOMORPHIC", reason });
   }
 
-  return {
-    expediente: { ...expediente, economic },
-    records,
-    blockers,
-  };
+  return { expediente: { ...expediente, economic }, records, blockers };
 }
 
 function procedureContext(expediente: UniversalExpedienteV13): CanonicalExpedienteState["procedureContext"] {
   const result: NonNullable<CanonicalExpedienteState["procedureContext"]> = {};
+
   const threshold = expediente.regulation.threshold;
   if (isPromotableEvidenceField(threshold) && typeof threshold.value === "number" && Number.isFinite(threshold.value) && threshold.value > 0) {
     result.umbralSara = threshold.value;
+  }
+
+  const harmonized = expediente.regulation.harmonizedRegulation;
+  if (isPromotableEvidenceField(harmonized) && typeof harmonized.value === "boolean") {
+    result.regulacionArmonizada = harmonized.value;
   }
 
   const criteria = expediente.criteria.awardCriteria;
@@ -123,15 +104,13 @@ function procedureContext(expediente: UniversalExpedienteV13): CanonicalExpedien
 
 /**
  * Vista de compatibilidad para motores anteriores al Bloque 13.
- * La autoridad de arquitectura sigue siendo UniversalExpedienteV13. Solo se
- * adjuntan como contexto auxiliar datos universales ya promocionables; nunca se
- * degradan a hechos canónicos ni se inventan equivalencias.
+ * La autoridad sigue siendo UniversalExpedienteV13. Solo se transportan
+ * auxiliares universales promocionables y nunca se degradan a hechos por
+ * analogía o por defecto.
  */
 export function canonicalCompatibilityView(
   expediente: UniversalExpedienteV13,
 ): CanonicalExpedienteState {
   const context = procedureContext(expediente);
-  return context
-    ? { ...expediente.canonical, procedureContext: context }
-    : expediente.canonical;
+  return context ? { ...expediente.canonical, procedureContext: context } : expediente.canonical;
 }
