@@ -16,7 +16,7 @@ export interface RepositoryCapabilityInventoryItem {
 }
 
 /**
- * Inventario LB91.3: describe qué hay ya en el repositorio antes de crear nuevos motores.
+ * Inventario LB91.3+: describe qué hay ya en el repositorio antes de crear nuevos motores.
  * No confunde un catálogo de reglas o un motor especializado con un motor universal validado.
  */
 export const REPOSITORY_CAPABILITY_INVENTORY: readonly RepositoryCapabilityInventoryItem[] = [
@@ -36,9 +36,10 @@ export const REPOSITORY_CAPABILITY_INVENTORY: readonly RepositoryCapabilityInven
   },
   {
     capability: "LOTS",
-    disposition: "SPECIALIZED_REFERENCE",
-    existingAssets: ["src/application/normative/LB4CleaningServiceEngine.ts", "src/domain/expediente/UniversalExpedienteV13.ts"],
-    constraints: ["Existe lógica especializada y modelo de datos, pero no un motor universal de lotes."],
+    disposition: "REUSE_WITH_BOUNDARY",
+    existingAssets: ["src/engines/UniversalLotsEngine.ts", "src/application/normative/LB4CleaningServiceEngine.ts", "src/domain/expediente/UniversalExpedienteV13.ts"],
+    universalComponent: "UniversalLotsEngine",
+    constraints: ["No fabrica motivación de no división y distingue el subtipo de concesión antes de aplicar reglas."],
   },
   {
     capability: "ECONOMICS",
@@ -70,15 +71,17 @@ export const REPOSITORY_CAPABILITY_INVENTORY: readonly RepositoryCapabilityInven
   },
   {
     capability: "AWARD_CRITERIA",
-    disposition: "KNOWLEDGE_ONLY",
-    existingAssets: ["knowledge/rules/criterios.rules.yaml", "src/application/normative/LB4CleaningServiceEngine.ts"],
-    constraints: ["El catálogo es amplio y existe lógica especializada de limpieza, pero falta una frontera universal tipada y validada."],
+    disposition: "REUSE_WITH_BOUNDARY",
+    existingAssets: ["src/engines/UniversalAwardCriteriaEngine.ts", "knowledge/rules/criterios.rules.yaml", "src/application/normative/LB4CleaningServiceEngine.ts"],
+    universalComponent: "UniversalAwardCriteriaEngine",
+    constraints: ["Valida criterios aportados por el expediente; no inventa criterios, ponderaciones ni fórmulas."],
   },
   {
     capability: "GUARANTEES",
-    disposition: "SPECIALIZED_REFERENCE",
-    existingAssets: ["src/application/normative/LB4CleaningServiceEngine.ts"],
-    constraints: ["La lógica existente está calibrada para el perfil de limpieza; no generalizar a todas las familias/procedimientos."],
+    disposition: "REUSE_WITH_BOUNDARY",
+    existingAssets: ["src/engines/UniversalGuaranteeEngine.ts", "src/application/normative/LB4CleaningServiceEngine.ts"],
+    universalComponent: "UniversalGuaranteeEngine",
+    constraints: ["Distingue Administración Pública, concesiones, ASA, acuerdos marco/SDA y excepciones; validación humana obligatoria."],
   },
   {
     capability: "EXECUTION",
@@ -89,20 +92,23 @@ export const REPOSITORY_CAPABILITY_INVENTORY: readonly RepositoryCapabilityInven
   {
     capability: "MODIFICATIONS",
     disposition: "REUSE_WITH_BOUNDARY",
-    existingAssets: ["src/engines/UniversalEconomicEngine.ts", "src/domain/expediente/UniversalExpedienteV13.ts", "protected supply DA33 pipeline"],
-    constraints: ["La modificación prevista debe estar definida de forma clara, precisa e inequívoca; no extrapolar DA33 a otros contratos."],
+    existingAssets: ["src/engines/UniversalModificationEngine.ts", "src/engines/UniversalEconomicEngine.ts", "src/domain/expediente/UniversalExpedienteV13.ts", "protected supply DA33 pipeline"],
+    universalComponent: "UniversalModificationEngine",
+    constraints: ["El art. 205 nunca se autocierra; la DA33 mantiene sus guardas y no se extrapola a otras familias."],
   },
   {
     capability: "PRICE_REVISION",
-    disposition: "MISSING_UNIVERSAL_COMPONENT",
-    existingAssets: ["src/domain/expediente/UniversalExpedienteV13.ts"],
-    constraints: ["Existe representación de datos, no decisión universal implementada."],
+    disposition: "REUSE_WITH_BOUNDARY",
+    existingAssets: ["src/engines/UniversalPriceRevisionEngine.ts", "src/domain/expediente/UniversalExpedienteV13.ts"],
+    universalComponent: "UniversalPriceRevisionEngine",
+    constraints: ["Evalúa procedencia abstracta y guardas; no fabrica fórmula ni índice oficial."],
   },
   {
     capability: "REMEDIES",
-    disposition: "MISSING_UNIVERSAL_COMPONENT",
-    existingAssets: [],
-    constraints: ["Falta una capa tipada que determine régimen de recursos sin inferir hechos ausentes."],
+    disposition: "REUSE_WITH_BOUNDARY",
+    existingAssets: ["src/engines/UniversalRemediesEngine.ts"],
+    universalComponent: "UniversalRemediesEngine",
+    constraints: ["Cubre ámbito contractual del recurso especial; acto recurrible, legitimación, plazo y órgano quedan fuera hasta su módulo específico."],
   },
   {
     capability: "DOCUMENT_MODEL_SELECTION",
