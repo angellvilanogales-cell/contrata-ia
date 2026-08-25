@@ -55,14 +55,17 @@ function replaceNamedTable(content: string, name: string, replacement: string): 
 }
 
 function visible(xml: string): string {
-  return xml.replace(/<text:tab[^>]*\/>/g, "\t").replace(/<text:s(?:\s+text:c="(\d+)")?\s*\/>/g, (_m, count: string | undefined) => " ".repeat(Number(count ?? 1))).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'");
+  return xml
+    .replace(/<text:tab[^>]*\/>/g, "\t")
+    .replace(/<text:s(?:\s+text:c="(\d+)")?\s*\/>/g, (_m, count: string | undefined) => " ".repeat(Number(count ?? 1)))
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'");
 }
 
 function paragraphStartsWithExactVisible(content: string, expected: string): number[] {
   const starts: number[] = [];
   for (const match of content.matchAll(PARAGRAPH_PATTERN)) {
-    if (match.index === undefined) continue;
-    if (visible(match[0]).trim() === expected) starts.push(match.index);
+    if (match.index !== undefined && visible(match[0]).trim() === expected) starts.push(match.index);
   }
   return starts;
 }
@@ -98,13 +101,8 @@ function decision(id: string): string {
 
 interface SecondPassRule { id: string; pattern: RegExp; value: string; }
 
-function yesNoFromDecision(id: string): string {
-  return /^Sí/i.test(decision(id)) ? "Sí" : "No";
-}
-
-function detailAfterYes(id: string): string {
-  return decision(id).replace(/^Sí\s*:\s*/i, "").replace(/^Sí\s*;\s*/i, "");
-}
+function yesNoFromDecision(id: string): string { return /^Sí/i.test(decision(id)) ? "Sí" : "No"; }
+function detailAfterYes(id: string): string { return decision(id).replace(/^Sí\s*:\s*/i, "").replace(/^Sí\s*;\s*/i, ""); }
 
 const SECOND_PASS_RULES: readonly SecondPassRule[] = [
   { id: "object-specification", pattern: /^Especificaciones del objeto del contrato\s*:\s*$/i, value: decision("object-specification") },
@@ -223,18 +221,17 @@ function materializeParagraphValue(xml: string, currentVisible: string, value: s
     if (replaced !== xml) return replaced;
     const opening = xml.match(/^<text:p\b(?![^>]*\/>)[^>]*>/)?.[0];
     if (!opening) throw new Error("LB77: párrafo ODF real sin apertura.");
-    const finalVisible = currentVisible.replace(/Sí\s*\/\s*No/i, value);
-    return `${opening}${xmlEscape(finalVisible)}</text:p>`;
+    return `${opening}${xmlEscape(currentVisible.replace(/Sí\s*\/\s*No/i, value))}</text:p>`;
   }
   const placeholder = xml.match(/_{3,}/)?.[0];
   if (placeholder) return xml.replace(placeholder, escaped);
   const closing = xml.lastIndexOf("</text:p>");
-  if (closing < 0) throw new Error("LB73: párrafo ODF sin cierre.");
+  if (closing < 0) throw new Error("LB83: párrafo ODF sin cierre.");
   if (currentVisible.includes(":")) return `${xml.slice(0, closing)} ${escaped}${xml.slice(closing)}`;
-  throw new Error(`LB73: no se sabe materializar «${currentVisible}».`);
+  throw new Error(`LB83: no se sabe materializar «${currentVisible}».`);
 }
 
-function applyOrderedRules(content: string, rules: readonly SecondPassRule[], label: string): { content: string; changed: number } {
+function applyStrictOrderedRules(content: string, rules: readonly SecondPassRule[]): { content: string; changed: number } {
   let cursor = lastActualAnnexStart(content, "I");
   let changed = 0;
   for (const rule of rules) {
@@ -245,11 +242,10 @@ function applyOrderedRules(content: string, rules: readonly SecondPassRule[], la
       const value = visible(match[0]).trim();
       if (rule.pattern.test(value) && isUnresolvedVisible(value)) { found = match; break; }
     }
-    if (!found || found.index === undefined) throw new Error(`${label}: no se localiza de forma ordenada el campo residual ${rule.id}.`);
+    if (!found || found.index === undefined) throw new Error(`LB73: no se localiza de forma ordenada el campo residual ${rule.id}.`);
     const absoluteStart = cursor + found.index;
     const oldXml = found[0];
-    const oldVisible = visible(oldXml).trim();
-    const newXml = materializeParagraphValue(oldXml, oldVisible, rule.value);
+    const newXml = materializeParagraphValue(oldXml, visible(oldXml).trim(), rule.value);
     content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + oldXml.length);
     cursor = absoluteStart + newXml.length;
     changed += 1;
@@ -257,20 +253,35 @@ function applyOrderedRules(content: string, rules: readonly SecondPassRule[], la
   return { content, changed };
 }
 
-function applySecondPassMaterialization(content: string): { content: string; changed: number } {
-  return applyOrderedRules(content, SECOND_PASS_RULES, "LB73");
+function applyResidualRules(content: string, rules: readonly SecondPassRule[]): { content: string; changed: number } {
+  let changed = 0;
+  for (const rule of rules) {
+    const annexIStart = lastActualAnnexStart(content, "I");
+    const annexIIStart = lastActualAnnexStart(content, "II");
+    const section = content.slice(annexIStart, annexIIStart);
+    let found: RegExpMatchArray | undefined;
+    for (const match of section.matchAll(PARAGRAPH_PATTERN)) {
+      const value = visible(match[0]).trim();
+      if (rule.pattern.test(value) && isUnresolvedVisible(value)) { found = match; break; }
+    }
+    if (!found || found.index === undefined) continue;
+    const absoluteStart = annexIStart + found.index;
+    const oldXml = found[0];
+    const newXml = materializeParagraphValue(oldXml, visible(oldXml).trim(), rule.value);
+    content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + oldXml.length);
+    changed += 1;
+  }
+  return { content, changed };
 }
 
 function applyFinalAuthorityClosure(content: string, caseId: string, title: string): { content: string; changed: number } {
   const runtimeRules = FINAL_AUTHORITY_RULES.map(rule => rule.id === "anexo-i-title" ? { ...rule, value: title } : rule.id === "anexo-i-file" ? { ...rule, value: caseId } : rule);
-  let next = applyOrderedRules(content, runtimeRules, "LB82");
+  let next = applyResidualRules(content, runtimeRules);
   const annexIStart = lastActualAnnexStart(next.content, "I");
   const annexIIStart = lastActualAnnexStart(next.content, "II");
   const before = next.content.slice(annexIStart, annexIIStart);
   const fixed = before.replace("Tramitación del gasto: Ordinaria/Anticipada.", "Tramitación del gasto: Ordinaria.");
-  if (fixed !== before) {
-    next = { content: next.content.slice(0, annexIStart) + fixed + next.content.slice(annexIIStart), changed: next.changed + 1 };
-  }
+  if (fixed !== before) next = { content: next.content.slice(0, annexIStart) + fixed + next.content.slice(annexIIStart), changed: next.changed + 1 };
   return next;
 }
 
@@ -294,7 +305,7 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
   let content = text(entries, "content.xml");
   content = replaceNamedTable(content, "Tabla4", buildAnexoITable());
   content = replaceNamedTable(content, "Tabla11", buildAnexoVTable());
-  const secondPass = applySecondPassMaterialization(content);
+  const secondPass = applyStrictOrderedRules(content, SECOND_PASS_RULES);
   const finalClosure = applyFinalAuthorityClosure(secondPass.content, caseId, title);
   content = finalClosure.content;
 
@@ -326,6 +337,7 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
   if (/EXPEDIENTE:\s*_+/.test(visible(annexes))) blockers.push("PCAP: quedan expedientes sin propagar en anexos II-XIII.");
   if (/TÍTULO:\s*_+/.test(visible(annexes))) blockers.push("PCAP: quedan títulos sin propagar en anexos II-XIII.");
   if (computeOdtStyleFingerprint(entries) !== sourceStyle) blockers.push("PCAP: el cierre final alteró la huella de estilos del original renderizado.");
+
   const anexoIStart = lastActualAnnexStart(content, "I");
   const anexoIIStart = lastActualAnnexStart(content, "II");
   const preDataTreatment = visible(content.slice(anexoIStart, anexoIIStart)).split(/15\.\s+TRATAMIENTO DE DATOS/i)[0] ?? "";
