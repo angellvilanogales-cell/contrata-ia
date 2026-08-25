@@ -79,12 +79,16 @@ export class UniversalAwardCriteriaEngine {
     const formulaWeightPercent = input.criteria.filter(item => item.evaluation === "FORMULA").reduce((sum, item) => sum + item.weightPercent, 0);
     const judgmentWeightPercent = input.criteria.filter(item => item.evaluation === "JUDGMENT").reduce((sum, item) => sum + item.weightPercent, 0);
 
+    if (input.criteria.length === 1 && input.criteria[0]?.kind !== "COST") {
+      blockers.push("Cuando se utiliza un único criterio de adjudicación debe estar relacionado con los costes, conforme al artículo 146.1 LCSP.");
+    }
+
     if (input.criteria.length > 1 && costWeightPercent <= 0) {
       blockers.push("La pluralidad de criterios cualitativos debe acompañarse de un criterio relacionado con los costes.");
     }
 
-    const priceOnly = input.criteria.length === 1 && input.criteria[0]?.kind === "COST";
-    if (priceOnly) {
+    const singleCostCriterion = input.criteria.length === 1 && input.criteria[0]?.kind === "COST";
+    if (singleCostCriterion) {
       if (input.contractType === "CONCESSION") blockers.push("Las concesiones requieren más de un criterio de adjudicación.");
       if (input.intellectualService || input.annexIVService || input.labourIntensiveService || input.privateSecurityService) {
         blockers.push("Para esta clase de servicio el precio no puede ser el único factor determinante de la adjudicación.");
