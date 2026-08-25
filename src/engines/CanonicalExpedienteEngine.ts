@@ -26,6 +26,10 @@ function toLegacyContext(state: CanonicalExpedienteState): ExpedienteContext {
   context.prorrogas = state.fields.extensionMonths.value ?? 0;
   context.divisionLotes = (state.fields.lots.value?.length ?? 0) > 1;
   context.criterios = state.fields.awardCriteria.value ? [...state.fields.awardCriteria.value] : [];
+  context.umbralSara = state.procedureContext?.umbralSara;
+  context.porcentajeJuicioValor = state.procedureContext?.porcentajeJuicioValor;
+  context.prestacionesIntelectuales = state.procedureContext?.prestacionesIntelectuales;
+  context.contratoMenorJustificado = state.procedureContext?.contratoMenorJustificado;
   if (state.fields.procedure.value && isPromotableEvidenceField(state.fields.procedure)) {
     context.procedimiento = state.fields.procedure.value as TipoProcedimiento;
   }
