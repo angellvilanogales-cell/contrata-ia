@@ -4,8 +4,8 @@ import {
   UniversalCapability,
   UniversalCoverageStatus,
   UniversalTargetContractType,
-  getContractFamilyCoverage,
 } from "../../domain/capabilities/UniversalContractCoverage";
+import { getReconciledContractFamilyCoverage } from "../../domain/capabilities/UniversalCoverageReconciliation";
 
 export type UniversalModuleAction = "RUN_EXISTING_COMPONENT" | "COLLECT_AND_VALIDATE_EVIDENCE" | "BLOCK_UNTIL_IMPLEMENTED";
 export interface UniversalModuleStep { capability: UniversalCapability; component?: string; action: UniversalModuleAction; coverage: UniversalCoverageStatus; humanValidationRequired: boolean; notes: readonly string[]; }
@@ -42,12 +42,12 @@ function stepFor(item: CapabilityCoverage): UniversalModuleStep {
 }
 
 /**
- * Construye el plan de módulos reutilizables. Que un componente exista no
- * significa que pueda generar: el status por familia conserva los huecos de
- * evidencia, modelo físico, procedimiento o régimen especial.
+ * Construye el plan sobre la cobertura efectiva reconciliada. Que un componente
+ * exista no significa que pueda generar: los huecos de evidencia, modelo físico,
+ * procedimiento o régimen especial siguen bloqueando la familia correspondiente.
  */
 export function buildUniversalContractPlan(contractType: UniversalTargetContractType): UniversalContractPlan {
-  const family = getContractFamilyCoverage(contractType);
+  const family = getReconciledContractFamilyCoverage(contractType);
   const steps = family.capabilities.map(stepFor);
   const blockers = steps.filter(step => step.action === "BLOCK_UNTIL_IMPLEMENTED")
     .map(step => `Cobertura pendiente ${contractType}/${step.capability}: ${step.notes[0] ?? "módulo no implementado"}`);
