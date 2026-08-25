@@ -22,11 +22,12 @@ export interface CanonicalExpedienteFields {
 /**
  * Vista auxiliar para motores heredados. No forma parte de la autoridad
  * canónica ni se promociona por sí sola: solo transporta datos universales ya
- * validados que son necesarios para aplicar reglas de procedimiento sin
- * completar silenciosamente condiciones jurídicas.
+ * acreditados necesarios para aplicar reglas sin completar silenciosamente
+ * condiciones jurídicas.
  */
 export interface CanonicalProcedureContext {
   umbralSara?: number;
+  regulacionArmonizada?: boolean;
   porcentajeJuicioValor?: number;
   prestacionesIntelectuales?: boolean;
   contratoMenorJustificado?: boolean;
