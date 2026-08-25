@@ -1,0 +1,51 @@
+{
+  "version": "REG-SERVICE-005-CARL-GUARD-11.8.1-v1",
+  "caseId": "REG-SERVICE-005",
+  "expediente": "ADM-2024-0004 (CONTR/2024/636510)",
+  "status": "AUTOMATIC_REGRESSION_READY",
+  "humanValidationPrerequisite": "11.8 SOURCE_EXTRACTION_HUMAN_VALIDATED",
+  "protectedScope": [
+    "tipo de contrato: servicios",
+    "objeto principal: limpieza de la sede del CARL",
+    "procedimiento abierto simplificado ordinario",
+    "CPV principal 90919200-4",
+    "CPV accesorios 39830000-9 y 42995000-7",
+    "insuficiencia de medios propios",
+    "existencia de subrogación de personal",
+    "materiales, maquinaria y uniformes como elementos instrumentales de la prestación de limpieza"
+  ],
+  "checks": [
+    "CARL-SERVICE-TYPE",
+    "CARL-CLEANING-SERVICE",
+    "CARL-PROCEDURE",
+    "CARL-MAIN-CPV",
+    "CARL-OWN-MEANS",
+    "CARL-SUBROGATION",
+    "CARL-ACCESSORY-INPUTS"
+  ],
+  "blockers": 0,
+  "forbiddenSupplyInheritance": [
+    "RECLASSIFY_AS_SUPPLY_DUE_TO_ACCESSORY_MATERIALS",
+    "FORCE_SUPPLY_DELIVERY_LOGIC",
+    "FERRETERIA_CATALOGUE_98_REFERENCES",
+    "FORCE_SUPPLY_UNIT_PRICE_MODEL",
+    "FORCE_DA33_WITHOUT_SERVICE_SOURCE_EVIDENCE",
+    "DROP_PERSONNEL_SUBROGATION",
+    "DROP_INSUFFICIENCY_OF_OWN_MEANS"
+  ],
+  "deliberatelyNotFrozenYet": [
+    "división o no en lotes y su justificación",
+    "aplicación o no de DA 33.ª",
+    "sistema económico exacto y forma de determinación del precio",
+    "PBL, IVA y valor estimado exactos",
+    "duración exacta y detalle de prórrogas",
+    "porcentaje y causa concreta de modificación prevista",
+    "número, ponderación y fórmula exacta de los criterios de adjudicación",
+    "solvencia, clasificación y habilitación",
+    "garantías",
+    "condiciones especiales de ejecución y penalidades",
+    "detalle nominal/económico de la información de subrogación"
+  ],
+  "goldenCase": false,
+  "requiresHumanRegistration": true
+}

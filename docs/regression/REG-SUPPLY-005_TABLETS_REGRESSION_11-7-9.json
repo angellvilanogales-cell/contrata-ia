@@ -1,0 +1,34 @@
+{
+  "version": "REG-SUPPLY-005-TABLETS-GUARD-11.7.9-v1",
+  "caseId": "REG-SUPPLY-005",
+  "expediente": "CONTR 2024 0001239412",
+  "status": "AUTOMATIC_REGRESSION_READY_PENDING_RUNTIME_REGISTRATION",
+  "checks": 10,
+  "expectedBlockers": 0,
+  "protectedScope": [
+    "tipo de contrato: suministro",
+    "existencia de componente de plataforma de gestión dentro del objeto",
+    "procedimiento abierto",
+    "lote único",
+    "DA 33.ª activa",
+    "precios unitarios",
+    "pluralidad de criterios evaluables mediante fórmulas",
+    "existencia de prórroga",
+    "existencia de modificación prevista"
+  ],
+  "classificationGuard": "La existencia de una plataforma no autoriza a recalificar automáticamente el contrato como servicio o contrato mixto sin extracción y validación jurídica específica.",
+  "deliberatelyNotFrozenYet": [
+    "calificación jurídica detallada del componente de plataforma y su peso económico",
+    "eventual régimen de prestaciones accesorias",
+    "importes económicos detallados",
+    "CPV principal y CPV complementarios",
+    "duración exacta y detalle de prórrogas",
+    "porcentaje y causa concreta de modificación",
+    "número, denominación, ponderación y fórmula exacta de cada criterio",
+    "presupuesto máximo DA 33.ª y método concreto de cálculo del valor estimado",
+    "garantías y condiciones especiales de ejecución",
+    "protección de datos, seguridad y niveles de servicio de la plataforma"
+  ],
+  "humanPrerequisite": "11.7.8 SOURCE_EXTRACTION_HUMAN_VALIDATED",
+  "nextCaseAfterRegistration": "REG-SUPPLY-006"
+}

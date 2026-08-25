@@ -7,6 +7,7 @@ export type CanonicalComponentId =
   | "legalReasoning"
   | "cpv"
   | "procedure"
+  | "expediente"
   | "documents"
   | "export"
   | "ai";

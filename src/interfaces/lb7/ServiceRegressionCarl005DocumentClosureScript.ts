@@ -1,0 +1,28 @@
+import { CARL_DOCUMENT_CLOSURE_11_8_5 } from "../../regression/ServiceRegressionCase005CarlDocumentClosure";
+import { SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_SCRIPT } from "./ServiceRegressionMaintenance007ExtractionScript";
+
+const CASE_JSON = JSON.stringify(CARL_DOCUMENT_CLOSURE_11_8_5);
+
+const CARL_DOCUMENT_CLOSURE_CORE_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");if(!work)return;
+var key="contrataIaAdaptiveAnswers";
+var VERSION="REG-SERVICE-005-CARL-DOCUMENT-CLOSURE-11.8.5-v1";
+var CASE=${CASE_JSON};
+function readJson(s,k){try{return JSON.parse(s.getItem(k)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,key);if(Object.keys(a).length)return a;return readJson(localStorage,key);}
+function save(a){var raw=JSON.stringify(a);sessionStorage.setItem(key,raw);localStorage.setItem(key,raw);document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:"carl-document-closure-11.8.5"}}));}
+function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function manifest(validated){return {version:VERSION,id:CASE.id,step:CASE.step,expediente:CASE.expediente,status:validated?"DOCUMENTARY_CLOSURE_HUMAN_VALIDATED_WITH_OPEN_ITEMS":CASE.status,counts:CASE.counts,items:CASE.items,closureRule:CASE.closureRule,promotionRule:CASE.promotionRule,humanValidated:validated===true,validatedAt:validated?new Date().toISOString():null};}
+function downloadJson(data){var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Contrata-IA_REG-SERVICE-005_CARL_Closure_11-8-5.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
+function statusLabel(s){if(s==="CONFIRMED")return "CONFIRMADO";if(s==="CONFIRMED_PARTIAL")return "CONFIRMADO PARCIAL";if(s==="PENDING_SOURCE_EVIDENCE")return "PENDIENTE FUENTE";return "NO APLICABLE";}
+function rows(){return CASE.items.map(function(x){return '<tr><td>'+esc(x.label)+'</td><td>'+esc(x.value)+'</td><td>'+esc(statusLabel(x.status))+'</td><td>'+esc(x.evidence)+'</td></tr>';}).join("");}
+function card(){var a=readAnswers();if(a.serviceRegressionCarl005AnnexIReviewValidated!==true)return "";var validated=a.serviceRegressionCarl005DocumentClosureValidated===true;var c=CASE.counts;var html='<div id="serviceRegressionCarl005DocumentClosureCard" class="card" style="margin-top:14px"><h3>11.8.5 Cierre documental · CARL</h3><div class="info"><strong>Matriz de cierre con trazabilidad.</strong> El expediente se clasifica por extremo como confirmado, confirmado parcial, pendiente de fuente o no aplicable. Un campo pendiente no se convierte en cerrado por el mero hecho de registrar este paso.</div><div class="grid"><div><strong>Confirmados</strong></div><div>'+c.CONFIRMED+'</div><div><strong>Confirmados parciales</strong></div><div>'+c.CONFIRMED_PARTIAL+'</div><div><strong>Pendientes de fuente</strong></div><div>'+c.PENDING_SOURCE_EVIDENCE+'</div><div><strong>No aplicables</strong></div><div>'+c.NOT_APPLICABLE+'</div></div><table style="width:100%;border-collapse:collapse;margin-top:12px"><thead><tr><th>Extremo</th><th>Valor</th><th>Estado</th><th>Evidencia</th></tr></thead><tbody>'+rows()+'</tbody></table><div class="warning"><strong>Regla de cierre.</strong> '+esc(CASE.closureRule)+'</div><div class="warning"><strong>Promoción futura.</strong> '+esc(CASE.promotionRule)+'</div>';
+if(!validated){html+='<p><strong>Estado:</strong> cierre documental con campos abiertos pendiente de validación humana.</p><button id="validateCarl005DocumentClosure" type="button">Validar cierre documental 11.8.5</button>';}else{html+='<div class="info"><strong>11.8.5 validado.</strong> CARL queda cerrado documentalmente en el alcance acreditado, manteniendo visibles los pendientes. No se convierte en golden case ni en expediente documental completo.</div><button id="downloadCarl005DocumentClosure" type="button" class="secondary">Descargar matriz 11.8.5 JSON</button>';}
+html+='</div>';return html;}
+function ensure(){var old=document.getElementById("serviceRegressionCarl005DocumentClosureCard");if(old)old.remove();var anchor=document.getElementById("serviceRegressionCarl005AnnexIClosureCard");if(anchor){var html=card();if(html)anchor.insertAdjacentHTML("afterend",html);}}
+document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateCarl005DocumentClosure"){var a=readAnswers();if(a.serviceRegressionCarl005AnnexIReviewValidated!==true){alert("Primero debe validarse la revisión de evidencia 11.8.4.");return;}var m=manifest(true);a.serviceRegressionCarl005DocumentClosureValidated=true;a.serviceRegressionCarl005DocumentClosureVersion=VERSION;a.serviceRegressionCarl005DocumentClosureManifest=m;a.serviceRegressionCarl005DocumentClosureStatus="DOCUMENTARY_CLOSURE_HUMAN_VALIDATED_WITH_OPEN_ITEMS";a.serviceRegressionNextRecommendedStep="11.9";save(a);downloadJson(m);ensure();alert("Cierre documental CARL 11.8.5 validado. Los pendientes de fuente permanecen abiertos.");return;}if(e.target.id==="downloadCarl005DocumentClosure"){var a2=readAnswers();downloadJson(a2.serviceRegressionCarl005DocumentClosureManifest||manifest(true));return;}},true);
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
+})();`;
+
+export const SERVICE_REGRESSION_CARL_005_DOCUMENT_CLOSURE_SCRIPT = CARL_DOCUMENT_CLOSURE_CORE_SCRIPT + "\n" + SERVICE_REGRESSION_MAINTENANCE_007_EXTRACTION_SCRIPT;

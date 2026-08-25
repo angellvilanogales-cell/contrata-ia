@@ -1,0 +1,29 @@
+import { MAINTENANCE_007_DOCUMENT_CLOSURE_11_9_5 } from "../../regression/ServiceRegressionCase007MaintenanceSevilleDocumentClosure";
+
+const CASE_JSON = JSON.stringify(MAINTENANCE_007_DOCUMENT_CLOSURE_11_9_5);
+
+export const SERVICE_REGRESSION_MAINTENANCE_007_DOCUMENT_CLOSURE_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");if(!work)return;
+var key="contrataIaAdaptiveAnswers";
+var VERSION="REG-SERVICE-007-MAINTENANCE-DOCUMENT-CLOSURE-11.9.5-v1";
+var CASE=${CASE_JSON};
+function readJson(s,k){try{return JSON.parse(s.getItem(k)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,key);if(Object.keys(a).length)return a;return readJson(localStorage,key);}
+function save(a){var raw=JSON.stringify(a);sessionStorage.setItem(key,raw);localStorage.setItem(key,raw);document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:"maintenance-document-closure-11.9.5"}}));}
+function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function manifest(validated){return {version:VERSION,id:CASE.id,step:CASE.step,expediente:CASE.expediente,status:validated?"DOCUMENTARY_CLOSURE_HUMAN_VALIDATED_WITH_OPEN_ITEMS_AND_SOURCE_CONFLICT":CASE.status,counts:CASE.counts,items:CASE.items,economicGuardStatus:CASE.economicGuardStatus,sourceRoundingTreatment:CASE.sourceRoundingTreatment,closureRule:CASE.closureRule,promotionRule:CASE.promotionRule,humanValidated:validated===true,validatedAt:validated?new Date().toISOString():null};}
+function downloadJson(data){var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Contrata-IA_REG-SERVICE-007_Mantenimiento-Sevilla_Closure_11-9-5.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
+function statusLabel(s){if(s==="CONFIRMED")return "CONFIRMADO";if(s==="CONFIRMED_SOURCE_DECLARATION")return "DECLARACIÓN DE FUENTE CONFIRMADA";if(s==="BLOCKED_SOURCE_CONFLICT")return "BLOQUEADO POR CONFLICTO DE FUENTE";return "PENDIENTE FUENTE";}
+function rows(){return CASE.items.map(function(x){return '<tr><td>'+esc(x.label)+'</td><td>'+esc(x.value)+'</td><td>'+esc(statusLabel(x.status))+'</td><td>'+esc(x.evidence)+'</td></tr>';}).join("");}
+function card(){var a=readAnswers();if(a.serviceRegressionMaintenance007EconomicsGuardRegistered!==true)return "";var validated=a.serviceRegressionMaintenance007DocumentClosureValidated===true;var c=CASE.counts;var html='<div id="serviceRegressionMaintenance007DocumentClosureCard" class="card" style="margin-top:14px"><h3>11.9.5 Cierre documental · Mantenimiento SAE Sevilla</h3>';
+html+='<div class="info"><strong>Matriz de cierre con trazabilidad.</strong> Se separan extremos confirmados, declaraciones económicas de fuente, pendientes de evidencia y el conflicto bloqueante sobre lotes. Cerrar este paso no convierte los campos pendientes en datos confirmados.</div>';
+html+='<div class="grid"><div><strong>Confirmados</strong></div><div>'+c.CONFIRMED+'</div><div><strong>Declaraciones de fuente</strong></div><div>'+c.CONFIRMED_SOURCE_DECLARATION+'</div><div><strong>Pendientes de fuente</strong></div><div>'+c.PENDING_SOURCE_EVIDENCE+'</div><div><strong>Conflictos bloqueantes</strong></div><div>'+c.BLOCKED_SOURCE_CONFLICT+'</div></div>';
+html+='<table style="width:100%;border-collapse:collapse;margin-top:12px"><thead><tr><th>Extremo</th><th>Valor</th><th>Estado</th><th>Evidencia</th></tr></thead><tbody>'+rows()+'</tbody></table>';
+html+='<div class="warning"><strong>Regla de cierre.</strong> '+esc(CASE.closureRule)+'</div><div class="warning"><strong>Promoción futura.</strong> '+esc(CASE.promotionRule)+'</div>';
+if(!validated){html+='<p><strong>Estado:</strong> cierre documental pendiente de validación humana, con campos abiertos y una contradicción de fuente no resuelta.</p><button id="validateMaintenance007DocumentClosure" type="button">Validar cierre documental 11.9.5</button>';}else{html+='<div class="info"><strong>11.9.5 validado.</strong> REG-SERVICE-007 queda cerrado documentalmente en el alcance acreditado, preservando todos los pendientes y la contradicción de lotes.</div><button id="downloadMaintenance007DocumentClosure" type="button" class="secondary">Descargar matriz 11.9.5 JSON</button>';}
+html+='</div>';return html;}
+function ensure(){var old=document.getElementById("serviceRegressionMaintenance007DocumentClosureCard");if(old)old.remove();var anchor=document.getElementById("serviceRegressionMaintenance007EconomicsGuardCard");if(anchor){var html=card();if(html)anchor.insertAdjacentHTML("afterend",html);}}
+document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="validateMaintenance007DocumentClosure"){var a=readAnswers();if(a.serviceRegressionMaintenance007EconomicsGuardRegistered!==true){alert("Primero debe registrarse la guarda económica 11.9.4.");return;}var m=manifest(true);a.serviceRegressionMaintenance007DocumentClosureValidated=true;a.serviceRegressionMaintenance007DocumentClosureVersion=VERSION;a.serviceRegressionMaintenance007DocumentClosureManifest=m;a.serviceRegressionMaintenance007DocumentClosureStatus="DOCUMENTARY_CLOSURE_HUMAN_VALIDATED_WITH_OPEN_ITEMS_AND_SOURCE_CONFLICT";a.serviceRegressionNextRecommendedStep="PENDING_NEW_PRIMARY_EVIDENCE";save(a);downloadJson(m);ensure();alert("Cierre documental 11.9.5 validado. Los campos pendientes y la contradicción de lotes permanecen abiertos.");return;}if(e.target.id==="downloadMaintenance007DocumentClosure"){var a2=readAnswers();downloadJson(a2.serviceRegressionMaintenance007DocumentClosureManifest||manifest(true));return;}},true);
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
+})();`;

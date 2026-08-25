@@ -1,0 +1,34 @@
+{
+  "version": "REG-SUPPLY-002-PANDA-GUARD-11.7.3-v1",
+  "caseId": "REG-SUPPLY-002",
+  "goldenCaseId": "CONTR-2026-240267-SUPPLY-DA33-GOLDEN-001",
+  "status": "AUTOMATIC_REGRESSION_ACTIVE",
+  "sourceExtraction": {
+    "step": "11.7.2",
+    "humanValidated": true
+  },
+  "expectedBlockers": 0,
+  "protectedRules": [
+    "DA 33.ª desactivada",
+    "procedimiento abierto simplificado ordinario",
+    "lote único",
+    "36 meses sin prórroga",
+    "precios unitarios sin presupuesto máximo DA 33.ª",
+    "VE igual a PBL",
+    "precio como criterio único de 100 puntos",
+    "modificación prevista del 20 % por reducción de financiación",
+    "modificación no vinculada a mayores necesidades DA 33.ª",
+    "garantía definitiva del 5 % del PBL",
+    "condición especial de transparencia fiscal"
+  ],
+  "forbiddenGoldenInheritance": [
+    "DA33_ACTIVE",
+    "DA33_MAXIMUM_BUDGET",
+    "DA33_NEEDS_INCREASE_MODIFICATION",
+    "EXTENSIONS_12_12",
+    "FERRETERIA_CATALOGUE_98_REFERENCES",
+    "PACKAGING_WASTE_SPECIAL_EXECUTION_CONDITION"
+  ],
+  "acceptanceRule": "La regresión debe fallar si Panda hereda reglas específicas del golden case o pierde cualquiera de sus hechos documentales validados en 11.7.2.",
+  "goldenStatus": false
+}

@@ -1,0 +1,14 @@
+export const SUPPLY_STATE_CONSISTENCY_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");if(!work)return;
+var answersKey="contrataIaAdaptiveAnswers";
+function readJson(storage,key){try{return JSON.parse(storage.getItem(key)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,answersKey);if(Object.keys(a).length)return a;a=readJson(localStorage,answersKey);if(Object.keys(a).length)sessionStorage.setItem(answersKey,JSON.stringify(a));return a;}
+function money(v){return Number(v||0).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";}
+function patchAccumulated(a){if(a.supplyEstimatedValueValidated!==true||!(Number(a.supplyEstimatedValueExVat)>0))return;var cards=Array.from(work.querySelectorAll(".card"));var card=cards.find(function(x){return (x.textContent||"").includes("Interpretación acumulada");});if(!card)return;var strongs=Array.from(card.querySelectorAll("strong"));var label=strongs.find(function(x){return (x.textContent||"").trim()==="Valor estimado provisional";});if(!label)return;label.textContent="Valor estimado validado";var labelCell=label.parentElement;var valueCell=labelCell&&labelCell.nextElementSibling;if(valueCell)valueCell.innerHTML=money(a.supplyEstimatedValueExVat)+'<br><span class="muted">Valor estimado cerrado separadamente de la proyección de consumo, incorporando la configuración validada de opciones y modificaciones.</span>';}
+function patchEconomic(a){if(a.supplyEstimatedValueValidated!==true||!(Number(a.supplyEstimatedValueExVat)>0))return;var card=document.getElementById("supplyEconomicPeriodCard");if(!card)return;Array.from(card.querySelectorAll(".warning,.info")).forEach(function(x){if((x.textContent||"").includes("Valor estimado contractual:")){x.className="info";x.innerHTML='<strong>Valor estimado contractual validado:</strong> '+money(a.supplyEstimatedValueExVat)+' sin IVA. Se mantiene jurídicamente separado del consumo estimado de referencia, de la proyección de consumo y del presupuesto máximo aprobado.';}});}
+function patchFinalization(a){var card=document.getElementById("supplyFinalizationCard");if(!card)return;Array.from(card.querySelectorAll(".info,.warning")).forEach(function(x){var t=x.textContent||"";if(t.includes("El cierre del valor estimado y de la motivación específica del criterio único")){x.innerHTML='<strong>Expediente estructuralmente preparado.</strong> El valor estimado ya está cerrado. Los criterios de adjudicación se controlan separadamente en el apartado 5.2 antes de generar documentación definitiva.';}});}
+function patch(){var a=readAnswers();patchAccumulated(a);patchEconomic(a);patchFinalization(a);}
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(patch,0);});
+setTimeout(patch,0);setTimeout(patch,120);
+})();`;

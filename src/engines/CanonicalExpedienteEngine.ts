@@ -1,0 +1,160 @@
+import { CPVEngine } from "./CPVEngine";
+import { ProcedimientoEngine } from "./ProcedimientoEngine";
+import { SolvenciaEngine } from "./SolvenciaEngine";
+import { PublicidadEngine } from "./PublicidadEngine";
+import { DecisionJuridica } from "../domain/conocimiento/DecisionJuridica";
+import { CanonicalExpedienteState } from "../domain/expediente/CanonicalExpedienteState";
+import { ExpedienteContext } from "../domain/expediente/ExpedienteContext";
+import { isPromotableEvidenceField } from "../domain/expediente/EvidenceField";
+import { TipoProcedimiento } from "../domain/procedimiento/TipoProcedimiento";
+import { promoteEngineProposal, promoteNormativeEngineDecision } from "./CanonicalEnginePromotion";
+
+export interface CanonicalEngineRunResult {
+  state: CanonicalExpedienteState;
+  context: ExpedienteContext;
+  executed: readonly string[];
+}
+
+function toLegacyContext(state: CanonicalExpedienteState): ExpedienteContext {
+  const context = new ExpedienteContext();
+  context.expediente = state.id;
+  context.objeto = state.fields.object.value ?? "";
+  context.tipoContrato = state.fields.contractType.value ?? "";
+  context.valorEstimado = (state.fields.estimatedValueCents.value ?? 0) / 100;
+  context.presupuestoBase = (state.fields.baseTenderBudgetCents.value ?? 0) / 100;
+  context.duracionMeses = state.fields.durationMonths.value ?? 0;
+  context.prorrogas = state.fields.extensionMonths.value ?? 0;
+  context.divisionLotes = (state.fields.lots.value?.length ?? 0) > 1;
+  context.criterios = state.fields.awardCriteria.value ? [...state.fields.awardCriteria.value] : [];
+  context.umbralSara = state.procedureContext?.umbralSara;
+  context.regulacionArmonizada = state.procedureContext?.regulacionArmonizada;
+  context.porcentajeJuicioValor = state.procedureContext?.porcentajeJuicioValor;
+  context.prestacionesIntelectuales = state.procedureContext?.prestacionesIntelectuales;
+  context.contratoMenorJustificado = state.procedureContext?.contratoMenorJustificado;
+  if (state.fields.procedure.value && isPromotableEvidenceField(state.fields.procedure)) {
+    context.procedimiento = state.fields.procedure.value as TipoProcedimiento;
+  }
+  return context;
+}
+
+function toMainCpvDecision(decision: ReturnType<CPVEngine["ejecutar"]>): DecisionJuridica<string> {
+  const mapped = new DecisionJuridica<string>();
+  const mainCode = decision.resultado?.[0]?.codigo;
+  mapped.resultado = mainCode ?? "";
+  mapped.explicacion = decision.explicacion;
+  mapped.articulos = [...decision.articulos];
+  mapped.normativa = [...decision.normativa];
+  mapped.informes = [...decision.informes];
+  mapped.jurisprudencia = [...decision.jurisprudencia];
+  mapped.reglasAplicadas = [...decision.reglasAplicadas];
+  mapped.confianza = mainCode ? decision.confianza : 0;
+  mapped.observaciones = [...decision.observaciones];
+  if (!mainCode) mapped.observaciones.push("CPVEngine no produjo código principal promocionable.");
+  return mapped;
+}
+
+function toSolvencyListDecision(decision: DecisionJuridica<string>): DecisionJuridica<readonly string[]> {
+  const mapped = new DecisionJuridica<readonly string[]>();
+  if (decision.resultado) mapped.resultado = [decision.resultado];
+  mapped.explicacion = decision.explicacion;
+  mapped.articulos = [...decision.articulos];
+  mapped.normativa = [...decision.normativa];
+  mapped.informes = [...decision.informes];
+  mapped.jurisprudencia = [...decision.jurisprudencia];
+  mapped.reglasAplicadas = [...decision.reglasAplicadas];
+  mapped.confianza = decision.confianza;
+  mapped.observaciones = [...decision.observaciones];
+  return mapped;
+}
+
+export class CanonicalExpedienteEngine {
+  constructor(
+    private readonly cpvEngine: CPVEngine,
+    private readonly procedimientoEngine: ProcedimientoEngine,
+    private readonly solvenciaEngine = new SolvenciaEngine(),
+    private readonly publicidadEngine = new PublicidadEngine(),
+  ) {}
+
+  public ejecutarIdentificacion(state: CanonicalExpedienteState): CanonicalEngineRunResult {
+    const context = toLegacyContext(state);
+    const executed: string[] = [];
+    let fields = state.fields;
+
+    if (context.objeto.trim().length > 0 && !isPromotableEvidenceField(state.fields.cpvMain)) {
+      const cpvDecision = this.cpvEngine.ejecutar(context);
+      fields = {
+        ...fields,
+        cpvMain: promoteEngineProposal(toMainCpvDecision(cpvDecision), {
+          key: "cpvMain",
+          motor: "CPVEngine",
+          sourceId: "CPVEngine:CPV-001",
+          requiresHumanValidation: true,
+          diagnostics: ["El CPV es una propuesta automática y no se promueve sin validación humana."],
+        }),
+      };
+      executed.push("CPVEngine");
+    }
+
+    if (context.valorEstimado > 0 && context.tipoContrato.trim().length > 0 && !isPromotableEvidenceField(state.fields.procedure)) {
+      const procedimientoDecision = this.procedimientoEngine.ejecutar(context);
+      fields = {
+        ...fields,
+        procedure: promoteNormativeEngineDecision(procedimientoDecision, {
+          key: "procedure",
+          motor: "ProcedimientoEngine",
+          sourceId: procedimientoDecision.reglasAplicadas[0] ?? "procedimiento.rules.json",
+          requiresHumanValidation: true,
+          diagnostics: ["La regla aplicada se conserva con sus artículos y requiere validación humana antes de generar pliegos."],
+        }),
+      };
+      executed.push("ProcedimientoEngine");
+    }
+
+    return { state: { ...state, fields }, context, executed };
+  }
+
+  public ejecutarRegimen(state: CanonicalExpedienteState): CanonicalEngineRunResult {
+    const context = toLegacyContext(state);
+    const executed: string[] = [];
+    let fields = state.fields;
+
+    if (!context.procedimiento || !isPromotableEvidenceField(state.fields.procedure)) return { state, context, executed };
+
+    if (!isPromotableEvidenceField(state.fields.solvency)) {
+      const solvenciaDecision = this.solvenciaEngine.ejecutar(context);
+      if (solvenciaDecision.resultado !== undefined && solvenciaDecision.resultado !== null) {
+        fields = {
+          ...fields,
+          solvency: promoteNormativeEngineDecision(toSolvencyListDecision(solvenciaDecision), {
+            key: "solvency",
+            motor: "SolvenciaEngine",
+            sourceId: solvenciaDecision.reglasAplicadas[0] ?? "SolvenciaEngine",
+            requiresHumanValidation: true,
+            diagnostics: ["Solo se promocionan conclusiones normativas cerradas; los requisitos concretos de solvencia permanecen en el dominio universal."],
+          }),
+        };
+        executed.push("SolvenciaEngine");
+      }
+    }
+
+    const publicity = state.fields.publicity;
+    if (!publicity || !isPromotableEvidenceField(publicity)) {
+      const publicidadDecision = this.publicidadEngine.ejecutar(context);
+      if (publicidadDecision.resultado !== undefined && publicidadDecision.resultado !== null) {
+        fields = {
+          ...fields,
+          publicity: promoteNormativeEngineDecision(publicidadDecision, {
+            key: "publicity",
+            motor: "PublicidadEngine",
+            sourceId: publicidadDecision.reglasAplicadas[0] ?? "PublicidadEngine",
+            requiresHumanValidation: true,
+            diagnostics: ["El motor expresa canales jurídicos de publicidad; la plataforma institucional concreta se resuelve fuera de este motor."],
+          }),
+        };
+        executed.push("PublicidadEngine");
+      }
+    }
+
+    return { state: { ...state, fields }, context, executed };
+  }
+}

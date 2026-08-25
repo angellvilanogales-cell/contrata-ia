@@ -18,6 +18,7 @@ describe("Canonical architecture", () => {
       "legalReasoning",
       "cpv",
       "procedure",
+      "expediente",
       "documents",
       "export",
       "ai"
@@ -32,5 +33,14 @@ describe("Canonical architecture", () => {
 
   it("resolves the selected rule engine deterministically", () => {
     expect(getCanonicalComponent("rules").canonicalPath).toBe("src/domain/rules/RuleEngine.ts");
+  });
+
+  it("declares UniversalExpedienteV13 as the only canonical expediente provider", () => {
+    const expediente = getCanonicalComponent("expediente");
+    expect(expediente.contract).toBe("UniversalExpedienteV13");
+    expect(expediente.canonicalPath).toBe("src/domain/expediente/UniversalExpedienteV13.ts");
+    expect(expediente.legacyPaths).toContain("src/domain/expediente/CanonicalExpedienteState.ts");
+    expect(expediente.legacyPaths).toContain("src/domain/expediente/Expediente.ts");
+    expect(expediente.legacyPaths).toContain("src/domain/expediente/ExpedienteContext.ts");
   });
 });

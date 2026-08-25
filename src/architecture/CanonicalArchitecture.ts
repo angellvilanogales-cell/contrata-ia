@@ -14,6 +14,7 @@ const COMPONENT_IDS: readonly CanonicalComponentId[] = [
   "legalReasoning",
   "cpv",
   "procedure",
+  "expediente",
   "documents",
   "export",
   "ai"

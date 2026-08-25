@@ -1,0 +1,21 @@
+{
+  "version": "REG-SUPPLY-006-VEIASA-EXTRACTION-11.7.10-v1",
+  "id": "REG-SUPPLY-006",
+  "expediente": "CF050-21-058",
+  "shortName": "VEIASA - licencias Windows Server",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceDocuments": ["MEMORIA", "PCAP", "PPT", "INFORME"],
+  "facts": {
+    "contractType": "SUMINISTRO",
+    "procedure": "ABIERTO_SIMPLIFICADO",
+    "lots": false,
+    "needsBasedDA33": false,
+    "economicMode": "PRECIO_GLOBAL",
+    "awardMode": "PRECIO_UNICO",
+    "extensions": false,
+    "plannedModification": false
+  },
+  "acceptanceRule": "Solo se congela el alcance clasificado en la matriz y sometido a validación humana. Importes, CPV, duración exacta, entrega, garantía, solvencia, fórmula económica y condiciones especiales permanecen fuera hasta extracción documental específica.",
+  "humanValidationRequired": true,
+  "humanValidated": false
+}

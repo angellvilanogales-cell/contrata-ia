@@ -1,0 +1,33 @@
+{
+  "version": "REG-SUPPLY-002-EXTRACTION-11.7.2-v1",
+  "id": "REG-SUPPLY-002",
+  "expediente": "CONTR 2025 466864 (2025/001003)",
+  "shortName": "Panda Antivirus - AVRA",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceDocuments": ["MEMORIA", "PCAP", "PPT"],
+  "facts": {
+    "contractType": "SUMINISTRO",
+    "cpv": "48760000-3",
+    "procedure": "ABIERTO_SIMPLIFICADO",
+    "lots": false,
+    "needsBasedDA33": false,
+    "initialDurationMonths": 36,
+    "extensions": false,
+    "pblExVat": 61192.25,
+    "vat": 12850.37,
+    "pblVatIncluded": 74042.62,
+    "estimatedValueExVat": 61192.25,
+    "economicMode": "PRECIOS_UNITARIOS",
+    "awardMode": "PRECIO_UNICO",
+    "awardPoints": 100,
+    "plannedModification": true,
+    "plannedModificationPercent": 20,
+    "plannedModificationReason": "REDUCCION_FINANCIACION_MEDIDAS_ESTABILIDAD_PRESUPUESTARIA",
+    "plannedModificationIsDA33NeedsIncrease": false,
+    "guaranteeDefinitivePercentOnPbl": 5,
+    "specialExecutionCondition": "TRANSPARENCIA_FISCAL",
+    "dataProcessingByContractor": false
+  },
+  "regressionPurpose": "Demostrar que un suministro ordinario sin DA 33.ª no hereda presupuesto máximo por necesidades, prórrogas ni modificación por mayores necesidades del golden case, aunque comparta precios unitarios y precio como criterio único.",
+  "humanValidationRequired": true
+}

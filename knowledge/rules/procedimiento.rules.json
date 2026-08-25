@@ -1,49 +1,47 @@
 {
   "modulo": "PROCEDIMIENTO",
-  "version": "1.0.0",
-  "descripcion": "Reglas para la determinación del procedimiento de adjudicación conforme a la LCSP.",
+  "version": "2026.1",
+  "descripcion": "Catálogo normativo de apoyo a ProcedimientoEngine. Las reglas históricas de decisión por cuantía única quedan neutralizadas: la selección exige tipo contractual y, cuando proceda, carácter intelectual, porcentaje de juicio de valor y umbral SARA aplicable.",
+  "vigenciaReferencia": "2026-08-25",
   "articulos": [
+    "101",
     "118",
     "131",
-    "159",
-    "159.6"
+    "156",
+    "159.1",
+    "159.6",
+    "21.1.a",
+    "22.1.a"
   ],
+  "parametros": {
+    "contratoMenor": {
+      "obrasEstrictoMenorQue": 40000,
+      "suministrosServiciosEstrictoMenorQue": 15000,
+      "requiereJustificacionArticulo118": true
+    },
+    "abiertoSimplificadoAbreviado": {
+      "obrasEstrictoMenorQue": 80000,
+      "suministrosServiciosEstrictoMenorQue": 60000,
+      "excluyePrestacionesIntelectuales": true,
+      "requiereCriteriosFormula": true
+    },
+    "abiertoSimplificado": {
+      "obrasIgualOInferiorA": 2000000,
+      "suministrosServicios": "inferior al umbral SARA aplicable conforme a arts. 21.1.a y 22.1.a o sus actualizaciones",
+      "juicioValorMaximoGeneralPorcentaje": 25,
+      "juicioValorMaximoIntelectualPorcentaje": 45
+    }
+  },
   "reglas": [
     {
-      "id": "PROC-001",
-      "nombre": "Contrato menor",
-      "tipo": "DECISION",
+      "id": "PROC-LEGACY-DISABLED-001",
+      "nombre": "Reglas históricas de cuantía única desactivadas",
+      "tipo": "GUARD",
       "prioridad": 1,
-      "condicion": "valorEstimado < 15000",
-      "resultado": "CONTRATO_MENOR",
-      "articulo": "118"
-    },
-    {
-      "id": "PROC-002",
-      "nombre": "Abierto simplificado abreviado",
-      "tipo": "DECISION",
-      "prioridad": 2,
-      "condicion": "valorEstimado <= 60000",
-      "resultado": "ABIERTO_SIMPLIFICADO_ABREVIADO",
-      "articulo": "159.6"
-    },
-    {
-      "id": "PROC-003",
-      "nombre": "Abierto simplificado",
-      "tipo": "DECISION",
-      "prioridad": 3,
-      "condicion": "valorEstimado <= 100000",
-      "resultado": "ABIERTO_SIMPLIFICADO",
-      "articulo": "159"
-    },
-    {
-      "id": "PROC-004",
-      "nombre": "Procedimiento abierto",
-      "tipo": "DECISION",
-      "condicion": "true",
-      "prioridad": 99,
-      "resultado": "ABIERTO",
-      "articulo": "131"
+      "condicion": "false",
+      "resultado": null,
+      "articulo": "118, 159 LCSP",
+      "mensaje": "No utilizar una escala única de cuantías para seleccionar procedimiento. Usar ProcedimientoEngine saneado y validación humana."
     }
   ]
 }

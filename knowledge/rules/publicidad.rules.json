@@ -1,66 +1,19 @@
 {
   "modulo": "PUBLICIDAD",
-  "version": "1.0.0",
-  "descripcion": "Reglas para determinar la publicidad de la licitación conforme a la LCSP.",
-  "articulos": [
-    "63",
-    "135",
-    "347"
-  ],
+  "version": "2026.1",
+  "descripcion": "Catálogo de apoyo. Se neutralizan las reglas históricas que confundían perfil con una plataforma concreta, declaraban ausencia de publicidad para contratos menores o podían eclipsar la publicidad DOUE por orden de prioridad.",
+  "vigenciaReferencia": "2026-08-25",
+  "articulos": ["63", "63.4", "118.6", "135", "159", "347"],
   "reglas": [
     {
-      "id": "PUB-001",
-      "nombre": "Contrato menor",
-      "tipo": "DECISION",
+      "id": "PUB-LEGACY-DISABLED-001",
+      "nombre": "Reglas históricas de publicidad desactivadas",
+      "tipo": "GUARD",
       "prioridad": 1,
-      "condicion": "procedimiento == 'CONTRATO_MENOR'",
-      "resultado": "NINGUNA",
-      "articulo": "118"
-    },
-    {
-      "id": "PUB-002",
-      "nombre": "Publicidad en Perfil del Contratante",
-      "tipo": "DECISION",
-      "prioridad": 10,
-      "condicion": "procedimiento == 'ABIERTO_SIMPLIFICADO_ABREVIADO'",
-      "resultado": "PERFIL_CONTRATANTE",
-      "articulo": "63"
-    },
-    {
-      "id": "PUB-003",
-      "nombre": "Publicidad en PLACE",
-      "tipo": "DECISION",
-      "prioridad": 20,
-      "condicion": "procedimiento == 'ABIERTO_SIMPLIFICADO'",
-      "resultado": "PLACE",
-      "articulo": "135"
-    },
-    {
-      "id": "PUB-004",
-      "nombre": "Publicidad en PLACE",
-      "tipo": "DECISION",
-      "prioridad": 30,
-      "condicion": "procedimiento == 'ABIERTO'",
-      "resultado": "PLACE",
-      "articulo": "135"
-    },
-    {
-      "id": "PUB-005",
-      "nombre": "Contrato sujeto a regulación armonizada",
-      "tipo": "DECISION",
-      "prioridad": 40,
-      "condicion": "regulacionArmonizada == true",
-      "resultado": "PLACE_DOUE",
-      "articulo": "135"
-    },
-    {
-      "id": "PUB-999",
-      "nombre": "Regla general",
-      "tipo": "DECISION",
-      "prioridad": 999,
-      "condicion": "true",
-      "resultado": "PERFIL_CONTRATANTE",
-      "articulo": "63"
+      "condicion": "false",
+      "resultado": null,
+      "articulo": "63, 135 LCSP",
+      "mensaje": "Usar PublicidadEngine saneado: perfil de contratante como concepto jurídico, DOUE cuando proceda y sin aplicar excepciones del contrato menor sin datos suficientes."
     }
   ]
 }

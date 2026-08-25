@@ -1,0 +1,36 @@
+{
+  "version": "REG-SERVICE-005-CARL-ANNEX-I-REVIEW-11.8.4-v1",
+  "caseId": "REG-SERVICE-005",
+  "expediente": "ADM-2024-0004 (CONTR/2024/636510)",
+  "status": "ANNEX_I_EVIDENCE_REVIEW_PENDING_HUMAN_VALIDATION",
+  "confirmed": {
+    "solvencyRequired": true,
+    "solvencyLocation": "ANEXO_I_APARTADO_4",
+    "economicProposalModelPresent": true,
+    "economicProposalAsTotalAmountExVat": true,
+    "awardCriteriaAllFormulaBased": true,
+    "awardCriteriaTotalPoints": 100,
+    "economicOfferPoints": 80,
+    "plannedModification": true,
+    "plannedModificationPercent": 20,
+    "personnelSubrogation": true
+  },
+  "unresolved": [
+    "umbral exacto y medio concreto de solvencia económica",
+    "umbral exacto y medio concreto de solvencia técnica/profesional",
+    "clasificación alternativa específica",
+    "garantía definitiva y complementaria",
+    "detalle de los 20 puntos restantes",
+    "fórmulas exactas",
+    "sistema literal de determinación del precio",
+    "condiciones especiales completas",
+    "penalidades específicas completas",
+    "causa literal de la modificación del 20 %",
+    "DA 33.ª"
+  ],
+  "evidencePolicy": {
+    "noInferenceToFillAnnexI": true,
+    "sourceTextRequiredForFreeze": true,
+    "humanValidationRequired": true
+  }
+}

@@ -1,0 +1,28 @@
+import { AULAS_REGRESSION_BASELINE, AULAS_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase003AulasGuard";
+import { SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT } from "./SupplyRegressionSas004ExtractionScript";
+
+const BASELINE_JSON = JSON.stringify(AULAS_REGRESSION_BASELINE);
+
+export const SUPPLY_REGRESSION_AULAS_003_GUARD_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");if(!work)return;
+var key="contrataIaAdaptiveAnswers";
+var VERSION=${JSON.stringify(AULAS_REGRESSION_VERSION)};
+var BASELINE=${BASELINE_JSON};
+function readJson(s,k){try{return JSON.parse(s.getItem(k)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,key);if(Object.keys(a).length)return a;return readJson(localStorage,key);}
+function save(a){var raw=JSON.stringify(a);sessionStorage.setItem(key,raw);localStorage.setItem(key,raw);document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:"aulas-regression-11.7.5"}}));}
+function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function manifest(){return {version:VERSION,caseId:BASELINE.caseId,status:BASELINE.passed?"AUTOMATIC_REGRESSION_ACTIVE":"AUTOMATIC_REGRESSION_BLOCKED",passed:BASELINE.passed,blockers:BASELINE.blockers,checks:BASELINE.checks,protectedScope:BASELINE.protectedScope,deliberatelyNotFrozenYet:BASELINE.deliberatelyNotFrozenYet,requiresSourceExtractionHumanValidation:true,sourceExtractionHumanValidated:true,acceptanceRule:"La regresión protege únicamente los hechos validados en 11.7.4. No puede congelar ni inferir importes, CPV por lote, duración exacta, detalle de prórrogas, fórmulas, ponderaciones, causa o porcentaje de modificación, condiciones especiales ni garantías hasta su extracción documental específica.",registeredAt:new Date().toISOString()};}
+function downloadJson(data){var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Contrata-IA_REG-SUPPLY-003_Aulas_Regression_11-7-5.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
+function rows(){return BASELINE.checks.map(function(c){return '<tr><td>'+esc(c.id)+'</td><td>'+(c.ok?'✓ Pasa':'✗ Bloquea')+'</td><td>'+esc(c.purpose)+'</td></tr>';}).join("");}
+function card(){var a=readAnswers();if(a.supplyRegressionAulas003ExtractionValidated!==true)return "";var registered=a.supplyRegressionAulas003AutomaticGuardRegistered===true;var html='<div id="supplyRegressionAulas003GuardCard" class="card" style="margin-top:14px"><h3>11.7.5 Regresión automática Aulas digitales</h3>';
+if(BASELINE.passed){html+='<div class="info"><strong>Protección automática activa.</strong> La línea base supera '+BASELINE.checks.length+' comprobaciones con 0 bloqueantes. La regresión protege 9 lotes, procedimiento abierto, SARA, DA 33.ª, fondos europeos, precios unitarios, criterios múltiples y la existencia de prórroga y modificación prevista.</div>';}else{html+='<div class="warning"><strong>Regresión bloqueada.</strong> Existen '+BASELINE.blockers.length+' incoherencias y no puede registrarse.</div>';}
+html+='<div class="warning"><strong>Alcance limitado deliberadamente.</strong> No se protegen todavía importes, CPV por lote, duración exacta, detalle temporal de prórrogas, fórmulas o ponderaciones de criterios, causa/porcentaje de modificación, condiciones especiales ni garantías.</div><table style="width:100%;border-collapse:collapse"><thead><tr><th>Check</th><th>Resultado</th><th>Qué protege</th></tr></thead><tbody>'+rows()+'</tbody></table>';
+if(!registered&&BASELINE.passed){html+='<button id="registerAulas003AutomaticGuard" type="button">Registrar regresión automática 11.7.5</button>';}else if(registered){html+='<div class="info"><strong>11.7.5 registrado.</strong> Versión '+esc(VERSION)+'. Aulas digitales queda protegido como caso de regresión, pero no como golden case.</div><button id="downloadAulas003AutomaticGuard" type="button" class="secondary">Descargar manifiesto 11.7.5 JSON</button>';}
+html+='</div>';return html;}
+function ensure(){var old=document.getElementById("supplyRegressionAulas003GuardCard");if(old)old.remove();var anchor=document.getElementById("supplyRegressionAulas003ExtractionCard");if(anchor){var html=card();if(html)anchor.insertAdjacentHTML("afterend",html);}}
+document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerAulas003AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionAulas003ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.4.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionAulas003AutomaticGuardRegistered=true;a.supplyRegressionAulas003AutomaticGuardVersion=VERSION;a.supplyRegressionAulas003AutomaticGuardManifest=m;a.supplyRegressionAulas003Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SUPPLY-004";save(a);downloadJson(m);ensure();alert("Regresión automática Aulas digitales 11.7.5 registrada. REG-SUPPLY-003 queda protegido sin convertirse en golden case.");return;}if(e.target.id==="downloadAulas003AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionAulas003AutomaticGuardManifest||manifest());return;}},true);
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
+})();
+${SUPPLY_REGRESSION_SAS_004_EXTRACTION_SCRIPT}`;

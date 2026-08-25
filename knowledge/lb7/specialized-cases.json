@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1.2.0",
+  "purpose": "Casos especializados para ampliar la regresión documental LB-7 fuera del núcleo de limpieza/mantenimiento. Los casos DEEP_READ se basan en copias documentales aportadas por el usuario o documentos oficiales leídos; los IDENTIFIED_ONLY no alimentan reglas jurídicas ni generación hasta lectura profunda.",
+  "cases": [
+    {
+      "id": "SPEC-EVENTS-001",
+      "label": "Premios Meridiana 2026",
+      "expediente": "CONTR 2025 645768",
+      "juntaExpedienteId": 877198,
+      "contractType": "SERVICES",
+      "procedure": "OPEN_SIMPLIFIED_ORDINARY",
+      "scope": "EVENT_SERVICES_AWARD_CEREMONY",
+      "cpv": "79952000-2",
+      "location": "Granada",
+      "status": "DEEP_READ",
+      "documents": {
+        "memory": "user-upload:Memoria Premios Meridiana.pdf",
+        "pcap": "user-upload:PCAP Premios Meridiana.pdf",
+        "ppt": "user-upload:PPT Premios Meridiana.pdf"
+      },
+      "observedPatterns": [
+        "MEMORY_IDENTIFICATION_HEADER",
+        "INSTITUTIONAL_PURPOSE_BEFORE_NEED",
+        "NEED_JUSTIFIED_FROM_PUBLIC_FUNCTION_AND_EVENT_PURPOSE",
+        "SOLVENCY_AND_AWARD_CRITERIA_EXPLICIT_IN_MEMORY",
+        "PPT_EVENT_PRODUCTION_TASK_CATALOGUE",
+        "PPT_PERSONNEL_INTELLECTUAL_PROPERTY_CONFIDENTIALITY_DATA_AND_PRL",
+        "PCAP_OFFICIAL_RECOMMENDED_MODEL_OPEN_SIMPLIFIED_ORDINARY",
+        "PCAP_CASE_SPECIFICS_CENTRED_IN_ANNEX_I"
+      ],
+      "sourcePolicy": {
+        "preferred": "USER_PROVIDED_OFFICIAL_COPIES",
+        "rule": "El contenido se usa para estructura y praxis. Las reglas jurídicas se validan contra normativa vigente y modelos oficiales vigentes antes de incorporarse al motor."
+      }
+    },
+    {
+      "id": "SPEC-EVENTS-002",
+      "label": "Premios de Artesanía, Congreso de Artesanía, Premios de Comercio Interior y Día del Comercio",
+      "expediente": "ADM/2026/007 (CONTR 2026 58905)",
+      "contractType": "SERVICES",
+      "procedure": "OPEN",
+      "scope": "EVENT_SERVICES_MULTI_EVENT_MULTI_LOT",
+      "cpv": "79950000-8",
+      "lots": 4,
+      "status": "DEEP_READ",
+      "documents": {
+        "memory": "user-upload:Memoria Premios Artesanía.pdf",
+        "pcap": "user-upload:PCAP Premios Artesanía.pdf",
+        "ppt": "user-upload:PPT Premios Artesanía.pdf"
+      },
+      "observedPatterns": [
+        "MEMORY_OBJECT_WITH_EVENT_BACKGROUND",
+        "MEMORY_NEED_AND_PROCEDURE_JUSTIFICATION",
+        "MEMORY_BUDGET_ESTIMATED_VALUE_DURATION_LOCATION_GUARANTEE_PAYMENT",
+        "MEMORY_AWARD_CRITERIA_DETAILED",
+        "PPT_MULTI_LOT_EVENT_TASKS",
+        "PPT_CALENDAR_ESCALATION_GRAPHICS_AUDIOVISUAL_INVITATIONS_SPEAKERS_VENUE_CATERING_FINAL_REPORT",
+        "PCAP_OFFICIAL_RECOMMENDED_MODEL_OPEN",
+        "PCAP_2025_MODEL_VERSION",
+        "PCAP_ANNEX_I_PER_LOT_LOCALITY_NUTS_AND_CHARACTERISTICS"
+      ],
+      "sourcePolicy": {
+        "preferred": "USER_PROVIDED_OFFICIAL_COPIES",
+        "rule": "El contenido se usa para estructura y praxis. Las reglas jurídicas se validan contra normativa vigente y modelos oficiales vigentes antes de incorporarse al motor."
+      }
+    },
+    {
+      "id": "SPEC-EVENTS-003",
+      "label": "I Gala Premios al Trabajo Autónomo en Andalucía",
+      "expediente": "ADM/2025/0008 (CONTR/2025/374417)",
+      "contractType": "SERVICES",
+      "procedure": "OPEN_SIMPLIFIED_ABBREVIATED",
+      "scope": "EVENT_SERVICES_AWARD_GALA_MULTI_LOT",
+      "cpv": ["79952000-2", "55320000-9"],
+      "location": "Almería",
+      "lots": 2,
+      "status": "DEEP_READ",
+      "documents": {
+        "memory": "user-upload:Pliegos Gala- Evento.zip/Memoria Gala.pdf",
+        "pcap": "user-upload:Pliegos Gala- Evento.zip/PCAP Gala.pdf",
+        "ppt": "user-upload:Pliegos Gala- Evento.zip/PPT Gala.pdf"
+      },
+      "observedPatterns": [
+        "EVENT_GALA_OBJECT_WITH_AWARD_CEREMONY",
+        "NEED_AND_INSUFFICIENCY_IN_MEMORY",
+        "TWO_LOTS_EVENT_AND_RESERVED_CATERING",
+        "RESERVED_LOT_SOCIAL_INSERTION_COMPANIES",
+        "TRAVEL_AND_ACCOMMODATION_FOR_AWARDEES_JURY",
+        "SIGN_LANGUAGE_PRESENTATION_SCENOGRAPHY_STREAMING",
+        "PHOTO_VIDEO_CORPORATE_IMAGE_AND_CATERING",
+        "PCAP_OFFICIAL_RECOMMENDED_SERVICES_MODEL",
+        "PCAP_LEGAL_REVIEW_REFERENCE_AJ_CEETA_2025_62"
+      ],
+      "sourcePolicy": {
+        "preferred": "USER_PROVIDED_SIGNED_COPIES",
+        "rule": "Se usa como evidencia de práctica documental y composición; cualquier regla jurídica derivada se contrasta con normativa vigente y fuente oficial aplicable."
+      }
+    },
+    {
+      "id": "SPEC-EVENTS-004",
+      "label": "Quince eventos provinciales en materia de emprendimiento",
+      "expediente": "CONTR 2026 112626",
+      "contractType": "SERVICES",
+      "procedure": "OPEN_SIMPLIFIED_ABBREVIATED",
+      "scope": "EVENT_SERVICES_PROVINCIAL_MULTI_LOT",
+      "cpv": ["79952000-2", "79951000-5"],
+      "lots": 8,
+      "status": "DEEP_READ",
+      "documents": {
+        "memory": "user-upload:Pliegos Gala- Evento.zip/Memoria Evento.pdf",
+        "pcap": "user-upload:Pliegos Gala- Evento.zip/PCAP Evento.pdf",
+        "ppt": "user-upload:Pliegos Gala- Evento.zip/PPT Evento.pdf"
+      },
+      "observedPatterns": [
+        "FIFTEEN_EVENTS_EIGHT_PROVINCIAL_LOTS",
+        "MEMORY_COMPETENCE_AND_PUBLIC_PURPOSE_CONTEXT",
+        "MULTIPLE_NUTS_AND_LOCATIONS",
+        "PPT_PER_LOT_TECHNICAL_SPECIFICATION",
+        "SECTOR_SPECIFIC_EVENT_CONTENT",
+        "PCAP_OFFICIAL_RECOMMENDED_SERVICES_MODEL_UPDATED_2025",
+        "PCAP_LEGAL_REVIEW_REFERENCE_AJ_CUII_2026_17",
+        "ANNEX_I_AS_CASE_SPECIFIC_CENTER"
+      ],
+      "sourcePolicy": {
+        "preferred": "USER_PROVIDED_SIGNED_COPIES",
+        "rule": "Se usa como evidencia de práctica documental y composición; cualquier regla jurídica derivada se contrasta con normativa vigente y fuente oficial aplicable."
+      }
+    }
+  ]
+}

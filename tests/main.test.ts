@@ -7,8 +7,8 @@ describe("Contrata-IA entrypoint", () => {
       name: "contrata-ia",
       version: "0.1.0",
       status: "initialized",
-      architectureVersion: "2.0.0",
-      canonicalComponents: 11,
+      architectureVersion: "2.2.0",
+      canonicalComponents: 12,
       environment: "test"
     });
   });

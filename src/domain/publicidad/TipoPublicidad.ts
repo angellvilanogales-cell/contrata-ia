@@ -4,36 +4,18 @@
  * TipoPublicidad
  * ============================================================
  *
- * Tipos de publicidad de la licitación.
- *
+ * Canales jurídicos de publicidad. Los valores PLACE se conservan por
+ * compatibilidad histórica, pero los motores universales deben preferir
+ * conceptos jurídicos neutros cuando la plataforma concreta depende del
+ * órgano de contratación.
  * ============================================================
  */
 
 export enum TipoPublicidad {
-
-    /**
-     * Sin publicidad.
-     */
     NINGUNA = "NINGUNA",
-
-    /**
-     * Perfil del contratante.
-     */
     PERFIL_CONTRATANTE = "PERFIL_CONTRATANTE",
-
-    /**
-     * Plataforma de Contratación del Sector Público.
-     */
+    PERFIL_CONTRATANTE_DOUE = "PERFIL_CONTRATANTE_DOUE",
     PLACE = "PLACE",
-
-    /**
-     * Diario Oficial de la Unión Europea.
-     */
     DOUE = "DOUE",
-
-    /**
-     * Publicidad combinada.
-     */
     PLACE_DOUE = "PLACE_DOUE"
-
 }

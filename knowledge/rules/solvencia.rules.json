@@ -1,61 +1,19 @@
 {
   "modulo": "SOLVENCIA",
-  "version": "1.0.0",
-  "descripcion": "Reglas para determinar la exigencia de solvencia conforme a la LCSP.",
-  "articulos": [
-    "74",
-    "75",
-    "86",
-    "87",
-    "88",
-    "89",
-    "90"
-  ],
+  "version": "2026.1",
+  "descripcion": "Catálogo de apoyo. Se neutralizan las decisiones genéricas heredadas porque los requisitos concretos de solvencia deben quedar vinculados al objeto, ser proporcionales y especificarse por el órgano de contratación. La única conclusión automática habilitada por el motor saneado es la exención de acreditación del art. 159.6.b cuando ese procedimiento ya está determinado.",
+  "vigenciaReferencia": "2026-08-25",
+  "articulos": ["74.2", "86", "87", "88", "89", "90", "92", "159.6.b"],
   "reglas": [
     {
-      "id": "SOL-001",
-      "nombre": "Contrato menor",
-      "tipo": "DECISION",
+      "id": "SOL-LEGACY-DISABLED-001",
+      "nombre": "Configuración genérica de solvencia desactivada",
+      "tipo": "GUARD",
       "prioridad": 1,
-      "condicion": "procedimiento == 'CONTRATO_MENOR'",
-      "resultado": "NO_EXIGIBLE",
-      "articulo": "118"
-    },
-    {
-      "id": "SOL-002",
-      "nombre": "Servicios",
-      "tipo": "DECISION",
-      "prioridad": 10,
-      "condicion": "tipoContrato == 'SERVICIOS'",
-      "resultado": "SOLVENCIA_TECNICA_Y_ECONOMICA",
-      "articulo": "90"
-    },
-    {
-      "id": "SOL-003",
-      "nombre": "Suministros",
-      "tipo": "DECISION",
-      "prioridad": 20,
-      "condicion": "tipoContrato == 'SUMINISTROS'",
-      "resultado": "SOLVENCIA_TECNICA_Y_ECONOMICA",
-      "articulo": "89"
-    },
-    {
-      "id": "SOL-004",
-      "nombre": "Obras",
-      "tipo": "DECISION",
-      "prioridad": 30,
-      "condicion": "tipoContrato == 'OBRAS'",
-      "resultado": "SOLVENCIA_TECNICA_Y_ECONOMICA",
-      "articulo": "88"
-    },
-    {
-      "id": "SOL-999",
-      "nombre": "Regla general",
-      "tipo": "DECISION",
-      "prioridad": 999,
-      "condicion": "true",
-      "resultado": "SOLVENCIA_GENERAL",
-      "articulo": "74"
+      "condicion": "false",
+      "resultado": null,
+      "articulo": "74.2 y 92 LCSP",
+      "mensaje": "No convertir el tipo contractual en requisitos genéricos de solvencia. Usar SolvenciaEngine saneado y configuración concreta del expediente."
     }
   ]
 }

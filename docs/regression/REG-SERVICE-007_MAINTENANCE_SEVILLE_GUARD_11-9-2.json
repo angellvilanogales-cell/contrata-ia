@@ -1,0 +1,30 @@
+{
+  "version": "REG-SERVICE-007-MAINTENANCE-SEVILLE-GUARD-11.9.2-v1",
+  "caseId": "REG-SERVICE-007",
+  "step": "11.9.2",
+  "status": "AUTOMATIC_REGRESSION_PENDING_HUMAN_REGISTRATION",
+  "protectedScope": {
+    "contractType": "SERVICIO",
+    "procedure": "ABIERTO",
+    "sara": true,
+    "lots": true,
+    "lotCount": 4,
+    "cpvCount": 6,
+    "insufficientOwnMeansJustified": true,
+    "gmaoRequiredAsTechnicalMeans": true
+  },
+  "automaticChecks": 8,
+  "internalBlockersExpected": 0,
+  "blockingSourceInconsistency": {
+    "id": "LOT-PRESENTATION-LIMIT-AMBIGUITY",
+    "severity": "BLOCKING_FOR_RULE_FREEZE",
+    "unresolved": true,
+    "statementA": "Limitación de presentación de lotes: No existe limitación.",
+    "statementB": "Número máximo de lotes para los que una misma persona licitadora puede presentar oferta: Dos lotes.",
+    "treatment": "No resolver automáticamente. Fallar si el motor congela cualquiera de las dos alternativas sin nueva evidencia primaria y validación humana."
+  },
+  "pendingPrimaryEvidenceRemainsOpen": true,
+  "requiresFineExtractionHumanValidation": true,
+  "requiresHumanRegistration": true,
+  "notGoldenCase": true
+}

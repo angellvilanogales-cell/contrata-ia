@@ -1,0 +1,40 @@
+export const SERVICE_REGRESSION_CASE_005_CARL_ANNEX_I_CLOSURE = {
+  id: "REG-SERVICE-005",
+  step: "11.8.4",
+  expediente: "ADM-2024-0004 (CONTR/2024/636510)",
+  status: "ANNEX_I_EVIDENCE_REVIEW_PENDING_HUMAN_VALIDATION",
+  purpose: "Cerrar solo los extremos del Anexo I que puedan acreditarse de forma inequívoca en las fuentes recuperables, sin completar por inferencia los campos no visibles o no suficientemente indexados.",
+  confirmedFromSources: {
+    solvencyRequired: true,
+    solvencyLocation: "ANEXO_I_APARTADO_4",
+    economicProposalModelPresent: true,
+    economicProposalAsTotalAmountExVat: true,
+    awardCriteriaAllFormulaBased: true,
+    awardCriteriaTotalPoints: 100,
+    economicOfferPoints: 80,
+    plannedModification: true,
+    plannedModificationPercent: 20,
+    personnelSubrogation: true,
+  },
+  unresolvedBecauseExactAnnexITextNotReliablyRecovered: [
+    "umbral exacto y medio concreto de solvencia económica",
+    "umbral exacto y medio concreto de solvencia técnica/profesional",
+    "clasificación alternativa, si la hubiera, aplicable específicamente a este expediente",
+    "garantía definitiva y eventual garantía complementaria",
+    "detalle exacto de los 20 puntos restantes de criterios de adjudicación",
+    "fórmula matemática exacta de la oferta económica y del resto de criterios",
+    "literalidad exacta del sistema de determinación del precio",
+    "condiciones especiales de ejecución completas",
+    "penalidades específicas completas",
+    "causa y redacción literal de la modificación prevista del 20 %",
+    "aplicación o no de la DA 33.ª",
+  ],
+  evidencePolicy: {
+    noInferenceToFillAnnexI: true,
+    sourceTextRequiredForFreeze: true,
+    humanValidationRequired: true,
+    note: "La existencia de una referencia genérica del PCAP al Anexo I no basta para congelar umbrales, porcentajes o cláusulas concretas. Solo se registran como cerrados los extremos cuyo contenido material aparece en las fuentes recuperadas.",
+  },
+} as const;
+
+export type ServiceRegressionCase005CarlAnnexIClosure = typeof SERVICE_REGRESSION_CASE_005_CARL_ANNEX_I_CLOSURE;

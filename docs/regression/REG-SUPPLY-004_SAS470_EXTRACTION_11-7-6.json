@@ -1,0 +1,35 @@
+{
+  "version": "REG-SUPPLY-004-SAS-EXTRACTION-11.7.6-v1",
+  "id": "REG-SUPPLY-004",
+  "expediente": "470/2025",
+  "shortName": "SAS - nebulización y oxigenoterapia",
+  "status": "SOURCE_EXTRACTED_PENDING_HUMAN_VALIDATION",
+  "sourceDocuments": ["MEMORIA", "PCAP", "PPT", "ANEXOS"],
+  "verifiedScope": {
+    "contractType": "SUMINISTRO",
+    "procurementInstrument": "ACUERDO_MARCO",
+    "procedure": "ABIERTO",
+    "lots": true,
+    "successiveSupply": true,
+    "economicMode": "PRECIOS_UNITARIOS",
+    "awardMode": "CRITERIOS_MULTIPLES",
+    "judgmentValueCriteria": true,
+    "automaticCriteria": true,
+    "plannedModification": true
+  },
+  "deliberatelyNotFrozenYet": [
+    "número exacto y descripción de cada lote",
+    "importes económicos por lote y globales",
+    "CPV por lote",
+    "duración y prórrogas exactas",
+    "porcentaje y causa concreta de modificación",
+    "ponderación exacta de cada criterio",
+    "fórmulas de valoración",
+    "número máximo de adjudicatarios por lote",
+    "condiciones de los contratos basados",
+    "garantías y condiciones especiales de ejecución"
+  ],
+  "acceptanceRule": "Esta manifestación congela únicamente el alcance documental ya identificado. No convierte el expediente en golden case ni valida detalles no extraídos. Requiere validación humana antes de construir la regresión automática 11.7.7.",
+  "humanValidationRequired": true,
+  "humanValidated": false
+}

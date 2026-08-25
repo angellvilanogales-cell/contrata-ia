@@ -52,6 +52,20 @@ export interface IntakeValidationRecord {
   readonly fingerprint?: string;
 }
 
+/**
+ * Extensión persistente introducida en LB-7 para perfiles especializados y
+ * revisión jurídica preventiva. Se mantiene fuera del catálogo LB-6 para no
+ * convertir patrones especializados en reglas normativas del MVP de limpieza.
+ */
+export interface LB7CaseSupplement {
+  readonly family?: "EVENT_SERVICES";
+  readonly eventServices?: {
+    readonly features: readonly string[];
+    readonly answers: Readonly<Record<string, unknown>>;
+  };
+  readonly preLegalReviewInput?: Readonly<Record<string, unknown>>;
+}
+
 export interface IntakeCase {
   readonly id: string;
   readonly mode: IntakeMode;
@@ -59,6 +73,7 @@ export interface IntakeCase {
   readonly answers: Readonly<Partial<Record<IntakeQuestionId, IntakeAnswer>>>;
   readonly validation: IntakeValidationRecord;
   readonly revision: number;
+  readonly lb7?: LB7CaseSupplement;
 }
 
 export interface IntakeProgress {

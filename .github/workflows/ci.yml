@@ -9,6 +9,7 @@ on:
       - agent/lb4-motor-normativo
       - agent/lb5-documentos-administrativos
       - agent/lb6-api-ui-integracion
+      - agent/lb7-qa-seguridad-v1
   pull_request:
     branches:
       - main
@@ -18,6 +19,7 @@ on:
       - agent/lb4-motor-normativo
       - agent/lb5-documentos-administrativos
       - agent/lb6-api-ui-integracion
+      - agent/lb7-qa-seguridad-v1
   workflow_dispatch:
 
 permissions:
@@ -97,6 +99,30 @@ jobs:
       - run: npm ci
       - run: npm run audit:lb6
 
+  audit-lb7:
+    name: Validate LB-7 operations and security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:lb7
+
+  audit-lb25:
+    name: Validate V1 release gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:lb25
+
   typecheck:
     name: TypeScript typecheck
     runs-on: ubuntu-latest
@@ -110,7 +136,7 @@ jobs:
       - run: npm run typecheck
 
   tests:
-    name: Unit, vertical, normative, document and intake tests
+    name: Unit, vertical, normative, document, intake and security tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -142,20 +168,41 @@ jobs:
         run: npm run demo:lb5
       - name: Execute LB-6 dual intake demo
         run: npm run demo:lb6
-      - name: Smoke test LB-6 HTTP API and UI
+      - name: Smoke test authenticated API, persistence and backup
+        env:
+          CONTRATA_IA_AUTH_REQUIRED: "1"
+          CONTRATA_IA_ADMIN_TOKEN: "ci-lb7-admin-token"
+          CONTRATA_IA_DATA_DIR: "/tmp/contrata-ia-lb7"
         run: |
-          npm run serve > /tmp/contrata-ia-lb6.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
-          for i in $(seq 1 20); do
-            if curl --fail --silent http://127.0.0.1:3000/api/questions > /tmp/questions.json; then break; fi
-            sleep 0.25
-          done
+          rm -rf "$CONTRATA_IA_DATA_DIR"
+          start_server() {
+            npm run serve > /tmp/contrata-ia-lb7.log 2>&1 &
+            SERVER_PID=$!
+            for i in $(seq 1 30); do
+              if curl --fail --silent http://127.0.0.1:3000/api/health > /tmp/health.json; then return 0; fi
+              sleep 0.25
+            done
+            cat /tmp/contrata-ia-lb7.log
+            return 1
+          }
+          start_server
+          test "$(curl --silent -o /tmp/unauth.json -w '%{http_code}' http://127.0.0.1:3000/api/questions)" = "401"
+          curl --fail --silent -H "Authorization: Bearer $CONTRATA_IA_ADMIN_TOKEN" http://127.0.0.1:3000/api/questions > /tmp/questions.json
           grep -q 'contractingAuthority' /tmp/questions.json
-          curl --fail --silent http://127.0.0.1:3000/ | grep -q 'Asistente guiado'
+          curl --fail --silent http://127.0.0.1:3000/ | grep -q 'Nuevo expediente guiado'
+          curl --fail --silent -X POST -H "Authorization: Bearer $CONTRATA_IA_ADMIN_TOKEN" -H 'Content-Type: application/json' -d '{"mode":"GUIDED"}' http://127.0.0.1:3000/api/cases > /tmp/case.json
+          CASE_ID=$(node -e "const fs=require('fs');process.stdout.write(JSON.parse(fs.readFileSync('/tmp/case.json','utf8')).id)")
+          test -n "$CASE_ID"
           kill $SERVER_PID
           wait $SERVER_PID 2>/dev/null || true
-          trap - EXIT
+          start_server
+          curl --fail --silent -H "Authorization: Bearer $CONTRATA_IA_ADMIN_TOKEN" "http://127.0.0.1:3000/api/cases/$CASE_ID" > /tmp/restored.json
+          grep -q "$CASE_ID" /tmp/restored.json
+          curl --fail --silent -X POST -H "Authorization: Bearer $CONTRATA_IA_ADMIN_TOKEN" http://127.0.0.1:3000/api/admin/backup > /tmp/backup.json
+          grep -q 'backups' /tmp/backup.json
+          test -f "$CONTRATA_IA_DATA_DIR/audit/security.jsonl"
+          kill $SERVER_PID
+          wait $SERVER_PID 2>/dev/null || true
       - name: Verify LB-5 and LB-6 artifacts
         run: |
           test -f artifacts/lb5/manifest.json
@@ -179,3 +226,14 @@ jobs:
           path: artifacts/lb6
           if-no-files-found: error
           retention-days: 30
+      - name: Prepare deployable V1 runtime build
+        run: |
+          npm prune --omit=dev
+          tar -czf /tmp/contrata-ia-v1-runtime-build.tgz dist package.json package-lock.json node_modules
+      - name: Preserve deployable V1 runtime build
+        uses: actions/upload-artifact@v4
+        with:
+          name: contrata-ia-v1-runtime-build
+          path: /tmp/contrata-ia-v1-runtime-build.tgz
+          if-no-files-found: error
+          retention-days: 7

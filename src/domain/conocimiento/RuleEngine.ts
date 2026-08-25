@@ -1,136 +1,46 @@
-/**
- * ============================================================
- * CONTRATA IA
- * RuleEngine
- * ============================================================
- *
- * Motor responsable de gestionar las reglas jurídicas
- * cargadas desde el repositorio de conocimiento.
- *
- * No interpreta las reglas.
- * Únicamente las carga, organiza y permite su consulta.
- *
- * La interpretación corresponde al InferenceEngine.
- *
- * ============================================================
- */
-
 import { RuleLoader, RuleDefinition } from "./RuleLoader";
 
+/**
+ * Registro local de reglas validadas. No interpreta ni decide; esa función
+ * corresponde a InferenceEngine. Las colecciones devueltas son copias para
+ * evitar mutaciones externas del banco cargado.
+ */
 export class RuleEngine {
+  private readonly loader = new RuleLoader();
+  private reglas: RuleDefinition[] = [];
 
-    /**
-     * Cargador de reglas.
-     */
-    private readonly loader = new RuleLoader();
+  public cargarReglas(fichero: string): void {
+    this.reglas = this.loader.cargar(fichero).map(rule => ({ ...rule }));
+  }
 
-    /**
-     * Reglas cargadas.
-     */
-    private reglas: RuleDefinition[] = [];
+  public obtenerReglas(): readonly RuleDefinition[] {
+    return this.reglas.map(rule => ({ ...rule }));
+  }
 
-    /**
-     * Carga un fichero de reglas.
-     */
-    public cargarReglas(
+  public obtenerRegla(id: string): RuleDefinition | undefined {
+    const rule = this.reglas.find(item => item.id === id);
+    return rule ? { ...rule } : undefined;
+  }
 
-        fichero: string
+  public existeRegla(id: string): boolean {
+    return this.reglas.some(rule => rule.id === id);
+  }
 
-    ): void {
+  public obtenerReglasOrdenadas(): RuleDefinition[] {
+    return this.reglas
+      .map(rule => ({ ...rule }))
+      .sort((a, b) => a.prioridad - b.prioridad || a.id.localeCompare(b.id));
+  }
 
-        this.reglas = this.loader.cargar(fichero);
+  public obtenerPorTipo(tipo: string): RuleDefinition[] {
+    return this.reglas.filter(rule => rule.tipo === tipo).map(rule => ({ ...rule }));
+  }
 
-    }
+  public total(): number {
+    return this.reglas.length;
+  }
 
-    /**
-     * Devuelve todas las reglas.
-     */
-    public obtenerReglas(): readonly RuleDefinition[] {
-
-        return this.reglas;
-
-    }
-
-    /**
-     * Devuelve una regla concreta.
-     */
-    public obtenerRegla(
-
-        id: string
-
-    ): RuleDefinition | undefined {
-
-        return this.reglas.find(
-
-            r => r.id === id
-
-        );
-
-    }
-
-    /**
-     * Comprueba si existe una regla.
-     */
-    public existeRegla(
-
-        id: string
-
-    ): boolean {
-
-        return this.obtenerRegla(id) !== undefined;
-
-    }
-
-    /**
-     * Devuelve todas las reglas
-     * ordenadas por prioridad.
-     */
-    public obtenerReglasOrdenadas(): RuleDefinition[] {
-
-        return [...this.reglas]
-
-            .sort(
-
-                (a, b) => a.prioridad - b.prioridad
-
-            );
-
-    }
-
-    /**
-     * Devuelve todas las reglas
-     * de un tipo determinado.
-     */
-    public obtenerPorTipo(
-
-        tipo: string
-
-    ): RuleDefinition[] {
-
-        return this.reglas.filter(
-
-            r => r.tipo === tipo
-
-        );
-
-    }
-
-    /**
-     * Número de reglas cargadas.
-     */
-    public total(): number {
-
-        return this.reglas.length;
-
-    }
-
-    /**
-     * Elimina todas las reglas.
-     */
-    public limpiar(): void {
-
-        this.reglas = [];
-
-    }
-
+  public limpiar(): void {
+    this.reglas = [];
+  }
 }

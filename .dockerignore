@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-test
+artifacts
+var
+.git
+.github
+*.log
+*.zip
+*.pdf
+*.docx

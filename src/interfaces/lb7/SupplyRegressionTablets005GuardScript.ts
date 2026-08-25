@@ -1,0 +1,30 @@
+import { TABLETS_REGRESSION_BASELINE, TABLETS_REGRESSION_VERSION } from "../../regression/SupplyRegressionCase005TabletsPlatformGuard";
+import { SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT } from "./SupplyRegressionVeiasa006ExtractionScript";
+import { SUPPLY_REGRESSION_VEIASA_006_GUARD_SCRIPT } from "./SupplyRegressionVeiasa006GuardScript";
+
+const BASELINE_JSON = JSON.stringify(TABLETS_REGRESSION_BASELINE);
+
+const TABLETS_GUARD_CORE_SCRIPT = `"use strict";
+(function(){
+var work=document.getElementById("work");if(!work)return;
+var key="contrataIaAdaptiveAnswers";
+var VERSION=${JSON.stringify(TABLETS_REGRESSION_VERSION)};
+var BASELINE=${BASELINE_JSON};
+function readJson(s,k){try{return JSON.parse(s.getItem(k)||"{}");}catch(e){return {};}}
+function readAnswers(){var a=readJson(sessionStorage,key);if(Object.keys(a).length)return a;return readJson(localStorage,key);}
+function save(a){var raw=JSON.stringify(a);sessionStorage.setItem(key,raw);localStorage.setItem(key,raw);document.dispatchEvent(new CustomEvent("contrata-ia:adaptive-saved",{detail:{kind:"tablets-regression-11.7.9"}}));}
+function esc(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function manifest(){return {version:VERSION,caseId:BASELINE.caseId,status:BASELINE.passed?"AUTOMATIC_REGRESSION_ACTIVE":"AUTOMATIC_REGRESSION_BLOCKED",passed:BASELINE.passed,blockers:BASELINE.blockers,checks:BASELINE.checks,protectedScope:BASELINE.protectedScope,deliberatelyNotFrozenYet:BASELINE.deliberatelyNotFrozenYet,classificationGuard:BASELINE.classificationGuard,requiresSourceExtractionHumanValidation:true,sourceExtractionHumanValidated:true,acceptanceRule:"La regresión protege únicamente el alcance validado en 11.7.8. No autoriza a recalificar el contrato por el componente de plataforma ni a congelar importes, CPV, duración exacta, ponderaciones, modificación concreta, garantías, protección de datos, seguridad o niveles de servicio sin extracción específica.",registeredAt:new Date().toISOString()};}
+function downloadJson(data){var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Contrata-IA_REG-SUPPLY-005_Tablets_Regression_11-7-9.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
+function rows(){return BASELINE.checks.map(function(c){return '<tr><td>'+esc(c.id)+'</td><td>'+(c.ok?'✓ Pasa':'✗ Bloquea')+'</td><td>'+esc(c.purpose)+'</td></tr>';}).join("");}
+function card(){var a=readAnswers();if(a.supplyRegressionTablets005ExtractionValidated!==true)return "";var registered=a.supplyRegressionTablets005AutomaticGuardRegistered===true;var html='<div id="supplyRegressionTablets005GuardCard" class="card" style="margin-top:14px"><h3>11.7.9 Regresión automática Tablets + plataforma</h3>';
+if(BASELINE.passed){html+='<div class="info"><strong>Protección automática activa.</strong> La línea base supera '+BASELINE.checks.length+' comprobaciones con 0 bloqueantes. Se protege suministro, componente de plataforma, procedimiento abierto, lote único, DA 33.ª, precios unitarios, criterios múltiples, evaluación mediante fórmulas y la existencia de prórroga y modificación prevista.</div>';}else{html+='<div class="warning"><strong>Regresión bloqueada.</strong> Existen '+BASELINE.blockers.length+' incoherencias y no puede registrarse.</div>';}
+html+='<div class="warning"><strong>Guarda de calificación.</strong> '+esc(BASELINE.classificationGuard)+'</div><div class="warning"><strong>Alcance limitado deliberadamente.</strong> No se congelan importes, CPV, duración exacta, detalle de prórrogas, porcentaje o causa de modificación, fórmulas/ponderaciones, garantías, condiciones especiales, protección de datos, seguridad ni niveles de servicio.</div><table style="width:100%;border-collapse:collapse"><thead><tr><th>Check</th><th>Resultado</th><th>Qué protege</th></tr></thead><tbody>'+rows()+'</tbody></table>';
+if(!registered&&BASELINE.passed){html+='<button id="registerTablets005AutomaticGuard" type="button">Registrar regresión automática 11.7.9</button>';}else if(registered){html+='<div class="info"><strong>11.7.9 registrado.</strong> Versión '+esc(VERSION)+'. Tablets + plataforma queda protegido como caso de regresión, pero no como golden case.</div><button id="downloadTablets005AutomaticGuard" type="button" class="secondary">Descargar manifiesto 11.7.9 JSON</button>';}
+html+='</div>';return html;}
+function ensure(){var old=document.getElementById("supplyRegressionTablets005GuardCard");if(old)old.remove();var anchor=document.getElementById("supplyRegressionTablets005ExtractionCard");if(anchor){var html=card();if(html)anchor.insertAdjacentHTML("afterend",html);}}
+document.addEventListener("click",function(e){if(!e.target)return;if(e.target.id==="registerTablets005AutomaticGuard"){var a=readAnswers();if(a.supplyRegressionTablets005ExtractionValidated!==true){alert("Primero debe validarse la extracción documental 11.7.8.");return;}if(!BASELINE.passed){alert("La regresión presenta bloqueantes y no puede registrarse.");return;}var m=manifest();a.supplyRegressionTablets005AutomaticGuardRegistered=true;a.supplyRegressionTablets005AutomaticGuardVersion=VERSION;a.supplyRegressionTablets005AutomaticGuardManifest=m;a.supplyRegressionTablets005Status="AUTOMATIC_REGRESSION_ACTIVE";a.supplyRegressionNextRecommendedCase="REG-SUPPLY-006";save(a);downloadJson(m);ensure();alert("Regresión automática Tablets + plataforma 11.7.9 registrada. REG-SUPPLY-005 queda protegido sin convertirse en golden case.");return;}if(e.target.id==="downloadTablets005AutomaticGuard"){var a2=readAnswers();downloadJson(a2.supplyRegressionTablets005AutomaticGuardManifest||manifest());return;}},true);
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(ensure,0);});setTimeout(ensure,0);setTimeout(ensure,500);
+})();`;
+
+export const SUPPLY_REGRESSION_TABLETS_005_GUARD_SCRIPT = TABLETS_GUARD_CORE_SCRIPT + "\n" + SUPPLY_REGRESSION_VEIASA_006_EXTRACTION_SCRIPT + "\n" + SUPPLY_REGRESSION_VEIASA_006_GUARD_SCRIPT;

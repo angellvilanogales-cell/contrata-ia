@@ -1,0 +1,44 @@
+{
+  "version": "REG-SUPPLY-004-SAS470-GUARD-11.7.7-v1",
+  "caseId": "REG-SUPPLY-004",
+  "expediente": "470/2025",
+  "status": "AUTOMATIC_REGRESSION_READY_PENDING_RUNTIME_REGISTRATION",
+  "protectedScope": [
+    "tipo de contrato: suministro",
+    "instrumento: acuerdo marco",
+    "procedimiento abierto",
+    "existencia de lotes",
+    "suministro de tracto sucesivo",
+    "precios unitarios",
+    "pluralidad de criterios",
+    "coexistencia de juicio de valor y criterios automáticos",
+    "existencia de modificación prevista"
+  ],
+  "checks": [
+    "SAS470-FRAMEWORK",
+    "SAS470-OPEN-PROCEDURE",
+    "SAS470-MULTI-LOT",
+    "SAS470-SUCCESSIVE-SUPPLY",
+    "SAS470-UNIT-PRICES",
+    "SAS470-MULTIPLE-CRITERIA",
+    "SAS470-JUDGMENT-VALUE",
+    "SAS470-AUTOMATIC-CRITERIA",
+    "SAS470-MODIFICATION-EXISTS"
+  ],
+  "requiredBlockers": 0,
+  "humanSourceExtractionValidationRequired": true,
+  "humanSourceExtractionValidationCompletedInStep": "11.7.6",
+  "notGoldenCase": true,
+  "deliberatelyNotFrozenYet": [
+    "número exacto y descripción de cada lote",
+    "importes económicos por lote y globales",
+    "CPV por lote",
+    "duración y prórrogas exactas",
+    "porcentaje y causa concreta de modificación",
+    "ponderación exacta de cada criterio",
+    "fórmulas de valoración",
+    "número máximo de adjudicatarios por lote",
+    "condiciones de los contratos basados",
+    "garantías y condiciones especiales de ejecución"
+  ]
+}
