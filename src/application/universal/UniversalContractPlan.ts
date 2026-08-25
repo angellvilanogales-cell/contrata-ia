@@ -32,19 +32,23 @@ export interface UniversalContractPlan {
 const COMPONENT_BY_CAPABILITY: Partial<Record<UniversalCapability, string>> = {
   OBJECT_AND_NEED: "ObjetoEngine",
   CPV: "CPVEngine",
+  LOTS: "UniversalLotsEngine",
   ECONOMICS: "UniversalEconomicEngine",
   PROCEDURE: "ProcedimientoEngine",
   SOLVENCY: "SolvenciaEngine",
   PUBLICITY: "PublicidadEngine",
+  AWARD_CRITERIA: "UniversalAwardCriteriaEngine",
+  GUARANTEES: "UniversalGuaranteeEngine",
+  MODIFICATIONS: "UniversalModificationEngine",
+  PRICE_REVISION: "UniversalPriceRevisionEngine",
+  REMEDIES: "UniversalRemediesEngine",
   DOCUMENT_MODEL_SELECTION: "CanonicalDocumentProfileSelector",
   EDITABLE_DOCUMENT_GENERATION: "UniversalDocumentGenerationGate",
   CROSS_DOCUMENT_AUDIT: "ProtectedPackageCrossAudit",
 };
 
 function actionFor(item: CapabilityCoverage): UniversalModuleAction {
-  if (item.status === "NOT_IMPLEMENTED" || item.status === "SOURCE_REFERENCE_ONLY") {
-    return "BLOCK_UNTIL_IMPLEMENTED";
-  }
+  if (item.status === "NOT_IMPLEMENTED" || item.status === "SOURCE_REFERENCE_ONLY") return "BLOCK_UNTIL_IMPLEMENTED";
   if (item.status === "PARTIAL_SOURCE_BACKED") return "COLLECT_AND_VALIDATE_EVIDENCE";
   return "RUN_EXISTING_COMPONENT";
 }
@@ -79,11 +83,5 @@ export function buildUniversalContractPlan(contractType: UniversalTargetContract
     && generationStep?.action !== "BLOCK_UNTIL_IMPLEMENTED"
     && modelStep?.action !== "BLOCK_UNTIL_IMPLEMENTED";
 
-  return {
-    contractType,
-    requiredDocuments: family.requiredDocuments,
-    steps,
-    blockers,
-    canReachDocumentGeneration,
-  };
+  return { contractType, requiredDocuments: family.requiredDocuments, steps, blockers, canReachDocumentGeneration };
 }
