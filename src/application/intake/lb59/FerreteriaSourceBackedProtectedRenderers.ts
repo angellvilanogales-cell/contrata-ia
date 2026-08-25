@@ -95,7 +95,7 @@ function auditMemory(entries: readonly OdtZipEntry[], sourceStructuralStyle: str
   return { ready: blockers.length === 0, blockers } as const;
 }
 
-function auditPpt(entries: readonly OdtZipEntry[]) {
+function auditPpt(entries: readonly OdtZipEntry[], sourceStructuralStyle: string) {
   const text = visibleText(part(entries, "content.xml")); const styles = part(entries, "styles.xml"); const blockers: string[] = [];
   if (text.includes("no exhaustivo ni limitativo")) blockers.push("PPT: persiste la formulación de catálogo abierto no exhaustivo ni limitativo.");
   if (!text.includes("La relación de referencias delimita los artículos objeto del suministro")) blockers.push("PPT: falta la regla explícita de catálogo cerrado.");
@@ -103,6 +103,7 @@ function auditPpt(entries: readonly OdtZipEntry[]) {
   if (!text.includes("duración máxima conjunta de 24 meses")) blockers.push("PPT: falta la prórroga máxima conjunta validada de 24 meses.");
   if (!part(entries, "content.xml").includes('table:name="ContrataIA_Catalogo98"')) blockers.push("PPT: el catálogo canónico no está materializado como tabla editable ODF.");
   if (count(styles, `<text:page-count>${PPT_AUDITED_PAGE_COUNT_CACHE}</text:page-count>`) !== 1) blockers.push("PPT: el contador de páginas no conserva el valor cacheado auditado tras materializar la tabla editable.");
+  if (structuralStyleFingerprint(entries) !== sourceStructuralStyle) blockers.push("PPT: se alteraron definiciones tipográficas/estilos estructurales fuera del contador de páginas permitido.");
   const missingDescriptions = FERRETERIA_CANONICAL_CATALOG_98.filter(item => !text.includes(item.description));
   if (missingDescriptions.length) blockers.push(`PPT: faltan ${missingDescriptions.length} de las 98 referencias canónicas (primera: ${missingDescriptions[0]?.sequence}).`);
   for (const total of ["10.552,44 €", "2.216,01 €", "12.768,45 €"]) if (!text.includes(total)) blockers.push(`PPT: falta total agregado declarado ${total}.`);
@@ -128,15 +129,14 @@ export async function renderFerreteriaProtectedMemory(store: UniversalEditableTe
 
 export async function renderFerreteriaProtectedPpt(store: UniversalEditableTemplateBinaryStore): Promise<ProtectedCaseDocumentRender> {
   const source = await store.get(FERRETERIA_PPT_TEMPLATE_ID); if (!source) throw new Error("PPT: no están disponibles los bytes exactos V6 en runtime.");
-  let entries = assertSource(source, FERRETERIA_PPT_TEMPLATE_ID, PPT_SOURCE_SHA, PPT_SOURCE_STYLE); let content = part(entries, "content.xml");
+  let entries = assertSource(source, FERRETERIA_PPT_TEMPLATE_ID, PPT_SOURCE_SHA, PPT_SOURCE_STYLE); const sourceStructuralStyle = structuralStyleFingerprint(entries); let content = part(entries, "content.xml");
   content = replaceParagraph(content, "El listado de productos y sus cantidades estimadas tienen carácter meramente orientativo, no exhaustivo ni limitativo", PPT_SCOPE_PARAGRAPH);
   content = replacePptImageCatalogue(content);
   entries = replacePart(entries, "content.xml", content);
   let styles = part(entries, "styles.xml");
   styles = replaceUnique(styles, "<text:page-count>7</text:page-count>", `<text:page-count>${PPT_AUDITED_PAGE_COUNT_CACHE}</text:page-count>`, "PPT contador de páginas");
   entries = replacePart(entries, "styles.xml", styles);
-  const audit = auditPpt(entries); const renderedStyle = computeOdtStyleFingerprint(entries); const bytes = writeOdtZip(entries);
-  if (renderedStyle !== PPT_SOURCE_STYLE) return { kind: "PPT", fileName: "CONTR-2026-240267_PPT_V7_Protegido_Contrata-IA.odt", bytes, sourceSha256: PPT_SOURCE_SHA, renderedSha256: hash(bytes), sourceStyleFingerprint: PPT_SOURCE_STYLE, renderedStyleFingerprint: renderedStyle, auditReady: false, auditBlockers: [...audit.blockers, "PPT: el render alteró la huella de estilos del V6."], appliedPhysicalBindings: FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id) };
+  const audit = auditPpt(entries, sourceStructuralStyle); const renderedStyle = computeOdtStyleFingerprint(entries); const bytes = writeOdtZip(entries);
   return { kind: "PPT", fileName: "CONTR-2026-240267_PPT_V7_Protegido_Contrata-IA.odt", bytes, sourceSha256: PPT_SOURCE_SHA, renderedSha256: hash(bytes), sourceStyleFingerprint: PPT_SOURCE_STYLE, renderedStyleFingerprint: renderedStyle, auditReady: audit.ready, auditBlockers: audit.blockers, appliedPhysicalBindings: FERRETERIA_PPT_PHYSICAL_BINDING_INVENTORY.map(item => item.id) };
 }
 
