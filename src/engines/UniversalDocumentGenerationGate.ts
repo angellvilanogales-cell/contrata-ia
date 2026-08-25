@@ -7,6 +7,10 @@ import {
 import { DocumentDefinition } from "../domain/documentModel/DocumentDefinition";
 import { DocumentType } from "../domain/documentModel/DocumentType";
 import { CanonicalDocumentProfileSelection, selectCanonicalDocumentProfile } from "./CanonicalDocumentProfileSelector";
+import {
+  UniversalFamilyPreparationGate,
+  UniversalFamilyPreparationInput,
+} from "../application/universal/UniversalFamilyPreparationGate";
 
 export interface UniversalDocumentGenerationGateResult {
   ready: boolean;
@@ -38,11 +42,34 @@ export function requiredUniversalDomainsForDocument(documentType: DocumentType):
   return DOCUMENT_DOMAIN_REQUIREMENTS[documentType] ?? [];
 }
 
+function familyPreparationBlockers(
+  expediente: UniversalExpedienteV13,
+  familyPreparation?: UniversalFamilyPreparationInput,
+): readonly string[] {
+  const contractType = expediente.canonical.fields.contractType.value;
+  if (contractType !== "WORKS" && contractType !== "CONCESSION" && contractType !== "MIXED") return [];
+  if (!familyPreparation) {
+    return [`La generación de ${contractType} exige evaluación previa de los hechos específicos de su familia contractual.`];
+  }
+  if (familyPreparation.contractType !== contractType) {
+    return [`El gate familiar recibido corresponde a ${familyPreparation.contractType} y no a ${contractType}.`];
+  }
+  const result = new UniversalFamilyPreparationGate().evaluate(familyPreparation);
+  return result.ready ? [] : result.blockers;
+}
+
+/**
+ * Gate universal de generación. Para obras, concesiones y mixtos exige además
+ * la preparación específica de familia: un expediente universal completo no
+ * puede ocultar la ausencia de proyecto/replanteo, riesgo operacional/viabilidad
+ * o determinación de la prestación principal.
+ */
 export function evaluateUniversalDocumentGeneration(
   expediente: UniversalExpedienteV13,
   documentType: DocumentType,
   registry: ContractDocumentModelProfileRegistry,
   requiredCoverage: DocumentModelCoverage = "FULL_MODEL",
+  familyPreparation?: UniversalFamilyPreparationInput,
 ): UniversalDocumentGenerationGateResult {
   const blockers: string[] = [];
   const evaluation = evaluateUniversalExpediente(expediente);
@@ -55,6 +82,8 @@ export function evaluateUniversalDocumentGeneration(
       blockers.push(`Dominio universal requerido no completo para ${documentType}: ${domain}`);
     }
   }
+
+  blockers.push(...familyPreparationBlockers(expediente, familyPreparation));
 
   const selection = selectCanonicalDocumentProfile(
     expediente.canonical,
