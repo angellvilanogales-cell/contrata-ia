@@ -1,183 +1,66 @@
-/**
- * ============================================================
- * CONTRATA IA
- * CPVMatcher
- * ============================================================
- *
- * Motor de búsqueda de códigos CPV.
- *
- * Compara el texto introducido por el usuario con
- * los CPV almacenados en el KnowledgeRepository y
- * devuelve los más relevantes.
- *
- * Esta primera versión utiliza coincidencias de
- * palabras clave.
- *
- * En futuras versiones se sustituirá por búsqueda
- * semántica mediante embeddings.
- *
- * ============================================================
- */
-
 import { CPVEntry } from "./CPVEntry";
 
 export interface CPVMatch {
-
-    cpv: CPVEntry;
-
-    puntuacion: number;
-
+  cpv: CPVEntry;
+  puntuacion: number;
 }
 
+/**
+ * Búsqueda CPV determinista y local. No usa embeddings ni servicios externos.
+ * La puntuación expresa coincidencia léxica, no certeza jurídica.
+ */
 export class CPVMatcher {
+  public buscar(descripcion: string, cpvDisponibles: CPVEntry[], limite = 10): CPVMatch[] {
+    const texto = this.normalizar(descripcion);
+    if (!texto || limite <= 0) return [];
 
-    /**
-     * Busca los mejores CPV.
-     */
-    public buscar(
+    return cpvDisponibles
+      .filter(cpv => cpv.activo !== false && cpv.codigo.trim().length > 0)
+      .map(cpv => ({ cpv, puntuacion: this.calcularPuntuacion(texto, cpv) }))
+      .filter(match => match.puntuacion > 0)
+      .sort((a, b) => b.puntuacion - a.puntuacion || a.cpv.codigo.localeCompare(b.cpv.codigo))
+      .slice(0, limite);
+  }
 
-        descripcion: string,
+  private calcularPuntuacion(texto: string, cpv: CPVEntry): number {
+    const tokens = new Set(this.tokenizar(texto));
+    let puntos = 0;
+    const descripcion = this.normalizar(cpv.descripcion);
 
-        cpvDisponibles: CPVEntry[],
+    if (descripcion && this.contieneExpresion(texto, descripcion)) puntos += 60;
 
-        limite = 10
-
-    ): CPVMatch[] {
-
-        const texto = this.normalizar(descripcion);
-
-        const resultado: CPVMatch[] = [];
-
-        for (const cpv of cpvDisponibles) {
-
-            const puntuacion = this.calcularPuntuacion(
-
-                texto,
-
-                cpv
-
-            );
-
-            if (puntuacion <= 0) {
-
-                continue;
-
-            }
-
-            resultado.push({
-
-                cpv,
-
-                puntuacion
-
-            });
-
-        }
-
-        return resultado
-
-            .sort(
-
-                (a, b) => b.puntuacion - a.puntuacion
-
-            )
-
-            .slice(
-
-                0,
-
-                limite
-
-            );
-
+    for (const palabra of cpv.palabrasClave) {
+      const normalizada = this.normalizar(palabra);
+      if (normalizada && this.coincide(texto, tokens, normalizada)) puntos += 15;
     }
 
-    /**
-     * Calcula una puntuación para un CPV.
-     */
-    private calcularPuntuacion(
-
-        texto: string,
-
-        cpv: CPVEntry
-
-    ): number {
-
-        let puntos = 0;
-
-        const descripcion = this.normalizar(
-
-            cpv.descripcion
-
-        );
-
-        if (texto.includes(descripcion)) {
-
-            puntos += 100;
-
-        }
-
-        for (const palabra of cpv.palabrasClave) {
-
-            if (
-
-                texto.includes(
-
-                    this.normalizar(palabra)
-
-                )
-
-            ) {
-
-                puntos += 15;
-
-            }
-
-        }
-
-        for (const sinonimo of cpv.sinonimos) {
-
-            if (
-
-                texto.includes(
-
-                    this.normalizar(sinonimo)
-
-                )
-
-            ) {
-
-                puntos += 10;
-
-            }
-
-        }
-
-        return puntos;
-
+    for (const sinonimo of cpv.sinonimos) {
+      const normalizado = this.normalizar(sinonimo);
+      if (normalizado && this.coincide(texto, tokens, normalizado)) puntos += 10;
     }
 
-    /**
-     * Normaliza texto.
-     */
-    private normalizar(
+    return Math.min(100, puntos);
+  }
 
-        texto: string
+  private coincide(texto: string, tokens: Set<string>, termino: string): boolean {
+    return termino.includes(" ") ? this.contieneExpresion(texto, termino) : tokens.has(termino);
+  }
 
-    ): string {
+  private contieneExpresion(texto: string, expresion: string): boolean {
+    return (` ${texto} `).includes(` ${expresion} `);
+  }
 
-        return texto
+  private tokenizar(texto: string): string[] {
+    return texto.split(/[^a-z0-9]+/).filter(Boolean);
+  }
 
-            .toLowerCase()
-
-            .normalize("NFD")
-
-            .replace(/[\u0300-\u036f]/g, "")
-
-            .replace(/\s+/g, " ")
-
-            .trim();
-
-    }
-
+  private normalizar(texto: string): string {
+    return texto
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 }
