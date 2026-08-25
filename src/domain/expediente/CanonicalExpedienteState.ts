@@ -19,12 +19,26 @@ export interface CanonicalExpedienteFields {
   publicity?: EvidenceField<string>;
 }
 
+/**
+ * Vista auxiliar para motores heredados. No forma parte de la autoridad
+ * canónica ni se promociona por sí sola: solo transporta datos universales ya
+ * validados que son necesarios para aplicar reglas de procedimiento sin
+ * completar silenciosamente condiciones jurídicas.
+ */
+export interface CanonicalProcedureContext {
+  umbralSara?: number;
+  porcentajeJuicioValor?: number;
+  prestacionesIntelectuales?: boolean;
+  contratoMenorJustificado?: boolean;
+}
+
 export interface CanonicalExpedienteState {
   id: string;
   lifecycleState: EstadoExpediente;
   fields: CanonicalExpedienteFields;
   blockers: readonly string[];
   warnings: readonly string[];
+  procedureContext?: CanonicalProcedureContext;
 }
 
 export interface CanonicalPromotionCheck {
