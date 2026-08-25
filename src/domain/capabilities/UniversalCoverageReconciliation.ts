@@ -30,6 +30,7 @@ const OVERRIDES: Readonly<Partial<Record<UniversalTargetContractType, OverrideMa
   },
   CONCESSION: {
     ECONOMICS: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalConcessionEconomicEngine", "LCSP art. 101"], notes: ["Calcula desde cifra neta de negocios y evita doble contabilización, pero falta calibración con expediente real de concesión."] },
+    PROCEDURE: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalConcessionProcedureEngine", "LCSP arts. 131 y 156-177"], notes: ["Valida abierto/restringido y bloquea procedimientos excepcionales sin supuesto legal documentado; el art. 159 no se extiende a concesiones."] },
     CROSS_DOCUMENT_AUDIT: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalAdministrativePackageAudit"], notes: ["Exige subtipo, riesgo operacional y estudio de viabilidad; no sustituye la falta de modelo real."] },
   },
   MIXED: {
