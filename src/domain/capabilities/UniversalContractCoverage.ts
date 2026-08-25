@@ -136,14 +136,18 @@ export const UNIVERSAL_CONTRACT_COVERAGE: readonly ContractFamilyCoverage[] = [
   {
     contractType: "WORKS",
     requiredDocuments: COMMON_DOCUMENTS,
-    realSourceCoverage: "LEGAL_SOURCE_ONLY",
+    realSourceCoverage: "REAL_SOURCES_AVAILABLE",
     capabilities: CORE_CAPABILITIES.map(name => capability(
       name,
       ["OBJECT_AND_NEED", "CPV", "PROCEDURE", "PUBLICITY"].includes(name)
         ? "AVAILABLE_WITH_HUMAN_VALIDATION"
-        : "NOT_IMPLEMENTED",
-      ["LCSP arts. 12-13 and universal base architecture"],
-      name === "EDITABLE_DOCUMENT_GENERATION" ? ["No se ha acreditado todavía un modelo real de obras en las fuentes recuperadas."] : [],
+        : name === "DOCUMENT_MODEL_SELECTION"
+          ? "PARTIAL_SOURCE_BACKED"
+          : "NOT_IMPLEMENTED",
+      ["PCAP OBRAS ABIERTO real", "LCSP arts. 12-13", "universal base architecture"],
+      name === "EDITABLE_DOCUMENT_GENERATION"
+        ? ["Existe fuente real de obras, pero aún falta registrar/verificar el activo editable y su pipeline específico antes de habilitar generación."]
+        : [],
     )),
   },
   {
