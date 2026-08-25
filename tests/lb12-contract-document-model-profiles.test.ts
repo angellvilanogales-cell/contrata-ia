@@ -3,7 +3,7 @@ import { DocumentType } from "../src/domain/documentModel/DocumentType";
 import { createStandardContractDocumentProfiles } from "../src/domain/documentModel/StandardContractDocumentProfiles";
 
 describe("Bloque 12.4 - perfiles documentales por tipo de contrato", () => {
-  it("registra PCAP de servicios como modelo completo y generable", () => {
+  it("registra PCAP de servicios como modelo lógico completo y generable", () => {
     const registry = createStandardContractDocumentProfiles();
     const profile = registry.find("SERVICE", DocumentType.PCAP);
 
@@ -23,14 +23,18 @@ describe("Bloque 12.4 - perfiles documentales por tipo de contrato", () => {
     expect(registry.canGenerateFullDocument("SERVICE", DocumentType.PPT)).toBe(false);
   });
 
-  it("mantiene el PCAP de suministros limitado al Anexo I mientras falte el clausulado general completo", () => {
+  it("conserva el perfil histórico de Anexo I y añade el PCAP oficial completo de suministro ASA", () => {
     const registry = createStandardContractDocumentProfiles();
     const profile = registry.find("SUPPLY", DocumentType.PCAP);
+    const all = registry.findAll("SUPPLY", DocumentType.PCAP);
+    const full = all.find(item => item.id === "SUPPLY-PCAP-ASA-AUTOFINANCED-JDA-2025-12");
 
     expect(profile?.coverage).toBe("ANNEX_I_ONLY");
     expect(profile?.generationAllowed).toBe(false);
     expect(profile?.definition.id).toBe("PCAP_SUPPLY_ANNEX_I_JDA_2025_12");
-    expect(registry.canGenerateFullDocument("SUPPLY", DocumentType.PCAP)).toBe(false);
+    expect(full?.coverage).toBe("FULL_MODEL");
+    expect(full?.generationAllowed).toBe(true);
+    expect(registry.canGenerateFullDocument("SUPPLY", DocumentType.PCAP)).toBe(true);
   });
 
   it("registra el PPT de suministros por necesidades como patrón estructural, no universal", () => {
