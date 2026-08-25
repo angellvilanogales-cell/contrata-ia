@@ -137,7 +137,8 @@ export class CanonicalExpedienteEngine {
       }
     }
 
-    if (!isPromotableEvidenceField(state.fields.publicity)) {
+    const publicity = state.fields.publicity;
+    if (!publicity || !isPromotableEvidenceField(publicity)) {
       const publicidadDecision = this.publicidadEngine.ejecutar(context);
       if (publicidadDecision.resultado !== undefined && publicidadDecision.resultado !== null) {
         fields = {
