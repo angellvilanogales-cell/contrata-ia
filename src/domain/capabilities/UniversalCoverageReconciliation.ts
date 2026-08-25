@@ -26,11 +26,13 @@ const OVERRIDES: Readonly<Partial<Record<UniversalTargetContractType, OverrideMa
   },
   WORKS: {
     ECONOMICS: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalWorksEconomicEngine", "UniversalEconomicEngine", "real works sources"], notes: ["Exige proyecto aprobado y mediciones; conserva VE declarado y audita diferencias."] },
+    EXECUTION: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalWorksExecutionEngine", "LCSP arts. 237-244"], notes: ["Valida replanteo, dirección facultativa, certificaciones, recepción, garantía y vicios ocultos; no sustituye el proyecto ni la dirección técnica."] },
     CROSS_DOCUMENT_AUDIT: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalAdministrativePackageAudit"], notes: ["Exige identidad y versión del proyecto en Memoria-PCAP-PPT."] },
   },
   CONCESSION: {
     ECONOMICS: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalConcessionEconomicEngine", "LCSP art. 101"], notes: ["Calcula desde cifra neta de negocios y evita doble contabilización, pero falta calibración con expediente real de concesión."] },
     PROCEDURE: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalConcessionProcedureEngine", "LCSP arts. 131 y 156-177"], notes: ["Valida abierto/restringido y bloquea procedimientos excepcionales sin supuesto legal documentado; el art. 159 no se extiende a concesiones."] },
+    EXECUTION: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalConcessionExecutionEngine", "LCSP arts. 251-270 y 286-297"], notes: ["Preserva riesgo operacional, régimen económico, controles, reequilibrio y especialidades de obras/servicios; no fabrica tarifas ni causas de intervención."] },
     CROSS_DOCUMENT_AUDIT: { status: "AVAILABLE_WITH_HUMAN_VALIDATION", evidence: ["UniversalAdministrativePackageAudit"], notes: ["Exige subtipo, riesgo operacional y estudio de viabilidad; no sustituye la falta de modelo real."] },
   },
   MIXED: {
@@ -42,24 +44,15 @@ function applyOverride(item: CapabilityCoverage, override?: CoverageOverride): C
   return override ? { ...item, ...override } : item;
 }
 
-/**
- * Vista efectiva de cobertura tras LB91. No modifica la matriz histórica de
- * evidencia: superpone únicamente capacidades implementadas y verificadas por
- * tests. Los huecos documentales y regímenes especiales siguen visibles.
- */
+/** Vista efectiva tras LB91; conserva bloqueos documentales y de evidencia aunque exista motor técnico. */
 export function getReconciledContractFamilyCoverage(contractType: UniversalTargetContractType): ContractFamilyCoverage {
   const baseline = getContractFamilyCoverage(contractType);
   const overrides = OVERRIDES[contractType] ?? {};
-  return {
-    ...baseline,
-    capabilities: baseline.capabilities.map(item => applyOverride(item, overrides[item.capability])),
-  };
+  return { ...baseline, capabilities: baseline.capabilities.map(item => applyOverride(item, overrides[item.capability])) };
 }
 
 export function getReconciledOperationalGaps(contractType?: UniversalTargetContractType) {
-  const types: readonly UniversalTargetContractType[] = contractType
-    ? [contractType]
-    : ["SUPPLY", "SERVICE", "WORKS", "CONCESSION", "MIXED"];
+  const types: readonly UniversalTargetContractType[] = contractType ? [contractType] : ["SUPPLY", "SERVICE", "WORKS", "CONCESSION", "MIXED"];
   return types.flatMap(type => getReconciledContractFamilyCoverage(type).capabilities
     .filter(item => item.criticalForOperationalClaim && item.status !== "VALIDATED_ENGINE" && item.status !== "AVAILABLE_WITH_HUMAN_VALIDATION")
     .map(item => ({ contractType: type, capability: item.capability, status: item.status, reason: item.notes[0] ?? `Cobertura ${item.status} insuficiente.` })));
