@@ -26,7 +26,7 @@ describe("LB91.18 - activos editables físicos", () => {
     const profiles = createStandardContractDocumentProfiles();
     const profile = profiles.findAll("SERVICE", DocumentType.PCAP)[0]!;
     const registry = new EditableTemplateAssetRegistry();
-    registry.register({ profileId: profile.id, contractType: "SERVICE", documentType: DocumentType.PCAP, templateId: "service-pcap-odt", sourceId: "PCAP_SERVICES_OPEN_2025_12", mediaType: "ODT", sha256: sha, styleFingerprint: style, verified: true, active: true });
+    registry.register({ profileId: profile.id, contractType: "SERVICE", documentType: DocumentType.PCAP, templateId: "service-pcap-odt", sourceId: profile.sourceIds[0], mediaType: "ODT", sha256: sha, styleFingerprint: style, verified: true, active: true });
     expect(registry.assess(profile).ready).toBe(true);
   });
 });
