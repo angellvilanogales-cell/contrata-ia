@@ -50,6 +50,13 @@ export class ExpedienteContext {
 
     public iva = 21;
 
+    /**
+     * Umbral SARA aplicable al órgano y tipo contractual en el momento
+     * de tramitar el expediente. Se aporta como dato normativo versionado;
+     * el motor no debe inventarlo cuando no esté disponible.
+     */
+    public umbralSara?: number;
+
     // =====================================================
     // DURACIÓN
     // =====================================================
@@ -69,6 +76,21 @@ export class ExpedienteContext {
     // =====================================================
 
     public procedimiento?: TipoProcedimiento;
+
+    /**
+     * Datos jurídicos necesarios para decidir procedimientos simplificados.
+     * Se mantienen opcionales: ausencia de dato significa que el motor no
+     * puede cerrar automáticamente esa alternativa.
+     */
+    public prestacionesIntelectuales?: boolean;
+
+    public porcentajeJuicioValor?: number;
+
+    /**
+     * Para el contrato menor no basta la cuantía: debe existir una
+     * justificación expresa de necesidad y de no alteración del objeto.
+     */
+    public contratoMenorJustificado?: boolean;
 
     // =====================================================
     // CPV
