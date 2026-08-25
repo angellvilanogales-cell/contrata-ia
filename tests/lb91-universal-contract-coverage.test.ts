@@ -27,12 +27,17 @@ describe("LB91.1 - matriz universal de cobertura contractual", () => {
     expect(supply.requiredDocuments).not.toContain(DocumentType.MEANS_INSUFFICIENCY_REPORT);
   });
 
-  it("no presenta obras ni concesiones como familias documentalmente listas", () => {
-    for (const type of ["WORKS", "CONCESSION"] as const) {
-      const coverage = getContractFamilyCoverage(type);
-      expect(coverage.realSourceCoverage).toBe("LEGAL_SOURCE_ONLY");
-      expect(getOperationalCoverageGaps(type).length).toBeGreaterThan(0);
-    }
+  it("reconoce fuente real de obras sin convertirla en cobertura operativa completa", () => {
+    const works = getContractFamilyCoverage("WORKS");
+    expect(works.realSourceCoverage).toBe("REAL_SOURCES_AVAILABLE");
+    expect(works.capabilities.some(item => item.evidence.includes("PCAP OBRAS ABIERTO real"))).toBe(true);
+    expect(getOperationalCoverageGaps("WORKS").length).toBeGreaterThan(0);
+  });
+
+  it("mantiene concesiones en cobertura normativa hasta localizar un expediente real verificable", () => {
+    const concession = getContractFamilyCoverage("CONCESSION");
+    expect(concession.realSourceCoverage).toBe("LEGAL_SOURCE_ONLY");
+    expect(getOperationalCoverageGaps("CONCESSION").length).toBeGreaterThan(0);
   });
 
   it("mantiene el caso mixto como evidencia parcial y no hereda cobertura completa de servicios o suministros", () => {
