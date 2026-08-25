@@ -8,7 +8,6 @@ import { auditFerreteriaCatalogProjectionParity, projectCanonicalCatalogToPcapAn
 
 const DEFAULT_CASE_ID = "CONTR/2026/240267";
 const DEFAULT_TITLE = "SUMINISTRO DE MATERIALES DE FERRETERÍA PARA LAS INSTALACIONES LOS EDIFICIOS DONDE SE UBICAN LOS SERVICIOS CENTRALES DEL SERVICIO ANDALUZ DE EMPLEO Y SUS OFICINAS ANEXAS";
-const PARAGRAPH_PATTERN = /<text:p\b(?![^>]*\/>)[^>]*>[\s\S]*?<\/text:p>/g;
 
 export interface FerreteriaPcapFinalPostProcessResult {
   bytes: Uint8Array;
@@ -21,6 +20,9 @@ export interface FerreteriaPcapFinalPostProcessResult {
   propagatedAnnexIdentityParagraphs: number;
   materializedSecondPassParagraphs: number;
 }
+
+interface ParagraphSpan { xml: string; start: number; end: number; }
+interface SecondPassRule { id: string; pattern: RegExp; value: string; }
 
 function xmlEscape(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&apos;");
@@ -62,12 +64,45 @@ function visible(xml: string): string {
     .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'");
 }
 
-function paragraphStartsWithExactVisible(content: string, expected: string): number[] {
-  const starts: number[] = [];
-  for (const match of content.matchAll(PARAGRAPH_PATTERN)) {
-    if (match.index !== undefined && visible(match[0]).trim() === expected) starts.push(match.index);
+/**
+ * Los párrafos del modelo contienen notas al pie con otros <text:p> anidados.
+ * Una regexp no puede delimitar correctamente esos párrafos. Este lector mínimo
+ * conserva el párrafo exterior completo y evita que LB35/LB60 confundan texto
+ * de nota con el campo administrativo al que acompaña.
+ */
+function topLevelParagraphs(content: string): ParagraphSpan[] {
+  const spans: ParagraphSpan[] = [];
+  let cursor = 0;
+  while (cursor < content.length) {
+    let start = content.indexOf("<text:p", cursor);
+    if (start < 0) break;
+    const openEnd = content.indexOf(">", start);
+    if (openEnd < 0) break;
+    if (/\/\s*>$/.test(content.slice(start, openEnd + 1))) { cursor = openEnd + 1; continue; }
+    let depth = 1;
+    let scan = openEnd + 1;
+    while (depth > 0) {
+      const nextOpen = content.indexOf("<text:p", scan);
+      const nextClose = content.indexOf("</text:p>", scan);
+      if (nextClose < 0) throw new Error("ODT inválido: párrafo sin cierre.");
+      if (nextOpen >= 0 && nextOpen < nextClose) {
+        const nestedEnd = content.indexOf(">", nextOpen);
+        if (nestedEnd < 0) throw new Error("ODT inválido: apertura de párrafo incompleta.");
+        if (!/\/\s*>$/.test(content.slice(nextOpen, nestedEnd + 1))) depth += 1;
+        scan = nestedEnd + 1;
+      } else {
+        depth -= 1;
+        scan = nextClose + "</text:p>".length;
+      }
+    }
+    spans.push({ xml: content.slice(start, scan), start, end: scan });
+    cursor = scan;
   }
-  return starts;
+  return spans;
+}
+
+function paragraphStartsWithExactVisible(content: string, expected: string): number[] {
+  return topLevelParagraphs(content).filter(item => visible(item.xml).trim() === expected).map(item => item.start);
 }
 
 function lastActualAnnexStart(content: string, roman: string): number {
@@ -78,13 +113,19 @@ function lastActualAnnexStart(content: string, roman: string): number {
 }
 
 function mapParagraphs(content: string, mapper: (xml: string, visibleText: string) => string): { content: string; changed: number } {
+  const spans = topLevelParagraphs(content);
+  let result = "";
+  let cursor = 0;
   let changed = 0;
-  const next = content.replace(PARAGRAPH_PATTERN, paragraph => {
-    const mapped = mapper(paragraph, visible(paragraph));
-    if (mapped !== paragraph) changed += 1;
-    return mapped;
-  });
-  return { content: next, changed };
+  for (const span of spans) {
+    result += content.slice(cursor, span.start);
+    const mapped = mapper(span.xml, visible(span.xml));
+    if (mapped !== span.xml) changed += 1;
+    result += mapped;
+    cursor = span.end;
+  }
+  result += content.slice(cursor);
+  return { content: result, changed };
 }
 
 function replaceBlankValueInParagraph(xml: string, value: string): string {
@@ -98,8 +139,6 @@ function decision(id: string): string {
   if (!item) throw new Error(`LB73: no existe decisión source-backed ${id}.`);
   return item.value;
 }
-
-interface SecondPassRule { id: string; pattern: RegExp; value: string; }
 
 function yesNoFromDecision(id: string): string { return /^Sí/i.test(decision(id)) ? "Sí" : "No"; }
 function detailAfterYes(id: string): string { return decision(id).replace(/^Sí\s*:\s*/i, "").replace(/^Sí\s*;\s*/i, ""); }
@@ -202,10 +241,10 @@ const FINAL_AUTHORITY_RULES: readonly SecondPassRule[] = [
   { id: "payment-mode", pattern: /^Pago Único \/Pagos parciales:/i, value: "Pagos parciales" },
   { id: "payment-periodicity", pattern: /^En caso de pagos parciales, periodicidad:/i, value: "En función de los pedidos realizados y conformados." },
   { id: "conformity-deadline-final", pattern: /^Plazo para aprobar los documentos que acrediten la conformidad de la realización del objeto del contrato:/i, value: "Máximo 30 días naturales desde la entrega y recepción material." },
-  { id: "preparatory-a", pattern: /^a\)\s+Operaciones preparatorias susceptibles de abonos a cuenta:/i, value: "No procede." },
-  { id: "preparatory-b", pattern: /^b\)\s+Exigencia, en su caso, de un programa de trabajo:/i, value: "No procede." },
-  { id: "preparatory-c", pattern: /^c\)\s+Criterios y forma de valoración de las operaciones preparatorias:/i, value: "No procede." },
-  { id: "preparatory-d", pattern: /^d\)\s+Plan de amortización de los abonos a cuenta:/i, value: "No procede." },
+  { id: "preparatory-a", pattern: /^Operaciones preparatorias susceptibles de abonos a cuenta:/i, value: "No procede." },
+  { id: "preparatory-b", pattern: /^Exigencia, en su caso, de un programa de trabajo:/i, value: "No procede." },
+  { id: "preparatory-c", pattern: /^Criterios y forma de valoración de las operaciones preparatorias:/i, value: "No procede." },
+  { id: "preparatory-d", pattern: /^Plan de amortización de los abonos a cuenta:/i, value: "No procede." },
 ] as const;
 
 function isUnresolvedVisible(value: string): boolean {
@@ -219,16 +258,17 @@ function materializeParagraphValue(xml: string, currentVisible: string, value: s
   if (/Sí\s*\/\s*No/i.test(currentVisible)) {
     const replaced = xml.replace(/Sí\s*\/\s*No/i, escaped);
     if (replaced !== xml) return replaced;
-    const opening = xml.match(/^<text:p\b(?![^>]*\/>)[^>]*>/)?.[0];
-    if (!opening) throw new Error("LB77: párrafo ODF real sin apertura.");
-    return `${opening}${xmlEscape(currentVisible.replace(/Sí\s*\/\s*No/i, value))}</text:p>`;
+    const openingEnd = xml.indexOf(">");
+    if (openingEnd < 0) throw new Error("LB84: párrafo ODF real sin apertura.");
+    const suffix = xml.endsWith("</text:p>") ? "</text:p>" : "";
+    return `${xml.slice(0, openingEnd + 1)}${xmlEscape(currentVisible.replace(/Sí\s*\/\s*No/i, value))}${suffix}`;
   }
   const placeholder = xml.match(/_{3,}/)?.[0];
   if (placeholder) return xml.replace(placeholder, escaped);
   const closing = xml.lastIndexOf("</text:p>");
-  if (closing < 0) throw new Error("LB83: párrafo ODF sin cierre.");
+  if (closing < 0) throw new Error("LB84: párrafo ODF sin cierre.");
   if (currentVisible.includes(":")) return `${xml.slice(0, closing)} ${escaped}${xml.slice(closing)}`;
-  throw new Error(`LB83: no se sabe materializar «${currentVisible}».`);
+  throw new Error(`LB84: no se sabe materializar «${currentVisible}».`);
 }
 
 function applyStrictOrderedRules(content: string, rules: readonly SecondPassRule[]): { content: string; changed: number } {
@@ -237,16 +277,11 @@ function applyStrictOrderedRules(content: string, rules: readonly SecondPassRule
   for (const rule of rules) {
     const annexIIStart = lastActualAnnexStart(content, "II");
     const section = content.slice(cursor, annexIIStart);
-    let found: RegExpMatchArray | undefined;
-    for (const match of section.matchAll(PARAGRAPH_PATTERN)) {
-      const value = visible(match[0]).trim();
-      if (rule.pattern.test(value) && isUnresolvedVisible(value)) { found = match; break; }
-    }
-    if (!found || found.index === undefined) throw new Error(`LB73: no se localiza de forma ordenada el campo residual ${rule.id}.`);
-    const absoluteStart = cursor + found.index;
-    const oldXml = found[0];
-    const newXml = materializeParagraphValue(oldXml, visible(oldXml).trim(), rule.value);
-    content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + oldXml.length);
+    const found = topLevelParagraphs(section).find(item => rule.pattern.test(visible(item.xml).trim()) && isUnresolvedVisible(visible(item.xml).trim()));
+    if (!found) throw new Error(`LB73: no se localiza de forma ordenada el campo residual ${rule.id}.`);
+    const absoluteStart = cursor + found.start;
+    const newXml = materializeParagraphValue(found.xml, visible(found.xml).trim(), rule.value);
+    content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + found.xml.length);
     cursor = absoluteStart + newXml.length;
     changed += 1;
   }
@@ -259,16 +294,11 @@ function applyResidualRules(content: string, rules: readonly SecondPassRule[]): 
     const annexIStart = lastActualAnnexStart(content, "I");
     const annexIIStart = lastActualAnnexStart(content, "II");
     const section = content.slice(annexIStart, annexIIStart);
-    let found: RegExpMatchArray | undefined;
-    for (const match of section.matchAll(PARAGRAPH_PATTERN)) {
-      const value = visible(match[0]).trim();
-      if (rule.pattern.test(value) && isUnresolvedVisible(value)) { found = match; break; }
-    }
-    if (!found || found.index === undefined) continue;
-    const absoluteStart = annexIStart + found.index;
-    const oldXml = found[0];
-    const newXml = materializeParagraphValue(oldXml, visible(oldXml).trim(), rule.value);
-    content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + oldXml.length);
+    const found = topLevelParagraphs(section).find(item => rule.pattern.test(visible(item.xml).trim()) && isUnresolvedVisible(visible(item.xml).trim()));
+    if (!found) continue;
+    const absoluteStart = annexIStart + found.start;
+    const newXml = materializeParagraphValue(found.xml, visible(found.xml).trim(), rule.value);
+    content = content.slice(0, absoluteStart) + newXml + content.slice(absoluteStart + found.xml.length);
     changed += 1;
   }
   return { content, changed };
@@ -340,8 +370,11 @@ export function finalizeFerreteriaPcapRenderedOdt(args: { bytes: Uint8Array; cas
 
   const anexoIStart = lastActualAnnexStart(content, "I");
   const anexoIIStart = lastActualAnnexStart(content, "II");
-  const preDataTreatment = visible(content.slice(anexoIStart, anexoIIStart)).split(/15\.\s+TRATAMIENTO DE DATOS/i)[0] ?? "";
-  if (/(?:Sí\s*\/\s*No|_{3,})/i.test(preDataTreatment)) blockers.push("PCAP: quedan decisiones administrativas sin materializar antes del apartado 15 del Anexo I.");
+  const anexoIParagraphs = topLevelParagraphs(content.slice(anexoIStart, anexoIIStart));
+  const section15Index = anexoIParagraphs.findIndex(item => /^15\.\s+TRATAMIENTO DE DATOS/i.test(visible(item.xml).trim()));
+  const authorityParagraphs = section15Index >= 0 ? anexoIParagraphs.slice(0, section15Index) : anexoIParagraphs;
+  const unresolvedAuthority = authorityParagraphs.map(item => visible(item.xml).trim()).filter(value => /(?:Sí\s*\/\s*No|_{3,})/i.test(value));
+  if (unresolvedAuthority.length) blockers.push(`PCAP: quedan ${unresolvedAuthority.length} decisiones administrativas sin materializar antes del apartado 15 del Anexo I (primera: ${unresolvedAuthority[0]}).`);
   const residual = auditJdaSupplyAsaRenderedOdt(writeOdtZip(entries));
   if (!residual.ready) blockers.push(...residual.blockers);
   const bytes = writeOdtZip(entries);
