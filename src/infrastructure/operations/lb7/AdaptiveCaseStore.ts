@@ -64,6 +64,17 @@ export class AdaptiveCaseStore {
     return this.save(caseId, current.answers, undefined, universalEvidence);
   }
 
+  public restore(value: AdaptiveStoredCase): AdaptiveStoredCase {
+    safeId(value.caseId);
+    const normalized: AdaptiveStoredCase = {
+      ...value,
+      answers: value.answers ?? {},
+      universalEvidence: value.universalEvidence ?? {}
+    };
+    this.write(normalized);
+    return normalized;
+  }
+
   private fileFor(caseId: string): string {
     return path.join(this.root, `${safeId(caseId)}.json`);
   }
