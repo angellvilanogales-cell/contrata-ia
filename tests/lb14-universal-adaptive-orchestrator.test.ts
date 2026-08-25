@@ -125,15 +125,29 @@ describe("Bloque 14.3 - orquestación automática hasta intervención humana", (
     expect(result.next.fieldKey).toBe("cpvMain");
   });
 
-  it("al proponer procedimiento conserva un CPV ya validado", () => {
+  it("conserva el CPV validado y pide los criterios antes de ejecutar ProcedimientoEngine", () => {
     const universal = createUniversalExpedienteFromCanonical(canonical());
     const originalCpv = universal.canonical.fields.cpvMain;
 
     const result = orchestrator(realEngine()).advance(universal);
 
-    expect(result.automaticSteps[0].engine).toBe("ProcedimientoEngine");
+    expect(result.automaticSteps).toEqual([]);
     expect(result.expediente.canonical.fields.cpvMain).toBe(originalCpv);
     expect(result.expediente.canonical.fields.cpvMain.status).toBe("HUMAN_VALIDATED");
+    expect(result.expediente.canonical.fields.procedure.status).toBe("PENDING");
+    expect(result.next.kind).toBe("ASK_USER");
+    expect(result.next.fieldKey).toBe("criteria.awardCriteria");
+  });
+
+  it("propone procedimiento cuando criterios y umbral aplicable ya están acreditados", () => {
+    const universal = createUniversalExpedienteFromCanonical(canonical());
+    universal.criteria.awardCriteria = validated("criteria.awardCriteria", []);
+    universal.regulation.threshold = validated("regulation.threshold", 216_000);
+
+    const result = orchestrator(realEngine()).advance(universal);
+
+    expect(result.automaticSteps[0].engine).toBe("ProcedimientoEngine");
+    expect(result.expediente.canonical.fields.procedure.value).toBe("ABIERTO_SIMPLIFICADO");
     expect(result.expediente.canonical.fields.procedure.status).toBe("SYSTEM_PROPOSAL");
     expect(result.next.kind).toBe("VALIDATE_HUMAN");
     expect(result.next.fieldKey).toBe("procedure");
