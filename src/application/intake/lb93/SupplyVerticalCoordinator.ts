@@ -2,6 +2,7 @@ import type { EvidenceField } from "../../../domain/expediente/EvidenceField";
 import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../lb51/UniversalV1UiFieldManifest";
 import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "./SupplyVerticalFieldManifest";
+import { evaluateSupplyEconomicConsistency } from "./SupplyEconomicConsistency";
 import { TipoProcedimiento } from "../../../domain/procedimiento/TipoProcedimiento";
 import type { FinancingProfile, TechnicalDocumentFamily } from "../../../domain/documentModel/DocumentarySourceEvidenceCatalogue";
 import type { SupplySourceVariant } from "../../../domain/documentModel/UniversalSupplySourceCorpus";
@@ -185,6 +186,10 @@ export function evaluateSupplyVertical(record: UniversalEvidenceRecord): SupplyV
   }
   blockers.push(...procedureBlockers(record));
   blockers.push(...lotsBlockers(record));
+
+  const economics = evaluateSupplyEconomicConsistency(record);
+  blockers.push(...economics.blockers);
+  warnings.push(...economics.warnings);
 
   const variant = supplyVariantAssessment(record);
   blockers.push(...variant.blockers);
