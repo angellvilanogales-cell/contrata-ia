@@ -10,6 +10,7 @@ on:
       - agent/lb5-documentos-administrativos
       - agent/lb6-api-ui-integracion
       - agent/lb7-qa-seguridad-v1
+      - agent/lb91-universalizacion-operativa
   pull_request:
     branches:
       - main
