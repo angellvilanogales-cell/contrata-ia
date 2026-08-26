@@ -29,8 +29,29 @@ function isPlainObject(value: unknown): value is UniversalCasePayload {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+/**
+ * Serialización JSON canónica para checksums persistentes.
+ * Ordena recursivamente las claves de los objetos para que el hash no dependa
+ * del orden de propiedades que pueda devolver PostgreSQL JSONB u otro transporte.
+ */
+export function canonicalJson(value: unknown): string {
+  if (value === null) return "null";
+  if (typeof value === "string" || typeof value === "boolean") return JSON.stringify(value);
+  if (typeof value === "number") return Number.isFinite(value) ? JSON.stringify(value) : "null";
+  if (Array.isArray(value)) return `[${value.map(item => canonicalJson(item === undefined ? null : item)).join(",")}]`;
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const entries = Object.keys(record)
+      .filter(key => record[key] !== undefined && typeof record[key] !== "function" && typeof record[key] !== "symbol")
+      .sort()
+      .map(key => `${JSON.stringify(key)}:${canonicalJson(record[key])}`);
+    return `{${entries.join(",")}}`;
+  }
+  throw new Error("UNIVERSAL_CANONICAL_JSON_UNSUPPORTED_VALUE");
+}
+
 export async function sha256Json(payload: UniversalCasePayload): Promise<string> {
-  const bytes = new TextEncoder().encode(JSON.stringify(payload));
+  const bytes = new TextEncoder().encode(canonicalJson(payload));
   const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
@@ -56,7 +77,8 @@ export async function validateUniversalSnapshot(
  * - write-through: conserva copia local aunque falle el espejo remoto;
  * - restore: prefiere remoto válido y cae a local válido;
  * - nunca migra versiones de esquema silenciosamente;
- * - nunca devuelve un snapshot con checksum inválido.
+ * - nunca devuelve un snapshot con checksum inválido;
+ * - LB92.13: checksum sobre JSON canónico, estable ante reordenación de JSONB.
  */
 export class UniversalDurableCaseStore<T extends UniversalCasePayload = UniversalCasePayload> {
   private readonly local = new Map<string, UniversalCaseSnapshot<T>>();
