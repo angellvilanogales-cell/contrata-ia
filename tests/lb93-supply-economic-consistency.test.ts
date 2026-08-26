@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
 import type { UniversalEvidenceRecord } from "../src/application/intake/lb52/UniversalEvidenceWorkspace";
 import { evaluateSupplyEconomicConsistency } from "../src/application/intake/lb93/SupplyEconomicConsistency";
 
@@ -11,26 +10,28 @@ function record(values: Record<string, unknown>): UniversalEvidenceRecord {
   return { caseId: "REG-SUPPLY-ECON-001", fields: Object.fromEntries(Object.entries(values).map(([k, v]) => [k, field(k, v)])), updatedAt: new Date(0).toISOString() };
 }
 
-test("LB93: detecta contradicción aritmética PBL + IVA", () => {
-  const result = evaluateSupplyEconomicConsistency(record({ baseTenderBudgetCents: 10000, "economic.initialVatAmountCents": 2100, "economic.initialPblVatIncludedCents": 13000 }));
-  assert.equal(result.coherent, false);
-  assert.ok(result.blockers.some(item => item.includes("PBL con IVA")));
-});
+describe("LB93 SupplyEconomicConsistency", () => {
+  it("detecta contradicción aritmética PBL + IVA", () => {
+    const result = evaluateSupplyEconomicConsistency(record({ baseTenderBudgetCents: 10000, "economic.initialVatAmountCents": 2100, "economic.initialPblVatIncludedCents": 13000 }));
+    expect(result.coherent).toBe(false);
+    expect(result.blockers.some(item => item.includes("PBL con IVA"))).toBe(true);
+  });
 
-test("LB93: detecta VE inferior al PBL sin corregirlo automáticamente", () => {
-  const result = evaluateSupplyEconomicConsistency(record({ baseTenderBudgetCents: 10000, "economic.legalEstimatedValueCents": 9999 }));
-  assert.equal(result.coherent, false);
-  assert.ok(result.blockers.some(item => item.includes("valor estimado")));
-});
+  it("detecta VE inferior al PBL sin corregirlo automáticamente", () => {
+    const result = evaluateSupplyEconomicConsistency(record({ baseTenderBudgetCents: 10000, "economic.legalEstimatedValueCents": 9999 }));
+    expect(result.coherent).toBe(false);
+    expect(result.blockers.some(item => item.includes("valor estimado"))).toBe(true);
+  });
 
-test("LB93: DA33 exige presupuesto máximo declarado", () => {
-  const result = evaluateSupplyEconomicConsistency(record({ "economic.needsBasedContractDa33": true }));
-  assert.equal(result.coherent, false);
-  assert.ok(result.blockers.some(item => item.includes("DA 33")));
-});
+  it("DA33 exige presupuesto máximo declarado", () => {
+    const result = evaluateSupplyEconomicConsistency(record({ "economic.needsBasedContractDa33": true }));
+    expect(result.coherent).toBe(false);
+    expect(result.blockers.some(item => item.includes("DA 33"))).toBe(true);
+  });
 
-test("LB93: no altera valores coherentes declarados", () => {
-  const result = evaluateSupplyEconomicConsistency(record({ baseTenderBudgetCents: 10000, "economic.initialVatAmountCents": 2100, "economic.initialPblVatIncludedCents": 12100, "economic.legalEstimatedValueCents": 15000 }));
-  assert.equal(result.coherent, true);
-  assert.deepEqual(result.blockers, []);
+  it("no altera valores coherentes declarados", () => {
+    const result = evaluateSupplyEconomicConsistency(record({ baseTenderBudgetCents: 10000, "economic.initialVatAmountCents": 2100, "economic.initialPblVatIncludedCents": 12100, "economic.legalEstimatedValueCents": 15000 }));
+    expect(result.coherent).toBe(true);
+    expect(result.blockers).toEqual([]);
+  });
 });
