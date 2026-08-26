@@ -15,84 +15,99 @@ Contrata-IA no declarará cobertura universal por la mera existencia de motores,
 
 ## Evidencia disponible
 
-- **SUPPLY**: existe caso dorado documental de suministro por necesidades/DA 33.ª y varios casos de regresión.
-- **SERVICE**: existen PCAP y memorias reales de servicios, incluido limpieza.
-- **MIXED**: existe caso real de limpieza calificado como mixto servicios+suministros, con prestación principal de servicios.
-- **WORKS**: consta una referencia real de PCAP de obras por procedimiento abierto en el inventario de fuentes, utilizada únicamente como calibración estructural. No se habilita generación física hasta verificar el activo editable concreto.
-- **CONCESSION**: existe cobertura normativa LCSP, pero no se ha acreditado todavía en LB91 un expediente/pliego real de concesión suficientemente identificable para regresión documental.
+- **SUPPLY**: caso dorado editable de suministro por necesidades/DA 33.ª y corpus multicaso independiente con Memorias y PPT de Panda/AVRA, aulas digitales, tablets+plataforma, acuerdo marco SAS, mobiliario judicial y VEIASA.
+- **SERVICE**: PCAP, memorias y PPT reales de varias subfamilias, incluido limpieza y mantenimiento.
+- **MIXED**: caso real de limpieza calificado como mixto servicios+suministros, con prestación principal de servicios.
+- **WORKS**: referencia real de PCAP de obras por procedimiento abierto utilizada como calibración estructural; la generación física sigue condicionada a activo editable acreditado.
+- **CONCESSION**: cobertura normativa y motores específicos, pero no se ha acreditado todavía en LB91 un expediente/pliego real suficientemente identificable para regresión documental física.
 
-La ausencia de caso real de concesión significa exactamente falta de evidencia de regresión, no inexistencia en todas las fuentes. Un ejemplo nunca se convierte por sí solo en regla jurídica universal.
+Un ejemplo nunca se convierte por sí solo en regla jurídica universal ni en plantilla productiva.
 
-## Bloques ejecutados LB91.12-LB91.25
+## Bloques ejecutados LB91.12-LB91.30
 
-### Familia y preparación
+### Familia, economía, procedimiento y ejecución
 
-- `UniversalWorksPreparationEngine`: proyecto, aprobación, replanteo, supervisión y disponibilidad de terrenos.
-- `UniversalConcessionPreparationEngine`: subtipo, riesgo operacional, viabilidad, duración y preparación previa.
-- `UniversalMixedContractEngine`: prestaciones vinculadas/complementarias y prestación principal.
-- `UniversalFamilyPreparationGate`: frontera obligatoria antes de documentos para WORKS, CONCESSION y MIXED.
-- `UniversalFamilyAdaptivePreparation`: preguntas progresivas específicas de familia; no pregunta datos propios de obras/concesiones a suministros o servicios.
-
-### Economía
-
-- `UniversalWorksEconomicEngine`: VE de obras sobre componentes acreditados, proyecto/mediciones y suministros puestos a disposición, conservando diferencias declaradas.
-- `UniversalConcessionEconomicEngine`: cifra neta de negocios prevista y componentes del art. 101 sin doble contabilización; riesgo y viabilidad permanecen obligatorios.
-
-### Procedimiento y ejecución
-
-- `UniversalConcessionProcedureEngine`: abierto/restringido como vías ordinarias, restringido obligatorio en concesiones de servicios especiales del Anexo IV y bloqueo de procedimientos excepcionales sin supuesto habilitante documentado. El art. 159 no se extrapola a concesiones.
-- `UniversalWorksExecutionEngine`: comprobación de replanteo, dirección facultativa, certificaciones, recepción, certificación final, garantía y vicios ocultos.
-- `UniversalConcessionExecutionEngine`: riesgo operacional durante la ejecución, régimen económico, inspección, incumplimientos, intervención/secuestro, reequilibrio y especialidades de concesión de obras/servicios.
+- `UniversalWorksPreparationEngine`, `UniversalWorksEconomicEngine`, `UniversalWorksExecutionEngine`.
+- `UniversalConcessionPreparationEngine`, `UniversalConcessionEconomicEngine`, `UniversalConcessionProcedureEngine`, `UniversalConcessionExecutionEngine`.
+- `UniversalMixedContractEngine` y `UniversalFamilyPreparationGate`.
+- `UniversalFamilyAdaptivePreparation` para preguntar únicamente hechos especiales realmente necesarios.
 
 ### Documentos y auditoría
 
-- `WorksPcapDefinition`: definición estructural de PCAP de obras. `STRUCTURAL_MODEL`, nunca `FULL_MODEL` por inferencia.
-- `EditableTemplateAssetRegistry`: exige ODT/DOCX físico, SHA-256, huella de estilo, fuente, verificación y activación.
-- `UniversalPhysicalDocumentGenerationGate`: combina aptitud lógica con activo físico verificado.
-- `UniversalAdministrativePackageAudit`: hechos mínimos obligatorios y coherencia Memoria-PCAP-PPT, con reglas familiares.
-- `UniversalAdministrativePackageGate`: los tres documentos deben ser físicamente generables y superar auditoría cruzada; aceptación humana siempre obligatoria.
-- `UniversalDocumentModelGapReport`: informa qué perfil/activo falta por familia y documento.
+- `WorksPcapDefinition`: modelo estructural, nunca `FULL_MODEL` por inferencia.
+- `EditableTemplateAssetRegistry`: ODT/DOCX, SHA-256, huella de estilo, fuente, verificación y activación.
+- `UniversalPhysicalDocumentGenerationGate` y `UniversalAdministrativePackageGate`.
+- `UniversalAdministrativePackageAudit` y `UniversalCrossDocumentAudit`.
+- `UniversalDocumentModelGapReport`, `SourceBackedDocumentAssetCatalogue`, `UniversalPhysicalCoverageMatrix`.
 
-### Cobertura
+### Activos protegidos acreditados de CONTR/2026/240267
 
-- `UniversalCoverageReconciliation` superpone únicamente capacidades efectivamente implementadas sobre la matriz conservadora de apertura.
-- `UniversalContractPlan` utiliza la cobertura reconciliada, pero mantiene bloqueos de evidencia/modelo físico.
-- La existencia de motores universales no equivale a cobertura documental universal.
+1. PCAP ODT `JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17`, SHA `45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc`.
+2. Memoria V12 ODT `case:CONTR-2026-240267:memoria:v12:editable`, SHA `36ed482048e19bc8b1f9c4fe1b8f1bd47eb81ac9e256dd4f0488e7bc97b8e4dc`.
+3. PPT V6 ODT `case:CONTR-2026-240267:ppt:v6:editable`, SHA `c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09`.
 
-## Bloques ejecutados LB91.26-LB91.30 — biblioteca física
+Son un paquete protegido completo; no se promueven a plantilla general por el mero hecho de estar verificados.
 
-- `SourceBackedDocumentAssetCatalogue`: inventario trazable de activos documentales físicos por familia, documento, procedimiento y alcance.
-- `UniversalDocumentAssetClassifier`: clasifica cada activo como general oficial, caso protegido o referencia estructural y evita borrar ese alcance por simple coincidencia de tipo/procedimiento.
-- `ProtectedEditableAssetManifest`: exige exactamente Memoria, PCAP y PPT editables, con identidad, SHA-256 y huella de estilo válidos, para cerrar el paquete físico protegido.
-- `UniversalPhysicalModelReadiness`: solo considera cobertura universal un modelo **general oficial + editable verificado + candidato de generación**. Un activo de caso protegido nunca cuenta como modelo universal.
-- `UniversalPhysicalCoverageMatrix`: matriz multicaso/familia que distingue expresamente `PROTECTED_CASE` de `UNIVERSAL_FAMILY`.
+## Bloques ejecutados LB91.31-LB91.55 — biblioteca productiva
 
-### Activos protegidos acreditados del expediente CONTR/2026/240267
+- PCAP general oficial de suministro ASA editable acreditado.
+- Separación estricta entre modelo lógico, fuente real, activo de caso y plantilla general productiva.
+- Catálogo documental por contrato, documento, procedimiento, financiación y subfamilia técnica.
+- Selector canónico multidimensional y preguntas adaptativas de financiación/subfamilia.
+- Preflight Memoria + PCAP + PPT con decisiones `RENDER_ALLOWED/BLOCKED`.
+- Registro/versionado de candidatos editables y gate de promoción por procedencia, SHA y estilo.
+- Adapter `UniversalPhysicalDocumentRenderer`: solo ejecuta renderer tras `GENERAL_EDITABLE_SELECTED`.
 
-1. **PCAP**: `JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17`, ODT, SHA `45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc`, huella de estilo `sha256:9eb23463f4d56abd03531cb909206ef47d749054bf284087bd45867b39e6ceee`.
-2. **Memoria V12**: `case:CONTR-2026-240267:memoria:v12:editable`, ODT, SHA `36ed482048e19bc8b1f9c4fe1b8f1bd47eb81ac9e256dd4f0488e7bc97b8e4dc`, huella `sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d`.
-3. **PPT V6**: `case:CONTR-2026-240267:ppt:v6:editable`, ODT, SHA `c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09`, huella `sha256:deadf7c2a176c83de774fad7022a0ac1d5adfcca514d8c0cddeb0b01029d1390`.
+## Bloques ejecutados LB91.56-LB91.75 — evidencia y adquisición
 
-Los tres forman un paquete físico protegido completo y siguen requiriendo aceptación humana. No se promueven a plantilla general de suministros por el mero hecho de estar verificados.
+- `UniversalTemplatePromotionEvidence`: las versiones del mismo expediente no cuentan como contraste independiente.
+- Núcleo común + overlay técnico por subfamilia; nunca sustituye requisitos particulares.
+- `UniversalTemplateAcquisitionPlan`: cola determinista de activos que faltan.
+- `UniversalDocumentDiscoveryEngine`: registra casos reales como `CASE_DOCUMENTED`, `EDITABLE_VERIFIED` o `GENERAL_MODEL_VERIFIED`.
+- `UniversalCoverageReconciler` y `UniversalPackagePromotionForecast`: distinguen abundancia documental de preparación física productiva.
 
-## Bloqueos reales después de LB91.30
+## Bloques ejecutados LB91.76-LB91.90 — corpus Supply multicaso
 
-1. **SUPPLY universal**: el caso protegido está físicamente cerrado, pero faltan activos generales oficiales editables completos para Memoria/PCAP/PPT aplicables fuera del caso protegido.
-2. **SERVICE**: existe fuente general de PCAP y perfiles lógicos, pero falta verificar y registrar el binario editable oficial concreto; PPT y Memoria generales siguen pendientes de cobertura física suficiente.
-3. **WORKS**: existe PCAP real de referencia estructural, pero faltan activos editables oficiales completos y la relación correcta entre PCAP, Memoria y proyecto/PPT.
-4. **CONCESSION**: faltan caso real acreditado, perfiles documentales y activos editables; no puede existir generación concesional de producción todavía.
-5. **MIXED**: falta selector documental formal y activos editables calibrados para las combinaciones reales; no se reutilizará ciegamente el modelo de la prestación principal.
-6. **PERSISTENCIA DESPLEGADA**: debe superarse create → restart/redeploy → recover en Render/Supabase antes de una V1 operativa desplegada.
-7. **MULTICASO FÍSICO**: la matriz ya existe, pero solo el caso protegido de ferretería puede marcarse listo físicamente con la evidencia acreditada actual.
+- Corpus real de Memorias/PPT Supply de al menos siete expedientes independientes.
+- Variantes separadas: catálogo/necesidades, TIC/licencias, equipamiento digital, suministro con servicio, sanitario/acuerdo marco, mobiliario+instalación y suministro ordinario a precio global.
+- `UniversalSupplyBlockEvidenceMatrix`: acredita bloques estructurales recurrentes sin generalizar MRR/DNSH, protección de datos u otras cláusulas circunstanciales.
+- `UniversalSupplyPromotionReadiness`: la estructura de Memoria/PPT está suficientemente contrastada; el bloqueo restante es físico, no de muestras.
+- `UniversalSupplyVariantGate`: impide heredar overlays técnicos de otra subfamilia por compartir `SUPPLY`.
 
-## Próxima prioridad
+## LB91.91-LB91.100 — cierre técnico
 
-1. Recuperar de fuentes/repositorio los binarios editables generales oficiales de servicios y suministros y verificar identidad, SHA y estilo.
-2. Incorporar activos de obras únicamente cuando sean realmente editables y correspondan al procedimiento/modelo administrativo aplicable.
-3. Localizar un expediente real de concesión y convertirlo en regresión antes de cualquier perfil físico concesional.
-4. Construir el selector documental formal de mixtos manteniendo las cláusulas específicas del componente combinado.
-5. Conectar la biblioteca física al flujo `/adaptive` y al gate de paquete, conservando el alcance `CASE_PROTECTED`/`GENERAL_OFFICIAL`.
-6. Ejecutar E2E físico multicaso y prueba real de persistencia desplegada.
+### Cantera `main`
+
+`main` se utiliza como cantera, no como fuente de verdad ni como merge automático. `MainBranchReuseClosureAudit` clasifica expresamente:
+
+- componentes ya heredados y reutilizados, como el ciclo base de generación y la orquestación histórica;
+- exportadores/catálogos que pueden adaptarse únicamente aguas abajo de los gates LB91;
+- piezas que no deben reutilizarse tal cual, como la fachada vacía `MemoryComposer` o conocimiento sin procedencia suficientemente cerrada.
+
+`canBulkReuseMain()` permanece siempre `false`.
+
+### Gate final LB91
+
+`LB91ClosureGate` separa dos conceptos:
+
+- **engineeringClosed**: todos los motores, gates, corpus, aislamiento de variantes y CI del alcance LB91 están completos;
+- **productionReady**: permanece siempre `false` en LB91.
+
+También mantiene `universalOperationalCoverage = false` y `humanValidationRequired = true`.
+
+### Bloqueos externos que LB91 no debe falsear
+
+1. `UNIVERSAL_EDITABLE_TEMPLATE_COVERAGE`: faltan activos editables generales para todas las familias/documentos.
+2. `CONCESSION_REAL_DOCUMENTARY_CASE`: falta regresión documental real suficientemente acreditada de concesión.
+3. `DEPLOYED_PERSISTENCE_RESTART_RECOVERY`: falta demostrar create → restart/redeploy → recover del estado universal desplegado.
+4. `KNOWLEDGE_PROVENANCE_QUARANTINE`: queda pendiente sanear/procedenciar completamente conocimiento histórico no canónico.
+5. `INSTITUTIONAL_SECURITY_PRIVACY_REVIEW`: evaluación institucional RGPD/LOPDGDD/ENS/DPA/residencia antes de producción real.
+
+Estos pendientes no impiden considerar terminado **el bloque de ingeniería LB91** cuando su HEAD pasa CI, pero sí impiden cualquier afirmación de V1 productiva o cobertura universal completa.
+
+## Estado de cierre
+
+**LB91 se considera técnicamente cerrable** cuando el HEAD con `LB91ClosureGate` y sus regresiones está en verde. El cierre no fusiona `main`, no modifica `main`, no crea una versión 1.0.0 y no elimina los bloqueos externos anteriores.
 
 ## Coste
 
