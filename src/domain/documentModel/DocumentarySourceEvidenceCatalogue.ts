@@ -3,7 +3,17 @@ import { TipoProcedimiento } from "../procedimiento/TipoProcedimiento";
 import { UniversalTargetContractType } from "../capabilities/UniversalContractCoverage";
 
 export type DocumentarySourceFormat = "ODT" | "DOCX" | "PDF" | "MIXED";
-export type DocumentaryEvidenceRole = "GENERAL_MODEL" | "CASE_SOURCE" | "STRUCTURAL_REFERENCE";
+export type DocumentaryEvidenceRole = "GENERAL_MODEL" | "CASE_SOURCE" | "STRUCTURAL_REFERENCE" | "ISOLATION_PENDING";
+export type FinancingProfile = "AUTOFINANCED" | "EU_FUNDS" | "OTHER" | "UNKNOWN";
+export type TechnicalDocumentFamily =
+  | "GENERAL_ADMINISTRATIVE"
+  | "CLEANING"
+  | "TRAINING"
+  | "MAINTENANCE"
+  | "CATALOGUE_NEEDS_SUPPLY"
+  | "WORKS_PROJECT"
+  | "CONCESSION_OPERATION"
+  | "OTHER";
 
 export interface DocumentarySourceEvidence {
   id: string;
@@ -12,6 +22,8 @@ export interface DocumentarySourceEvidence {
   format: DocumentarySourceFormat;
   role: DocumentaryEvidenceRole;
   applicableProcedures: readonly TipoProcedimiento[];
+  financing: FinancingProfile;
+  technicalFamily: TechnicalDocumentFamily;
   editableBinaryVerified: boolean;
   generalizable: boolean;
   sourceTitle: string;
@@ -20,10 +32,8 @@ export interface DocumentarySourceEvidence {
 }
 
 /**
- * LB91.36 — fuentes reales contrastadas en la biblioteca del proyecto.
- * El catálogo separa evidencia documental de plantilla física. Un PDF real o un
- * ODT de expediente concreto puede reforzar estructura/regresión sin convertirse
- * por ello en plantilla universal generable.
+ * Biblioteca documental trazable. El catálogo nunca equipara documento real,
+ * binario editable y plantilla universal: cada promoción exige acreditación independiente.
  */
 export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] = [
   {
@@ -33,10 +43,29 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "ODT",
     role: "GENERAL_MODEL",
     applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    financing: "AUTOFINANCED",
+    technicalFamily: "GENERAL_ADMINISTRATIVE",
     editableBinaryVerified: true,
     generalizable: true,
     sourceTitle: "Modelo PCAP suministro abierto simplificado abreviado - presentación electrónica - autofinanciación",
-    observations: ["Modelo general recomendado por la Comisión Consultiva; único activo general físicamente verificado en este tramo."],
+    observations: ["Modelo general recomendado por la Comisión Consultiva; activo general físicamente verificado."],
+  },
+  {
+    id: "SERVICE-ASA-EU-FUNDS-ODT-ISOLATION-PENDING",
+    contractType: "SERVICE",
+    documentType: DocumentType.PCAP,
+    format: "ODT",
+    role: "ISOLATION_PENDING",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO],
+    financing: "EU_FUNDS",
+    technicalFamily: "GENERAL_ADMINISTRATIVE",
+    editableBinaryVerified: false,
+    generalizable: false,
+    sourceTitle: "PCAP Servicios Abierto Simplificado ordinario juicio y fórmulas. Fondos Europeos. Presentación electrónica",
+    observations: [
+      "El texto aparece incrustado al final de varios ODT de trabajo del expediente de ferretería.",
+      "No se promociona hasta recuperar o aislar el binario original y verificar procedencia, integridad, estilo y versión.",
+    ],
   },
   {
     id: "CARL-2024-PCAP-SERVICE-SIMPLIFIED-ORDINARY",
@@ -45,6 +74,8 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "PDF",
     role: "CASE_SOURCE",
     applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO],
+    financing: "UNKNOWN",
+    technicalFamily: "GENERAL_ADMINISTRATIVE",
     editableBinaryVerified: false,
     generalizable: false,
     sourceTitle: "PCAP servicio de limpieza sede del Consejo Andaluz de Relaciones Laborales",
@@ -61,6 +92,8 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "PDF",
     role: "CASE_SOURCE",
     applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO],
+    financing: "UNKNOWN",
+    technicalFamily: "CLEANING",
     editableBinaryVerified: false,
     generalizable: false,
     sourceTitle: "PPT servicio de limpieza sede del Consejo Andaluz de Relaciones Laborales",
@@ -74,6 +107,8 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "PDF",
     role: "STRUCTURAL_REFERENCE",
     applicableProcedures: [],
+    financing: "UNKNOWN",
+    technicalFamily: "CLEANING",
     editableBinaryVerified: false,
     generalizable: false,
     sourceTitle: "PPT servicio de limpieza oficinas y centros de empleo SAE Huelva",
@@ -86,6 +121,8 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "PDF",
     role: "STRUCTURAL_REFERENCE",
     applicableProcedures: [],
+    financing: "EU_FUNDS",
+    technicalFamily: "TRAINING",
     editableBinaryVerified: false,
     generalizable: false,
     sourceTitle: "PPT acciones formativas FPE en tecnologías y entornos 5G",
@@ -102,6 +139,8 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "ODT",
     role: "CASE_SOURCE",
     applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    financing: "AUTOFINANCED",
+    technicalFamily: "CATALOGUE_NEEDS_SUPPLY",
     editableBinaryVerified: true,
     generalizable: false,
     sourceTitle: "Memoria justificativa suministro de ferretería SSCC SAE",
@@ -115,6 +154,8 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     format: "ODT",
     role: "CASE_SOURCE",
     applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    financing: "AUTOFINANCED",
+    technicalFamily: "CATALOGUE_NEEDS_SUPPLY",
     editableBinaryVerified: true,
     generalizable: false,
     sourceTitle: "PPT suministro de materiales de ferretería SSCC SAE",
@@ -132,6 +173,26 @@ export function findDocumentarySourceEvidence(
   );
 }
 
+export function findDocumentarySourcesByDimensions(input: {
+  contractType?: UniversalTargetContractType;
+  documentType?: DocumentType;
+  procedure?: TipoProcedimiento;
+  financing?: FinancingProfile;
+  technicalFamily?: TechnicalDocumentFamily;
+}): readonly DocumentarySourceEvidence[] {
+  return DOCUMENTARY_SOURCE_EVIDENCE.filter(item =>
+    (!input.contractType || item.contractType === input.contractType) &&
+    (!input.documentType || item.documentType === input.documentType) &&
+    (!input.procedure || item.applicableProcedures.includes(input.procedure)) &&
+    (!input.financing || item.financing === input.financing) &&
+    (!input.technicalFamily || item.technicalFamily === input.technicalFamily),
+  );
+}
+
 export function getGeneralizableEditableEvidence(): readonly DocumentarySourceEvidence[] {
   return DOCUMENTARY_SOURCE_EVIDENCE.filter(item => item.generalizable && item.editableBinaryVerified);
+}
+
+export function getIsolationPendingEvidence(): readonly DocumentarySourceEvidence[] {
+  return DOCUMENTARY_SOURCE_EVIDENCE.filter(item => item.role === "ISOLATION_PENDING");
 }
