@@ -10,12 +10,11 @@ import { createStandardContractDocumentProfiles } from "../src/domain/documentMo
 describe("LB91.36-40 - explotación conservadora de fuentes documentales", () => {
   it("reconoce varias fuentes reales independientes para PPT de servicios", () => {
     const sources = findDocumentarySourceEvidence("SERVICE", DocumentType.PPT);
+    const ids = sources.map(item => item.id);
     expect(sources.length).toBeGreaterThanOrEqual(3);
-    expect(new Set(sources.map(item => item.id))).toEqual(expect.objectContaining(new Set([
-      "CARL-2024-PPT-SERVICE-CLEANING",
-      "SAE-HUELVA-PPT-SERVICE-CLEANING",
-      "FPE-5G-2024-PPT-SERVICE-TRAINING",
-    ])));
+    expect(ids).toContain("CARL-2024-PPT-SERVICE-CLEANING");
+    expect(ids).toContain("SAE-HUELVA-PPT-SERVICE-CLEANING");
+    expect(ids).toContain("FPE-5G-2024-PPT-SERVICE-TRAINING");
     expect(sources.every(item => item.generalizable === false)).toBe(true);
   });
 
