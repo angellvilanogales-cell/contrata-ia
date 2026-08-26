@@ -14,6 +14,20 @@ test("LB93: no infiere procedimiento ni financiación en expediente vacío", () 
   assert.ok(paths.includes("technical.supplyVariant"));
 });
 
+test("LB93: ASA abreviado no pregunta solvencia que el art. 159.6.b exime de acreditar", () => {
+  const plan = planSupplyQuestions(record({ procedure: "ABIERTO_SIMPLIFICADO_ABREVIADO" }));
+  const paths = plan.pendingRequired.map(q => q.fieldPath);
+  assert.equal(paths.includes("criteria.economicSolvency"), false);
+  assert.equal(paths.includes("criteria.technicalSolvency"), false);
+});
+
+test("LB93: procedimiento abierto mantiene preguntas de solvencia", () => {
+  const plan = planSupplyQuestions(record({ procedure: "ABIERTO" }));
+  const paths = plan.pendingRequired.map(q => q.fieldPath);
+  assert.ok(paths.includes("criteria.economicSolvency"));
+  assert.ok(paths.includes("criteria.technicalSolvency"));
+});
+
 test("LB93: catálogo abre solo la pregunta de pedidos sucesivos", () => {
   const plan = planSupplyQuestions(record({ "technical.supplyVariant": "CATALOGUE_NEEDS" }));
   assert.deepEqual(plan.conditionalQuestions.map(q => q.fieldPath), ["technical.hasSuccessiveOrders"]);
