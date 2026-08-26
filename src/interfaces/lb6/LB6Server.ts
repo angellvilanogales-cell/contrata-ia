@@ -17,6 +17,9 @@ import { UniversalEvidenceWorkspace } from "../../application/intake/lb52/Univer
 import { VerifiedRuntimeTemplateStore } from "../../application/intake/lb53/VerifiedRuntimeTemplateStore";
 import { evaluateUniversalV1ProductionReadiness, legacyGenerationAllowed } from "../../application/intake/lb54/UniversalV1ProductionCoordinator";
 import { generateFerreteriaV1ProtectedPackage } from "../../application/intake/lb61/FerreteriaV1ProtectedPackageGenerator";
+import { DurableUniversalEvidenceWorkspace } from "../../application/universal/DurableUniversalEvidenceWorkspace";
+import { createUniversalCaseMirrorFromEnv } from "../../application/universal/HttpUniversalCaseMirror";
+import { UniversalDurableCaseStore } from "../../application/universal/UniversalDurableCaseStore";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore, type AdaptiveStoredCase } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -50,7 +53,14 @@ const adaptiveRemote = HttpAdaptiveCaseMirror.fromEnvironment();
 let adaptiveRemoteHydratedCases = 0;
 const universalEvidenceCases = new UniversalEvidenceCaseService(adaptiveCases);
 const universalTemplateRegistry = new UniversalOfficialTemplateRegistry();
-const universalEvidence = new UniversalEvidenceWorkspace(path.join(DATA_ROOT, "universal-evidence-v1"));
+const universalEvidenceRoot = path.join(DATA_ROOT, "universal-evidence-v1");
+const universalEvidence = new UniversalEvidenceWorkspace(universalEvidenceRoot);
+const universalEvidenceMirror = createUniversalCaseMirrorFromEnv();
+const durableUniversalEvidence = new DurableUniversalEvidenceWorkspace(
+  universalEvidenceRoot,
+  universalEvidence,
+  new UniversalDurableCaseStore(1, universalEvidenceMirror ?? undefined),
+);
 const verifiedTemplates = new VerifiedRuntimeTemplateStore(TEMPLATE_ROOT);
 function sendJson(response: ServerResponse, status: number, value: unknown): void { const body = Buffer.from(JSON.stringify(value)); response.writeHead(status, { "content-type": "application/json; charset=utf-8", "content-length": body.length }); response.end(body); }
 function sendText(response: ServerResponse, status: number, bodyText: string, contentType: string, cacheControl = "no-cache"): void { const body = Buffer.from(bodyText); response.writeHead(status, { "content-type": contentType, "content-length": body.length, "cache-control": cacheControl }); response.end(body); }
@@ -89,19 +99,20 @@ export function createLB6Server(): http.Server {
       if (request.method === "GET" && url.pathname === "/manifest.webmanifest") { sendText(response, 200, PWA_MANIFEST, "application/manifest+json; charset=utf-8", "public, max-age=3600"); return; }
       if (request.method === "GET" && url.pathname === "/sw.js") { sendText(response, 200, PWA_SERVICE_WORKER, "application/javascript; charset=utf-8", "no-cache"); return; }
       if (request.method === "GET" && url.pathname === "/icons/contrata-ia.svg") { sendText(response, 200, PWA_ICON_SVG, "image/svg+xml; charset=utf-8", "public, max-age=86400"); return; }
-      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 85, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, externalAdaptivePersistence: Boolean(adaptiveRemote), externalAdaptivePersistenceHydratedCases: adaptiveRemoteHydratedCases, universalReadiness: true, protectedSupplyAsaPipeline: true, protectedV1PackageGeneration: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
+      if (request.method === "GET" && url.pathname === "/api/health") { sendJson(response, 200, { status: "ok", service: "contrata-ia", lb: 92, pwa: true, specializedWorkflow: true, adaptiveFlow: true, adaptivePersistence: true, externalAdaptivePersistence: Boolean(adaptiveRemote), externalAdaptivePersistenceHydratedCases: adaptiveRemoteHydratedCases, universalReadiness: true, protectedSupplyAsaPipeline: true, protectedV1PackageGeneration: true, sourceCoverageMatrix: true, universalUiManifest: true, universalEvidencePersistence: true, externalUniversalEvidencePersistence: Boolean(universalEvidenceMirror), universalEvidenceBrowserUi: true, verifiedEditableAssetStore: true, legacyProductionGeneration: false, timestamp: new Date().toISOString() }); return; }
       if (request.method === "GET" && url.pathname === "/api/source-coverage") { requireRole(request, "VIEWER"); sendJson(response, 200, { matrix: PROCUREMENT_SOURCE_CASE_COVERAGE_MATRIX, evaluation: evaluateProcurementSourceCaseCoverage() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal-ui-manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST, evaluation: evaluateUniversalV1UiFieldManifest() }); return; }
       if (request.method === "GET" && url.pathname === "/api/universal/manifest") { requireRole(request, "VIEWER"); sendJson(response, 200, { fields: UNIVERSAL_V1_UI_FIELD_MANIFEST }); return; }
       if (request.method === "GET" && url.pathname === "/api/runtime-assets/readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, { legacyAssets: FERRETERIA_V1_EDITABLE_ASSET_MANIFEST.map(asset => ({ assetId: asset.assetId, fileName: asset.fileName, role: asset.role, identityConfigured: Boolean(asset.expectedSha256) })), legacyEvaluation: evaluateFerreteriaV1RuntimeAssetReadiness(), verifiedPackage: verifiedTemplates.packageReadiness() }); return; }
       if (parts[0] === "api" && parts[1] === "universal" && parts[2] === "cases" && parts[3]) {
         const caseId = decodeURIComponent(parts[3]);
-        if (request.method === "GET" && parts[4] === "evidence" && parts.length === 5) { requireRole(request, "VIEWER"); sendJson(response, 200, universalEvidence.get(caseId)); return; }
-        if (request.method === "PUT" && parts[4] === "evidence" && parts[5] && parts.length === 6) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); sendJson(response, 200, universalEvidence.declare(caseId, decodeURIComponent(parts[5]), body.value, actor.id)); return; }
-        if (request.method === "POST" && parts[4] === "evidence" && parts[5] && parts[6] === "validate") { const actor = requireRole(request, "REVIEWER"); sendJson(response, 200, universalEvidence.validate(caseId, decodeURIComponent(parts[5]), actor.id)); return; }
-        if (request.method === "GET" && parts[4] === "production-readiness") { requireRole(request, "VIEWER"); sendJson(response, 200, evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates)); return; }
+        if (request.method === "GET" && parts[4] === "evidence" && parts.length === 5) { requireRole(request, "VIEWER"); const result = await durableUniversalEvidence.get(caseId); sendJson(response, 200, result.record); return; }
+        if (request.method === "PUT" && parts[4] === "evidence" && parts[5] && parts.length === 6) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const result = await durableUniversalEvidence.declare(caseId, decodeURIComponent(parts[5]), body.value, actor.id); sendJson(response, 200, result.record); return; }
+        if (request.method === "POST" && parts[4] === "evidence" && parts[5] && parts[6] === "validate") { const actor = requireRole(request, "REVIEWER"); const result = await durableUniversalEvidence.validate(caseId, decodeURIComponent(parts[5]), actor.id); sendJson(response, 200, result.record); return; }
+        if (request.method === "GET" && parts[4] === "production-readiness") { requireRole(request, "VIEWER"); await durableUniversalEvidence.get(caseId); sendJson(response, 200, evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates)); return; }
         if (request.method === "POST" && parts[4] === "generate") {
           requireRole(request, "OPERATOR");
+          await durableUniversalEvidence.get(caseId);
           const gate = evaluateUniversalV1ProductionReadiness(caseId, universalEvidence, verifiedTemplates);
           if (!gate.ready) { sendJson(response, 409, { error: "El paquete universal no está preparado para generación.", gate }); return; }
           const pkg = await generateFerreteriaV1ProtectedPackage({ caseId, evidence: universalEvidence.get(caseId), binaryStore: verifiedTemplates });
