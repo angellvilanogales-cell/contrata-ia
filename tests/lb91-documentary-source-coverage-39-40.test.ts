@@ -32,9 +32,11 @@ describe("LB91.39-40 - cobertura documental basada en fuentes", () => {
     expect(result.blockers.some(item => item.startsWith("PPT:"))).toBe(true);
   });
 
-  it("mantiene servicios bloqueado físicamente aunque tenga PCAP/PPT reales", () => {
+  it("mantiene servicios bloqueado físicamente aunque tenga varias fuentes PCAP/PPT reales", () => {
     const result = evaluateDocumentaryPackageSourceReadiness("SERVICE");
     expect(result.physicalUniversalPackageReady).toBe(false);
-    expect(result.documents.find(item => item.documentType === DocumentType.PCAP)?.status).toBe("SOURCE_ONLY");
+    const pcap = result.documents.find(item => item.documentType === DocumentType.PCAP);
+    expect(pcap?.status).toBe("MULTI_SOURCE_STRUCTURAL");
+    expect(pcap?.physicalUniversalGenerationReady).toBe(false);
   });
 });
