@@ -9,16 +9,16 @@ import {
 } from "../src/application/intake/lb94/SupplyGeneralEditableTemplateDerivation";
 import type { VerifiedEditableAsset } from "../src/infrastructure/operations/lb52/VerifiedEditableAssetStore";
 
-function entry(name: string, value: string, compression: "STORE" | "DEFLATE" = "DEFLATE"): OdtZipEntry {
-  return { name, bytes: Buffer.from(value, "utf8"), compression };
+function entry(name: string, value: string, method: 0 | 8 = 8): OdtZipEntry {
+  return { name, bytes: Buffer.from(value, "utf8"), method, modTime: 0, modDate: 0, externalAttributes: 0 };
 }
 
 function fixtureAsset(): { asset: VerifiedEditableAsset; style: string } {
   const entries: OdtZipEntry[] = [
-    entry("mimetype", "application/vnd.oasis.opendocument.text", "STORE"),
-    entry("META-INF/manifest.xml", "<?xml version=\"1.0\"?><manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\"/>", "DEFLATE"),
+    entry("mimetype", "application/vnd.oasis.opendocument.text", 0),
+    entry("META-INF/manifest.xml", "<?xml version=\"1.0\"?><manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\"/>", 8),
     entry("styles.xml", "<?xml version=\"1.0\"?><office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"><office:styles/></office:document-styles>"),
-    entry("settings.xml", "<?xml version=\"1.0\"?><office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"/>", "DEFLATE"),
+    entry("settings.xml", "<?xml version=\"1.0\"?><office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"/>", 8),
     entry("meta.xml", "<?xml version=\"1.0\"?><office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\"><office:meta><dc:title>CONTR/2026/240267 FERRETERÍA</dc:title></office:meta></office:document-meta>"),
     entry("content.xml", "<?xml version=\"1.0\"?><office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"><office:automatic-styles/><office:body><office:text><text:p>CONTR/2026/240267</text:p><text:p>44316400-2</text:p><text:p>FERRETERÍA</text:p><text:p>ABRAZADERAS MANGUERA</text:p></office:text></office:body></office:document-content>"),
   ];
