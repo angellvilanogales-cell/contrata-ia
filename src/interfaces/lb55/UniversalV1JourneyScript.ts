@@ -36,6 +36,18 @@ function parse(def,raw){
 }
 function mergedDefinitions(base){const existing=new Set(base.map(x=>x.fieldPath));return [...base,...supplySupplement.filter(x=>!existing.has(x.fieldPath))];}
 function fieldUsable(path){const f=currentRecord.fields?.[path];return !!f&&!['PENDING','SOURCE_CONFLICT','SYSTEM_PROPOSAL'].includes(f.status);}
+function definitionVisible(def){
+  const conditional={
+    'technical.hasSuccessiveOrders':'CATALOGUE_NEEDS',
+    'technical.hasServicePlatformComponent':'SUPPLY_WITH_SERVICE_COMPONENT',
+    'technical.hasInstallationOrAssembly':'FURNITURE_INSTALLATION',
+    'administrative.isFrameworkAgreement':'MEDICAL_FRAMEWORK',
+    'regulation.europeanFunding':'DIGITAL_EQUIPMENT'
+  };
+  const requiredVariant=conditional[def.fieldPath];
+  if(!requiredVariant)return true;
+  return currentRecord.fields?.['technical.supplyVariant']?.value===requiredVariant;
+}
 function renderSupplyProgress(){
   const host=byId('supplyProgress');if(!host)return;
   const type=currentRecord.fields?.contractType?.value;
@@ -68,6 +80,7 @@ async function load(){
   const box=byId('fields');
   box.innerHTML='';
   for(const def of definitions){
+    if(!definitionVisible(def))continue;
     const f=currentRecord.fields?.[def.fieldPath];
     const div=document.createElement('div');
     div.className='field';div.dataset.path=def.fieldPath;
