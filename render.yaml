@@ -4,7 +4,7 @@ services:
     runtime: docker
     region: frankfurt
     plan: free
-    branch: agent/lb7-qa-seguridad-v1
+    branch: agent/lb91-universalizacion-operativa
     autoDeployTrigger: checksPass
     healthCheckPath: /api/health
     envVars:
