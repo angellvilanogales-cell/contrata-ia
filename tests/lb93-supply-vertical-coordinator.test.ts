@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
 import type { UniversalEvidenceRecord } from "../src/application/intake/lb52/UniversalEvidenceWorkspace";
 import { evaluateSupplyVertical, getSupplyVerticalEditableManifest } from "../src/application/intake/lb93/SupplyVerticalCoordinator";
 
@@ -46,61 +45,63 @@ const completeValues = {
   "criteria.awardCriteria": [{ nombre: "Precio", ponderacion: 100, evaluableMedianteFormula: true }],
 };
 
-test("LB93: expediente Supply vacío permanece pendiente y no productivo", () => {
-  const result = evaluateSupplyVertical(record({}));
-  assert.equal(result.workflowReadyForHumanReview, false);
-  assert.equal(result.physicalPackageReady, false);
-  assert.equal(result.productionReady, false);
-  assert.ok(result.blockers.some(item => item.includes("SUPPLY")));
-});
+describe("LB93 SupplyVerticalCoordinator", () => {
+  it("mantiene un expediente vacío pendiente y no productivo", () => {
+    const result = evaluateSupplyVertical(record({}));
+    expect(result.workflowReadyForHumanReview).toBe(false);
+    expect(result.physicalPackageReady).toBe(false);
+    expect(result.productionReady).toBe(false);
+    expect(result.blockers.some(item => item.includes("SUPPLY"))).toBe(true);
+  });
 
-test("LB93: vertical Supply completo puede quedar listo para revisión sin falsear paquete físico", () => {
-  const result = evaluateSupplyVertical(record(completeValues));
-  assert.equal(result.workflowReadyForHumanReview, true);
-  assert.equal(result.workflowHumanValidated, false);
-  assert.equal(result.physicalPackageReady, false);
-  assert.equal(result.documents.find(row => row.documentType === "PCAP")?.decision, "RENDER_ALLOWED");
-  assert.equal(result.documents.find(row => row.documentType === "MEMORY")?.decision, "BLOCKED");
-  assert.equal(result.documents.find(row => row.documentType === "PPT")?.decision, "BLOCKED");
-});
+  it("permite revisión jurídica sin falsear paquete físico", () => {
+    const result = evaluateSupplyVertical(record(completeValues));
+    expect(result.workflowReadyForHumanReview).toBe(true);
+    expect(result.workflowHumanValidated).toBe(false);
+    expect(result.physicalPackageReady).toBe(false);
+    expect(result.documents.find(row => row.documentType === "PCAP")?.decision).toBe("RENDER_ALLOWED");
+    expect(result.documents.find(row => row.documentType === "MEMORY")?.decision).toBe("BLOCKED");
+    expect(result.documents.find(row => row.documentType === "PPT")?.decision).toBe("BLOCKED");
+  });
 
-test("LB93: validación humana de todos los campos exigidos no equivale a productionReady", () => {
-  const result = evaluateSupplyVertical(record(completeValues, true));
-  assert.equal(result.workflowHumanValidated, true);
-  assert.equal(result.productionReady, false);
-  assert.equal(result.humanAcceptanceRequired, true);
-});
+  it("no equipara validación humana con productionReady", () => {
+    const result = evaluateSupplyVertical(record(completeValues, true));
+    expect(result.workflowHumanValidated).toBe(true);
+    expect(result.productionReady).toBe(false);
+    expect(result.humanAcceptanceRequired).toBe(true);
+  });
 
-test("LB93: contrato menor de suministro >= 15.000 euros queda bloqueado", () => {
-  const result = evaluateSupplyVertical(record({ ...completeValues, procedure: "CONTRATO_MENOR", "economic.legalEstimatedValueCents": 1_500_000 }));
-  assert.ok(result.blockers.some(item => item.includes("15.000")));
-  assert.equal(result.workflowReadyForHumanReview, false);
-});
+  it("bloquea contrato menor de suministro con VE >= 15.000 euros", () => {
+    const result = evaluateSupplyVertical(record({ ...completeValues, procedure: "CONTRATO_MENOR", "economic.legalEstimatedValueCents": 1_500_000 }));
+    expect(result.blockers.some(item => item.includes("15.000"))).toBe(true);
+    expect(result.workflowReadyForHumanReview).toBe(false);
+  });
 
-test("LB93: ASA abreviado >= 60.000 euros queda bloqueado", () => {
-  const result = evaluateSupplyVertical(record({ ...completeValues, "economic.legalEstimatedValueCents": 6_000_000 }));
-  assert.ok(result.blockers.some(item => item.includes("60.000")));
-});
+  it("bloquea ASA abreviado con VE >= 60.000 euros", () => {
+    const result = evaluateSupplyVertical(record({ ...completeValues, "economic.legalEstimatedValueCents": 6_000_000 }));
+    expect(result.blockers.some(item => item.includes("60.000"))).toBe(true);
+  });
 
-test("LB93: no división en lotes sin motivación suficiente queda bloqueada", () => {
-  const result = evaluateSupplyVertical(record({ ...completeValues, "lots.divisionIntoLots": false, "lots.noDivisionJustification": "No" }));
-  assert.ok(result.blockers.some(item => item.includes("99.3")));
-});
+  it("bloquea no división en lotes sin motivación suficiente", () => {
+    const result = evaluateSupplyVertical(record({ ...completeValues, "lots.divisionIntoLots": false, "lots.noDivisionJustification": "No" }));
+    expect(result.blockers.some(item => item.includes("99.3"))).toBe(true);
+  });
 
-test("LB93: financiación desconocida nunca habilita plantilla física", () => {
-  const result = evaluateSupplyVertical(record({ ...completeValues, "economic.fundingSource": "UNKNOWN" }));
-  assert.equal(result.physicalPackageReady, false);
-  assert.ok(result.documents.every(row => row.decision === "BLOCKED"));
-});
+  it("no selecciona plantillas físicas con financiación desconocida", () => {
+    const result = evaluateSupplyVertical(record({ ...completeValues, "economic.fundingSource": "UNKNOWN" }));
+    expect(result.physicalPackageReady).toBe(false);
+    expect(result.documents.every(row => row.decision === "BLOCKED")).toBe(true);
+  });
 
-test("LB93: variante catálogo exige pedidos sucesivos y evita herencia silenciosa", () => {
-  const result = evaluateSupplyVertical(record({ ...completeValues, "technical.supplyVariant": "CATALOGUE_NEEDS", "technical.hasSuccessiveOrders": false }));
-  assert.ok(result.blockers.some(item => item.includes("pedidos/entregas sucesivas")));
-});
+  it("exige pedidos sucesivos para la variante catálogo", () => {
+    const result = evaluateSupplyVertical(record({ ...completeValues, "technical.supplyVariant": "CATALOGUE_NEEDS", "technical.hasSuccessiveOrders": false }));
+    expect(result.blockers.some(item => item.includes("pedidos/entregas sucesivas"))).toBe(true);
+  });
 
-test("LB93: manifiesto operativo incluye procedimiento, financiación y subfamilia", () => {
-  const paths = getSupplyVerticalEditableManifest().map(item => item.fieldPath);
-  assert.ok(paths.includes("procedure"));
-  assert.ok(paths.includes("economic.fundingSource"));
-  assert.ok(paths.includes("technical.supplyVariant"));
+  it("expone procedimiento, financiación y subfamilia en el manifiesto operativo", () => {
+    const paths = getSupplyVerticalEditableManifest().map(item => item.fieldPath);
+    expect(paths).toContain("procedure");
+    expect(paths).toContain("economic.fundingSource");
+    expect(paths).toContain("technical.supplyVariant");
+  });
 });
