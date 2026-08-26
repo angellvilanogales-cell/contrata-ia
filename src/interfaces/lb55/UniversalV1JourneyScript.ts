@@ -37,6 +37,9 @@ function parse(def,raw){
 function mergedDefinitions(base){const existing=new Set(base.map(x=>x.fieldPath));return [...base,...supplySupplement.filter(x=>!existing.has(x.fieldPath))];}
 function fieldUsable(path){const f=currentRecord.fields?.[path];return !!f&&!['PENDING','SOURCE_CONFLICT','SYSTEM_PROPOSAL'].includes(f.status);}
 function definitionVisible(def){
+  const procedure=currentRecord.fields?.procedure?.value;
+  if((def.fieldPath==='criteria.economicSolvency'||def.fieldPath==='criteria.technicalSolvency')&&(procedure==='ABIERTO_SIMPLIFICADO_ABREVIADO'||procedure==='CONTRATO_MENOR'))return false;
+  if(def.fieldPath==='lots.noDivisionJustification')return currentRecord.fields?.['lots.divisionIntoLots']?.value===false;
   const conditional={
     'technical.hasSuccessiveOrders':'CATALOGUE_NEEDS',
     'technical.hasServicePlatformComponent':'SUPPLY_WITH_SERVICE_COMPONENT',
@@ -48,13 +51,26 @@ function definitionVisible(def){
   if(!requiredVariant)return true;
   return currentRecord.fields?.['technical.supplyVariant']?.value===requiredVariant;
 }
+function activeSupplyPaths(){
+  const procedure=currentRecord.fields?.procedure?.value;
+  const variant=currentRecord.fields?.['technical.supplyVariant']?.value;
+  const paths=['object','contractType','cpvMain','need','procedure','administrative.contractingAuthority','baseTenderBudgetCents','economic.legalEstimatedValueCents','economic.fundingSource','durationMonths','technical.supplyVariant','technical.technicalRequirements','technical.executionLocations','execution.specialExecutionConditions','execution.receiptAndAcceptanceRegime','lots.divisionIntoLots','criteria.awardCriteria'];
+  if(procedure!=='ABIERTO_SIMPLIFICADO_ABREVIADO'&&procedure!=='CONTRATO_MENOR')paths.push('criteria.economicSolvency','criteria.technicalSolvency');
+  if(currentRecord.fields?.['lots.divisionIntoLots']?.value===false)paths.push('lots.noDivisionJustification');
+  if(variant==='CATALOGUE_NEEDS')paths.push('technical.hasSuccessiveOrders');
+  if(variant==='SUPPLY_WITH_SERVICE_COMPONENT')paths.push('technical.hasServicePlatformComponent');
+  if(variant==='FURNITURE_INSTALLATION')paths.push('technical.hasInstallationOrAssembly');
+  if(variant==='MEDICAL_FRAMEWORK')paths.push('administrative.isFrameworkAgreement');
+  if(variant==='DIGITAL_EQUIPMENT')paths.push('regulation.europeanFunding');
+  return paths;
+}
 function renderSupplyProgress(){
   const host=byId('supplyProgress');if(!host)return;
   const type=currentRecord.fields?.contractType?.value;
-  const paths=['object','contractType','cpvMain','need','procedure','administrative.contractingAuthority','baseTenderBudgetCents','economic.legalEstimatedValueCents','economic.fundingSource','durationMonths','technical.supplyVariant','technical.technicalRequirements','technical.executionLocations','criteria.economicSolvency','criteria.technicalSolvency','execution.specialExecutionConditions','execution.receiptAndAcceptanceRegime','lots.divisionIntoLots','lots.noDivisionJustification','criteria.awardCriteria'];
+  const paths=activeSupplyPaths();
   const completed=paths.filter(fieldUsable).length;
   const conflicts=paths.filter(path=>currentRecord.fields?.[path]?.status==='SOURCE_CONFLICT');
-  const pct=Math.round(completed/paths.length*100);
+  const pct=paths.length?Math.round(completed/paths.length*100):0;
   const procedure=currentRecord.fields?.procedure?.value;
   const ve=Number(currentRecord.fields?.['economic.legalEstimatedValueCents']?.value||0);
   const blockers=[];
@@ -66,7 +82,7 @@ function renderSupplyProgress(){
   conflicts.forEach(path=>blockers.push(path+': conflicto de fuentes pendiente de decisión humana.'));
   const cls=blockers.length?'warning':(pct===100&&type==='SUPPLY'?'ok':'muted');
   host.className=cls;
-  host.innerHTML='<strong>Vertical Supply: '+pct+' % completado</strong><br>'+completed+' de '+paths.length+' campos esenciales declarados.'+(blockers.length?'<br><strong>Bloqueos:</strong><br>'+blockers.map(x=>'• '+esc(x)).join('<br>'):'')+'<br><span class="muted">La preparación jurídica no equivale a disponibilidad física de Memoria + PCAP + PPT ni sustituye la validación humana.</span>';
+  host.innerHTML='<strong>Vertical Supply: '+pct+' % completado</strong><br>'+completed+' de '+paths.length+' campos esenciales aplicables declarados.'+(blockers.length?'<br><strong>Bloqueos:</strong><br>'+blockers.map(x=>'• '+esc(x)).join('<br>'):'')+'<br><span class="muted">La preparación jurídica no equivale a disponibilidad física de Memoria + PCAP + PPT ni sustituye la validación humana.</span>';
 }
 async function load(){
   const id=String(byId('caseId')?.value||'').trim();
