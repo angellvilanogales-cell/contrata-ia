@@ -28,16 +28,32 @@ export function createStandardContractDocumentProfiles(): ContractDocumentModelP
   });
 
   registry.register({
+    id: "SERVICE-PCAP-SIMPLIFIED-ORDINARY-CARL-2024",
+    contractType: "SERVICE",
+    documentType: DocumentType.PCAP,
+    coverage: "FULL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO],
+    sourceIds: ["CARL-2024-PCAP-SERVICE-SIMPLIFIED-ORDINARY", "REG-SERVICE-005_CARL"],
+    definition: ServicePcapDefinition,
+    generationAllowed: true,
+    notes: [
+      "Perfil lógico completo contrastado con el PCAP real ADM-2024-0004 de limpieza del CARL, tramitado por abierto simplificado ordinario.",
+      "No constituye por sí solo plantilla física general: la fuente recuperada es PDF y el expediente contiene decisiones particulares que no deben heredarse.",
+      "La selección automática solo puede usar este perfil cuando el procedimiento canónico sea ABIERTO_SIMPLIFICADO.",
+    ],
+  });
+
+  registry.register({
     id: "SERVICE-PPT-STRUCTURAL-CLEANING",
     contractType: "SERVICE",
     documentType: DocumentType.PPT,
     coverage: "STRUCTURAL_MODEL",
-    sourceIds: ["PPT_SERVICE_CLEANING_CARL_2024", "PPT_SERVICE_CLEANING_SAE_HUELVA_2025"],
+    sourceIds: ["CARL-2024-PPT-SERVICE-CLEANING", "SAE-HUELVA-PPT-SERVICE-CLEANING", "FPE-5G-2024-PPT-SERVICE-TRAINING"],
     definition: ServicePptDefinition,
     generationAllowed: false,
     notes: [
-      "Estructura contrastada con varios PPT reales de limpieza.",
-      "No se promueve como plantilla universal de servicios: el contenido técnico depende del objeto concreto.",
+      "Estructura contrastada con varios PPT reales y con subfamilias de servicio distintas: limpieza y formación profesional.",
+      "La pluralidad de fuentes confirma bloques transversales, pero también impide promover un único PPT universal rígido: el contenido técnico depende del objeto concreto.",
     ],
   });
 
