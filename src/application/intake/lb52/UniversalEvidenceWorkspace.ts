@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { EvidenceField, EvidenceFieldStatus, EvidenceReference } from "../../../domain/expediente/EvidenceField";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../lb51/UniversalV1UiFieldManifest";
+import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../lb93/SupplyVerticalFieldManifest";
 
 export interface UniversalEvidenceRecord {
   caseId: string;
@@ -9,7 +10,10 @@ export interface UniversalEvidenceRecord {
   updatedAt: string;
 }
 
-const ALLOWED_PATHS = new Set(UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath));
+const ALLOWED_PATHS = new Set([
+  ...UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath),
+  ...SUPPLY_VERTICAL_FIELD_MANIFEST.map(item => item.fieldPath),
+]);
 
 function safeCaseId(value: string): string {
   const id = value.trim();
