@@ -1,6 +1,7 @@
 import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace";
 import { SUPPLY_VERTICAL_FIELD_MANIFEST, type SupplyVerticalFieldDefinition } from "./SupplyVerticalFieldManifest";
 import type { SupplySourceVariant } from "../../../domain/documentModel/UniversalSupplySourceCorpus";
+import { TipoProcedimiento } from "../../../domain/procedimiento/TipoProcedimiento";
 
 export interface SupplyQuestionPlan {
   pendingRequired: readonly SupplyVerticalFieldDefinition[];
@@ -19,13 +20,22 @@ function definition(path: string): SupplyVerticalFieldDefinition | undefined {
   return SUPPLY_VERTICAL_FIELD_MANIFEST.find(field => field.fieldPath === path);
 }
 
+function requiredForProcedure(record: UniversalEvidenceRecord, field: SupplyVerticalFieldDefinition): boolean {
+  if (!field.requiredForWorkflowReview) return false;
+  const procedure = record.fields.procedure?.value as TipoProcedimiento | undefined;
+  const isSolvency = field.fieldPath === "criteria.economicSolvency" || field.fieldPath === "criteria.technicalSolvency";
+  if (isSolvency && (procedure === TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO || procedure === TipoProcedimiento.CONTRATO_MENOR)) return false;
+  return true;
+}
+
 /**
- * Planificador conservador: pregunta las dimensiones Supply obligatorias que faltan
- * y solo abre hechos condicionados cuando la subfamilia declarada los necesita.
- * No intenta adivinar procedimiento, financiación, solvencia o variante por CPV.
+ * Planificador conservador: pregunta solo dimensiones Supply necesarias según
+ * los hechos ya declarados. No adivina procedimiento, financiación, solvencia
+ * ni variante por CPV. En el ASA abreviado no exige preguntas de solvencia,
+ * de acuerdo con el art. 159.6.b LCSP; tampoco las fuerza en contrato menor.
  */
 export function planSupplyQuestions(record: UniversalEvidenceRecord): SupplyQuestionPlan {
-  const pendingRequired = SUPPLY_VERTICAL_FIELD_MANIFEST.filter(field => field.requiredForWorkflowReview && !answered(record, field.fieldPath));
+  const pendingRequired = SUPPLY_VERTICAL_FIELD_MANIFEST.filter(field => requiredForProcedure(record, field) && !answered(record, field.fieldPath));
   const variant = record.fields["technical.supplyVariant"]?.value as SupplySourceVariant | undefined;
   const conditionalPaths: string[] = [];
 
