@@ -1,8 +1,7 @@
-import test from "node:test";
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
 import { UniversalEvidenceWorkspace } from "../src/application/intake/lb52/UniversalEvidenceWorkspace";
 import { DurableUniversalEvidenceWorkspace } from "../src/application/universal/DurableUniversalEvidenceWorkspace";
 import { UniversalDurableCaseStore, type UniversalCaseMirror, type UniversalCaseSnapshot } from "../src/application/universal/UniversalDurableCaseStore";
@@ -13,25 +12,30 @@ class MemoryMirror implements UniversalCaseMirror {
   async load(caseId: string): Promise<UniversalCaseSnapshot | null> { return structuredClone(this.data.get(caseId) ?? null); }
 }
 
-test("LB93: procedimiento, financiación y subfamilia Supply sobreviven a recreación del workspace", async () => {
-  const mirror = new MemoryMirror();
-  const firstRoot = fs.mkdtempSync(path.join(os.tmpdir(), "lb93-supply-a-"));
-  const firstLocal = new UniversalEvidenceWorkspace(firstRoot);
-  const first = new DurableUniversalEvidenceWorkspace(firstRoot, firstLocal, new UniversalDurableCaseStore(1, mirror));
-  const caseId = "REG-SUPPLY-LB93-DURABLE-001";
+const roots: string[] = [];
+function root(prefix: string): string { const value = fs.mkdtempSync(path.join(os.tmpdir(), prefix)); roots.push(value); return value; }
+afterEach(() => { while (roots.length) fs.rmSync(roots.pop()!, { recursive: true, force: true }); });
 
-  await first.declare(caseId, "contractType", "SUPPLY", "operator");
-  await first.declare(caseId, "procedure", "ABIERTO_SIMPLIFICADO_ABREVIADO", "operator");
-  await first.declare(caseId, "economic.fundingSource", "AUTOFINANCED", "operator");
-  await first.declare(caseId, "technical.supplyVariant", "ORDINARY_GLOBAL_PRICE", "operator");
+describe("LB93 durable Supply evidence", () => {
+  it("recupera procedimiento, financiación y subfamilia tras recrear el workspace", async () => {
+    const mirror = new MemoryMirror();
+    const firstRoot = root("lb93-supply-a-");
+    const first = new DurableUniversalEvidenceWorkspace(firstRoot, new UniversalEvidenceWorkspace(firstRoot), new UniversalDurableCaseStore(1, mirror));
+    const caseId = "REG-SUPPLY-LB93-DURABLE-001";
 
-  const secondRoot = fs.mkdtempSync(path.join(os.tmpdir(), "lb93-supply-b-"));
-  const secondLocal = new UniversalEvidenceWorkspace(secondRoot);
-  const second = new DurableUniversalEvidenceWorkspace(secondRoot, secondLocal, new UniversalDurableCaseStore(1, mirror));
-  const restored = await second.get(caseId);
+    await first.declare(caseId, "contractType", "SUPPLY", "operator");
+    await first.declare(caseId, "procedure", "ABIERTO_SIMPLIFICADO_ABREVIADO", "operator");
+    await first.declare(caseId, "economic.fundingSource", "AUTOFINANCED", "operator");
+    await first.declare(caseId, "technical.supplyVariant", "ORDINARY_GLOBAL_PRICE", "operator");
 
-  assert.equal(restored.record.fields.contractType?.value, "SUPPLY");
-  assert.equal(restored.record.fields.procedure?.value, "ABIERTO_SIMPLIFICADO_ABREVIADO");
-  assert.equal(restored.record.fields["economic.fundingSource"]?.value, "AUTOFINANCED");
-  assert.equal(restored.record.fields["technical.supplyVariant"]?.value, "ORDINARY_GLOBAL_PRICE");
+    const secondRoot = root("lb93-supply-b-");
+    const second = new DurableUniversalEvidenceWorkspace(secondRoot, new UniversalEvidenceWorkspace(secondRoot), new UniversalDurableCaseStore(1, mirror));
+    const restored = await second.get(caseId);
+
+    expect(restored.persistence.status).toBe("RESTORED_REMOTE");
+    expect(restored.record.fields.contractType?.value).toBe("SUPPLY");
+    expect(restored.record.fields.procedure?.value).toBe("ABIERTO_SIMPLIFICADO_ABREVIADO");
+    expect(restored.record.fields["economic.fundingSource"]?.value).toBe("AUTOFINANCED");
+    expect(restored.record.fields["technical.supplyVariant"]?.value).toBe("ORDINARY_GLOBAL_PRICE");
+  });
 });
