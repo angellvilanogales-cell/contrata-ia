@@ -5,6 +5,7 @@ import {
   UniversalEvidenceWorkspace,
 } from "../intake/lb52/UniversalEvidenceWorkspace";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../intake/lb51/UniversalV1UiFieldManifest";
+import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../intake/lb93/SupplyVerticalFieldManifest";
 import {
   UniversalCasePayload,
   UniversalDurableCaseStore,
@@ -16,7 +17,10 @@ interface UniversalEvidencePayload extends UniversalCasePayload {
   record: UniversalEvidenceRecord;
 }
 
-const ALLOWED_FIELDS = new Set(UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath));
+const ALLOWED_FIELDS = new Set([
+  ...UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath),
+  ...SUPPLY_VERTICAL_FIELD_MANIFEST.map(item => item.fieldPath),
+]);
 const ALLOWED_STATUS = new Set(["PENDING", "SOURCE_DECLARED", "SOURCE_CONFIRMED", "SYSTEM_PROPOSAL", "HUMAN_VALIDATED", "SOURCE_CONFLICT", "NOT_APPLICABLE"]);
 
 function fileSafeCaseId(value: string): string {
@@ -35,9 +39,11 @@ function validateRecord(record: UniversalEvidenceRecord, expectedCaseId: string)
 }
 
 /**
- * LB92.6-8. Envoltorio durable de la clase real UniversalEvidenceWorkspace (lb52).
+ * LB92.6-8 / LB93.12. Envoltorio durable de UniversalEvidenceWorkspace.
  * El workspace conserva las reglas de edición/validación; esta capa aporta
  * snapshot remoto, checksum, versión de esquema y recuperación tras reinicio.
+ * LB93 amplía el mismo manifiesto permitido con los campos específicos Supply:
+ * no existe un segundo almacén ni una persistencia paralela.
  */
 export class DurableUniversalEvidenceWorkspace {
   public constructor(
