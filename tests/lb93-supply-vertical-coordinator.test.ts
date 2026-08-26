@@ -64,6 +64,20 @@ describe("LB93 SupplyVerticalCoordinator", () => {
     expect(result.documents.find(row => row.documentType === "PPT")?.decision).toBe("BLOCKED");
   });
 
+  it("ASA abreviado no exige solvencia para completar el flujo", () => {
+    const { ["criteria.economicSolvency"]: _economic, ["criteria.technicalSolvency"]: _technical, ...withoutSolvency } = completeValues;
+    const result = evaluateSupplyVertical(record(withoutSolvency));
+    expect(result.workflowReadyForHumanReview).toBe(true);
+    expect(result.sections.find(section => section.id === "SOLVENCY")?.total).toBe(0);
+  });
+
+  it("si hay división en lotes no exige una motivación ficticia de no división", () => {
+    const { ["lots.noDivisionJustification"]: _unused, ...withoutNoDivisionText } = completeValues;
+    const result = evaluateSupplyVertical(record(withoutNoDivisionText));
+    expect(result.workflowReadyForHumanReview).toBe(true);
+    expect(result.sections.find(section => section.id === "LOTS")?.total).toBe(1);
+  });
+
   it("no equipara validación humana con productionReady", () => {
     const result = evaluateSupplyVertical(record(completeValues, true));
     expect(result.workflowHumanValidated).toBe(true);
@@ -85,6 +99,16 @@ describe("LB93 SupplyVerticalCoordinator", () => {
   it("bloquea no división en lotes sin motivación suficiente", () => {
     const result = evaluateSupplyVertical(record({ ...completeValues, "lots.divisionIntoLots": false, "lots.noDivisionJustification": "No" }));
     expect(result.blockers.some(item => item.includes("99.3"))).toBe(true);
+  });
+
+  it("incorpora contradicciones económicas al gate sin corregir los valores", () => {
+    const result = evaluateSupplyVertical(record({
+      ...completeValues,
+      "economic.initialVatAmountCents": 420_000,
+      "economic.initialPblVatIncludedCents": 2_300_000,
+    }));
+    expect(result.blockers.some(item => item.includes("PBL con IVA"))).toBe(true);
+    expect(result.workflowReadyForHumanReview).toBe(false);
   });
 
   it("no selecciona plantillas físicas con financiación desconocida", () => {
