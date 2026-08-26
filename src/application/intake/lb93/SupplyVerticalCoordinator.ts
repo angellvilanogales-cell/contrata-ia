@@ -55,14 +55,14 @@ const SECTION_LABELS: Readonly<Record<string, string>> = {
   CRITERIA: "Criterios",
 };
 
-const CORE_PATHS_BY_SECTION: Readonly<Record<string, readonly string[]>> = {
+const BASE_PATHS_BY_SECTION: Readonly<Record<string, readonly string[]>> = {
   NEED_OBJECT: ["object", "contractType", "cpvMain", "need"],
   PROCEDURE: ["procedure", "administrative.contractingAuthority"],
   ECONOMICS: ["baseTenderBudgetCents", "economic.legalEstimatedValueCents", "economic.fundingSource", "durationMonths"],
   TECHNICAL: ["technical.supplyVariant", "technical.technicalRequirements", "technical.executionLocations"],
   SOLVENCY: ["criteria.economicSolvency", "criteria.technicalSolvency"],
   EXECUTION: ["execution.specialExecutionConditions", "execution.receiptAndAcceptanceRegime"],
-  LOTS: ["lots.divisionIntoLots", "lots.noDivisionJustification"],
+  LOTS: ["lots.divisionIntoLots"],
   CRITERIA: ["criteria.awardCriteria"],
 };
 
@@ -82,8 +82,28 @@ function isValidated(f: EvidenceField<unknown> | undefined): boolean {
   return Boolean(f && (f.status === "HUMAN_VALIDATED" || f.status === "NOT_APPLICABLE") && (f.humanValidated || f.status === "NOT_APPLICABLE"));
 }
 
-function buildSections(record: UniversalEvidenceRecord): SupplyVerticalSectionResult[] {
-  return Object.entries(CORE_PATHS_BY_SECTION).map(([id, paths]) => {
+function pathsBySection(record: UniversalEvidenceRecord): Readonly<Record<string, readonly string[]>> {
+  const procedure = value<TipoProcedimiento>(record, "procedure");
+  const divisionIntoLots = value<boolean>(record, "lots.divisionIntoLots");
+  const variant = value<SupplySourceVariant>(record, "technical.supplyVariant");
+  const result: Record<string, string[]> = Object.fromEntries(
+    Object.entries(BASE_PATHS_BY_SECTION).map(([section, paths]) => [section, [...paths]]),
+  );
+
+  if (procedure === TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO || procedure === TipoProcedimiento.CONTRATO_MENOR) {
+    result.SOLVENCY = [];
+  }
+  if (divisionIntoLots === false) result.LOTS.push("lots.noDivisionJustification");
+  if (variant === "CATALOGUE_NEEDS") result.TECHNICAL.push("technical.hasSuccessiveOrders");
+  if (variant === "SUPPLY_WITH_SERVICE_COMPONENT") result.TECHNICAL.push("technical.hasServicePlatformComponent");
+  if (variant === "FURNITURE_INSTALLATION") result.TECHNICAL.push("technical.hasInstallationOrAssembly");
+  if (variant === "MEDICAL_FRAMEWORK") result.PROCEDURE.push("administrative.isFrameworkAgreement");
+  if (variant === "DIGITAL_EQUIPMENT") result.ECONOMICS.push("regulation.europeanFunding");
+  return result;
+}
+
+function buildSections(record: UniversalEvidenceRecord, sectionPaths: Readonly<Record<string, readonly string[]>>): SupplyVerticalSectionResult[] {
+  return Object.entries(sectionPaths).map(([id, paths]) => {
     const blockers: string[] = [];
     let completed = 0;
     let conflict = false;
@@ -111,10 +131,10 @@ function procedureBlockers(record: UniversalEvidenceRecord): string[] {
   }
   if (typeof estimatedValue === "number") {
     if (procedure === TipoProcedimiento.CONTRATO_MENOR && estimatedValue >= 1_500_000) {
-      blockers.push("El contrato menor de suministro exige valor estimado inferior a 15.000 € (art. 118 LCSP)." );
+      blockers.push("El contrato menor de suministro exige valor estimado inferior a 15.000 € (art. 118 LCSP).");
     }
     if (procedure === TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO && estimatedValue >= 6_000_000) {
-      blockers.push("El abierto simplificado abreviado de suministros exige valor estimado inferior a 60.000 € (art. 159.6 LCSP)." );
+      blockers.push("El abierto simplificado abreviado de suministros exige valor estimado inferior a 60.000 € (art. 159.6 LCSP).");
     }
   }
   return blockers;
@@ -176,7 +196,8 @@ function documentRows(record: UniversalEvidenceRecord): SupplyVerticalDocumentRo
 export function evaluateSupplyVertical(record: UniversalEvidenceRecord): SupplyVerticalAssessment {
   const blockers: string[] = [];
   const warnings: string[] = [];
-  const sections = buildSections(record);
+  const sectionPaths = pathsBySection(record);
+  const sections = buildSections(record, sectionPaths);
   const contractType = value<string>(record, "contractType");
   const isSupply = contractType === "SUPPLY";
   if (!isSupply) blockers.push(contractType ? `El expediente está clasificado como ${contractType}; este vertical solo admite SUPPLY.` : "Debe declarar y validar el tipo contractual SUPPLY.");
@@ -195,10 +216,10 @@ export function evaluateSupplyVertical(record: UniversalEvidenceRecord): SupplyV
   blockers.push(...variant.blockers);
   warnings.push(...variant.warnings);
 
-  const requiredPaths = [...new Set(Object.values(CORE_PATHS_BY_SECTION).flat())];
+  const requiredPaths = [...new Set(Object.values(sectionPaths).flat())];
   const usable = requiredPaths.filter(path => isUsable(field(record, path))).length;
   const validated = requiredPaths.filter(path => isValidated(field(record, path))).length;
-  const progressPct = Math.round((usable / requiredPaths.length) * 100);
+  const progressPct = requiredPaths.length ? Math.round((usable / requiredPaths.length) * 100) : 0;
   const workflowReadyForHumanReview = isSupply && blockers.length === 0 && usable === requiredPaths.length;
   const workflowHumanValidated = workflowReadyForHumanReview && validated === requiredPaths.length;
 
@@ -220,8 +241,8 @@ export function evaluateSupplyVertical(record: UniversalEvidenceRecord): SupplyV
     legalReferences: [
       "LCSP arts. 28 y 99: necesidad, objeto y lotes.",
       "LCSP arts. 100-102: presupuesto, valor estimado y precio.",
-      "LCSP arts. 118, 131 y 159: procedimiento de adjudicación.",
-      "LCSP arts. 74 y 86-92: solvencia vinculada y proporcional.",
+      "LCSP arts. 118, 131 y 159: procedimiento de adjudicación; art. 159.6.b para la exención de acreditación de solvencia en ASA abreviado.",
+      "LCSP arts. 74 y 86-92: solvencia vinculada y proporcional cuando proceda.",
       "LCSP arts. 145-146: criterios de adjudicación.",
       "LCSP arts. 192-202: ejecución y condiciones especiales.",
       "LCSP arts. 203-207: modificaciones.",
