@@ -2,6 +2,7 @@ import http, { type ServerResponse } from "node:http";
 import path from "node:path";
 import { UniversalEvidenceWorkspace } from "../../application/intake/lb52/UniversalEvidenceWorkspace";
 import { createHttpPersistedTemplateAssetStoreFromEnv } from "../../application/intake/lb94/HttpPersistedTemplateAssetStore";
+import { evaluateSupplyPcapParametrizationGate } from "../../application/intake/lb95/SupplyPcapParametrizationGate";
 import { evaluateSupplyUserJourney } from "../../application/intake/lb95/SupplyUserJourneyCoordinator";
 import { DurableUniversalEvidenceWorkspace } from "../../application/universal/DurableUniversalEvidenceWorkspace";
 import { createUniversalCaseMirrorFromEnv } from "../../application/universal/HttpUniversalCaseMirror";
@@ -12,6 +13,7 @@ import { SUPPLY_USER_JOURNEY_UI } from "./SupplyUserJourneyUi";
 
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
 const EVIDENCE_ROOT = path.join(DATA_ROOT, "universal-evidence-v1");
+const PCAP_TEMPLATE_ID = "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17";
 const security = new SecurityPolicy();
 const localEvidence = new UniversalEvidenceWorkspace(EVIDENCE_ROOT);
 const durableEvidence = new DurableUniversalEvidenceWorkspace(
@@ -74,6 +76,8 @@ export function createLB95RuntimeServer(): http.Server {
         const store = createHttpPersistedTemplateAssetStoreFromEnv();
         const physical = store ? await store.readiness() : { ready: false, blockers: ["Persistencia externa de plantillas no configurada."], assets: [] };
         const journey = evaluateSupplyUserJourney(restored.record, physical.ready);
+        const officialPcapAvailable = physical.assets.some(asset => asset.templateId === PCAP_TEMPLATE_ID && asset.available === true);
+        const pcapGate = evaluateSupplyPcapParametrizationGate(restored.record, journey, officialPcapAvailable);
         const currentStageIndex = Math.max(0, journey.stages.findIndex(stage => stage.id === journey.currentStage));
         const journeyForUi = {
           ...journey,
@@ -85,6 +89,7 @@ export function createLB95RuntimeServer(): http.Server {
           journey: journeyForUi,
           persistence: restored.persistence.status,
           physicalPackage: physical,
+          pcapParametrization: pcapGate,
           sourceAuthority: "00_GUIA_MAESTRA_SUPPLY_LB94",
           humanValidationRequired: true,
         });
