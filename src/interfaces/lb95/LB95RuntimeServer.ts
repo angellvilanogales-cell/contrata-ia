@@ -74,8 +74,15 @@ export function createLB95RuntimeServer(): http.Server {
         const store = createHttpPersistedTemplateAssetStoreFromEnv();
         const physical = store ? await store.readiness() : { ready: false, blockers: ["Persistencia externa de plantillas no configurada."], assets: [] };
         const journey = evaluateSupplyUserJourney(restored.record, physical.ready);
+        const currentStageIndex = Math.max(0, journey.stages.findIndex(stage => stage.id === journey.currentStage));
+        const journeyForUi = {
+          ...journey,
+          currentStageIndex,
+          currentStageLabel: journey.stages[currentStageIndex]?.label ?? journey.currentStage,
+          stages: journey.stages.map(stage => ({ ...stage, requiredFields: stage.applicablePaths, optionalFields: [] as string[] })),
+        };
         sendJson(response, 200, {
-          journey,
+          journey: journeyForUi,
           persistence: restored.persistence.status,
           physicalPackage: physical,
           sourceAuthority: "00_GUIA_MAESTRA_SUPPLY_LB94",
