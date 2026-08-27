@@ -1,0 +1,83 @@
+import http, { type ServerResponse } from "node:http";
+import path from "node:path";
+import { UniversalEvidenceWorkspace } from "../../application/intake/lb52/UniversalEvidenceWorkspace";
+import { createHttpPersistedTemplateAssetStoreFromEnv } from "../../application/intake/lb94/HttpPersistedTemplateAssetStore";
+import { evaluateSupplyUserJourney } from "../../application/intake/lb95/SupplyUserJourneyCoordinator";
+import { DurableUniversalEvidenceWorkspace } from "../../application/universal/DurableUniversalEvidenceWorkspace";
+import { createUniversalCaseMirrorFromEnv } from "../../application/universal/HttpUniversalCaseMirror";
+import { UniversalDurableCaseStore } from "../../application/universal/UniversalDurableCaseStore";
+import { createLB94RuntimeServer } from "../lb94/LB94RuntimeServer";
+import { SecurityPolicy } from "../lb7/SecurityPolicy";
+
+const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
+const EVIDENCE_ROOT = path.join(DATA_ROOT, "universal-evidence-v1");
+const security = new SecurityPolicy();
+const localEvidence = new UniversalEvidenceWorkspace(EVIDENCE_ROOT);
+const durableEvidence = new DurableUniversalEvidenceWorkspace(
+  EVIDENCE_ROOT,
+  localEvidence,
+  new UniversalDurableCaseStore(1, createUniversalCaseMirrorFromEnv() ?? undefined),
+);
+
+function sendJson(response: ServerResponse, status: number, value: unknown): void {
+  const body = Buffer.from(JSON.stringify(value));
+  response.writeHead(status, {
+    "content-type": "application/json; charset=utf-8",
+    "content-length": body.length,
+    "cache-control": "no-store",
+  });
+  response.end(body);
+}
+
+function statusFor(error: Error): number {
+  if (/autenticación|credencial|sesión segura/i.test(error.message)) return 401;
+  if (/permiso insuficiente/i.test(error.message)) return 403;
+  if (/no encontrad/i.test(error.message)) return 404;
+  return 400;
+}
+
+/**
+ * LB95 añade exclusivamente el recorrido de usuario Supply sobre el runtime
+ * LB94 ya probado. No crea otra autoridad de expediente, otra persistencia ni
+ * otro selector documental: restaura la misma evidencia durable y consulta el
+ * mismo almacén físico persistido.
+ */
+export function createLB95RuntimeServer(): http.Server {
+  const base = createLB94RuntimeServer();
+  return http.createServer(async (request, response) => {
+    security.applySecurityHeaders(response);
+    try {
+      const url = new URL(request.url ?? "/", "http://localhost");
+      const parts = url.pathname.split("/").filter(Boolean);
+      if (
+        request.method === "GET" &&
+        parts[0] === "api" &&
+        parts[1] === "lb95" &&
+        parts[2] === "cases" &&
+        parts[3] &&
+        parts[4] === "journey" &&
+        parts.length === 5
+      ) {
+        const actor = security.authenticate(request);
+        security.require(actor, "VIEWER");
+        const caseId = decodeURIComponent(parts[3]);
+        const restored = await durableEvidence.get(caseId);
+        const store = createHttpPersistedTemplateAssetStoreFromEnv();
+        const physical = store ? await store.readiness() : { ready: false, blockers: ["Persistencia externa de plantillas no configurada."], assets: [] };
+        const journey = evaluateSupplyUserJourney(restored.record, physical.ready);
+        sendJson(response, 200, {
+          journey,
+          persistence: restored.persistence.status,
+          physicalPackage: physical,
+          sourceAuthority: "00_GUIA_MAESTRA_SUPPLY_LB94",
+        });
+        return;
+      }
+      base.emit("request", request, response);
+    } catch (error) {
+      const failure = error instanceof Error ? error : new Error(String(error));
+      if (!response.headersSent) sendJson(response, statusFor(failure), { error: failure.message });
+      else response.end();
+    }
+  });
+}
