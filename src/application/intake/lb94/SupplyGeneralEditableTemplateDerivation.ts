@@ -25,7 +25,6 @@ export interface SupplyDerivedTemplateEvidence {
 
 export const SUPPLY_GENERAL_DERIVATION_VERSION = "LB94-SUPPLY-GENERAL-ODT-V2" as const;
 
-/** Fuentes independientes usadas solo para acreditar estructura, no para copiar decisiones. */
 export const SUPPLY_GENERAL_STRUCTURAL_CORPUS = [
   "FERRETERIA-2026",
   "PANDA-ANTIVIRUS-AVRA",
@@ -50,11 +49,6 @@ const FORBIDDEN_CASE_MARKERS = [
   "ABRAZADERAS MANGUERA",
 ] as const;
 
-/*
- * Los nombres de estilo se toman de los ODT fuente verificados. De esta forma
- * la plantilla general conserva tipografías, espaciados y jerarquía visual del
- * entorno administrativo, pero no conserva el contenido del expediente donante.
- */
 const MEMORY_BODY = `<office:text>
 <text:p text:style-name="P25">MEMORIA JUSTIFICATIVA DEL CONTRATO DE SUMINISTRO</text:p>
 <text:p text:style-name="P24">EXPEDIENTE: {{caseId}}</text:p>
@@ -112,12 +106,6 @@ function automaticStyles(contentXml: string): string {
   return contentXml.match(/<office:automatic-styles\b[\s\S]*?<\/office:automatic-styles>/)?.[0] ?? "";
 }
 
-/**
- * Huella estructural que excluye únicamente el contenido del master-page.
- * Permite sanear textos de cabecera/pie específicos del expediente sin afirmar
- * que el hash completo de styles.xml permanece idéntico. Fuentes, estilos y
- * automatic-styles deben seguir siendo exactamente los mismos.
- */
 export function computeSupplyStructuralStyleFingerprint(entries: readonly OdtZipEntry[]): string {
   const styles = text(entries, "styles.xml").replace(/<office:master-styles\b[\s\S]*?<\/office:master-styles>/, "<office:master-styles/>");
   const content = text(entries, "content.xml");
@@ -172,10 +160,7 @@ function pruneUnreferencedEmbeddedObjects(entries: readonly OdtZipEntry[]): OdtZ
 }
 
 function contamination(entries: readonly OdtZipEntry[]): string[] {
-  const allXml = entries
-    .filter(item => item.name.endsWith(".xml"))
-    .map(item => Buffer.from(item.bytes).toString("utf8").toUpperCase())
-    .join("\n");
+  const allXml = entries.filter(item => item.name.endsWith(".xml")).map(item => Buffer.from(item.bytes).toString("utf8").toUpperCase()).join("\n");
   return FORBIDDEN_CASE_MARKERS.filter(marker => allXml.includes(marker.toUpperCase()));
 }
 
@@ -238,5 +223,5 @@ export function deriveSupplyGeneralEditableTemplate(input: {
 
 export function supplyGeneralTemplatePlaceholders(kind: SupplyGeneralTemplateKind): readonly string[] {
   const body = kind === "MEMORY" ? MEMORY_BODY : PPT_BODY;
-  return [...body.matchAll(/\{\{([A-Za-z0-9.]+)\}\}/g)].map(match => match[1]);
+  return [...body.matchAll(/\{\{([A-Za-z0-9.]+)\}\}/g)].map(match => match[1]!);
 }
