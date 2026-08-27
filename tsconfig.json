@@ -7,7 +7,8 @@
   },
   "include": [
     "src/main.ts",
-    "src/architecture/**/*.ts"
+    "src/architecture/**/*.ts",
+    "src/interfaces/lb94/**/*.ts"
   ],
   "exclude": [
     "node_modules",
