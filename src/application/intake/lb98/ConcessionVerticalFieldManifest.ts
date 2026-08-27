@@ -16,7 +16,11 @@ export const CONCESSION_VERTICAL_FIELD_MANIFEST = [
   { fieldPath:"concession.stateAidRelevant", label:"Existen ayudas relevantes para la viabilidad", control:"BOOLEAN", section:"VIABILITY", requiredForWorkflowReview:true, humanValidationRequired:true },
   { fieldPath:"concession.stateAidCompatibility", label:"Análisis de compatibilidad de ayuda de Estado", control:"TEXTAREA", section:"VIABILITY", requiredForWorkflowReview:false, humanValidationRequired:true },
   { fieldPath:"concession.tariffRegime", label:"Régimen de tarifas y actualización", control:"TEXTAREA", section:"EXECUTION", requiredForWorkflowReview:true, humanValidationRequired:true },
+  { fieldPath:"concession.definitiveGuaranteeRegime", label:"Garantía definitiva fijada motivadamente para la concesión", control:"TEXTAREA", section:"PROCEDURE", requiredForWorkflowReview:true, humanValidationRequired:true },
+  { fieldPath:"concession.qualityContinuityRegime", label:"Calidad, continuidad y niveles de servicio", control:"TEXTAREA", section:"TECHNICAL", requiredForWorkflowReview:true, humanValidationRequired:true },
+  { fieldPath:"concession.userAccessRegime", label:"Acceso, derechos y condiciones de las personas usuarias", control:"TEXTAREA", section:"TECHNICAL", requiredForWorkflowReview:true, humanValidationRequired:true },
   { fieldPath:"concession.economicEquilibriumRegime", label:"Régimen de equilibrio económico", control:"TEXTAREA", section:"EXECUTION", requiredForWorkflowReview:true, humanValidationRequired:true },
   { fieldPath:"concession.interventionRescueRegime", label:"Secuestro/intervención y rescate", control:"TEXTAREA", section:"EXECUTION", requiredForWorkflowReview:true, humanValidationRequired:true },
   { fieldPath:"concession.publicServicePolicePowers", label:"Poderes de policía del servicio público cuando proceda", control:"TEXTAREA", section:"EXECUTION", requiredForWorkflowReview:true, humanValidationRequired:true },
+  { fieldPath:"concession.dataProtectionRegime", label:"Régimen de protección de datos", control:"TEXTAREA", section:"EXECUTION", requiredForWorkflowReview:true, humanValidationRequired:true },
 ] as const;
