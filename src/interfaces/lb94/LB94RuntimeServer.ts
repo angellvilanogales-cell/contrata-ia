@@ -83,20 +83,36 @@ function statusFor(error: Error): number {
 const ASSET_UI = `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Contrata-IA · Activos LB94</title>
-<style>body{font-family:Arial,sans-serif;max-width:920px;margin:32px auto;padding:0 20px;color:#222}fieldset{margin:18px 0;padding:18px}button{padding:9px 14px}pre{white-space:pre-wrap;background:#f4f4f4;padding:14px}.ok{color:#176b35}.bad{color:#a62121}</style></head>
+<style>body{font-family:Arial,sans-serif;max-width:920px;margin:32px auto;padding:0 20px;color:#222}fieldset{margin:18px 0;padding:18px}button{padding:9px 14px;margin-right:8px}pre{white-space:pre-wrap;background:#f4f4f4;padding:14px}.ok{color:#176b35}.bad{color:#a62121}.status{padding:10px 12px;margin:12px 0;background:#f4f4f4}.status.ok{background:#e9f7ef}.status.bad{background:#fdecec}</style></head>
 <body><h1>Contrata-IA · Activos físicos LB94</h1>
 <p>Esta pantalla instala únicamente los binarios exactos acreditados. El servidor valida SHA-256 antes de persistirlos; la credencial de Supabase nunca llega al navegador.</p>
+<div id="session" class="status">Comprobando sesión…</div>
 <div id="auth"><form method="post" action="/lb94/login"><label>Credencial administrativa <input name="token" type="password" autocomplete="current-password"></label> <button>Iniciar sesión</button></form></div>
 <fieldset><legend>PCAP oficial Supply ASA</legend><input type="file" id="pcap" accept=".odt"><button data-id="JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" data-file="pcap">Instalar PCAP</button></fieldset>
 <fieldset><legend>Memoria Supply general derivada</legend><input type="file" id="memory" accept=".odt"><button data-id="contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2" data-file="memory">Instalar Memoria</button></fieldset>
 <fieldset><legend>PPT Supply general derivado</legend><input type="file" id="ppt" accept=".odt"><button data-id="contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2" data-file="ppt">Instalar PPT</button></fieldset>
-<button id="check">Comprobar readiness</button><pre id="out">Pendiente.</pre>
+<button id="check">Comprobar readiness de activos</button>
+<fieldset><legend>Prueba E2E documental LB94</legend>
+<label>Expediente de regresión <input id="caseId" value="REG-SUPPLY-LB94-E2E-001" size="34"></label>
+<p>Este expediente es sintético y sirve únicamente para probar el pipeline físico; no representa un expediente administrativo real.</p>
+<button id="caseCheck">Comprobar expediente</button>
+<button id="memoryDownload">Descargar Memoria E2E</button>
+<button id="pptDownload">Descargar PPT E2E</button>
+</fieldset>
+<pre id="out">Pendiente.</pre>
 <script>
-const out=document.getElementById('out');
+const out=document.getElementById('out');const session=document.getElementById('session');
 async function fileBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onerror=()=>reject(r.error);r.onload=()=>resolve(String(r.result).split(',')[1]||'');r.readAsDataURL(file);});}
 async function provision(button){const input=document.getElementById(button.dataset.file);const file=input.files&&input.files[0];if(!file){out.textContent='Selecciona primero el ODT correspondiente.';return;}out.textContent='Validando e instalando '+file.name+'…';const contentBase64=await fileBase64(file);const response=await fetch('/api/lb94/templates/provision',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({templateId:button.dataset.id,contentBase64})});const data=await response.json();out.textContent=JSON.stringify(data,null,2);out.className=response.ok?'ok':'bad';}
+async function checkSession(){const r=await fetch('/api/lb94/templates/readiness');if(r.ok){session.textContent='Sesión administrativa activa.';session.className='status ok';return;}session.textContent='Sesión no activa. Introduzca la credencial administrativa.';session.className='status bad';}
+async function caseReadiness(){const id=document.getElementById('caseId').value.trim();const r=await fetch('/api/lb94/cases/'+encodeURIComponent(id)+'/readiness');const d=await r.json();out.textContent=JSON.stringify(d,null,2);out.className=r.ok&&d.ready?'ok':'bad';}
+async function downloadKind(kind){const id=document.getElementById('caseId').value.trim();out.textContent='Generando '+kind+' desde evidencia durable y plantillas persistidas…';const r=await fetch('/api/lb94/cases/'+encodeURIComponent(id)+'/generate/'+kind,{method:'POST'});if(!r.ok){let d;try{d=await r.json();}catch{d={error:'Error de generación '+r.status};}out.textContent=JSON.stringify(d,null,2);out.className='bad';return;}const blob=await r.blob();const disposition=r.headers.get('content-disposition')||'';const match=/filename="([^"]+)"/.exec(disposition);const name=match?match[1]:(id+'_'+kind+'.odt');const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);out.textContent=kind+' generado y descargado correctamente.';out.className='ok';}
 document.querySelectorAll('button[data-id]').forEach(button=>button.addEventListener('click',()=>provision(button).catch(e=>{out.textContent=String(e);out.className='bad';})));
 document.getElementById('check').addEventListener('click',async()=>{const r=await fetch('/api/lb94/templates/readiness');const d=await r.json();out.textContent=JSON.stringify(d,null,2);out.className=r.ok&&d.ready?'ok':'bad';});
+document.getElementById('caseCheck').addEventListener('click',()=>caseReadiness().catch(e=>{out.textContent=String(e);out.className='bad';}));
+document.getElementById('memoryDownload').addEventListener('click',()=>downloadKind('MEMORIA').catch(e=>{out.textContent=String(e);out.className='bad';}));
+document.getElementById('pptDownload').addEventListener('click',()=>downloadKind('PPT').catch(e=>{out.textContent=String(e);out.className='bad';}));
+checkSession().catch(()=>{session.textContent='No se pudo comprobar la sesión.';session.className='status bad';});
 </script></body></html>`;
 
 /**
