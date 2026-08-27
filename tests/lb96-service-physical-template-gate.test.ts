@@ -34,7 +34,8 @@ function record(bytes: Uint8Array, slots: readonly string[]): ServiceGeneralTemp
     expectedStyleFingerprint: computeOdtStyleFingerprint(readOdtZip(bytes)),
     provenance: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
     officialModel: false,
-    sourceAuthority: "SERVICE_REAL_CORPUS_PLUS_ADMIN_STYLE_DONOR",
+    sourceAuthority: "SERVICE_REAL_CORPUS_2024_2026_PLUS_JDA_ADMIN_STYLE",
+    derivationVersion: "LB96-SERVICE-GENERAL-ODT-V2",
     humanValidationRequired: true,
     slots,
   };
@@ -62,9 +63,9 @@ describe("LB96 gate físico de plantillas Service", () => {
     expect(result.blockers.join(" ")).toContain("slots");
   });
 
-  it("mantiene Memoria y PPT Service separados del inventario Supply", () => {
-    expect(LB96_SERVICE_GENERAL_RUNTIME_ASSETS).toHaveLength(2);
-    expect(LB96_SERVICE_GENERAL_RUNTIME_ASSETS.map(item => item.kind).sort()).toEqual(["MEMORIA", "PPT"]);
+  it("mantiene PCAP, Memoria y PPT Service separados del inventario Supply", () => {
+    expect(LB96_SERVICE_GENERAL_RUNTIME_ASSETS).toHaveLength(3);
+    expect(LB96_SERVICE_GENERAL_RUNTIME_ASSETS.map(item => item.kind).sort()).toEqual(["MEMORIA", "PCAP", "PPT"]);
     expect(LB96_SERVICE_GENERAL_RUNTIME_ASSETS.every(item => item.templateId.includes(":service:"))).toBe(true);
     expect(LB96_SERVICE_GENERAL_RUNTIME_ASSETS.every(item => item.provenanceRole === "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE")).toBe(true);
   });
