@@ -2,7 +2,7 @@ export type ServiceGeneralTemplateKind = "MEMORY" | "PPT" | "PCAP";
 
 export type ServiceGeneralTemplateSourceAuthority =
   | "SERVICE_REAL_CORPUS_2024_2026_PLUS_JDA_ADMIN_STYLE"
-  | "JDA_SERVICE_OPEN_2026_PLUS_SAE_MAINTENANCE_2026";
+  | "JDA_RECOMMENDED_SERVICE_OPEN_2025_12_CURRENT_PORTAL_PLUS_SERVICE_REAL_CORPUS_2026";
 
 export interface ServiceGeneralTemplateManifestRecord {
   templateId: string;
@@ -14,18 +14,19 @@ export interface ServiceGeneralTemplateManifestRecord {
   provenance: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE";
   officialModel: false;
   sourceAuthority: ServiceGeneralTemplateSourceAuthority;
-  derivationVersion: "LB96-SERVICE-GENERAL-ODT-V2" | "LB96-SERVICE-PCAP-DERIVED-ODT-V1";
+  derivationVersion: "LB96-SERVICE-GENERAL-ODT-V2" | "LB96-SERVICE-PCAP-DERIVED-ODT-V2";
   humanValidationRequired: true;
   slots: readonly string[];
 }
 
 /**
- * Rebaseline físico LB96. Los binarios V1 de Memoria/PPT se perdieron fuera
- * del almacén durable y no se sustituyen silenciosamente: V2 tiene identidad,
- * SHA y estilo nuevos. El PCAP se incorpora como plantilla general DERIVADA,
- * nunca como modelo oficial, a partir del PCAP Service 2026 implementado sobre
- * el modelo recomendado de 17/12/2025 y contrastado con el mantenimiento SAE
- * Sevilla 2026. Todas las piezas exigen validación humana.
+ * Baseline físico LB96. Memoria y PPT son activos generales derivados de
+ * Contrata-IA. El PCAP Service V2 también es derivado y NO se presenta como
+ * modelo oficial: su estructura y ámbito se contrastan con el modelo vigente
+ * de Servicios por procedimiento abierto/autofinanciado publicado por la Junta
+ * de Andalucía (actualización diciembre de 2025) y con el corpus Service real
+ * 2026. Los tres activos conservan identidad física independiente y exigen
+ * validación humana antes de aprobación o firma.
  */
 export const SERVICE_GENERAL_TEMPLATE_MANIFEST: readonly ServiceGeneralTemplateManifestRecord[] = [
   {
@@ -57,16 +58,16 @@ export const SERVICE_GENERAL_TEMPLATE_MANIFEST: readonly ServiceGeneralTemplateM
     slots: ["caseId", "object", "contractManagement", "durationSummary", "executionLocations", "technicalRequirements", "serviceVariantRequirements", "personnelAndMeansRequirements", "serviceControlAndExecutionConditions"],
   },
   {
-    templateId: "contrata-ia:service:pcap:general:LB96-SERVICE-PCAP-DERIVED-ODT-V1",
+    templateId: "contrata-ia:service:pcap:general:LB96-SERVICE-PCAP-DERIVED-ODT-V2",
     kind: "PCAP",
-    fileName: "LB96_PCAP_SERVICE_GENERAL_V1.odt",
+    fileName: "LB96_PCAP_SERVICE_GENERAL_V2.odt",
     mediaType: "application/vnd.oasis.opendocument.text",
-    expectedSha256: "d21d2ece5fa4ef4d684a1f13e5e4eb4947b19c120e2a9f05dacda647e6bf4343",
-    expectedStyleFingerprint: "sha256:e13c10b8f6799b0444a53b36a1ef96b26c8bab1a1fdd8183eab0cfabb36e53ef",
+    expectedSha256: "7a3021f5e8665202b78e49060456a644a472421d1176a58ba4038b5af8148248",
+    expectedStyleFingerprint: "sha256:21f3ff8b627be04a347ae63da7681519d143d878d0cc8c2c538cc51b26b02274",
     provenance: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
     officialModel: false,
-    sourceAuthority: "JDA_SERVICE_OPEN_2026_PLUS_SAE_MAINTENANCE_2026",
-    derivationVersion: "LB96-SERVICE-PCAP-DERIVED-ODT-V1",
+    sourceAuthority: "JDA_RECOMMENDED_SERVICE_OPEN_2025_12_CURRENT_PORTAL_PLUS_SERVICE_REAL_CORPUS_2026",
+    derivationVersion: "LB96-SERVICE-PCAP-DERIVED-ODT-V2",
     humanValidationRequired: true,
     slots: ["caseId", "title", "locationSummary", "cpvSummary", "objectSummary", "lotsSummary", "reservedContractSummary", "needsBasedContractSummary", "specificLegalRegimeSummary", "economicSummary", "budgetSummary", "estimatedValueSummary", "priceSummary", "durationSummary", "solvencySummary", "buyerProfileSummary", "procedureSummary", "guaranteesSummary", "awardCriteriaSummary", "specialExecutionConditionsSummary", "subcontractingSummary", "penaltiesSummary", "paymentSummary", "executionSummary", "suspensionSummary", "modificationSummary", "dataProtectionSummary", "subrogationSummary"],
   },
