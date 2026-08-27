@@ -16,9 +16,12 @@ describe("LB95 Supply user journey UI", () => {
     expect(SUPPLY_USER_JOURNEY_UI).not.toContain("SHA-256");
   });
 
-  it("mantiene la aceptación humana y no presenta el PCAP como generado antes de parametrizarlo", () => {
+  it("mantiene aceptación humana y no habilita el paquete hasta superar el gate PCAP", () => {
     expect(SUPPLY_USER_JOURNEY_UI).toContain("Validar humanamente");
     expect(SUPPLY_USER_JOURNEY_UI).toContain("La descarga no sustituye la revisión ni la aprobación humana");
-    expect(SUPPLY_USER_JOURNEY_UI).toContain("PCAP pendiente de parametrización final");
+    expect(SUPPLY_USER_JOURNEY_UI).toContain("Generar y descargar PCAP + Memoria + PPT");
+    expect(SUPPLY_USER_JOURNEY_UI).toContain("id=\"package\" disabled");
+    expect(SUPPLY_USER_JOURNEY_UI).toContain("El PCAP oficial se habilitará solo cuando su ámbito y todas las decisiones del Anexo I estén acreditadas");
+    expect(SUPPLY_USER_JOURNEY_UI).toContain("$('package').disabled=!(ready&&pg.ready)");
   });
 });
