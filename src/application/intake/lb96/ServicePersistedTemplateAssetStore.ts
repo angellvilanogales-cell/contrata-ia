@@ -2,7 +2,7 @@ import { HttpPersistedTemplateAssetStore, type PersistedTemplateAssetDescriptor 
 import { SERVICE_GENERAL_TEMPLATE_MANIFEST } from "./ServiceGeneralTemplateManifest";
 
 export const LB96_SERVICE_GENERAL_RUNTIME_ASSETS: readonly PersistedTemplateAssetDescriptor[] = SERVICE_GENERAL_TEMPLATE_MANIFEST.map(item => ({
-  kind: item.kind === "MEMORY" ? "MEMORIA" : "PPT",
+  kind: item.kind === "MEMORY" ? "MEMORIA" : item.kind === "PCAP" ? "PCAP" : "PPT",
   templateId: item.templateId,
   sourceId: item.templateId,
   sha256: item.expectedSha256,
@@ -12,8 +12,8 @@ export const LB96_SERVICE_GENERAL_RUNTIME_ASSETS: readonly PersistedTemplateAsse
 
 /**
  * LB96 reutiliza el almacén HTTP ya endurecido en LB94, pero con un manifiesto
- * Service independiente. No mezcla inventarios Supply/Service ni admite activos
- * que no estén expresamente registrados en el manifiesto LB96.
+ * Service independiente de tres piezas. No mezcla inventarios Supply/Service ni
+ * admite activos que no estén expresamente registrados y verificados en LB96.
  */
 export function createHttpPersistedServiceTemplateAssetStore(
   endpoint: string,
