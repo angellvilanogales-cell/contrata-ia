@@ -11,7 +11,6 @@ function validated(key: string, value: unknown): EvidenceField<unknown> {
     sources: [{ kind: "USER_INPUT", sourceId: "test:reviewer" }],
     humanValidationRequired: true,
     humanValidated: true,
-    validatedBy: "reviewer",
     diagnostics: [],
   };
 }
@@ -23,6 +22,7 @@ function record(overrides: Record<string, EvidenceField<unknown>> = {}): Univers
     object: "Suministro de material de oficina",
     cpvMain: "30192000-1",
     "administrative.contractingAuthority": "Servicio Andaluz de Empleo",
+    "administrative.reservedContractDa4": false,
     "lots.divisionIntoLots": false,
     "lots.noDivisionJustification": "Suministro homogéneo que no admite división útil en este supuesto.",
     baseTenderBudgetCents: 1000000,
@@ -33,19 +33,27 @@ function record(overrides: Record<string, EvidenceField<unknown>> = {}): Univers
     "economic.estimatedValueCalculationMethod": "Sin prórrogas ni modificaciones",
     "economic.fundingSource": "AUTOFINANCED",
     "economic.priceRevisionRegime": "No procede",
+    "economic.needsBasedContractDa33": false,
+    "economic.budgetCoversEntireContractLife": true,
+    "economic.annualityBudgetRows": [{ year: 2026, amountCents: 1210000, budgetApplication: "G/32L/22000/00", vatIncluded: true }],
     durationMonths: 12,
     extensionMonths: 0,
     procedure: "ABIERTO_SIMPLIFICADO_ABREVIADO",
-    "criteria.awardCriteria": "Precio 100 puntos",
+    "processing.processingType": "ORDINARIA",
+    "criteria.awardCriteria": [{ nombre: "Precio", ponderacion: 100, evaluableMedianteFormula: true }],
     "criteria.singleCriterionMotivation": "Prestación perfectamente definida",
     "technical.supplyVariant": "ORDINARY_GLOBAL_PRICE",
-    "technical.technicalRequirements": "Bienes nuevos y conformes",
+    "technical.technicalRequirements": ["Bienes nuevos y conformes"],
     "technical.executionLocations": ["Sevilla"],
     "execution.extensionStructure": "Sin prórrogas",
     "execution.extensionNoticeMonths": 0,
-    "execution.specialExecutionConditions": "Gestión de residuos de embalaje",
+    "execution.specialExecutionConditions": ["Gestión de residuos de embalaje"],
     "execution.receiptAndAcceptanceRegime": "Recepción tras comprobación de conformidad",
-    "execution.plannedModificationRegime": "No se prevén modificaciones",
+    "execution.plannedModificationRegime": {
+      budgetStability: { applicable: false, maximumPercent: 0 },
+      needsDa33: { applicable: false, maximumPercent: 0, limits: [] },
+      other: { applicable: false, description: "", maximumPercent: 0, limits: [] },
+    },
   };
   const fields = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, validated(key, value)]));
   return { caseId: "REG-SUPPLY-LB95-001", fields: { ...fields, ...overrides }, updatedAt: new Date(0).toISOString() };
@@ -58,6 +66,7 @@ describe("LB95 Supply user journey", () => {
     expect(journey.readyForDocuments).toBe(true);
     expect(journey.progressPercent).toBe(100);
     expect(journey.stages.find(stage => stage.id === "PROCEDURE")?.applicablePaths).not.toContain("criteria.economicSolvency");
+    expect(journey.stages.find(stage => stage.id === "PROCEDURE")?.applicablePaths).toContain("processing.processingType");
   });
 
   it("solo exige justificación de no división cuando no hay lotes", () => {
