@@ -3,6 +3,7 @@ import path from "node:path";
 import { EvidenceField, EvidenceFieldStatus, EvidenceReference } from "../../../domain/expediente/EvidenceField";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../lb51/UniversalV1UiFieldManifest";
 import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../lb93/SupplyVerticalFieldManifest";
+import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../lb95/SupplyAsaPcapFieldManifest";
 
 export interface UniversalEvidenceRecord {
   caseId: string;
@@ -13,6 +14,7 @@ export interface UniversalEvidenceRecord {
 const ALLOWED_PATHS = new Set([
   ...UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath),
   ...SUPPLY_VERTICAL_FIELD_MANIFEST.map(item => item.fieldPath),
+  ...SUPPLY_ASA_PCAP_FIELD_MANIFEST.map(item => item.fieldPath),
 ]);
 
 function safeCaseId(value: string): string {
