@@ -44,17 +44,32 @@ function sendBinary(response: ServerResponse, data: Uint8Array, fileName: string
   response.end(body);
 }
 
-async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
+function redirect(response: ServerResponse, location: string, cookie?: string): void {
+  if (cookie) response.setHeader("set-cookie", cookie);
+  response.writeHead(303, { location, "cache-control": "no-store" });
+  response.end();
+}
+
+async function readBody(request: IncomingMessage, limit = MAX_PROVISION_JSON_BYTES): Promise<Buffer> {
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of request) {
     const value = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
     size += value.length;
-    if (size > MAX_PROVISION_JSON_BYTES) throw new Error("Solicitud LB94 demasiado grande.");
+    if (size > limit) throw new Error("Solicitud LB94 demasiado grande.");
     chunks.push(value);
   }
-  if (!chunks.length) return {};
-  return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
+  return Buffer.concat(chunks);
+}
+
+async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
+  const body = await readBody(request);
+  if (!body.length) return {};
+  return JSON.parse(body.toString("utf8")) as Record<string, unknown>;
+}
+
+async function readForm(request: IncomingMessage): Promise<URLSearchParams> {
+  return new URLSearchParams((await readBody(request, 16 * 1024)).toString("utf8"));
 }
 
 function statusFor(error: Error): number {
@@ -71,7 +86,7 @@ const ASSET_UI = `<!doctype html>
 <style>body{font-family:Arial,sans-serif;max-width:920px;margin:32px auto;padding:0 20px;color:#222}fieldset{margin:18px 0;padding:18px}button{padding:9px 14px}pre{white-space:pre-wrap;background:#f4f4f4;padding:14px}.ok{color:#176b35}.bad{color:#a62121}</style></head>
 <body><h1>Contrata-IA · Activos físicos LB94</h1>
 <p>Esta pantalla instala únicamente los binarios exactos acreditados. El servidor valida SHA-256 antes de persistirlos; la credencial de Supabase nunca llega al navegador.</p>
-<div id="auth"><form method="post" action="/adaptive/login"><label>Credencial administrativa <input name="token" type="password" autocomplete="current-password"></label> <button>Iniciar sesión</button></form></div>
+<div id="auth"><form method="post" action="/lb94/login"><label>Credencial administrativa <input name="token" type="password" autocomplete="current-password"></label> <button>Iniciar sesión</button></form></div>
 <fieldset><legend>PCAP oficial Supply ASA</legend><input type="file" id="pcap" accept=".odt"><button data-id="JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" data-file="pcap">Instalar PCAP</button></fieldset>
 <fieldset><legend>Memoria Supply general derivada</legend><input type="file" id="memory" accept=".odt"><button data-id="contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2" data-file="memory">Instalar Memoria</button></fieldset>
 <fieldset><legend>PPT Supply general derivado</legend><input type="file" id="ppt" accept=".odt"><button data-id="contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2" data-file="ppt">Instalar PPT</button></fieldset>
@@ -100,6 +115,15 @@ export function createLB94RuntimeServer(): http.Server {
 
       if (request.method === "GET" && url.pathname === "/lb94-assets") {
         sendText(response, 200, ASSET_UI);
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname === "/lb94/login") {
+        const form = await readForm(request);
+        const token = String(form.get("token") ?? "").trim();
+        if (!token) throw new Error("Falta la credencial de acceso.");
+        security.authenticateToken(token);
+        redirect(response, "/lb94-assets", security.sessionCookie(token));
         return;
       }
 
