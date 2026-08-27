@@ -5,6 +5,7 @@ import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../lb51/UniversalV1UiFieldManife
 import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../lb93/SupplyVerticalFieldManifest";
 import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../lb95/SupplyAsaPcapFieldManifest";
 import { SERVICE_VERTICAL_FIELD_MANIFEST } from "../lb96/ServiceVerticalFieldManifest";
+import { WORKS_VERTICAL_FIELD_MANIFEST } from "../lb97/WorksVerticalFieldManifest";
 
 export interface UniversalEvidenceRecord {
   caseId: string;
@@ -17,6 +18,7 @@ const ALLOWED_PATHS = new Set([
   ...SUPPLY_VERTICAL_FIELD_MANIFEST.map(item => item.fieldPath),
   ...SUPPLY_ASA_PCAP_FIELD_MANIFEST.map(item => item.fieldPath),
   ...SERVICE_VERTICAL_FIELD_MANIFEST.map(item => item.fieldPath),
+  ...WORKS_VERTICAL_FIELD_MANIFEST.map(item => item.fieldPath),
 ]);
 
 function safeCaseId(value: string): string {
