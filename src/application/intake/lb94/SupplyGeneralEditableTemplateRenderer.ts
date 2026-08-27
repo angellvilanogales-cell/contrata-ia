@@ -58,8 +58,8 @@ export function renderSupplyGeneralEditableTemplate(input: {
 
   const bySlot = new Map(input.values.map(item => [item.slotId, item.value] as const));
   bySlot.set("caseId", input.caseId);
-  const placeholders = [...content.matchAll(/\{\{([A-Za-z0-9.]+)\}\}/g)].map(match => match[1]);
-  const unique = [...new Set(placeholders)];
+  const placeholders: string[] = [...content.matchAll(/\{\{([A-Za-z0-9.]+)\}\}/g)].map(match => match[1]!);
+  const unique: string[] = [...new Set(placeholders)];
   if (unique.length !== placeholders.length) throw new Error("La plantilla general contiene slots físicos duplicados; cada slot debe tener un anclaje único.");
 
   const applied: string[] = [];
