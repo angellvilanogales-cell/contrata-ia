@@ -1,0 +1,15 @@
+export const WORKS_VERTICAL_FIELD_MANIFEST = [
+  { fieldPath: "works.projectExists", label: "Existe proyecto de obras", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.projectApproval", label: "Proyecto aprobado por órgano competente", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.affectsStabilitySafetyOrWatertightness", label: "Afecta a estabilidad, seguridad o estanqueidad", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.supervisionReportAvailable", label: "Informe de supervisión disponible cuando resulte preceptivo", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.replanteoCompleted", label: "Replanteo del proyecto realizado", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.terrainAvailabilityAccredited", label: "Disponibilidad de terrenos acreditada o excepción motivada", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.projectAndWorksJointAward", label: "Adjudicación conjunta de proyecto y obra", control: "BOOLEAN", section: "PREPARATION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.projectScope", label: "Alcance técnico del proyecto", control: "TEXTAREA", section: "TECHNICAL", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.executionDirection", label: "Dirección facultativa y régimen de instrucciones", control: "TEXTAREA", section: "EXECUTION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.materialsAndQualityControl", label: "Materiales, ensayos y control de calidad", control: "TEXTAREA", section: "TECHNICAL", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.healthAndSafetyCoordination", label: "Seguridad y salud / coordinación aplicable", control: "TEXTAREA", section: "EXECUTION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.certificationRegime", label: "Medición, certificaciones y abonos a cuenta", control: "TEXTAREA", section: "EXECUTION", requiredForWorkflowReview: true, humanValidationRequired: true },
+  { fieldPath: "works.receptionAndGuaranteeRegime", label: "Recepción, garantía, liquidación y vicios ocultos", control: "TEXTAREA", section: "EXECUTION", requiredForWorkflowReview: true, humanValidationRequired: true },
+] as const;
