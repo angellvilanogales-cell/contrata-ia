@@ -8,6 +8,7 @@ import { createUniversalCaseMirrorFromEnv } from "../../application/universal/Ht
 import { UniversalDurableCaseStore } from "../../application/universal/UniversalDurableCaseStore";
 import { createLB94RuntimeServer } from "../lb94/LB94RuntimeServer";
 import { SecurityPolicy } from "../lb7/SecurityPolicy";
+import { SUPPLY_USER_JOURNEY_UI } from "./SupplyUserJourneyUi";
 
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
 const EVIDENCE_ROOT = path.join(DATA_ROOT, "universal-evidence-v1");
@@ -21,11 +22,13 @@ const durableEvidence = new DurableUniversalEvidenceWorkspace(
 
 function sendJson(response: ServerResponse, status: number, value: unknown): void {
   const body = Buffer.from(JSON.stringify(value));
-  response.writeHead(status, {
-    "content-type": "application/json; charset=utf-8",
-    "content-length": body.length,
-    "cache-control": "no-store",
-  });
+  response.writeHead(status, { "content-type": "application/json; charset=utf-8", "content-length": body.length, "cache-control": "no-store" });
+  response.end(body);
+}
+
+function sendHtml(response: ServerResponse, html: string): void {
+  const body = Buffer.from(html);
+  response.writeHead(200, { "content-type": "text/html; charset=utf-8", "content-length": body.length, "cache-control": "no-store" });
   response.end(body);
 }
 
@@ -49,6 +52,12 @@ export function createLB95RuntimeServer(): http.Server {
     try {
       const url = new URL(request.url ?? "/", "http://localhost");
       const parts = url.pathname.split("/").filter(Boolean);
+
+      if (request.method === "GET" && (url.pathname === "/supply" || url.pathname === "/supply/")) {
+        sendHtml(response, SUPPLY_USER_JOURNEY_UI);
+        return;
+      }
+
       if (
         request.method === "GET" &&
         parts[0] === "api" &&
@@ -70,6 +79,7 @@ export function createLB95RuntimeServer(): http.Server {
           persistence: restored.persistence.status,
           physicalPackage: physical,
           sourceAuthority: "00_GUIA_MAESTRA_SUPPLY_LB94",
+          humanValidationRequired: true,
         });
         return;
       }
