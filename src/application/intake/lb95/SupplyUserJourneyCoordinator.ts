@@ -43,8 +43,6 @@ const BASE_STAGES: Readonly<Record<Exclude<SupplyJourneyStageId, "FINAL_REVIEW" 
   ],
   ECONOMICS: [
     "baseTenderBudgetCents",
-    "economic.initialVatAmountCents",
-    "economic.initialPblVatIncludedCents",
     "economic.legalEstimatedValueCents",
     "economic.priceDeterminationRegime",
     "economic.estimatedValueCalculationMethod",
@@ -56,7 +54,6 @@ const BASE_STAGES: Readonly<Record<Exclude<SupplyJourneyStageId, "FINAL_REVIEW" 
   PROCEDURE: [
     "procedure",
     "criteria.awardCriteria",
-    "criteria.singleCriterionMotivation",
   ],
   TECHNICAL: [
     "technical.supplyVariant",
@@ -100,6 +97,12 @@ function validated(record: UniversalEvidenceRecord, path: string): boolean {
   return current.status === "HUMAN_VALIDATED" && current.humanValidated === true;
 }
 
+function awardCriterionCount(record: UniversalEvidenceRecord): number | null {
+  const value = field(record, "criteria.awardCriteria")?.value;
+  if (!Array.isArray(value)) return null;
+  return value.length;
+}
+
 function conditionalPaths(record: UniversalEvidenceRecord): Readonly<Record<Exclude<SupplyJourneyStageId, "FINAL_REVIEW" | "DOCUMENTS">, readonly string[]>> {
   const identification = [...BASE_STAGES.IDENTIFICATION];
   const economics = [...BASE_STAGES.ECONOMICS];
@@ -111,11 +114,26 @@ function conditionalPaths(record: UniversalEvidenceRecord): Readonly<Record<Excl
   if (field(record, "lots.divisionIntoLots")?.value === true) identification.push("lots.lots");
 
   const procedureValue = String(field(record, "procedure")?.value ?? "");
+  const funding = String(field(record, "economic.fundingSource")?.value ?? "");
+  const supplyAsaAutofinanced = procedureValue === "ABIERTO_SIMPLIFICADO_ABREVIADO" && ["AUTOFINANCED", "AUTOFINANCIADA"].includes(funding);
+  if (supplyAsaAutofinanced) {
+    identification.push("administrative.reservedContractDa4");
+    economics.push(
+      "economic.initialVatAmountCents",
+      "economic.initialPblVatIncludedCents",
+      "economic.needsBasedContractDa33",
+      "economic.budgetCoversEntireContractLife",
+      "economic.annualityBudgetRows",
+    );
+    procedure.push("processing.processingType");
+  }
   if (procedureValue !== "ABIERTO_SIMPLIFICADO_ABREVIADO" && procedureValue !== "CONTRATO_MENOR") {
     procedure.push("criteria.economicSolvency", "criteria.technicalSolvency");
   }
+  if (awardCriterionCount(record) === 1) procedure.push("criteria.singleCriterionMotivation");
 
   const variant = String(field(record, "technical.supplyVariant")?.value ?? "");
+  if (variant === "CATALOGUE_NEEDS") economics.push("economic.unitPrices");
   if (variant === "CATALOGUE_NEEDS") technical.push("technical.hasSuccessiveOrders");
   if (variant === "SUPPLY_WITH_SERVICE_COMPONENT") technical.push("technical.hasServicePlatformComponent");
   if (variant === "FURNITURE_INSTALLATION") technical.push("technical.hasInstallationOrAssembly");
