@@ -36,6 +36,16 @@ export const SUPPLY_VERTICAL_FIELD_MANIFEST: readonly SupplyVerticalFieldDefinit
     help: "La selección debe contrastarse con importe, objeto y circunstancias del expediente; arts. 131 y ss. LCSP.",
   },
   {
+    fieldPath: "processing.processingType",
+    label: "Tipo de tramitación",
+    control: "SELECT",
+    section: "PROCEDURE",
+    requiredForWorkflowReview: false,
+    humanValidationRequired: true,
+    options: ["ORDINARIA", "URGENTE"],
+    help: "La tramitación urgente exige motivación y régimen propio; no se presume por el procedimiento.",
+  },
+  {
     fieldPath: "economic.fundingSource",
     label: "Perfil de financiación",
     control: "SELECT",
