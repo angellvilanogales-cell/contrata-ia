@@ -5,61 +5,37 @@ import { LB97_WORKS_RUNTIME_ASSETS } from "../src/application/intake/lb97/WorksP
 
 describe("LB97 preparación y cierre Works", () => {
   it("exige supervisión desde 500.000 euros sin IVA", () => {
-    const preparation = evaluateWorksPreparationGate({
-      projectExists: true,
-      projectApproved: true,
-      baseTenderBudgetExVatCents: 50_000_000,
-      affectsStabilitySafetyOrWatertightness: false,
-      supervisionReportAvailable: false,
-      replanteoCompleted: true,
-      terrainAvailabilityAccredited: true,
-    });
+    const preparation = evaluateWorksPreparationGate({ projectExists: true, projectApproved: true, baseTenderBudgetExVatCents: 50_000_000, affectsStabilitySafetyOrWatertightness: false, supervisionReportAvailable: false, replanteoCompleted: true, terrainAvailabilityAccredited: true });
     expect(preparation.supervisionRequired).toBe(true);
     expect(preparation.readyForTenderPreparation).toBe(false);
     expect(preparation.blockers.join(" ")).toContain("artículo 235");
   });
 
   it("exige supervisión por estabilidad, seguridad o estanqueidad aunque el PBL sea inferior", () => {
-    const preparation = evaluateWorksPreparationGate({
-      projectExists: true,
-      projectApproved: true,
-      baseTenderBudgetExVatCents: 10_000_000,
-      affectsStabilitySafetyOrWatertightness: true,
-      supervisionReportAvailable: false,
-      replanteoCompleted: true,
-      terrainAvailabilityAccredited: true,
-    });
+    const preparation = evaluateWorksPreparationGate({ projectExists: true, projectApproved: true, baseTenderBudgetExVatCents: 10_000_000, affectsStabilitySafetyOrWatertightness: true, supervisionReportAvailable: false, replanteoCompleted: true, terrainAvailabilityAccredited: true });
     expect(preparation.supervisionRequired).toBe(true);
     expect(preparation.readyForTenderPreparation).toBe(false);
   });
 
   it("no confunde tener tres ODT con tener un expediente Works preparado", () => {
-    const preparation = evaluateWorksPreparationGate({
-      projectExists: false,
-      projectApproved: false,
-      baseTenderBudgetExVatCents: 20_000_000,
-      affectsStabilitySafetyOrWatertightness: false,
-      supervisionReportAvailable: false,
-      replanteoCompleted: false,
-      terrainAvailabilityAccredited: null,
-    });
-    const closure = evaluateWorksVerticalClosure({ pcapAvailable: true, memoryAvailable: true, pptAvailable: true, preparation });
+    const preparation = evaluateWorksPreparationGate({ projectExists: false, projectApproved: false, baseTenderBudgetExVatCents: 20_000_000, affectsStabilitySafetyOrWatertightness: false, supervisionReportAvailable: false, replanteoCompleted: false, terrainAvailabilityAccredited: null });
+    const closure = evaluateWorksVerticalClosure({ pcapAvailable: true, memoryAvailable: true, pptAvailable: true, preparation, packageGeneratorReady: true });
     expect(closure.documentaryLayerReady).toBe(true);
     expect(closure.preparationLayerReady).toBe(false);
     expect(closure.engineeringClosed).toBe(false);
   });
 
-  it("solo habilita cierre cuando documentos y preparación están acreditados", () => {
-    const preparation = evaluateWorksPreparationGate({
-      projectExists: true,
-      projectApproved: true,
-      baseTenderBudgetExVatCents: 20_000_000,
-      affectsStabilitySafetyOrWatertightness: false,
-      supervisionReportAvailable: false,
-      replanteoCompleted: true,
-      terrainAvailabilityAccredited: true,
-    });
+  it("mantiene el cierre bloqueado mientras falte renderer, ZIP y auditoría cruzada", () => {
+    const preparation = evaluateWorksPreparationGate({ projectExists: true, projectApproved: true, baseTenderBudgetExVatCents: 20_000_000, affectsStabilitySafetyOrWatertightness: false, supervisionReportAvailable: false, replanteoCompleted: true, terrainAvailabilityAccredited: true });
     const closure = evaluateWorksVerticalClosure({ pcapAvailable: true, memoryAvailable: true, pptAvailable: true, preparation });
+    expect(preparation.readyForTenderPreparation).toBe(true);
+    expect(closure.packageGeneratorReady).toBe(false);
+    expect(closure.engineeringClosed).toBe(false);
+  });
+
+  it("solo habilita cierre cuando documentos, preparación y generador están acreditados", () => {
+    const preparation = evaluateWorksPreparationGate({ projectExists: true, projectApproved: true, baseTenderBudgetExVatCents: 20_000_000, affectsStabilitySafetyOrWatertightness: false, supervisionReportAvailable: false, replanteoCompleted: true, terrainAvailabilityAccredited: true });
+    const closure = evaluateWorksVerticalClosure({ pcapAvailable: true, memoryAvailable: true, pptAvailable: true, preparation, packageGeneratorReady: true });
     expect(preparation.supervisionRequired).toBe(false);
     expect(closure.engineeringClosed).toBe(true);
     expect(closure.productionReady).toBe(false);
