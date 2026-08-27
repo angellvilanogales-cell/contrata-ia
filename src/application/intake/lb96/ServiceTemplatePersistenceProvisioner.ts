@@ -8,7 +8,7 @@ export interface ServiceTemplateProvisioningInput {
 
 export interface ServiceTemplateProvisioningResult {
   templateId: string;
-  kind: "MEMORIA" | "PPT";
+  kind: "MEMORIA" | "PPT" | "PCAP";
   sha256: string;
   byteLength: number;
   persisted: true;
@@ -26,9 +26,10 @@ function decode(value: string): Uint8Array {
 }
 
 /**
- * Único camino de alta de Memoria/PPT generales Service. Antes de enviar nada
- * al almacén durable ejecuta el gate físico completo: ODT, SHA, estilo, slots y
- * procedencia. Un binario distinto del acreditado queda bloqueado localmente.
+ * Único camino de alta de las plantillas generales Service. Antes de enviar
+ * nada al almacén durable ejecuta el gate físico completo: ODT, SHA, estilo,
+ * slots y procedencia. El PCAP derivado queda sujeto a las mismas garantías y
+ * mantiene officialModel=false.
  */
 export async function provisionServiceTemplateAsset(
   input: ServiceTemplateProvisioningInput,
@@ -43,7 +44,7 @@ export async function provisionServiceTemplateAsset(
   const gate = gateServiceGeneralTemplate(input.kind, bytes);
   if (!gate.ready) throw new Error(`Gate físico LB96 rechazado para ${input.kind}: ${gate.blockers.join(" | ")}`);
 
-  const kind = input.kind === "MEMORY" ? "MEMORIA" : "PPT";
+  const kind = input.kind === "MEMORY" ? "MEMORIA" : input.kind === "PCAP" ? "PCAP" : "PPT";
   const response = await fetch(`${endpoint(persistenceUrl)}/templates/${encodeURIComponent(manifest.templateId)}`, {
     method: "PUT",
     headers: {
@@ -59,7 +60,7 @@ export async function provisionServiceTemplateAsset(
       provenance: {
         role: manifest.provenance,
         sourceAuthority: manifest.sourceAuthority,
-        derivationVersion: "LB96-SERVICE-GENERAL-ODT-V1",
+        derivationVersion: manifest.derivationVersion,
         officialModelClaimed: false,
         exactBinaryIdentityVerified: true,
         humanValidationRequired: true,
