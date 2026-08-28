@@ -15,10 +15,7 @@ export interface RealCaseRegressionEntry{
   readonly openIssues:readonly string[];
 }
 
-/**
- * Corpus de expedientes reales para LB102. Cada entrada conserva únicamente hechos
- * acreditados por las fuentes del proyecto; no completa huecos por analogía.
- */
+/** Corpus real LB102: solo hechos expresamente acreditados; nunca completa huecos por analogía. */
 export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
   {
     registryId:"REG-SUPPLY-001",caseId:"CONTR/2026/240267",family:"SUPPLY",
@@ -28,9 +25,9 @@ export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
   },
   {
     registryId:"REG-SUPPLY-002",caseId:"CONTR 2025 466864",family:"SUPPLY",
-    procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO",sourceAuthority:"PANDA_ANTIVIRUS_MEMORIA_PCAP_PPT",
+    procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO",sourceAuthority:"PANDA_ANTIVIRUS_MEMORIA_PCAP_PPT_FIRMADOS",
     sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"SOURCE_COMPLETE_PROFILE_PENDING",neverGeneralModel:true,
-    invariants:{subfamily:"SOFTWARE_LICENSE",lots:6,divisionIntoLots:true,osl:true,da33:false},
+    invariants:{subfamily:"SOFTWARE_LICENSE",cpvMain:"48760000-3",divisionIntoLots:false,durationMonths:36,extensionMonths:0,baseTenderBudgetCents:6119225,vatIncludedBudgetCents:7404262,estimatedValueCents:6119225,unitPrices:true,da33:false,partnerGoldRequired:true},
     openIssues:["El perfil físico Supply ASO debe ser independiente del PCAP ASA."]
   },
   {
