@@ -9,13 +9,7 @@ import { DocumentType } from "../src/domain/documentModel/DocumentType";
 
 describe("LB91.1 - matriz universal de cobertura contractual", () => {
   it("registra las cinco familias contractuales objetivo sin afirmar cobertura universal", () => {
-    expect(UNIVERSAL_CONTRACT_COVERAGE.map(item => item.contractType)).toEqual([
-      "SUPPLY",
-      "SERVICE",
-      "WORKS",
-      "CONCESSION",
-      "MIXED",
-    ]);
+    expect(UNIVERSAL_CONTRACT_COVERAGE.map(item => item.contractType)).toEqual(["SUPPLY","SERVICE","WORKS","CONCESSION","MIXED"]);
     expect(canClaimUniversalOperationalCoverage()).toBe(false);
     expect(getOperationalCoverageGaps().length).toBeGreaterThan(0);
   });
@@ -27,16 +21,18 @@ describe("LB91.1 - matriz universal de cobertura contractual", () => {
     expect(supply.requiredDocuments).not.toContain(DocumentType.MEANS_INSUFFICIENCY_REPORT);
   });
 
-  it("reconoce fuente real de obras sin convertirla en cobertura operativa completa", () => {
+  it("reconoce la cobertura física LB97 de obras sin confundirla con cobertura universal", () => {
     const works = getContractFamilyCoverage("WORKS");
     expect(works.realSourceCoverage).toBe("REAL_SOURCES_AVAILABLE");
-    expect(works.capabilities.some(item => item.evidence.includes("PCAP OBRAS ABIERTO real"))).toBe(true);
+    expect(works.capabilities.some(item => item.evidence.includes("LB97 Works package"))).toBe(true);
     expect(getOperationalCoverageGaps("WORKS").length).toBeGreaterThan(0);
   });
 
-  it("mantiene concesiones en cobertura normativa hasta localizar un expediente real verificable", () => {
+  it("reconoce expedientes reales y cobertura física concesional sin afirmar universalidad", () => {
     const concession = getContractFamilyCoverage("CONCESSION");
-    expect(concession.realSourceCoverage).toBe("LEGAL_SOURCE_ONLY");
+    expect(concession.realSourceCoverage).toBe("REAL_SOURCES_AVAILABLE");
+    expect(concession.capabilities.some(item => item.evidence.includes("Puerto Real service concession"))).toBe(true);
+    expect(concession.capabilities.some(item => item.evidence.includes("Málaga parking works concession"))).toBe(true);
     expect(getOperationalCoverageGaps("CONCESSION").length).toBeGreaterThan(0);
   });
 
