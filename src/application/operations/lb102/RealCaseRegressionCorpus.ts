@@ -26,9 +26,9 @@ export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
   {
     registryId:"REG-SUPPLY-002",caseId:"CONTR 2025 466864",family:"SUPPLY",
     procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO",sourceAuthority:"PANDA_ANTIVIRUS_MEMORIA_PCAP_PPT_FIRMADOS",
-    sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"SOURCE_COMPLETE_PROFILE_PENDING",neverGeneralModel:true,
+    sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"FULL_PIPELINE",neverGeneralModel:true,
     invariants:{subfamily:"SOFTWARE_LICENSE",cpvMain:"48760000-3",divisionIntoLots:false,durationMonths:36,extensionMonths:0,baseTenderBudgetCents:6119225,vatIncludedBudgetCents:7404262,estimatedValueCents:6119225,unitPrices:true,da33:false,partnerGoldRequired:true},
-    openIssues:["El perfil físico Supply ASO debe ser independiente del PCAP ASA."]
+    openIssues:[]
   },
   {
     registryId:"REG-SUPPLY-003",caseId:"CONTR 2025 0000489703",family:"SUPPLY",
@@ -53,7 +53,7 @@ export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
     procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO",sourceAuthority:"CARL_LIMPIEZA_MEMORIA_PCAP_PPT",
     sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"SOURCE_COMPLETE_PROFILE_PENDING",neverGeneralModel:true,
     invariants:{serviceVariant:"CLEANING",cpvMain:"90919200-4",insufficiencyOwnMeans:true,subrogation:true,sara:false},
-    openIssues:["Los PENDING_SOURCE_EVIDENCE no pueden convertirse en reglas congeladas."]
+    openIssues:["Los PENDING_SOURCE_EVIDENCE no pueden convertirse en reglas congeladas.","La fuente caracteriza el contrato como mixto 90 % servicios / 10 % suministros accesorios con prestación principal servicios; no debe degradarse a servicio puro."]
   },
   {
     registryId:"REG-SERVICE-007",caseId:"REG-SERVICE-007_MAINTENANCE_SEVILLE",family:"SERVICE",
