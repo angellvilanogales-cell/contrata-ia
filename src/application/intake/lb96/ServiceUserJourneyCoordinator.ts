@@ -18,7 +18,8 @@ function paths(record: UniversalEvidenceRecord) {
   if(field(record,"lots.divisionIntoLots")?.value===true) identification.push("lots.lots");
   const economics=["baseTenderBudgetCents","economic.initialVatAmountCents","economic.initialPblVatIncludedCents","economic.legalEstimatedValueCents","economic.priceDeterminationRegime","economic.estimatedValueCalculationMethod","economic.fundingSource","economic.priceRevisionRegime","durationMonths","extensionMonths"];
   const procedure=["procedure","criteria.awardCriteria","criteria.economicSolvency","criteria.technicalSolvency"];
-  if(Array.isArray(field(record,"criteria.awardCriteria")?.value)&&field(record,"criteria.awardCriteria")?.value?.length===1) procedure.push("criteria.singleCriterionMotivation");
+  const awardCriteria=field(record,"criteria.awardCriteria")?.value;
+  if(Array.isArray(awardCriteria)&&awardCriteria.length===1) procedure.push("criteria.singleCriterionMotivation");
   const technical=["service.variant","technical.technicalRequirements","technical.executionLocations","service.personnelRequirements"];
   const variant=String(field(record,"service.variant")?.value??"");
   if(variant==="CLEANING") technical.push("service.materialsOrEquipmentRegime");
