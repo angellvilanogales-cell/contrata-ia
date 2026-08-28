@@ -18,11 +18,11 @@ describe("LB91.20 - reconciliación de cobertura", () => {
     expect(status("SERVICE", "CROSS_DOCUMENT_AUDIT")).toBe("AVAILABLE_WITH_HUMAN_VALIDATION");
   });
 
-  it("mantiene bloqueada la generación física de obras y concesiones", () => {
-    expect(status("WORKS", "EDITABLE_DOCUMENT_GENERATION")).toBe("NOT_IMPLEMENTED");
-    expect(status("CONCESSION", "DOCUMENT_MODEL_SELECTION")).toBe("NOT_IMPLEMENTED");
-    expect(buildUniversalContractPlan("WORKS").canReachDocumentGeneration).toBe(false);
-    expect(buildUniversalContractPlan("CONCESSION").canReachDocumentGeneration).toBe(false);
+  it("reconoce generación física Works y Concession sin eliminar validación humana", () => {
+    expect(status("WORKS", "EDITABLE_DOCUMENT_GENERATION")).toBe("PARTIAL_SOURCE_BACKED");
+    expect(status("CONCESSION", "DOCUMENT_MODEL_SELECTION")).toBe("PARTIAL_SOURCE_BACKED");
+    expect(buildUniversalContractPlan("WORKS").canReachDocumentGeneration).toBe(true);
+    expect(buildUniversalContractPlan("CONCESSION").canReachDocumentGeneration).toBe(true);
   });
 
   it("no declara cobertura universal mientras existan huecos reales", () => {
@@ -30,7 +30,7 @@ describe("LB91.20 - reconciliación de cobertura", () => {
     expect(getReconciledOperationalGaps().length).toBeGreaterThan(0);
   });
 
-  it("mantiene concesiones sin caso real como calibración normativa, no documental", () => {
-    expect(getReconciledContractFamilyCoverage("CONCESSION").realSourceCoverage).toBe("LEGAL_SOURCE_ONLY");
+  it("reconoce casos reales de concesión como autoridad documental no generalizable", () => {
+    expect(getReconciledContractFamilyCoverage("CONCESSION").realSourceCoverage).toBe("REAL_SOURCES_AVAILABLE");
   });
 });
