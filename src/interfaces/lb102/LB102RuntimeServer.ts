@@ -12,7 +12,7 @@ import {createLB99RuntimeServer} from "../lb99/LB99RuntimeServer";
 
 function sendJson(r:ServerResponse,status:number,value:unknown){const bytes=Buffer.from(JSON.stringify(value));r.writeHead(status,{"content-type":"application/json; charset=utf-8","content-length":bytes.length,"cache-control":"no-store"});r.end(bytes);}
 function usersFromEnv(){try{const value=JSON.parse(process.env.CONTRATA_IA_USERS_JSON??"[]");return Array.isArray(value)?value:[];}catch{return[];}}
-function runLB101LivePreflight(){
+export function runLB101LivePreflight(){
  const users=usersFromEnv();const roles=new Set(users.map(x=>x?.role).filter(Boolean));const policy=new SecurityPolicy(process.env);
  const scratch=fs.mkdtempSync(path.join(os.tmpdir(),"contrata-lb102-live-"));
  try{
