@@ -9,7 +9,8 @@
     "src/main.ts",
     "src/architecture/**/*.ts",
     "src/interfaces/lb94/**/*.ts",
-    "src/interfaces/lb95/**/*.ts"
+    "src/interfaces/lb95/**/*.ts",
+    "src/interfaces/lb102/**/*.ts"
   ],
   "exclude": [
     "node_modules",
