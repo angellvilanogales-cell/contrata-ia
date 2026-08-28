@@ -14,10 +14,14 @@ services:
         value: 0.0.0.0
       - key: CONTRATA_IA_AUTH_REQUIRED
         value: "1"
+      - key: CONTRATA_IA_PUBLIC_BASE_URL
+        value: https://contrata-ia.onrender.com
       - key: CONTRATA_IA_DATA_DIR
         value: /data/contrata-ia
       - key: CONTRATA_IA_TEMPLATE_DIR
         value: /data/contrata-ia/templates
+      - key: CONTRATA_IA_USERS_JSON
+        sync: false
       - key: CONTRATA_IA_ADMIN_TOKEN
         sync: false
       - key: CONTRATA_IA_PERSISTENCE_URL
