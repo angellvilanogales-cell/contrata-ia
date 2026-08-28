@@ -8,9 +8,9 @@ describe("LB102 real-case regression corpus",()=>{
     expect(LB102_REAL_CASE_CORPUS.every(x=>x.neverGeneralModel)).toBe(true);
     expect(LB102_REAL_CASE_CORPUS.every(packageCompleteInSource)).toBe(true);
   });
-  it("solo cuenta inicialmente ferretería como pipeline Supply físicamente acreditado",()=>{
+  it("acredita dos pipelines Supply reales separados por procedimiento y subfamilia",()=>{
     expect(physicallyExecutableForPilot(findRealCase("REG-SUPPLY-001")!)).toBe(true);
-    expect(physicallyExecutableForPilot(findRealCase("REG-SUPPLY-002")!)).toBe(false);
+    expect(physicallyExecutableForPilot(findRealCase("REG-SUPPLY-002")!)).toBe(true);
   });
   it("impide heredar DA 33 a software, sanitario o tablets",()=>{
     expect(findRealCase("REG-SUPPLY-001")!.invariants.da33).toBe(true);
