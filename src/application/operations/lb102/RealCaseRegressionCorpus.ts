@@ -27,8 +27,7 @@ export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
     registryId:"REG-SUPPLY-002",caseId:"CONTR 2025 466864",family:"SUPPLY",
     procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO",sourceAuthority:"PANDA_ANTIVIRUS_MEMORIA_PCAP_PPT_FIRMADOS",
     sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"FULL_PIPELINE",neverGeneralModel:true,
-    invariants:{subfamily:"SOFTWARE_LICENSE",cpvMain:"48760000-3",divisionIntoLots:false,durationMonths:36,extensionMonths:0,baseTenderBudgetCents:6119225,vatIncludedBudgetCents:7404262,estimatedValueCents:6119225,unitPrices:true,da33:false,partnerGoldRequired:true},
-    openIssues:[]
+    invariants:{subfamily:"SOFTWARE_LICENSE",cpvMain:"48760000-3",divisionIntoLots:false,durationMonths:36,extensionMonths:0,baseTenderBudgetCents:6119225,vatIncludedBudgetCents:7404262,estimatedValueCents:6119225,unitPrices:true,da33:false,partnerGoldRequired:true},openIssues:[]
   },
   {
     registryId:"REG-SUPPLY-003",caseId:"CONTR 2025 0000489703",family:"SUPPLY",
@@ -49,6 +48,18 @@ export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
     invariants:{subfamily:"SUPPLY_PLUS_PLATFORM_SERVICE",platformComponent:true,da33:false},openIssues:["No recalificar automáticamente como servicio o mixto."]
   },
   {
+    registryId:"REG-SERVICE-008",caseId:"CONTR 2025 0000468715",family:"SERVICE",
+    procedure:"ABIERTO",sourceAuthority:"JDA_SAE_HUELVA_MEMORIA_PCAP_PPT",
+    sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"FULL_PIPELINE",neverGeneralModel:true,
+    invariants:{serviceVariant:"CLEANING",cpvMain:"90911200-8",divisionIntoLots:false,baseTenderBudgetCents:17458258,vatIncludedBudgetCents:21124493,estimatedValueCents:29679039,locations:4},openIssues:[]
+  },
+  {
+    registryId:"REG-SERVICE-009",caseId:"CONTR/2023/957915",family:"SERVICE",
+    procedure:"ABIERTO",sourceAuthority:"JDA_CEETA_5G_MEMORIA_PCAP_PPT",
+    sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"FULL_PIPELINE",neverGeneralModel:true,
+    invariants:{serviceVariant:"TRAINING",cpvMain:"80530000-8",divisionIntoLots:false,sara:true,baseTenderBudgetCents:561330000,estimatedValueCents:561330000,trainingEditions:84,provinces:8,noExtensionsOrPlannedModificationsInVe:true},openIssues:[]
+  },
+  {
     registryId:"REG-SERVICE-005",caseId:"CONTR/2024/636510",family:"SERVICE",
     procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO",sourceAuthority:"CARL_LIMPIEZA_MEMORIA_PCAP_PPT",
     sourceDocuments:["MEMORY","PCAP","PPT"],physicalCoverage:"SOURCE_COMPLETE_PROFILE_PENDING",neverGeneralModel:true,
@@ -67,3 +78,4 @@ export const LB102_REAL_CASE_CORPUS:readonly RealCaseRegressionEntry[]=[
 export function findRealCase(registryId:string):RealCaseRegressionEntry|undefined{return LB102_REAL_CASE_CORPUS.find(x=>x.registryId===registryId);}
 export function packageCompleteInSource(entry:RealCaseRegressionEntry):boolean{return ["MEMORY","PCAP","PPT"].every(x=>entry.sourceDocuments.includes(x as RealCaseDocument));}
 export function physicallyExecutableForPilot(entry:RealCaseRegressionEntry):boolean{return packageCompleteInSource(entry)&&entry.physicalCoverage==="FULL_PIPELINE";}
+export function countExecutableRealCases(family:RealCaseFamily):number{return LB102_REAL_CASE_CORPUS.filter(x=>x.family===family&&physicallyExecutableForPilot(x)).length;}
