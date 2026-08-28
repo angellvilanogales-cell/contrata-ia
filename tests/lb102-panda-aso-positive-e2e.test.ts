@@ -4,6 +4,7 @@ import type {UniversalEvidenceRecord} from "../src/application/intake/lb52/Unive
 import {createInMemoryEditableTemplateBinaryStore} from "../src/application/intake/lb23/UniversalOdtProductionRenderer";
 import {generateSupplyAsoUserDocumentPackage} from "../src/application/intake/lb102/SupplyAsoUserDocumentPackageGenerator";
 import {PANDA_ASO_ASSETS} from "./fixtures/lb102-panda-aso-assets";
+import {PANDA_ASO_PCAP_EXACT} from "./fixtures/lb102-panda-pcap-exact";
 
 function validated(key:string,value:unknown):EvidenceField<unknown>{return{key,value,status:"HUMAN_VALIDATED",sources:[{kind:"PRIMARY_DOCUMENT",sourceId:"REG-SUPPLY-002"}],humanValidationRequired:true,humanValidated:true,diagnostics:["Contraste LB102 con Memoria/PCAP/PPT primarios firmados."]};}
 const values:Record<string,unknown>={
@@ -20,7 +21,8 @@ const values:Record<string,unknown>={
  "execution.receiptAndAcceptanceRegime":"Conformidad previa comprobación de licencias, activación y soporte contratado."
 };
 const record:UniversalEvidenceRecord={caseId:"CONTR 2025 466864",updatedAt:new Date(0).toISOString(),fields:Object.fromEntries(Object.entries(values).map(([k,v])=>[k,validated(k,v)]))};
-const store=createInMemoryEditableTemplateBinaryStore(Object.values(PANDA_ASO_ASSETS).map(x=>({templateId:x.templateId,sourceId:x.sourceId,bytes:Buffer.from(x.base64,"base64")})));
+const exact=[PANDA_ASO_PCAP_EXACT,PANDA_ASO_ASSETS.memory,PANDA_ASO_ASSETS.ppt];
+const store=createInMemoryEditableTemplateBinaryStore(exact.map(x=>({templateId:x.templateId,sourceId:x.sourceId,bytes:Buffer.from(x.base64,"base64")})));
 
 describe("LB102 Panda ASO software real E2E",()=>{
  it("genera PCAP Memoria PPT completos sin contaminación ASA/ferretería",async()=>{
