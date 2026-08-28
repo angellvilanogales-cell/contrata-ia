@@ -12,19 +12,20 @@ describe("LB91.2/20 - planificador universal por familia contractual", () => {
     expect(economics?.component).toContain("UniversalEconomicEngine");
   });
 
-  it("bloquea obras mientras falten módulos/modelos esenciales y no inventa generación documental", () => {
+  it("permite alcanzar generación documental de obras tras LB97 pero mantiene validación humana", () => {
     const plan = buildUniversalContractPlan("WORKS");
-    expect(plan.blockers.length).toBeGreaterThan(0);
-    expect(plan.canReachDocumentGeneration).toBe(false);
-    expect(plan.steps.some(step => step.action === "BLOCK_UNTIL_IMPLEMENTED")).toBe(true);
+    expect(plan.canReachDocumentGeneration).toBe(true);
+    expect(plan.steps.some(step => step.action === "BLOCK_UNTIL_IMPLEMENTED")).toBe(false);
     expect(plan.steps.find(step => step.capability === "ECONOMICS")?.coverage).toBe("AVAILABLE_WITH_HUMAN_VALIDATION");
+    expect(plan.steps.every(step => step.humanValidationRequired)).toBe(true);
   });
 
-  it("bloquea concesiones aunque ya exista economía específica mientras falten régimen y modelos documentales", () => {
+  it("permite plan concesional con fuentes reales y perfiles físicos, sujeto a validación humana", () => {
     const plan = buildUniversalContractPlan("CONCESSION");
-    expect(plan.canReachDocumentGeneration).toBe(false);
+    expect(plan.canReachDocumentGeneration).toBe(true);
     expect(plan.steps.find(step => step.capability === "ECONOMICS")?.coverage).toBe("AVAILABLE_WITH_HUMAN_VALIDATION");
-    expect(plan.blockers.some(blocker => blocker.includes("CONCESSION"))).toBe(true);
+    expect(plan.steps.some(step => step.action === "BLOCK_UNTIL_IMPLEMENTED")).toBe(false);
+    expect(plan.steps.every(step => step.humanValidationRequired)).toBe(true);
   });
 
   it("no trata el caso mixto como suma automática de coberturas de servicios y suministros", () => {
