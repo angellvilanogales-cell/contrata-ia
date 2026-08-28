@@ -10,4 +10,10 @@ export const MIXED_VERTICAL_FIELD_MANIFEST=[
   {fieldPath:"mixed.worksProjectAvailable",label:"Proyecto de obra disponible cuando art. 18.3 lo exige",control:"BOOLEAN",section:"PREPARATION",requiredForWorkflowReview:false,humanValidationRequired:true},
   {fieldPath:"mixed.concessionViabilityStudyAvailable",label:"Estudio de viabilidad del componente concesional",control:"BOOLEAN",section:"VIABILITY",requiredForWorkflowReview:false,humanValidationRequired:true},
   {fieldPath:"mixed.concessionAnteprojectResolved",label:"Anteproyecto concesional resuelto cuando proceda",control:"BOOLEAN",section:"VIABILITY",requiredForWorkflowReview:false,humanValidationRequired:true},
+  {fieldPath:"mixed.supplyRequirements",label:"Prescripciones de la prestación de suministro",control:"TEXTAREA",section:"TECHNICAL",requiredForWorkflowReview:false,humanValidationRequired:true},
+  {fieldPath:"mixed.serviceRequirements",label:"Prescripciones de la prestación de servicio",control:"TEXTAREA",section:"TECHNICAL",requiredForWorkflowReview:false,humanValidationRequired:true},
+  {fieldPath:"mixed.integrationRequirements",label:"Integración funcional entre prestaciones",control:"TEXTAREA",section:"TECHNICAL",requiredForWorkflowReview:false,humanValidationRequired:true},
+  {fieldPath:"mixed.acceptanceControl",label:"Recepción, conformidad y control diferenciados",control:"TEXTAREA",section:"EXECUTION",requiredForWorkflowReview:false,humanValidationRequired:true},
+  {fieldPath:"mixed.executionLocations",label:"Lugares de entrega y ejecución",control:"TEXTAREA",section:"EXECUTION",requiredForWorkflowReview:false,humanValidationRequired:true},
+  {fieldPath:"mixed.dataProtectionRegime",label:"Protección de datos aplicable a las prestaciones",control:"TEXTAREA",section:"EXECUTION",requiredForWorkflowReview:false,humanValidationRequired:true},
 ] as const;
