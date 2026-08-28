@@ -6,10 +6,14 @@ Declarar `appViableForPilot=true` únicamente cuando exista evidencia técnica y
 
 ## Casos de referencia ya disponibles en fuentes
 
+El inventario canónico de casos se conserva en `knowledge/sources/lb102-pilot-cases.yaml`. Los casos reales son evidencia de contraste/aceptación y nunca se convierten automáticamente en plantillas generales.
+
 ### Supply
 
-- `CONTR/2026/240267` — suministro de materiales de ferretería SAE. Las fuentes contienen PCAP, PPT, memoria/trazabilidad y un manifest de paquete generado con PCAP + Memoria + PPT y auditoría cruzada. Debe utilizarse como caso controlado, no como plantilla general.
-- Debe seleccionarse un **segundo expediente Supply real independiente** antes de cerrar LB102; las regresiones sintéticas o subfamilias de la guía no sustituyen este requisito.
+- `CONTR/2026/240267` — suministro de materiales de ferretería SAE. Las fuentes contienen PCAP, PPT, memoria/trazabilidad y un manifest de paquete generado con PCAP + Memoria + PPT y auditoría cruzada. Es el primer caso Supply completo controlado.
+- `GGI0263OSV0` / `CONTR 2025 0000265459` — suministro, instalación y renovación de infraestructuras TIC para los sistemas informáticos de la Agencia de Obra Pública de la Junta de Andalucía. Se han verificado en fuente oficial Junta la Memoria justificativa y el PPT; la ficha de licitación acredita naturaleza de suministro, procedimiento abierto simplificado y presupuesto de 58.000 €. Es un segundo Supply real independiente, pero **no cuenta todavía como PASS documental completo** hasta recuperar/verificar el PCAP exacto y revisar humanamente el paquete resultante.
+
+Como evidencia adicional de suministro ordinario distinto del golden existe `REG-SUPPLY-006` / VEIASA Windows Server; sus fuentes/regresiones protegen procedimiento, precio global, ausencia de DA 33.ª, prórroga y modificación. No se utiliza para sustituir la completitud documental exigida al segundo caso.
 
 ### Service
 
@@ -25,9 +29,9 @@ Los campos que las fuentes marquen como pendientes permanecen pendientes; el pro
 - LB99 cerrado para alcance del piloto;
 - gobierno de fuentes LB100;
 - generación base sin API de IA de pago obligatoria;
-- seguridad LB101 acreditada en el entorno real;
-- al menos 2 ejecuciones Supply reales/controladas;
-- al menos 2 ejecuciones Service reales/controladas;
+- seguridad LB101 acreditada en el entorno real mediante `npm run pilot:lb101-preflight`;
+- al menos 2 ejecuciones Supply reales/controladas completas;
+- al menos 2 ejecuciones Service reales/controladas completas;
 - regresión de conflicto de fuentes;
 - regresión de falta de validación humana;
 - regresión de integridad de plantilla.
