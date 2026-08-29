@@ -8,7 +8,13 @@ export interface PersistedTemplateAssetDescriptor {
   sourceId: string;
   sha256: string;
   styleFingerprint: string;
-  provenanceRole: "OFFICIAL_MODEL" | "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE" | "CONTRATA_IA_DERIVED_MIXED_SPECIALIZED_TEMPLATE";
+  provenanceRole:
+    | "OFFICIAL_MODEL"
+    | "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE"
+    | "CONTRATA_IA_DERIVED_MIXED_SPECIALIZED_TEMPLATE"
+    | "CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE"
+    | "CONTRATA_IA_DERIVED_PROCEDURE_TEMPLATE"
+    | "CONTRATA_IA_DERIVED_SUBFAMILY_TEMPLATE";
 }
 
 export const LB94_SUPPLY_GENERAL_RUNTIME_ASSETS: readonly PersistedTemplateAssetDescriptor[] = [
