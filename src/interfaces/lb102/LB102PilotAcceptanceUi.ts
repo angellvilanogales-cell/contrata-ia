@@ -32,6 +32,24 @@ pre{white-space:pre-wrap;background:#f7f7f7;padding:12px;border-radius:8px}.sha{
 <pre id="status">Sin consultar.</pre>
 </section>
 <section class="card">
+<h2>2.A. Fuentes físicas Ferretería</h2>
+<p class="muted">Solo ADMIN. Carga única de los ODT fuente exactos del expediente CONTR/2026/240267. El servidor comprueba SHA-256 y huella de estilo antes de persistirlos.</p>
+<div class="row">
+<div>
+<label for="memorySource">Memoria V12 letrado (.odt)</label>
+<input id="memorySource" type="file" accept=".odt,application/vnd.oasis.opendocument.text">
+<button id="uploadMemoryButton" type="button">Validar y guardar Memoria</button>
+</div>
+<div>
+<label for="pptSource">PPT V6 (.odt)</label>
+<input id="pptSource" type="file" accept=".odt,application/vnd.oasis.opendocument.text">
+<button id="uploadPptButton" type="button">Validar y guardar PPT</button>
+</div>
+</div>
+<button id="sourceStatusButton" type="button">Comprobar fuentes Ferretería</button>
+<pre id="sourceStatus">Sin comprobar.</pre>
+</section>
+<section class="card">
 <h2>3. Cuatro expedientes reales</h2>
 <p class="muted">Descarga y abre cada ZIP. Revisa Memoria, PCAP y PPT. Solo después registra el resultado. El SHA no se introduce manualmente: Contrata-IA lo calcula al generar el paquete.</p>
 <div id="packages" class="packages"></div>
@@ -62,14 +80,12 @@ async function requestJson(url, options) {
   }
   return value;
 }
-
 function setText(id, text, className) {
   const element = document.getElementById(id);
   if (!element) return;
   element.textContent = text;
   if (className) element.className = className;
 }
-
 async function login() {
   try {
     const tokenInput = document.getElementById("token");
@@ -79,179 +95,94 @@ async function login() {
     setText("me", "Autenticado: " + (value.actor.displayName || value.actor.id) + " · " + value.actor.role, "ok");
     await loadPackages();
     await refreshStatus();
-  } catch (error) {
-    setText("me", "Error: " + error.message, "bad");
-  }
+    await refreshSourceStatus();
+  } catch (error) { setText("me", "Error: " + error.message, "bad"); }
 }
-
 async function logout() {
   try {
     await requestJson("/api/lb102/session/logout", { method: "POST", body: "{}" });
     setText("me", "No autenticado.", "muted");
     document.getElementById("packages").replaceChildren();
-  } catch (error) {
-    setText("me", "Error: " + error.message, "bad");
-  }
+  } catch (error) { setText("me", "Error: " + error.message, "bad"); }
 }
-
 async function recordSession() {
-  try {
-    await requestJson("/api/lb102/acceptance/sessions", { method: "POST", body: "{}" });
-    await refreshStatus();
-  } catch (error) {
-    setText("status", "Error: " + error.message, "bad");
-  }
+  try { await requestJson("/api/lb102/acceptance/sessions", { method: "POST", body: "{}" }); await refreshStatus(); }
+  catch (error) { setText("status", "Error: " + error.message, "bad"); }
 }
-
 async function refreshStatus() {
+  try { const value = await requestJson("/api/lb102/acceptance/status"); setText("status", JSON.stringify(value, null, 2)); }
+  catch (error) { setText("status", "Error: " + error.message, "bad"); }
+}
+async function uploadSource(kind, inputId) {
+  const input = document.getElementById(inputId);
+  const file = input.files && input.files[0];
+  if (!file) { setText("sourceStatus", "Selecciona primero el archivo ODT.", "bad"); return; }
   try {
-    const value = await requestJson("/api/lb102/acceptance/status");
-    setText("status", JSON.stringify(value, null, 2));
-  } catch (error) {
-    setText("status", "Error: " + error.message, "bad");
-  }
+    setText("sourceStatus", "Validando " + file.name + "...", "muted");
+    const response = await fetch("/api/lb102/ferreteria-sources/" + kind, { method: "PUT", credentials: "same-origin", headers: { "content-type": "application/vnd.oasis.opendocument.text" }, body: file });
+    const text = await response.text(); let value; try { value = JSON.parse(text); } catch { value = { raw: text }; }
+    if (!response.ok) throw new Error(value.error || JSON.stringify(value));
+    setText("sourceStatus", "Guardado " + value.kind + " · SHA-256 " + value.sha256, "ok");
+    input.value = "";
+    await refreshSourceStatus();
+  } catch (error) { setText("sourceStatus", "Error: " + error.message, "bad"); }
 }
-
-function field(tag, text) {
-  const element = document.createElement(tag);
-  element.textContent = text;
-  return element;
+async function refreshSourceStatus() {
+  try {
+    const value = await requestJson("/api/lb102/ferreteria-sources");
+    const lines = value.assets.map(function (x) { return (x.available ? "OK " : "FALTA ") + x.kind + " · " + x.templateId + (x.sha256 ? " · " + x.sha256 : ""); });
+    setText("sourceStatus", (value.ready ? "Fuentes protegidas listas.\n" : "Fuentes protegidas incompletas.\n") + lines.join("\n"), value.ready ? "ok" : "bad");
+  } catch (error) { setText("sourceStatus", "Error: " + error.message, "bad"); }
 }
-
+function field(tag, text) { const element = document.createElement(tag); element.textContent = text; return element; }
 function createPackageCard(pkg) {
-  const article = document.createElement("article");
-  article.className = "pkg";
-  article.id = "pkg-" + pkg.id;
-
+  const article = document.createElement("article"); article.className = "pkg"; article.id = "pkg-" + pkg.id;
   article.appendChild(field("h3", pkg.label));
-  const metadata = field("p", "Expediente: " + pkg.caseId + " · Familia: " + pkg.family + " · Perfil: " + pkg.profile);
-  article.appendChild(metadata);
-
-  const download = field("button", "Generar y descargar ZIP");
-  download.type = "button";
-  article.appendChild(download);
-
-  const sha = field("p", "SHA pendiente de generación.");
-  sha.className = "sha muted";
-  article.appendChild(sha);
-
-  const acceptedLabel = document.createElement("label");
-  const accepted = document.createElement("input");
-  accepted.type = "checkbox";
-  accepted.checked = true;
-  accepted.style.width = "auto";
-  acceptedLabel.appendChild(accepted);
-  acceptedLabel.appendChild(document.createTextNode(" Documentación aceptable para piloto"));
-  article.appendChild(acceptedLabel);
-
-  const criticalLabel = field("label", "Defectos críticos abiertos");
-  const critical = document.createElement("input");
-  critical.type = "number";
-  critical.min = "0";
-  critical.value = "0";
-  article.appendChild(criticalLabel);
-  article.appendChild(critical);
-
-  const notesLabel = field("label", "Observaciones de revisión");
-  const notes = document.createElement("textarea");
-  article.appendChild(notesLabel);
-  article.appendChild(notes);
-
-  const review = field("button", "Registrar revisión de este paquete");
-  review.type = "button";
-  article.appendChild(review);
-
-  const result = document.createElement("pre");
-  article.appendChild(result);
-
+  article.appendChild(field("p", "Expediente: " + pkg.caseId + " · Familia: " + pkg.family + " · Perfil: " + pkg.profile));
+  const download = field("button", "Generar y descargar ZIP"); download.type = "button"; article.appendChild(download);
+  const sha = field("p", "SHA pendiente de generación."); sha.className = "sha muted"; article.appendChild(sha);
+  const acceptedLabel = document.createElement("label"); const accepted = document.createElement("input"); accepted.type = "checkbox"; accepted.checked = true; accepted.style.width = "auto"; acceptedLabel.appendChild(accepted); acceptedLabel.appendChild(document.createTextNode(" Documentación aceptable para piloto")); article.appendChild(acceptedLabel);
+  const criticalLabel = field("label", "Defectos críticos abiertos"); const critical = document.createElement("input"); critical.type = "number"; critical.min = "0"; critical.value = "0"; article.appendChild(criticalLabel); article.appendChild(critical);
+  const notesLabel = field("label", "Observaciones de revisión"); const notes = document.createElement("textarea"); article.appendChild(notesLabel); article.appendChild(notes);
+  const review = field("button", "Registrar revisión de este paquete"); review.type = "button"; article.appendChild(review);
+  const result = document.createElement("pre"); article.appendChild(result);
   download.addEventListener("click", async function () {
     try {
-      sha.textContent = "Generando paquete...";
-      sha.className = "sha muted";
+      sha.textContent = "Generando paquete..."; sha.className = "sha muted";
       const response = await fetch("/api/lb102/pilot-packages/" + encodeURIComponent(pkg.id) + "/download", { credentials: "same-origin" });
-      if (!response.ok) {
-        const value = await response.json();
-        throw new Error((value.blockers || []).join(" · ") || value.error || "No se pudo generar el paquete");
-      }
-      const hash = response.headers.get("x-contrata-ia-package-sha256") || "SHA no disponible";
-      const blob = await response.blob();
-      const disposition = response.headers.get("content-disposition") || "";
-      const match = /filename="([^"]+)"/.exec(disposition);
-      const anchor = document.createElement("a");
-      anchor.href = URL.createObjectURL(blob);
-      anchor.download = match ? match[1] : pkg.id + ".zip";
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      setTimeout(function () { URL.revokeObjectURL(anchor.href); }, 1000);
-      sha.textContent = "SHA-256 generado por servidor: " + hash;
-      sha.className = "sha ok";
-    } catch (error) {
-      sha.textContent = "Error: " + error.message;
-      sha.className = "sha bad";
-    }
+      if (!response.ok) { const value = await response.json(); throw new Error((value.blockers || []).join(" · ") || value.error || "No se pudo generar el paquete"); }
+      const hash = response.headers.get("x-contrata-ia-package-sha256") || "SHA no disponible"; const blob = await response.blob(); const disposition = response.headers.get("content-disposition") || ""; const match = /filename="([^"]+)"/.exec(disposition); const anchor = document.createElement("a"); anchor.href = URL.createObjectURL(blob); anchor.download = match ? match[1] : pkg.id + ".zip"; document.body.appendChild(anchor); anchor.click(); const href = anchor.href; anchor.remove(); setTimeout(function () { URL.revokeObjectURL(href); }, 1000); sha.textContent = "SHA-256 generado por servidor: " + hash; sha.className = "sha ok";
+    } catch (error) { sha.textContent = "Error: " + error.message; sha.className = "sha bad"; }
   });
-
   review.addEventListener("click", async function () {
     try {
-      const body = {
-        accepted: accepted.checked,
-        criticalDefectsOpen: Number(critical.value || 0),
-        notes: notes.value
-      };
+      const body = { accepted: accepted.checked, criticalDefectsOpen: Number(critical.value || 0), notes: notes.value };
       const value = await requestJson("/api/lb102/pilot-packages/" + encodeURIComponent(pkg.id) + "/review", { method: "POST", body: JSON.stringify(body) });
-      result.textContent = "Revisión registrada. SHA servidor: " + value.package.sha256;
-      result.className = "ok";
-      sha.textContent = "SHA-256 registrado: " + value.package.sha256;
-      sha.className = "sha ok";
-      await refreshStatus();
-    } catch (error) {
-      result.textContent = "Error: " + error.message;
-      result.className = "bad";
-    }
+      result.textContent = "Revisión registrada. SHA servidor: " + value.package.sha256; result.className = "ok"; sha.textContent = "SHA-256 registrado: " + value.package.sha256; sha.className = "sha ok"; await refreshStatus();
+    } catch (error) { result.textContent = "Error: " + error.message; result.className = "bad"; }
   });
-
   return article;
 }
-
 async function loadPackages() {
-  const container = document.getElementById("packages");
-  container.replaceChildren();
-  try {
-    const value = await requestJson("/api/lb102/pilot-packages");
-    for (const pkg of value.packages) container.appendChild(createPackageCard(pkg));
-  } catch (error) {
-    const paragraph = field("p", "Error: " + error.message);
-    paragraph.className = "bad";
-    container.appendChild(paragraph);
-  }
+  const container = document.getElementById("packages"); container.replaceChildren();
+  try { const value = await requestJson("/api/lb102/pilot-packages"); for (const pkg of value.packages) container.appendChild(createPackageCard(pkg)); }
+  catch (error) { const paragraph = field("p", "Error: " + error.message); paragraph.className = "bad"; container.appendChild(paragraph); }
 }
-
 async function decision(accepted) {
-  try {
-    const rationale = document.getElementById("rationale").value;
-    const value = await requestJson("/api/lb102/acceptance/decision", { method: "POST", body: JSON.stringify({ accepted, rationale }) });
-    setText("decisionResult", JSON.stringify(value, null, 2));
-    await refreshStatus();
-  } catch (error) {
-    setText("decisionResult", "Error: " + error.message, "bad");
-  }
+  try { const rationale = document.getElementById("rationale").value; const value = await requestJson("/api/lb102/acceptance/decision", { method: "POST", body: JSON.stringify({ accepted, rationale }) }); setText("decisionResult", JSON.stringify(value, null, 2)); await refreshStatus(); }
+  catch (error) { setText("decisionResult", "Error: " + error.message, "bad"); }
 }
-
 document.getElementById("loginButton").addEventListener("click", login);
 document.getElementById("logoutButton").addEventListener("click", logout);
 document.getElementById("sessionButton").addEventListener("click", recordSession);
 document.getElementById("statusButton").addEventListener("click", refreshStatus);
+document.getElementById("uploadMemoryButton").addEventListener("click", function () { uploadSource("memoria", "memorySource"); });
+document.getElementById("uploadPptButton").addEventListener("click", function () { uploadSource("ppt", "pptSource"); });
+document.getElementById("sourceStatusButton").addEventListener("click", refreshSourceStatus);
 document.getElementById("acceptDecisionButton").addEventListener("click", function () { decision(true); });
 document.getElementById("rejectDecisionButton").addEventListener("click", function () { decision(false); });
-
 (async function bootstrap() {
-  try {
-    const value = await requestJson("/api/lb102/session/me");
-    setText("me", "Autenticado: " + (value.actor.displayName || value.actor.id) + " · " + value.actor.role, "ok");
-    await loadPackages();
-    await refreshStatus();
-  } catch {}
+  try { const value = await requestJson("/api/lb102/session/me"); setText("me", "Autenticado: " + (value.actor.displayName || value.actor.id) + " · " + value.actor.role, "ok"); await loadPackages(); await refreshStatus(); await refreshSourceStatus(); } catch {}
 })();
 </script>
 </body>
