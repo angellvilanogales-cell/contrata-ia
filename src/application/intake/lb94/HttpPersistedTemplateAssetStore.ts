@@ -10,6 +10,7 @@ export interface PersistedTemplateAssetDescriptor {
   styleFingerprint: string;
   provenanceRole:
     | "OFFICIAL_MODEL"
+    | "VALIDATED_REAL_CASE_SOURCE"
     | "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE"
     | "CONTRATA_IA_DERIVED_MIXED_SPECIALIZED_TEMPLATE"
     | "CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE"
