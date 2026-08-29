@@ -1,13 +1,258 @@
-export const LB102_PILOT_ACCEPTANCE_UI=`<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contrata-IA · Piloto LB102</title><style>body{font-family:Arial,sans-serif;max-width:1100px;margin:32px auto;padding:0 16px;color:#202124}h1{margin-bottom:6px}.muted{color:#666}.card{border:1px solid #ddd;border-radius:10px;padding:18px;margin:16px 0}.packages{display:grid;grid-template-columns:1fr 1fr;gap:16px}.pkg{border:1px solid #ddd;border-radius:10px;padding:15px}label{display:block;font-weight:600;margin:10px 0 4px}input,textarea,button{font:inherit;padding:10px;box-sizing:border-box}input,textarea{width:100%}textarea{min-height:70px}button{cursor:pointer;margin:8px 6px 0 0}.ok{color:#137333}.bad{color:#b3261e}pre{white-space:pre-wrap;background:#f7f7f7;padding:12px;border-radius:8px}.sha{font-family:monospace;word-break:break-all;font-size:12px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.packages,.row{grid-template-columns:1fr}}</style></head><body><h1>Contrata-IA · aceptación funcional LB102</h1><p class="muted">Prepiloto técnico acreditado. Cada revisión queda ligada al ZIP generado por el servidor. La aceptación del piloto no implica producción institucional.</p><section class="card"><h2>1. Identificación</h2><label>Token nominativo</label><input id="token" type="password" autocomplete="current-password"><button onclick="login()">Entrar</button><button onclick="logout()">Salir</button><p id="me" class="muted">No autenticado.</p></section><section class="card"><h2>2. Sesión de aceptación</h2><button onclick="recordSession()">Registrar esta sesión</button><button onclick="refreshStatus()">Actualizar estado</button><pre id="status">Sin consultar.</pre></section><section class="card"><h2>3. Cuatro expedientes reales</h2><p class="muted">Descarga y abre cada ZIP. Revisa Memoria, PCAP y PPT. Solo después registra el resultado. El SHA no se introduce manualmente: Contrata-IA lo calcula al generar el paquete.</p><div id="packages" class="packages"></div></section><section class="card"><h2>4. Decisión final</h2><p class="muted">Solo ADMIN. Deben existir 2 sesiones, 2 usuarios distintos, 4 paquetes revisados y 0 defectos críticos abiertos.</p><label>Motivación</label><textarea id="rationale" placeholder="Motivación de la aceptación o rechazo funcional"></textarea><button onclick="decision(true)">Aceptar piloto</button><button onclick="decision(false)">Rechazar / mantener abierto</button><pre id="decisionResult"></pre></section><script>
-async function j(url,opt={}){const r=await fetch(url,{credentials:'same-origin',headers:{'content-type':'application/json',...(opt.headers||{})},...opt});const t=await r.text();let v;try{v=JSON.parse(t)}catch{v={raw:t}}if(!r.ok)throw new Error(v.error||((v.blockers||[]).join(' · '))||JSON.stringify(v));return v}
-async function login(){try{const token=document.getElementById('token').value;const v=await j('/api/lb102/session/login',{method:'POST',body:JSON.stringify({token})});document.getElementById('token').value='';document.getElementById('me').textContent='Autenticado: '+(v.actor.displayName||v.actor.id)+' · '+v.actor.role;await loadPackages();await refreshStatus()}catch(e){document.getElementById('me').textContent='Error: '+e.message}}
-async function logout(){try{await j('/api/lb102/session/logout',{method:'POST',body:'{}'});document.getElementById('me').textContent='No autenticado.';document.getElementById('packages').innerHTML=''}catch(e){alert(e.message)}}
-async function recordSession(){try{await j('/api/lb102/acceptance/sessions',{method:'POST',body:'{}'});await refreshStatus()}catch(e){alert(e.message)}}
-async function refreshStatus(){try{const v=await j('/api/lb102/acceptance/status');document.getElementById('status').textContent=JSON.stringify(v,null,2)}catch(e){document.getElementById('status').textContent=e.message}}
-function esc(x){return String(x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
-async function loadPackages(){try{const v=await j('/api/lb102/pilot-packages');document.getElementById('packages').innerHTML=v.packages.map(p=>'<article class="pkg" id="pkg-'+p.id+'"><h3>'+esc(p.label)+'</h3><p><b>Expediente:</b> '+esc(p.caseId)+'<br><b>Familia:</b> '+esc(p.family)+'<br><b>Perfil:</b> '+esc(p.profile)+'</p><button onclick="downloadPackage(\''+p.id+'\')">Generar y descargar ZIP</button><p id="sha-'+p.id+'" class="sha muted">SHA pendiente de generación.</p><div class="row"><div><label><input id="accepted-'+p.id+'" type="checkbox" checked style="width:auto"> Documentación aceptable para piloto</label></div><div><label>Defectos críticos abiertos</label><input id="critical-'+p.id+'" type="number" min="0" value="0"></div></div><label>Observaciones de revisión</label><textarea id="notes-'+p.id+'"></textarea><button onclick="reviewPackage(\''+p.id+'\')">Registrar revisión de este paquete</button><pre id="result-'+p.id+'"></pre></article>').join('')}catch(e){document.getElementById('packages').innerHTML='<p class="bad">'+esc(e.message)+'</p>'}}
-async function downloadPackage(id){const target=document.getElementById('sha-'+id);try{target.textContent='Generando paquete...';const r=await fetch('/api/lb102/pilot-packages/'+encodeURIComponent(id)+'/download',{credentials:'same-origin'});if(!r.ok){const v=await r.json();throw new Error((v.blockers||[]).join(' · ')||v.error||'No se pudo generar el paquete')}const sha=r.headers.get('x-contrata-ia-package-sha256')||'SHA no disponible';const blob=await r.blob();const cd=r.headers.get('content-disposition')||'';const m=/filename="([^"]+)"/.exec(cd);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=m?m[1]:(id+'.zip');document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);target.textContent='SHA-256 generado por servidor: '+sha;target.className='sha ok'}catch(e){target.textContent='Error: '+e.message;target.className='sha bad'}}
-async function reviewPackage(id){const out=document.getElementById('result-'+id);try{const body={accepted:document.getElementById('accepted-'+id).checked,criticalDefectsOpen:Number(document.getElementById('critical-'+id).value||0),notes:document.getElementById('notes-'+id).value};const v=await j('/api/lb102/pilot-packages/'+encodeURIComponent(id)+'/review',{method:'POST',body:JSON.stringify(body)});out.textContent='Revisión registrada. SHA servidor: '+v.package.sha256;out.className='ok';document.getElementById('sha-'+id).textContent='SHA-256 registrado: '+v.package.sha256;await refreshStatus()}catch(e){out.textContent='Error: '+e.message;out.className='bad'}}
-async function decision(accepted){try{const v=await j('/api/lb102/acceptance/decision',{method:'POST',body:JSON.stringify({accepted,rationale:document.getElementById('rationale').value})});document.getElementById('decisionResult').textContent=JSON.stringify(v,null,2);await refreshStatus()}catch(e){document.getElementById('decisionResult').textContent=e.message}}
-(async()=>{try{const v=await j('/api/lb102/session/me');document.getElementById('me').textContent='Autenticado: '+(v.actor.displayName||v.actor.id)+' · '+v.actor.role;await loadPackages();await refreshStatus()}catch{}})();
-</script></body></html>`;
+export const LB102_PILOT_ACCEPTANCE_UI = `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contrata-IA · Piloto LB102</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:1100px;margin:32px auto;padding:0 16px;color:#202124}
+h1{margin-bottom:6px}.muted{color:#666}.card{border:1px solid #ddd;border-radius:10px;padding:18px;margin:16px 0}
+.packages{display:grid;grid-template-columns:1fr 1fr;gap:16px}.pkg{border:1px solid #ddd;border-radius:10px;padding:15px}
+label{display:block;font-weight:600;margin:10px 0 4px}input,textarea,button{font:inherit;padding:10px;box-sizing:border-box}
+input,textarea{width:100%}textarea{min-height:70px}button{cursor:pointer;margin:8px 6px 0 0}.ok{color:#137333}.bad{color:#b3261e}
+pre{white-space:pre-wrap;background:#f7f7f7;padding:12px;border-radius:8px}.sha{font-family:monospace;word-break:break-all;font-size:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.packages,.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>Contrata-IA · aceptación funcional LB102</h1>
+<p class="muted">Prepiloto técnico acreditado. Cada revisión queda ligada al ZIP generado por el servidor. La aceptación del piloto no implica producción institucional.</p>
+<section class="card">
+<h2>1. Identificación</h2>
+<label for="token">Token nominativo</label>
+<input id="token" type="password" autocomplete="current-password">
+<button id="loginButton" type="button">Entrar</button>
+<button id="logoutButton" type="button">Salir</button>
+<p id="me" class="muted">No autenticado.</p>
+</section>
+<section class="card">
+<h2>2. Sesión de aceptación</h2>
+<button id="sessionButton" type="button">Registrar esta sesión</button>
+<button id="statusButton" type="button">Actualizar estado</button>
+<pre id="status">Sin consultar.</pre>
+</section>
+<section class="card">
+<h2>3. Cuatro expedientes reales</h2>
+<p class="muted">Descarga y abre cada ZIP. Revisa Memoria, PCAP y PPT. Solo después registra el resultado. El SHA no se introduce manualmente: Contrata-IA lo calcula al generar el paquete.</p>
+<div id="packages" class="packages"></div>
+</section>
+<section class="card">
+<h2>4. Decisión final</h2>
+<p class="muted">Solo ADMIN. Deben existir 2 sesiones, 2 usuarios distintos, 4 paquetes revisados y 0 defectos críticos abiertos.</p>
+<label for="rationale">Motivación</label>
+<textarea id="rationale" placeholder="Motivación de la aceptación o rechazo funcional"></textarea>
+<button id="acceptDecisionButton" type="button">Aceptar piloto</button>
+<button id="rejectDecisionButton" type="button">Rechazar / mantener abierto</button>
+<pre id="decisionResult"></pre>
+</section>
+<script>
+async function requestJson(url, options) {
+  const config = options || {};
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    headers: { "content-type": "application/json", ...(config.headers || {}) },
+    ...config
+  });
+  const text = await response.text();
+  let value;
+  try { value = JSON.parse(text); } catch { value = { raw: text }; }
+  if (!response.ok) {
+    const blockers = Array.isArray(value.blockers) ? value.blockers.join(" · ") : "";
+    throw new Error(value.error || blockers || JSON.stringify(value));
+  }
+  return value;
+}
+
+function setText(id, text, className) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.textContent = text;
+  if (className) element.className = className;
+}
+
+async function login() {
+  try {
+    const tokenInput = document.getElementById("token");
+    const token = tokenInput.value;
+    const value = await requestJson("/api/lb102/session/login", { method: "POST", body: JSON.stringify({ token }) });
+    tokenInput.value = "";
+    setText("me", "Autenticado: " + (value.actor.displayName || value.actor.id) + " · " + value.actor.role, "ok");
+    await loadPackages();
+    await refreshStatus();
+  } catch (error) {
+    setText("me", "Error: " + error.message, "bad");
+  }
+}
+
+async function logout() {
+  try {
+    await requestJson("/api/lb102/session/logout", { method: "POST", body: "{}" });
+    setText("me", "No autenticado.", "muted");
+    document.getElementById("packages").replaceChildren();
+  } catch (error) {
+    setText("me", "Error: " + error.message, "bad");
+  }
+}
+
+async function recordSession() {
+  try {
+    await requestJson("/api/lb102/acceptance/sessions", { method: "POST", body: "{}" });
+    await refreshStatus();
+  } catch (error) {
+    setText("status", "Error: " + error.message, "bad");
+  }
+}
+
+async function refreshStatus() {
+  try {
+    const value = await requestJson("/api/lb102/acceptance/status");
+    setText("status", JSON.stringify(value, null, 2));
+  } catch (error) {
+    setText("status", "Error: " + error.message, "bad");
+  }
+}
+
+function field(tag, text) {
+  const element = document.createElement(tag);
+  element.textContent = text;
+  return element;
+}
+
+function createPackageCard(pkg) {
+  const article = document.createElement("article");
+  article.className = "pkg";
+  article.id = "pkg-" + pkg.id;
+
+  article.appendChild(field("h3", pkg.label));
+  const metadata = field("p", "Expediente: " + pkg.caseId + " · Familia: " + pkg.family + " · Perfil: " + pkg.profile);
+  article.appendChild(metadata);
+
+  const download = field("button", "Generar y descargar ZIP");
+  download.type = "button";
+  article.appendChild(download);
+
+  const sha = field("p", "SHA pendiente de generación.");
+  sha.className = "sha muted";
+  article.appendChild(sha);
+
+  const acceptedLabel = document.createElement("label");
+  const accepted = document.createElement("input");
+  accepted.type = "checkbox";
+  accepted.checked = true;
+  accepted.style.width = "auto";
+  acceptedLabel.appendChild(accepted);
+  acceptedLabel.appendChild(document.createTextNode(" Documentación aceptable para piloto"));
+  article.appendChild(acceptedLabel);
+
+  const criticalLabel = field("label", "Defectos críticos abiertos");
+  const critical = document.createElement("input");
+  critical.type = "number";
+  critical.min = "0";
+  critical.value = "0";
+  article.appendChild(criticalLabel);
+  article.appendChild(critical);
+
+  const notesLabel = field("label", "Observaciones de revisión");
+  const notes = document.createElement("textarea");
+  article.appendChild(notesLabel);
+  article.appendChild(notes);
+
+  const review = field("button", "Registrar revisión de este paquete");
+  review.type = "button";
+  article.appendChild(review);
+
+  const result = document.createElement("pre");
+  article.appendChild(result);
+
+  download.addEventListener("click", async function () {
+    try {
+      sha.textContent = "Generando paquete...";
+      sha.className = "sha muted";
+      const response = await fetch("/api/lb102/pilot-packages/" + encodeURIComponent(pkg.id) + "/download", { credentials: "same-origin" });
+      if (!response.ok) {
+        const value = await response.json();
+        throw new Error((value.blockers || []).join(" · ") || value.error || "No se pudo generar el paquete");
+      }
+      const hash = response.headers.get("x-contrata-ia-package-sha256") || "SHA no disponible";
+      const blob = await response.blob();
+      const disposition = response.headers.get("content-disposition") || "";
+      const match = /filename="([^"]+)"/.exec(disposition);
+      const anchor = document.createElement("a");
+      anchor.href = URL.createObjectURL(blob);
+      anchor.download = match ? match[1] : pkg.id + ".zip";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(function () { URL.revokeObjectURL(anchor.href); }, 1000);
+      sha.textContent = "SHA-256 generado por servidor: " + hash;
+      sha.className = "sha ok";
+    } catch (error) {
+      sha.textContent = "Error: " + error.message;
+      sha.className = "sha bad";
+    }
+  });
+
+  review.addEventListener("click", async function () {
+    try {
+      const body = {
+        accepted: accepted.checked,
+        criticalDefectsOpen: Number(critical.value || 0),
+        notes: notes.value
+      };
+      const value = await requestJson("/api/lb102/pilot-packages/" + encodeURIComponent(pkg.id) + "/review", { method: "POST", body: JSON.stringify(body) });
+      result.textContent = "Revisión registrada. SHA servidor: " + value.package.sha256;
+      result.className = "ok";
+      sha.textContent = "SHA-256 registrado: " + value.package.sha256;
+      sha.className = "sha ok";
+      await refreshStatus();
+    } catch (error) {
+      result.textContent = "Error: " + error.message;
+      result.className = "bad";
+    }
+  });
+
+  return article;
+}
+
+async function loadPackages() {
+  const container = document.getElementById("packages");
+  container.replaceChildren();
+  try {
+    const value = await requestJson("/api/lb102/pilot-packages");
+    for (const pkg of value.packages) container.appendChild(createPackageCard(pkg));
+  } catch (error) {
+    const paragraph = field("p", "Error: " + error.message);
+    paragraph.className = "bad";
+    container.appendChild(paragraph);
+  }
+}
+
+async function decision(accepted) {
+  try {
+    const rationale = document.getElementById("rationale").value;
+    const value = await requestJson("/api/lb102/acceptance/decision", { method: "POST", body: JSON.stringify({ accepted, rationale }) });
+    setText("decisionResult", JSON.stringify(value, null, 2));
+    await refreshStatus();
+  } catch (error) {
+    setText("decisionResult", "Error: " + error.message, "bad");
+  }
+}
+
+document.getElementById("loginButton").addEventListener("click", login);
+document.getElementById("logoutButton").addEventListener("click", logout);
+document.getElementById("sessionButton").addEventListener("click", recordSession);
+document.getElementById("statusButton").addEventListener("click", refreshStatus);
+document.getElementById("acceptDecisionButton").addEventListener("click", function () { decision(true); });
+document.getElementById("rejectDecisionButton").addEventListener("click", function () { decision(false); });
+
+(async function bootstrap() {
+  try {
+    const value = await requestJson("/api/lb102/session/me");
+    setText("me", "Autenticado: " + (value.actor.displayName || value.actor.id) + " · " + value.actor.role, "ok");
+    await loadPackages();
+    await refreshStatus();
+  } catch {}
+})();
+</script>
+</body>
+</html>`;
