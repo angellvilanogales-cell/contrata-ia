@@ -12,8 +12,10 @@ import {countExecutableRealCases} from "../../application/operations/lb102/RealC
 import {evaluateLB102TechnicalPrePilot} from "../../application/operations/lb102/LB102TechnicalPrePilotStatus";
 import {SecurityPolicy} from "../lb7/SecurityPolicy";
 import {createLB99RuntimeServer} from "../lb99/LB99RuntimeServer";
+import {LB102_PILOT_ACCEPTANCE_UI} from "./LB102PilotAcceptanceUi";
 
 function sendJson(r:ServerResponse,status:number,value:unknown){const bytes=Buffer.from(JSON.stringify(value));r.writeHead(status,{"content-type":"application/json; charset=utf-8","content-length":bytes.length,"cache-control":"no-store"});r.end(bytes);}
+function sendHtml(r:ServerResponse,html:string){const bytes=Buffer.from(html);r.writeHead(200,{"content-type":"text/html; charset=utf-8","content-length":bytes.length,"cache-control":"no-store"});r.end(bytes);}
 function usersFromEnv(){try{const value=JSON.parse(process.env.CONTRATA_IA_USERS_JSON??"[]");return Array.isArray(value)?value:[];}catch{return[];}}
 async function readJson(request:IncomingMessage){const chunks:Buffer[]=[];for await(const chunk of request){chunks.push(Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk));if(chunks.reduce((n,x)=>n+x.length,0)>64*1024)throw new Error("Payload demasiado grande.");}const raw=Buffer.concat(chunks).toString("utf8");return raw?JSON.parse(raw):{};}
 export function runLB101LivePreflight(){
@@ -34,7 +36,12 @@ function acceptanceStatus(store:LB102PilotAcceptanceStore,lb101SecurityReady:boo
 /** Runtime LB102: conserva LB99 y añade preflight y aceptación humana auditable. */
 export function createLB102RuntimeServer():http.Server{
  const base=createLB99RuntimeServer();const security=new SecurityPolicy();const dataRoot=path.resolve(process.env.CONTRATA_IA_DATA_DIR??"var/contrata-ia");const acceptance=new LB102PilotAcceptanceStore(path.join(dataRoot,"lb102","acceptance.json"));
- return http.createServer(async(request,response)=>{security.applySecurityHeaders(response);try{const url=new URL(request.url??"/","http://localhost");if(request.method==="GET"&&url.pathname==="/api/lb102/preflight"){
+ return http.createServer(async(request,response)=>{security.applySecurityHeaders(response);try{const url=new URL(request.url??"/","http://localhost");
+  if(request.method==="GET"&&(url.pathname==="/pilot-acceptance"||url.pathname==="/pilot-acceptance/")){sendHtml(response,LB102_PILOT_ACCEPTANCE_UI);return;}
+  if(request.method==="POST"&&url.pathname==="/api/lb102/session/login"){const body=await readJson(request) as Record<string,unknown>;const token=String(body.token??"");const actor=security.authenticateToken(token);if(actor.namedIdentity!==true)throw new Error("El piloto LB102 exige identidad nominativa.");response.setHeader("set-cookie",security.sessionCookie(token));sendJson(response,200,{actor:{id:actor.id,role:actor.role,displayName:actor.displayName,namedIdentity:true},productionReady:false});return;}
+  if(request.method==="POST"&&url.pathname==="/api/lb102/session/logout"){response.setHeader("set-cookie",security.clearSessionCookie());sendJson(response,200,{signedOut:true});return;}
+  if(request.method==="GET"&&url.pathname==="/api/lb102/session/me"){const actor=security.authenticate(request);sendJson(response,200,{actor:{id:actor.id,role:actor.role,displayName:actor.displayName,namedIdentity:actor.namedIdentity===true}});return;}
+  if(request.method==="GET"&&url.pathname==="/api/lb102/preflight"){
    const lb101=runLB101LivePreflight();const lb102=evaluateLB102TechnicalPrePilot({lb101SecurityReady:lb101.pilotSecurityReady,negativeRegressionConflictPassed:true,negativeRegressionMissingValidationPassed:true,negativeRegressionTemplateIntegrityPassed:true});
    sendJson(response,lb102.technicalPrePilotReady?200:503,{block:"LB102",technicalPrePilotReady:lb102.technicalPrePilotReady,appViableForPilot:false,lb101:{pilotSecurityReady:lb101.pilotSecurityReady,blockers:lb101.blockers,ensComplianceClaimed:false},blockers:lb102.blockers,productionReady:false,humanAcceptanceRequired:true});return;
   }
