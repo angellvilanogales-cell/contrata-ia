@@ -5,6 +5,7 @@ import {createHttpPersistedTemplateAssetStoreFromEnv} from "../../intake/lb94/Ht
 import {generateSupplyUserDocumentPackage} from "../../intake/lb95/SupplyUserDocumentPackageGenerator";
 import {LB102_SUPPLY_FERRETERIA,LB102_SUPPLY_PANDA} from "./RealSupplyPilotSnapshots";
 import {LB102_SERVICE_5G,LB102_SERVICE_HUELVA} from "./RealServicePilotSnapshots";
+import {renderFerreteriaPilotPcap} from "./FerreteriaPilotPcapRenderer";
 
 export type LB102PilotPackageId="supply-ferreteria"|"supply-panda"|"service-huelva"|"service-5g";
 export interface LB102PilotPackageDescriptor{id:LB102PilotPackageId;caseId:string;family:"SUPPLY"|"SERVICE";label:string;profile:string;}
@@ -21,7 +22,7 @@ export async function generateLB102PilotPackage(id:LB102PilotPackageId):Promise<
  try{
   if(id==="supply-ferreteria"){
    const store=createHttpPersistedTemplateAssetStoreFromEnv();if(!store)throw new Error("Persistencia de plantillas Supply no configurada.");
-   const out=await generateSupplyUserDocumentPackage({record:LB102_SUPPLY_FERRETERIA,templateStore:store});return{ready:out.ready,descriptor,fileName:out.fileName,bytes:out.bytes,sha256:out.sha256,blockers:out.blockers};
+   const out=await generateSupplyUserDocumentPackage({record:LB102_SUPPLY_FERRETERIA,templateStore:store,pcapRenderer:renderFerreteriaPilotPcap});return{ready:out.ready,descriptor,fileName:out.fileName,bytes:out.bytes,sha256:out.sha256,blockers:out.blockers};
   }
   if(id==="supply-panda"){
    const store=createLB102PandaTemplateStoreFromEnv();if(!store)throw new Error("Persistencia de plantillas Panda no configurada.");
