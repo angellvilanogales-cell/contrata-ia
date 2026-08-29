@@ -1,7 +1,6 @@
 import {generateStrictServicePilotPackage} from "../../intake/lb102/StrictServicePilotPackageGenerator";
-import {createLB102PandaTemplateStoreFromEnv,createLB102ServiceTemplateStoreFromEnv} from "../../intake/lb102/LB102PersistedPilotTemplateStores";
+import {createLB102FerreteriaTemplateStoreFromEnv,createLB102PandaTemplateStoreFromEnv,createLB102ServiceTemplateStoreFromEnv} from "../../intake/lb102/LB102PersistedPilotTemplateStores";
 import {generateSupplyAsoUserDocumentPackage} from "../../intake/lb102/SupplyAsoUserDocumentPackageGenerator";
-import {createHttpPersistedTemplateAssetStoreFromEnv} from "../../intake/lb94/HttpPersistedTemplateAssetStore";
 import {generateFerreteriaPilotPackage} from "./FerreteriaPilotPackageGenerator";
 import {LB102_SUPPLY_PANDA} from "./RealSupplyPilotSnapshots";
 import {LB102_SERVICE_5G,LB102_SERVICE_HUELVA} from "./RealServicePilotSnapshots";
@@ -20,7 +19,7 @@ export async function generateLB102PilotPackage(id:LB102PilotPackageId):Promise<
  const descriptor=pilotPackageDescriptor(id);if(!descriptor)throw new Error("Paquete piloto desconocido.");
  try{
   if(id==="supply-ferreteria"){
-   const store=createHttpPersistedTemplateAssetStoreFromEnv();if(!store)throw new Error("Persistencia de plantillas Supply no configurada.");
+   const store=createLB102FerreteriaTemplateStoreFromEnv();if(!store)throw new Error("Persistencia protegida Ferretería no configurada.");
    const out=await generateFerreteriaPilotPackage(store);return{ready:out.ready,descriptor,fileName:out.fileName,bytes:out.bytes,sha256:out.sha256,blockers:out.blockers};
   }
   if(id==="supply-panda"){
