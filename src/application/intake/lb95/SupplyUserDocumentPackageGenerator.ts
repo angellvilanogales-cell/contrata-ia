@@ -3,7 +3,7 @@ import type { UniversalEditableTemplateBinaryStore } from "../lb23/UniversalOdtP
 import { readOdtZip } from "../lb23/OdtPackageCodec";
 import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace";
 import { generateSupplyGeneralEvidenceDocuments } from "../lb94/SupplyGeneralEvidenceDocumentGenerator";
-import { renderSupplyAsaGeneralPcap } from "./SupplyAsaGeneralPcapRenderer";
+import { renderSupplyAsaGeneralPcap, type SupplyAsaGeneralPcapResult } from "./SupplyAsaGeneralPcapRenderer";
 import { zipStoredFiles } from "./StoredZipPackage";
 
 export interface SupplyUserDocumentPackage {
@@ -23,6 +23,8 @@ export interface SupplyUserDocumentPackage {
   };
   blockers: readonly string[];
 }
+
+export type SupplyPcapRenderer = (input: { record: UniversalEvidenceRecord; templateStore: UniversalEditableTemplateBinaryStore }) => Promise<SupplyAsaGeneralPcapResult>;
 
 function sha256(bytes: Uint8Array): string { return createHash("sha256").update(bytes).digest("hex"); }
 function textOf(bytes: Uint8Array): string {
@@ -59,11 +61,16 @@ function crossAudit(record: UniversalEvidenceRecord, pcap: Uint8Array, memory: U
   return blockers;
 }
 
-export async function generateSupplyUserDocumentPackage(input: { record: UniversalEvidenceRecord; templateStore: UniversalEditableTemplateBinaryStore }): Promise<SupplyUserDocumentPackage> {
+export async function generateSupplyUserDocumentPackage(input: {
+  record: UniversalEvidenceRecord;
+  templateStore: UniversalEditableTemplateBinaryStore;
+  pcapRenderer?: SupplyPcapRenderer;
+}): Promise<SupplyUserDocumentPackage> {
   const blockers: string[] = [];
-  const pcap = await renderSupplyAsaGeneralPcap(input);
+  const renderer = input.pcapRenderer ?? renderSupplyAsaGeneralPcap;
+  const pcap = await renderer({ record: input.record, templateStore: input.templateStore });
   if (!pcap.ready || !pcap.document) blockers.push(...pcap.blockers.map(item => `PCAP: ${item}`));
-  const general = await generateSupplyGeneralEvidenceDocuments(input);
+  const general = await generateSupplyGeneralEvidenceDocuments({ record: input.record, templateStore: input.templateStore });
   if (!general.ready) blockers.push(...general.blockers);
   if (blockers.length || !pcap.document || general.documents.length !== 2) return { ready: false, fileName: null, mediaType: "application/zip", bytes: null, sha256: null, manifest: null, blockers };
 
