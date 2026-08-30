@@ -26,7 +26,7 @@ function cookieValue(request: IncomingMessage, name: string): string | undefined
   return undefined;
 }
 
-interface NamedUserConfig {id:string;role:ApplicationRole;token:string;displayName?:string;}
+interface NamedUserConfig {id:string;role:ApplicationRole;token:string;password?:string;displayName?:string;}
 function namedUsers(raw:string|undefined):NamedUserConfig[]{
   if(!raw?.trim())return[];
   let parsed:unknown;try{parsed=JSON.parse(raw);}catch{throw new Error("CONTRATA_IA_USERS_JSON no contiene JSON válido.");}
@@ -34,12 +34,14 @@ function namedUsers(raw:string|undefined):NamedUserConfig[]{
   const users:NamedUserConfig[]=[];const ids=new Set<string>();const tokens=new Set<string>();
   for(const [index,item] of parsed.entries()){
     if(!item||typeof item!=="object"||Array.isArray(item))throw new Error(`Usuario ${index+1} inválido en CONTRATA_IA_USERS_JSON.`);
-    const row=item as Record<string,unknown>;const id=typeof row.id==="string"?row.id.trim():"";const role=typeof row.role==="string"?row.role as ApplicationRole:null;const token=typeof row.token==="string"?row.token:"";const displayName=typeof row.displayName==="string"&&row.displayName.trim()?row.displayName.trim():undefined;
+    const row=item as Record<string,unknown>;const id=typeof row.id==="string"?row.id.trim():"";const role=typeof row.role==="string"?row.role as ApplicationRole:null;const token=typeof row.token==="string"?row.token:"";const password=typeof row.password==="string"?row.password:"";const displayName=typeof row.displayName==="string"&&row.displayName.trim()?row.displayName.trim():undefined;
     if(!id||!/^[A-Za-z0-9._@-]{2,120}$/.test(id))throw new Error(`Identidad nominativa inválida en usuario ${index+1}.`);
     if(!role||!ROLES.has(role))throw new Error(`Rol inválido para ${id}.`);
-    if(token.length<16)throw new Error(`La credencial nominativa de ${id} debe tener al menos 16 caracteres.`);
+    if(token.length<16)throw new Error(`La credencial nominativa interna de ${id} debe tener al menos 16 caracteres.`);
+    if(password&&password.length<10)throw new Error(`La contraseña de ${id} debe tener al menos 10 caracteres.`);
+    if(password&&equalSecret(password,token))throw new Error(`La contraseña de ${id} debe ser distinta del token interno.`);
     if(ids.has(id))throw new Error(`Identidad nominativa duplicada: ${id}.`);if(tokens.has(token))throw new Error("No se permite compartir una credencial entre usuarios nominativos.");
-    ids.add(id);tokens.add(token);users.push({id,role,token,...(displayName?{displayName}:{})});
+    ids.add(id);tokens.add(token);users.push({id,role,token,...(password?{password}:{}),...(displayName?{displayName}:{})});
   }
   return users;
 }
@@ -69,12 +71,18 @@ export class SecurityPolicy {
 
   public namedIdentityCount():number{return this.namedIdentityCountValue;}
   public hasNamedIdentities():boolean{return this.namedIdentityCountValue>0;}
-  public namedUserDirectory():readonly {id:string;displayName?:string;role:ApplicationRole}[]{return this.namedUsersValue.map(user=>({id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{})}));}
+  public namedPasswordCount():number{return this.namedUsersValue.filter(user=>Boolean(user.password)).length;}
+  public namedUserDirectory():readonly {id:string;displayName?:string;role:ApplicationRole;passwordEnabled:boolean}[]{return this.namedUsersValue.map(user=>({id:user.id,role:user.role,passwordEnabled:Boolean(user.password),...(user.displayName?{displayName:user.displayName}:{})}));}
 
   public authenticateNamedUser(id:string,password:string):AuthenticatedActor{
-    const user=this.namedUsersValue.find(item=>item.id===id);
-    if(!user||!equalSecret(password,user.token))throw new Error("Usuario o contraseña no válidos.");
+    const normalized=id.trim();const user=this.namedUsersValue.find(item=>item.id===normalized);
+    if(!user?.password||!equalSecret(password,user.password))throw new Error("Usuario o contraseña no válidos.");
     return {id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{}),namedIdentity:true};
+  }
+
+  public sessionCookieForNamedUser(id:string,password:string):{actor:AuthenticatedActor;cookie:string}{
+    const actor=this.authenticateNamedUser(id,password);const user=this.namedUsersValue.find(item=>item.id===actor.id)!;
+    return{actor,cookie:this.sessionCookie(user.token)};
   }
 
   public authenticateToken(token: string): AuthenticatedActor {
@@ -97,11 +105,6 @@ export class SecurityPolicy {
   public sessionCookie(token: string): string {
     this.authenticateToken(token);
     return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
-  }
-
-  public sessionCookieForNamedUser(id:string,password:string):string{
-    this.authenticateNamedUser(id,password);
-    return `${SESSION_COOKIE}=${encodeURIComponent(password)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
   }
 
   public clearSessionCookie(): string {
