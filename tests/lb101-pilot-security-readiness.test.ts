@@ -15,12 +15,12 @@ describe("LB101 seguridad de piloto",()=>{
     expect(policy.namedIdentityCount()).toBe(2);expect(policy.authenticateToken("token-operador-0001").id).toBe("gestor.a");expect(policy.authenticateToken("token-revisor--0002").role).toBe("REVIEWER");expect(()=>policy.require(policy.authenticateToken("token-operador-0001"),"REVIEWER")).toThrow(/Permiso insuficiente/);
   });
   it("permite usuario y contraseña sin exponer la contraseña en la sesión",()=>{
-    const internalToken="token-interno-admin-0001";const password="ClavePiloto-2026!";
+    const internalToken="token-interno-admin-0001";const password="Clave Piloto:2026!";
     const policy=new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"usuario-piloto-1",displayName:"Usuario piloto 1",role:"ADMIN",token:internalToken,password}])});
     expect(policy.namedPasswordCount()).toBe(1);
     expect(policy.authenticateNamedUser("usuario-piloto-1",password)).toMatchObject({id:"usuario-piloto-1",role:"ADMIN",namedIdentity:true});
     expect(()=>policy.authenticateNamedUser("usuario-piloto-1","ClaveIncorrecta-2026")).toThrow(/Usuario o contraseña/);
-    const envelope="LOGIN\u0000usuario-piloto-1\u0000"+password;
+    const envelope="LOGIN:"+encodeURIComponent("usuario-piloto-1")+":"+encodeURIComponent(password);
     expect(policy.authenticateToken(envelope).id).toBe("usuario-piloto-1");
     const cookie=policy.sessionCookie(envelope);
     expect(cookie).toContain("contrata_ia_token="+internalToken);
