@@ -48,11 +48,12 @@ export class SecurityPolicy {
   private readonly tokens: readonly { token: string; actor: AuthenticatedActor }[];
   private readonly required: boolean;
   private readonly namedIdentityCountValue:number;
+  private readonly namedUsersValue:readonly NamedUserConfig[];
 
   public constructor(environment: NodeJS.ProcessEnv = process.env) {
     this.required = environment.CONTRATA_IA_AUTH_REQUIRED === "1" || environment.NODE_ENV === "production";
     const tokens: { token: string; actor: AuthenticatedActor }[] = [];
-    const users=namedUsers(environment.CONTRATA_IA_USERS_JSON);this.namedIdentityCountValue=users.length;
+    const users=namedUsers(environment.CONTRATA_IA_USERS_JSON);this.namedUsersValue=users;this.namedIdentityCountValue=users.length;
     for(const user of users)tokens.push({token:user.token,actor:{id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{}),namedIdentity:true}});
     const add = (token: string | undefined, id: string, role: ApplicationRole): void => {
       if (token) tokens.push({ token, actor: { id, role, namedIdentity:false } });
@@ -68,6 +69,13 @@ export class SecurityPolicy {
 
   public namedIdentityCount():number{return this.namedIdentityCountValue;}
   public hasNamedIdentities():boolean{return this.namedIdentityCountValue>0;}
+  public namedUserDirectory():readonly {id:string;displayName?:string;role:ApplicationRole}[]{return this.namedUsersValue.map(user=>({id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{})}));}
+
+  public authenticateNamedUser(id:string,password:string):AuthenticatedActor{
+    const user=this.namedUsersValue.find(item=>item.id===id);
+    if(!user||!equalSecret(password,user.token))throw new Error("Usuario o contraseña no válidos.");
+    return {id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{}),namedIdentity:true};
+  }
 
   public authenticateToken(token: string): AuthenticatedActor {
     const found = this.tokens.find(entry => equalSecret(token, entry.token));
@@ -88,7 +96,12 @@ export class SecurityPolicy {
 
   public sessionCookie(token: string): string {
     this.authenticateToken(token);
-    return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`;
+    return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
+  }
+
+  public sessionCookieForNamedUser(id:string,password:string):string{
+    this.authenticateNamedUser(id,password);
+    return `${SESSION_COOKIE}=${encodeURIComponent(password)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
   }
 
   public clearSessionCookie(): string {
