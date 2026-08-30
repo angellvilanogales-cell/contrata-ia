@@ -6,7 +6,7 @@ export interface AuthenticatedActor { readonly id: string; readonly role: Applic
 
 const RANK: Readonly<Record<ApplicationRole, number>> = { VIEWER: 1, OPERATOR: 2, REVIEWER: 3, ADMIN: 4 };
 const SESSION_COOKIE = "contrata_ia_token";
-const LOGIN_PREFIX = "LOGIN\u0000";
+const LOGIN_PREFIX = "LOGIN:";
 const ROLES=new Set<ApplicationRole>(["VIEWER","OPERATOR","REVIEWER","ADMIN"]);
 
 function equalSecret(candidate: string, expected: string): boolean {
@@ -49,8 +49,9 @@ function namedUsers(raw:string|undefined):NamedUserConfig[]{
 
 function parseLoginEnvelope(value:string):{id:string;password:string}|null{
   if(!value.startsWith(LOGIN_PREFIX))return null;
-  const payload=value.slice(LOGIN_PREFIX.length);const separator=payload.indexOf("\u0000");
-  if(separator<1)return null;return{id:payload.slice(0,separator),password:payload.slice(separator+1)};
+  const payload=value.slice(LOGIN_PREFIX.length);const separator=payload.indexOf(":");
+  if(separator<1)return null;
+  try{return{id:decodeURIComponent(payload.slice(0,separator)),password:decodeURIComponent(payload.slice(separator+1))};}catch{return null;}
 }
 
 export class SecurityPolicy {
