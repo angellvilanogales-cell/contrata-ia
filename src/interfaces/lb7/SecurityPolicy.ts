@@ -6,6 +6,7 @@ export interface AuthenticatedActor { readonly id: string; readonly role: Applic
 
 const RANK: Readonly<Record<ApplicationRole, number>> = { VIEWER: 1, OPERATOR: 2, REVIEWER: 3, ADMIN: 4 };
 const SESSION_COOKIE = "contrata_ia_token";
+const LOGIN_PREFIX = "LOGIN\u0000";
 const ROLES=new Set<ApplicationRole>(["VIEWER","OPERATOR","REVIEWER","ADMIN"]);
 
 function equalSecret(candidate: string, expected: string): boolean {
@@ -46,6 +47,12 @@ function namedUsers(raw:string|undefined):NamedUserConfig[]{
   return users;
 }
 
+function parseLoginEnvelope(value:string):{id:string;password:string}|null{
+  if(!value.startsWith(LOGIN_PREFIX))return null;
+  const payload=value.slice(LOGIN_PREFIX.length);const separator=payload.indexOf("\u0000");
+  if(separator<1)return null;return{id:payload.slice(0,separator),password:payload.slice(separator+1)};
+}
+
 export class SecurityPolicy {
   private readonly tokens: readonly { token: string; actor: AuthenticatedActor }[];
   private readonly required: boolean;
@@ -57,9 +64,7 @@ export class SecurityPolicy {
     const tokens: { token: string; actor: AuthenticatedActor }[] = [];
     const users=namedUsers(environment.CONTRATA_IA_USERS_JSON);this.namedUsersValue=users;this.namedIdentityCountValue=users.length;
     for(const user of users)tokens.push({token:user.token,actor:{id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{}),namedIdentity:true}});
-    const add = (token: string | undefined, id: string, role: ApplicationRole): void => {
-      if (token) tokens.push({ token, actor: { id, role, namedIdentity:false } });
-    };
+    const add = (token: string | undefined, id: string, role: ApplicationRole): void => { if (token) tokens.push({ token, actor: { id, role, namedIdentity:false } }); };
     add(environment.CONTRATA_IA_VIEWER_TOKEN, "viewer", "VIEWER");
     add(environment.CONTRATA_IA_OPERATOR_TOKEN, "operator", "OPERATOR");
     add(environment.CONTRATA_IA_REVIEWER_TOKEN, "reviewer", "REVIEWER");
@@ -80,12 +85,14 @@ export class SecurityPolicy {
     return {id:user.id,role:user.role,...(user.displayName?{displayName:user.displayName}:{}),namedIdentity:true};
   }
 
-  public sessionCookieForNamedUser(id:string,password:string):{actor:AuthenticatedActor;cookie:string}{
-    const actor=this.authenticateNamedUser(id,password);const user=this.namedUsersValue.find(item=>item.id===actor.id)!;
-    return{actor,cookie:this.sessionCookie(user.token)};
+  private internalTokenForNamedUser(id:string,password:string):string{
+    const actor=this.authenticateNamedUser(id,password);const user=this.namedUsersValue.find(item=>item.id===actor.id);
+    if(!user)throw new Error("Usuario o contraseña no válidos.");return user.token;
   }
 
   public authenticateToken(token: string): AuthenticatedActor {
+    const envelope=parseLoginEnvelope(token);
+    if(envelope)return this.authenticateNamedUser(envelope.id,envelope.password);
     const found = this.tokens.find(entry => equalSecret(token, entry.token));
     if (found) return found.actor;
     if (!this.required && token === "") return { id: "development-user", role: "ADMIN", namedIdentity:false };
@@ -103,8 +110,9 @@ export class SecurityPolicy {
   }
 
   public sessionCookie(token: string): string {
-    this.authenticateToken(token);
-    return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
+    const envelope=parseLoginEnvelope(token);const internal=envelope?this.internalTokenForNamedUser(envelope.id,envelope.password):token;
+    this.authenticateToken(internal);
+    return `${SESSION_COOKIE}=${encodeURIComponent(internal)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
   }
 
   public clearSessionCookie(): string {
