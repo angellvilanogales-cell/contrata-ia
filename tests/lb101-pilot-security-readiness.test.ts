@@ -14,6 +14,21 @@ describe("LB101 seguridad de piloto",()=>{
     const policy=new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"gestor.a",role:"OPERATOR",token:"token-operador-0001"},{id:"revisor.b",role:"REVIEWER",token:"token-revisor--0002"}])});
     expect(policy.namedIdentityCount()).toBe(2);expect(policy.authenticateToken("token-operador-0001").id).toBe("gestor.a");expect(policy.authenticateToken("token-revisor--0002").role).toBe("REVIEWER");expect(()=>policy.require(policy.authenticateToken("token-operador-0001"),"REVIEWER")).toThrow(/Permiso insuficiente/);
   });
+  it("permite usuario y contraseña sin exponer la contraseña en la sesión",()=>{
+    const internalToken="token-interno-admin-0001";const password="ClavePiloto-2026!";
+    const policy=new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"usuario-piloto-1",displayName:"Usuario piloto 1",role:"ADMIN",token:internalToken,password}])});
+    expect(policy.namedPasswordCount()).toBe(1);
+    expect(policy.authenticateNamedUser("usuario-piloto-1",password)).toMatchObject({id:"usuario-piloto-1",role:"ADMIN",namedIdentity:true});
+    expect(()=>policy.authenticateNamedUser("usuario-piloto-1","ClaveIncorrecta-2026")).toThrow(/Usuario o contraseña/);
+    const envelope="LOGIN\u0000usuario-piloto-1\u0000"+password;
+    expect(policy.authenticateToken(envelope).id).toBe("usuario-piloto-1");
+    const cookie=policy.sessionCookie(envelope);
+    expect(cookie).toContain("contrata_ia_token="+internalToken);
+    expect(cookie).not.toContain(password);
+    expect(cookie).toContain("HttpOnly");expect(cookie).toContain("Secure");expect(cookie).toContain("SameSite=Strict");expect(cookie).toContain("Max-Age=604800");
+    expect(policy.authenticateToken(internalToken).id).toBe("usuario-piloto-1");
+  });
+  it("rechaza contraseña igual al token interno",()=>{const secret="credencial-igual-0001";expect(()=>new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"usuario1",role:"ADMIN",token:secret,password:secret}])})).toThrow(/distinta del token/i);});
   it("rechaza credenciales nominativas compartidas",()=>{expect(()=>new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"a1",role:"OPERATOR",token:"token-compartido-0001"},{id:"b2",role:"REVIEWER",token:"token-compartido-0001"}])})).toThrow(/compartir|duplicad/i);});
   it("detecta alteración de auditoría append-only",()=>{const root=tmp();const file=path.join(root,"audit.jsonl");const audit=new PilotAccessAudit(file);audit.record({timestamp:"2026-08-28T10:00:00Z",actor:"gestor.a",action:"OPEN_CASE",caseId:"REG-SUPPLY-001",outcome:"SUCCESS"});audit.record({timestamp:"2026-08-28T10:01:00Z",actor:"revisor.b",action:"VALIDATE",caseId:"REG-SUPPLY-001",outcome:"SUCCESS"});expect(audit.verify().valid).toBe(true);const rows=fs.readFileSync(file,"utf8").replace("OPEN_CASE","DELETE_CASE");fs.writeFileSync(file,rows);expect(new PilotAccessAudit(file).verify().valid).toBe(false);});
   it("versiona paquetes aceptados sin sobrescribir y verifica SHA",()=>{const root=tmp();const store=new PilotDocumentVersionStore(path.join(root,"versions"));store.save({caseId:"REG-SUPPLY-001",actorId:"revisor.b",fileName:"v1.zip",bytes:Buffer.from("uno"),sourceCommit:"abc",humanAccepted:true});store.save({caseId:"REG-SUPPLY-001",actorId:"revisor.b",fileName:"v2.zip",bytes:Buffer.from("dos"),sourceCommit:"def",humanAccepted:true});expect(store.list("REG-SUPPLY-001").map(x=>x.version)).toEqual([1,2]);expect(store.verify("REG-SUPPLY-001").valid).toBe(true);});
