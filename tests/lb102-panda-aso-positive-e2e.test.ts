@@ -32,6 +32,7 @@ describe("LB102 Panda ASO software real E2E",()=>{
   expect(out.manifest?.profile).toBe("SUPPLY_ASO_SOFTWARE_AUTOFINANCED_LB102");expect(out.manifest?.sourceRegression).toBe("REG-SUPPLY-002");expect(out.manifest?.productionReady).toBe(false);
   expect(out.manifest?.documents.map(x=>x.kind).sort()).toEqual(["MEMORIA","PCAP","PPT"]);expect(out.manifest?.documents.every(x=>x.officialModel===false)).toBe(true);
  });
+ it("es determinista para el mismo expediente y fuentes físicas",async()=>{const a=await generateSupplyAsoUserDocumentPackage({record,templateStore:store});const b=await generateSupplyAsoUserDocumentPackage({record,templateStore:store});expect(a.ready).toBe(true);expect(b.ready).toBe(true);expect(a.sha256).toBe(b.sha256);expect(Buffer.from(a.bytes??[]).equals(Buffer.from(b.bytes??[]))).toBe(true);});
  it("bloquea cualquier intento de aplicar DA 33/pedidos sucesivos al perfil Panda",async()=>{
   const contaminated:UniversalEvidenceRecord={...record,fields:{...record.fields,"technical.hasSuccessiveOrders":validated("technical.hasSuccessiveOrders",true)}};
   const out=await generateSupplyAsoUserDocumentPackage({record:contaminated,templateStore:store});expect(out.ready).toBe(false);expect(out.blockers.join(" ")).toMatch(/DA 33/);
