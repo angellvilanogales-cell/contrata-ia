@@ -1,0 +1,28 @@
+name: Contrata-IA Generation Gate
+
+on:
+  push:
+    branches:
+      - agent/lb91-universalizacion-operativa
+      - agent/lb7-qa-seguridad-v1
+  pull_request:
+    branches:
+      - agent/lb7-qa-seguridad-v1
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generation:
+    name: Generate and audit editable procurement packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:generation
