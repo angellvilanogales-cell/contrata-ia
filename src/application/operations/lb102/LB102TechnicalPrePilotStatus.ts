@@ -28,7 +28,6 @@ export function evaluateLB102TechnicalPrePilot(input:LB102TechnicalPrePilotInput
   distinctPilotUsers:0,
   criticalDefectsOpen:0,
   generatedPackagesHumanReviewed:0,
-  distinctCasesHumanReviewed:0,
   acceptanceDecisionRecorded:false,
  });
 }
