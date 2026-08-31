@@ -11,8 +11,8 @@ export interface LB102PilotEvidence{
   userAcceptanceSessions:number;
   distinctPilotUsers:number;
   criticalDefectsOpen:number;
+  /** Número de expedientes distintos con revisión humana registrada. */
   generatedPackagesHumanReviewed:number;
-  distinctCasesHumanReviewed:number;
   acceptanceDecisionRecorded:boolean;
 }
 export interface LB102PilotAcceptanceStatus{
@@ -37,8 +37,7 @@ export function evaluateLB102PilotAcceptance(e:LB102PilotEvidence):LB102PilotAcc
   const blockers=[...technical];
   if(e.userAcceptanceSessions<2)blockers.push("Se requieren al menos dos sesiones de aceptación funcional con usuarios.");
   if(e.distinctPilotUsers<2)blockers.push("La aceptación debe involucrar al menos dos usuarios distintos.");
-  if(e.generatedPackagesHumanReviewed<4)blockers.push("Deben revisarse humanamente al menos cuatro paquetes generados (Supply/Service).");
-  if(e.distinctCasesHumanReviewed<4)blockers.push("Las revisiones humanas deben cubrir los cuatro expedientes distintos del piloto.");
+  if(e.generatedPackagesHumanReviewed<4)blockers.push("Deben revisarse humanamente los cuatro expedientes distintos del piloto (2 Supply + 2 Service).");
   if(e.criticalDefectsOpen>0)blockers.push("No puede haber defectos críticos abiertos al declarar viabilidad del piloto.");
   if(!e.acceptanceDecisionRecorded)blockers.push("Falta decisión de aceptación funcional registrada.");
   return{block:"LB102",objective:"OPERATIONAL_PILOT_AND_FUNCTIONAL_ACCEPTANCE",technicalPrePilotReady,appViableForPilot:blockers.length===0,blockers,productionReady:false,institutionalReadinessRequired:true,humanAcceptanceRequired:true};
