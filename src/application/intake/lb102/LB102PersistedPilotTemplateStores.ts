@@ -2,7 +2,7 @@ import {HttpPersistedTemplateAssetStore,type PersistedTemplateAssetDescriptor,LB
 import {FERRETERIA_MEMORY_TEMPLATE_ID,FERRETERIA_PPT_TEMPLATE_ID} from "../lb59/FerreteriaSourceBackedProtectedRenderers";
 
 const PANDA_STYLE="sha256:049071c575580cb7080b5f9c530523e2c3160bec87902205592c36225cc67064";
-const SERVICE_STYLE="sha256:ab69d4c2e87c1873c2bb3ccba87132e931ef0fff85273b1313df4245b50f002a";
+const SERVICE_STYLE_V2="sha256:7caa80e68cf19d03cfd70538125c1762f79fadbe2b4a4e3f9af2203f7492027d";
 
 export const LB102_FERRETERIA_SOURCE_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
  {kind:"MEMORIA",templateId:FERRETERIA_MEMORY_TEMPLATE_ID,sourceId:"real-case:CONTR/2026/240267:memoria:v12",sha256:"36ed482048e19bc8b1f9c4fe1b8f1bd47eb81ac9e256dd4f0488e7bc97b8e4dc",styleFingerprint:"sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d",provenanceRole:"VALIDATED_REAL_CASE_SOURCE"},
@@ -16,9 +16,9 @@ export const LB102_PANDA_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
  {kind:"PPT",templateId:"contrata-ia:supply:ppt:aso:software:LB102-V1",sourceId:"contrata-ia:supply:ppt:aso:software:LB102-V1",sha256:"bd9e7c31f6705ba23815b127e09185eefb6dc4685990daaa32a1407c16b15264",styleFingerprint:PANDA_STYLE,provenanceRole:"CONTRATA_IA_DERIVED_SUBFAMILY_TEMPLATE"},
 ] as const;
 export const LB102_SERVICE_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
- {kind:"PCAP",templateId:"contrata-ia:service:pcap:strict-pilot:LB102-V1",sourceId:"contrata-ia:service:pcap:strict-pilot:LB102-V1",sha256:"d2ee1cc5d99660b2486bfb4b4e1cd3992bed36ae298ff5bbc9663869a4f66299",styleFingerprint:SERVICE_STYLE,provenanceRole:"CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE"},
- {kind:"MEMORIA",templateId:"contrata-ia:service:memory:strict-pilot:LB102-V1",sourceId:"contrata-ia:service:memory:strict-pilot:LB102-V1",sha256:"5bd6d1f046e340a69e7b15a9ea8cdd88cb2b0ead4bfeaa0221aedbcc951eb774",styleFingerprint:SERVICE_STYLE,provenanceRole:"CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE"},
- {kind:"PPT",templateId:"contrata-ia:service:ppt:strict-pilot:LB102-V1",sourceId:"contrata-ia:service:ppt:strict-pilot:LB102-V1",sha256:"c3d646a4e1c986c73d463c0a8de908a67e3f16f7581fe0bc1f400ef8b5248115",styleFingerprint:SERVICE_STYLE,provenanceRole:"CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE"},
+ {kind:"PCAP",templateId:"contrata-ia:service:pcap:strict-pilot:LB102-V2",sourceId:"source-structural:service:pcap:LB102-V2",sha256:"fe4fd96179c13dfe1ab72150ee17e49190001d2a0920c5040fb8298f94296214",styleFingerprint:SERVICE_STYLE_V2,provenanceRole:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE"},
+ {kind:"MEMORIA",templateId:"contrata-ia:service:memory:strict-pilot:LB102-V2",sourceId:"source-structural:service:memory:LB102-V2",sha256:"540d557e70621f3a041fb193b2f3ddba9543c247e36f4dc45c123a0971d869fe",styleFingerprint:SERVICE_STYLE_V2,provenanceRole:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE"},
+ {kind:"PPT",templateId:"contrata-ia:service:ppt:strict-pilot:LB102-V2",sourceId:"source-structural:service:ppt:LB102-V2",sha256:"8e6aa998d71234e4a91ea597f2301ff923248ab8adb5e9b01e83ba60a438e4d1",styleFingerprint:SERVICE_STYLE_V2,provenanceRole:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE"},
 ] as const;
 function env(manifest:readonly PersistedTemplateAssetDescriptor[]){const endpoint=process.env.CONTRATA_IA_PERSISTENCE_URL?.trim();const token=process.env.CONTRATA_IA_PERSISTENCE_TOKEN?.trim();if(!endpoint||!token)return null;return new HttpPersistedTemplateAssetStore(endpoint,token,manifest);}
 export function createLB102FerreteriaTemplateStoreFromEnv(){return env(LB102_FERRETERIA_RUNTIME_ASSETS);}
