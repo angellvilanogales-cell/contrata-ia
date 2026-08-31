@@ -14,7 +14,7 @@ function requiredAsset(index:number){const asset=LB102_PANDA_ASSETS[index];if(!a
 const SPECS={
  PCAP:{asset:requiredAsset(0),tokens:{caseId:1,cpvMain:1},markers:["PROCEDIMIENTO ABIERTO SIMPLIFICADO ORDINARIO","I. ELEMENTOS DEL CONTRATO","IV. EXTINCIÓN DEL CONTRATO"]},
  MEMORIA:{asset:requiredAsset(1),tokens:{caseId:1,cpvMain:1},markers:["1. NATURALEZA Y OBJETO DEL CONTRATO","14. SOLICITUD DE INFORME PRECEPTIVO PREVIO A LA CONTRATACIÓN","Página de 1 de 5"]},
- PPT:{asset:requiredAsset(2),tokens:{caseId:2},markers:["1 INTRODUCCIÓN","4.11 Seguridad","Página 2 de 16"]},
+ PPT:{asset:requiredAsset(2),tokens:{caseId:1},markers:["1 INTRODUCCIÓN","4.11 Seguridad","Página 2 de 16"]},
 } as const;
 
 type Kind=keyof typeof SPECS;
