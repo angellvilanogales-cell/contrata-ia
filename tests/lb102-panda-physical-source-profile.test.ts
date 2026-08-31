@@ -10,6 +10,10 @@ describe("LB102 Panda physical source gate",()=>{
   expect(LB102_PANDA_PHYSICAL_SOURCE_PROFILE.MEMORIA.requiredVisualFeatures).toContain("VERIFICATION_FOOTER");
   expect(Object.values(LB102_PANDA_PHYSICAL_SOURCE_PROFILE).every(x=>x.neverGeneralModel&&x.sourceRole==="VALIDATED_REAL_CASE_REGRESSION_SOURCE")).toBe(true);
  });
+ it("fija la Parte IV del PCAP conforme a la fuente Panda real",()=>{
+  expect(LB102_PANDA_PHYSICAL_SOURCE_PROFILE.PCAP.requiredHeadings).toContain("IV. PRERROGATIVAS DE LA ADMINISTRACIÓN, JURISDICCIÓN Y RECURSOS");
+  expect(LB102_PANDA_PHYSICAL_SOURCE_PROFILE.PCAP.requiredHeadings).not.toContain("IV. EXTINCIÓN DEL CONTRATO");
+ });
  it("bloquea una salida Panda abreviada aunque contenga datos del expediente",()=>{
   const out=comparePandaAgainstPhysicalSource({kind:"PPT",pageCount:2,text:"CONTR 2025 466864 PANDA SECURITY 1 INTRODUCCIÓN 2 ALCANCE DE LOS TRABAJOS",visualFeatures:visuals("PPT")});
   expect(out.passed).toBe(false);expect(out.pageCountMatched).toBe(false);expect(out.blockers.some(x=>x.includes("fuente 16"))).toBe(true);expect(out.missingHeadings).toContain("4.11 Seguridad");
