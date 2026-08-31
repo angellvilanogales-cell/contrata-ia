@@ -9,11 +9,12 @@ function sha(bytes:Uint8Array){return createHash("sha256").update(bytes).digest(
 function esc(v:string){return v.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&apos;");}
 function odtText(bytes:Uint8Array){const e=readOdtZip(bytes).find(x=>x.name==="content.xml");return e?Buffer.from(e.bytes).toString("utf8").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/\s+/g," "):"";}
 function validatedText(record:UniversalEvidenceRecord,path:string){const f=record.fields[path];if(!f||f.status!=="HUMAN_VALIDATED"||!f.humanValidated||typeof f.value!=="string"||!f.value.trim())throw new Error(`${path} no está validado para Panda source-backed.`);return f.value.trim();}
+function requiredAsset(index:number){const asset=LB102_PANDA_ASSETS[index];if(!asset)throw new Error(`Manifiesto Panda V3 incompleto en índice ${index}.`);return asset;}
 
 const SPECS={
- PCAP:{asset:LB102_PANDA_ASSETS[0],tokens:{caseId:1,cpvMain:1},markers:["PROCEDIMIENTO ABIERTO SIMPLIFICADO ORDINARIO","I. ELEMENTOS DEL CONTRATO","IV. EXTINCIÓN DEL CONTRATO"]},
- MEMORIA:{asset:LB102_PANDA_ASSETS[1],tokens:{caseId:1,cpvMain:1},markers:["1. NATURALEZA Y OBJETO DEL CONTRATO","14. SOLICITUD DE INFORME PRECEPTIVO PREVIO A LA CONTRATACIÓN","Página de 1 de 5"]},
- PPT:{asset:LB102_PANDA_ASSETS[2],tokens:{caseId:2},markers:["1 INTRODUCCIÓN","4.11 Seguridad","Página 2 de 16"]},
+ PCAP:{asset:requiredAsset(0),tokens:{caseId:1,cpvMain:1},markers:["PROCEDIMIENTO ABIERTO SIMPLIFICADO ORDINARIO","I. ELEMENTOS DEL CONTRATO","IV. EXTINCIÓN DEL CONTRATO"]},
+ MEMORIA:{asset:requiredAsset(1),tokens:{caseId:1,cpvMain:1},markers:["1. NATURALEZA Y OBJETO DEL CONTRATO","14. SOLICITUD DE INFORME PRECEPTIVO PREVIO A LA CONTRATACIÓN","Página de 1 de 5"]},
+ PPT:{asset:requiredAsset(2),tokens:{caseId:2},markers:["1 INTRODUCCIÓN","4.11 Seguridad","Página 2 de 16"]},
 } as const;
 
 type Kind=keyof typeof SPECS;
@@ -38,5 +39,5 @@ export async function generatePandaSourceBackedPilotPackage(input:{record:Univer
   const safe=input.record.caseId.replaceAll("/","-").replaceAll(" ","-");const docs=[{kind:"PCAP" as const,fileName:`PCAP_${safe}_Panda_SourceBacked.odt`,bytes:pcap},{kind:"MEMORIA" as const,fileName:`Memoria_${safe}_Panda_SourceBacked.odt`,bytes:memoria},{kind:"PPT" as const,fileName:`PPT_${safe}_Panda_SourceBacked.odt`,bytes:ppt}];
   const manifest={schemaVersion:1,caseId:input.record.caseId,profile:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V3" as const,sourceAuthority:"REG-SUPPLY-002_PHYSICAL_SOURCE",neverGeneralModel:true as const,documents:docs.map(d=>({kind:d.kind,fileName:d.fileName,sha256:sha(d.bytes),provenance:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",officialModel:false as const})),sourcePhysicalPages:{MEMORIA:5,PCAP:85,PPT:16},crossDocumentAuditReady:true,humanAcceptanceRequired:true as const,productionReady:false as const};
   const bytes=zipStoredFiles([...docs.map(d=>({name:d.fileName,bytes:d.bytes})),{name:"manifest.json",bytes:Buffer.from(JSON.stringify(manifest,null,2),"utf8")}]);return{ready:true,fileName:`Contrata-IA_${safe}_Panda_SourceBacked.zip`,bytes,sha256:sha(bytes),manifest,blockers:[] as string[]};
- }catch(error){return{ready:false,fileName:null,bytes:null,sha256:null,manifest:null,blockers:[error instanceof Error?error.message:String(error)]};}
+ }catch(error){return{ready:false,fileName:null,bytes:null,sha256:null,manifest:null,blockers:[error instanceof Error?error.message:String(error)]};
 }
