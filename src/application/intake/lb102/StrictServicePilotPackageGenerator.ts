@@ -19,6 +19,7 @@ export interface StrictServicePilotSnapshot{
 function hash(bytes:Uint8Array){return createHash("sha256").update(bytes).digest("hex");}
 function esc(v:string){return v.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&apos;");}
 function text(bytes:Uint8Array){const e=readOdtZip(bytes).find(x=>x.name==="content.xml");return e?Buffer.from(e.bytes).toString("utf8").replace(/<[^>]+>/g," ").replace(/\s+/g," "):"";}
+function requireTerm(label:string,term:string,targets:readonly {name:string;text:string}[]){if(!term.trim())throw new Error(`Auditoría cruzada Service: ${label} vacío.`);for(const target of targets)if(!target.text.includes(term))throw new Error(`Auditoría cruzada Service: ${target.name} no materializa ${label}=${term}.`);}
 async function render(kind:StrictServiceDocumentKind,s:StrictServicePilotSnapshot,store:UniversalEditableTemplateBinaryStore){
  const spec=TEMPLATES[kind],source=await store.get(spec.templateId);if(!source)throw new Error(`Falta activo físico ${spec.templateId}.`);
  if(hash(source.bytes)!==spec.sha256)throw new Error(`Integridad física Service ${kind}: SHA-256 no coincide.`);
@@ -36,9 +37,16 @@ export async function generateStrictServicePilotPackage(input:{snapshot:StrictSe
   if(!s.sourceConfirmed||s.sourceConflict)throw new Error("El expediente Service no tiene snapshot primario confirmado y libre de conflictos.");
   if(s.sourceReferences.length<3)throw new Error("El piloto Service exige trazabilidad a Memoria, PCAP y PPT primarios.");
   const pcap=await render("PCAP",s,input.templateStore),memory=await render("MEMORY",s,input.templateStore),ppt=await render("PPT",s,input.templateStore);
-  const texts=[text(pcap),text(memory),text(ppt)];for(const [label,term] of Object.entries(s.auditTerms)){if(!term.trim()||!texts.some(t=>t.includes(term)))throw new Error(`Auditoría cruzada Service: no se materializa ${label}=${term}.`);}
+  const docs={PCAP:text(pcap),MEMORY:text(memory),PPT:text(ppt)};
+  const all=[{name:"PCAP",text:docs.PCAP},{name:"MEMORY",text:docs.MEMORY},{name:"PPT",text:docs.PPT}] as const;
+  const admin=[{name:"PCAP",text:docs.PCAP},{name:"MEMORY",text:docs.MEMORY}] as const;
+  requireTerm("caseId",s.caseId,all);
+  requireTerm("object",s.auditTerms.object,all);
+  requireTerm("cpv",s.auditTerms.cpv,admin);
+  requireTerm("pbl",s.auditTerms.pbl,admin);
+  requireTerm("estimatedValue",s.auditTerms.estimatedValue,admin);
   const safe=s.caseId.replaceAll("/","-").replaceAll(" ","-");const documents=[{kind:"PCAP" as const,fileName:`PCAP_${safe}.odt`,bytes:pcap},{kind:"MEMORY" as const,fileName:`Memoria_${safe}.odt`,bytes:memory},{kind:"PPT" as const,fileName:`PPT_${safe}.odt`,bytes:ppt}];
-  const manifest={caseId:s.caseId,profile:"SERVICE_STRICT_PILOT_LB102" as const,sourceAuthority:s.sourceAuthority,sourceReferences:s.sourceReferences,documents:documents.map(d=>({kind:d.kind,fileName:d.fileName,sha256:hash(d.bytes),provenance:"CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE",officialModel:false as const})),crossDocumentAuditReady:true,packageCompleteForPilot:true,humanAcceptanceRequired:true as const,productionReady:false as const};
+  const manifest={schemaVersion:1,caseId:s.caseId,profile:"SERVICE_STRICT_PILOT_LB102" as const,sourceAuthority:s.sourceAuthority,sourceReferences:s.sourceReferences,documents:documents.map(d=>({kind:d.kind,fileName:d.fileName,sha256:hash(d.bytes),provenance:"CONTRATA_IA_DERIVED_STRICT_PILOT_TEMPLATE",officialModel:false as const})),crossDocumentAuditReady:true,packageCompleteForPilot:true,humanAcceptanceRequired:true as const,productionReady:false as const};
   const bytes=zipStoredFiles([...documents.map(d=>({name:d.fileName,bytes:d.bytes})),{name:"manifest.json",bytes:Buffer.from(JSON.stringify(manifest,null,2),"utf8")}]);return{ready:true,fileName:`Contrata-IA_${safe}_Service_Strict.zip`,bytes,sha256:hash(bytes),manifest,blockers};
  }catch(error){blockers.push(error instanceof Error?error.message:String(error));return{ready:false,fileName:null,bytes:null,sha256:null,manifest:null,blockers};}
 }
