@@ -54,6 +54,7 @@ function crossAudit(pcap: Uint8Array, memory: Uint8Array, ppt: Uint8Array): stri
  * Paquete físico del golden case Ferretería.
  * Nunca cae a plantillas generales: si faltan los ODT fuente exactos de Memoria
  * o PPT, devuelve MISSING_SOURCE y bloquea la aceptación humana.
+ * El ZIP es determinista: iguales fuentes y reglas producen el mismo SHA-256.
  */
 export async function generateFerreteriaPilotPackage(templateStore: UniversalEditableTemplateBinaryStore): Promise<FerreteriaPilotPackageResult> {
   try {
@@ -87,9 +88,9 @@ export async function generateFerreteriaPilotPackage(templateStore: UniversalEdi
       { kind: "PPT" as const, fileName: ppt.fileName, bytes: ppt.bytes, sha256: ppt.renderedSha256, provenance: "FERRETERIA_SOURCE_V6+LB59_PROTECTED_RENDER" },
     ];
     const manifest = {
+      schemaVersion: 1,
       caseId: "CONTR/2026/240267",
       profile: "FERRETERIA_SUPPLY_ASA_DA33_LB102_PROTECTED",
-      generatedAt: new Date().toISOString(),
       documents: documents.map(({ kind, fileName, sha256: hash, provenance }) => ({ kind, fileName, sha256: hash, provenance, auditReady: true, blockers: [] })),
       crossDocumentAuditReady: true,
       blockers: [] as string[],
