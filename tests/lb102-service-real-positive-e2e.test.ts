@@ -18,6 +18,7 @@ describe("LB102 Service real strict E2E",()=>{
   expect(out.manifest?.documents.map(x=>x.kind).sort()).toEqual(["MEMORY","PCAP","PPT"]);expect(out.manifest?.documents.every(x=>x.officialModel===false)).toBe(true);
   const joined=JSON.stringify(snapshot.values);expect(joined).toContain(termA);expect(joined).toContain(termB);
  });
+ it.each([["Huelva",LB102_SERVICE_HUELVA],["5G",LB102_SERVICE_5G]])("produce SHA estable para %s con iguales fuentes",async(_label,snapshot)=>{const a=await generateStrictServicePilotPackage({snapshot,templateStore:store});const b=await generateStrictServicePilotPackage({snapshot,templateStore:store});expect(a.ready).toBe(true);expect(b.ready).toBe(true);expect(a.sha256).toBe(b.sha256);expect(Buffer.from(a.bytes??[]).equals(Buffer.from(b.bytes??[]))).toBe(true);});
  it("bloquea un expediente Service con conflicto de fuente",async()=>{
   const snapshot={...LB102_SERVICE_HUELVA,sourceConflict:true as true,sourceConfirmed:true as true};
   const out=await generateStrictServicePilotPackage({snapshot:snapshot as never,templateStore:store});expect(out.ready).toBe(false);expect(out.blockers.join(" ")).toMatch(/conflict/i);
