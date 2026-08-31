@@ -30,7 +30,14 @@ function cookieValue(request: IncomingMessage, name: string): string | undefined
 interface NamedUserConfig {id:string;role:ApplicationRole;token:string;password?:string;displayName?:string;}
 function namedUsers(raw:string|undefined):NamedUserConfig[]{
   if(!raw?.trim())return[];
-  let parsed:unknown;try{parsed=JSON.parse(raw);}catch{throw new Error("CONTRATA_IA_USERS_JSON no contiene JSON válido.");}
+  let parsed:unknown;
+  try{parsed=JSON.parse(raw);}catch{
+    // Un error de sintaxis en la configuración nominativa no debe tumbar todo el
+    // runtime si existen credenciales técnicas heredadas válidas. Al devolver
+    // cero identidades nominativas, LB101/LB102 siguen bloqueando correctamente
+    // la aceptación humana hasta que la configuración se repare.
+    return[];
+  }
   if(!Array.isArray(parsed))throw new Error("CONTRATA_IA_USERS_JSON debe ser una lista de usuarios.");
   const users:NamedUserConfig[]=[];const ids=new Set<string>();const tokens=new Set<string>();
   for(const [index,item] of parsed.entries()){
@@ -72,7 +79,7 @@ export class SecurityPolicy {
     add(environment.CONTRATA_IA_ADMIN_TOKEN, "admin", "ADMIN");
     const duplicateSecrets=new Set<string>();const seen=new Set<string>();for(const entry of tokens){if(seen.has(entry.token))duplicateSecrets.add(entry.token);seen.add(entry.token);}if(duplicateSecrets.size)throw new Error("No se permiten credenciales duplicadas entre identidades/roles.");
     this.tokens = tokens;
-    if (this.required && this.tokens.length === 0) throw new Error("Producción requiere al menos una credencial CONTRATA_IA_USERS_JSON o CONTRATA_IA_*_TOKEN.");
+    if (this.required && this.tokens.length === 0) throw new Error("Producción requiere al menos una credencial válida. Si CONTRATA_IA_USERS_JSON está malformado, repárelo o mantenga una credencial técnica CONTRATA_IA_*_TOKEN durante la fase de recuperación.");
   }
 
   public namedIdentityCount():number{return this.namedIdentityCountValue;}
