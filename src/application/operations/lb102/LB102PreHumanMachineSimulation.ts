@@ -47,14 +47,15 @@ export function evaluateLB102PreHumanMachineSimulation(
 }
 
 /**
- * Estado de acreditación física actualmente exigible por expediente.
- * Ferretería usa Memoria/PPT fuente exactas + PCAP oficial protegido.
- * Panda y Service continúan bloqueados hasta promover una plantilla cuya
- * estructura/estilo haya sido comparada contra las fuentes administrativas.
+ * Política de fidelidad física del piloto.
+ * - Ferretería: fuente exacta protegida cuando sus binarios originales están disponibles.
+ * - Service V2: plantilla DERIVADA, no oficial, promovida únicamente para estructura/estilo
+ *   tras contraste con Memoria/PPT Huelva y PCAP/PPT 5G del corpus real del proyecto.
+ * - Panda permanece pendiente de promoción física específica ASO/software.
  */
 export const LB102_SOURCE_FIDELITY_POLICY:Readonly<Record<LB102PilotPackageId,{level:LB102SourceFidelityLevel;accredited:boolean;reason:string}>>={
  "supply-ferreteria":{level:"EXACT_VALIDATED_SOURCE_STYLE",accredited:true,reason:"PCAP oficial y Memoria/PPT del expediente real protegidos por SHA y huella de estilo."},
  "supply-panda":{level:"DERIVED_STYLE_PENDING_COMPARISON",accredited:false,reason:"La plantilla ASO actual es derivada y todavía no tiene comparación física/promoción frente al expediente Panda de referencia."},
- "service-huelva":{level:"DERIVED_STYLE_PENDING_COMPARISON",accredited:false,reason:"La plantilla Service estricta actual es derivada y todavía no reproduce/acredita físicamente el modelo real de servicios de Junta/SAE."},
- "service-5g":{level:"DERIVED_STYLE_PENDING_COMPARISON",accredited:false,reason:"La plantilla Service estricta actual es derivada y todavía no reproduce/acredita físicamente el modelo real de servicios de Junta/SAE."},
+ "service-huelva":{level:"PROMOTED_SOURCE_DERIVED_STYLE",accredited:true,reason:"Service V2 deriva estructura física de fuentes reales Huelva/5G: cabecera institucional, jerarquía administrativa, tablas, anexos y paginación; officialModel=false."},
+ "service-5g":{level:"PROMOTED_SOURCE_DERIVED_STYLE",accredited:true,reason:"Service V2 deriva estructura física de fuentes reales Huelva/5G y conserva separación entre contenido del expediente y plantilla estructural; officialModel=false."},
 };
