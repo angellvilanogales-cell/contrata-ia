@@ -16,11 +16,20 @@ describe("LB102 Panda physical source gate",()=>{
   expect(out.blockers.some(x=>x.includes("fuente 16"))).toBe(true);
   expect(out.missingHeadings).toContain("4.11 Seguridad");
  });
- it("solo acredita comparación cuando coinciden profundidad, epígrafes y marcadores",()=>{
+ it("bloquea expresamente el prototipo V2 actual: 7 páginas y placeholders visibles",()=>{
+  const text=[...LB102_PANDA_PHYSICAL_SOURCE_PROFILE.MEMORIA.requiredHeadings,...LB102_PANDA_PHYSICAL_SOURCE_PROFILE.MEMORIA.requiredMarkers,"DATOS VARIABLES DEL EXPEDIENTE · CONTRATA-IA · caseId: {{caseId}} · need: {{need}} · object: {{object}} · cpvMain: {{cpvMain}}"].join("\n");
+  const out=comparePandaAgainstPhysicalSource({kind:"MEMORIA",pageCount:7,text});
+  expect(out.passed).toBe(false);
+  expect(out.pageCountMatched).toBe(false);
+  expect(out.forbiddenMarkersFound).toContain("{{caseId}}");
+  expect(out.forbiddenMarkersFound).toContain("CONTRATA-IA");
+  expect(out.forbiddenMarkersFound).toContain("DATOS VARIABLES DEL EXPEDIENTE");
+ });
+ it("solo acredita comparación cuando coinciden profundidad, epígrafes y marcadores y no existen marcadores impropios",()=>{
   const p=LB102_PANDA_PHYSICAL_SOURCE_PROFILE.MEMORIA;
   const text=[...p.requiredHeadings,...p.requiredMarkers].join("\n");
   const out=comparePandaAgainstPhysicalSource({kind:"MEMORIA",pageCount:5,text});
-  expect(out.passed).toBe(true);expect(out.blockers).toEqual([]);
+  expect(out.passed).toBe(true);expect(out.blockers).toEqual([]);expect(out.forbiddenMarkersFound).toEqual([]);
  });
  it("mantiene Panda fuera de UAT mientras la plantilla desplegada no supere el perfil físico",()=>{
   expect(LB102_SOURCE_FIDELITY_POLICY["supply-panda"].accredited).toBe(false);
