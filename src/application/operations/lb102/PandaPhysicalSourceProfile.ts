@@ -6,6 +6,7 @@ export interface PandaPhysicalSourceDocumentProfile{
  readonly sourcePages:number;
  readonly requiredHeadings:readonly string[];
  readonly requiredMarkers:readonly string[];
+ readonly forbiddenMarkers:readonly string[];
  readonly sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE";
  readonly neverGeneralModel:true;
 }
@@ -37,6 +38,7 @@ export const LB102_PANDA_PHYSICAL_SOURCE_PROFILE:Readonly<Record<PandaDocumentKi
    "14. SOLICITUD DE INFORME PRECEPTIVO PREVIO A LA CONTRATACIÓN",
   ],
   requiredMarkers:["CONTR 2025 466864","48760000-3","Panda Security","Página de 1 de 5"],
+  forbiddenMarkers:["{{caseId}}","{{need}}","{{object}}","{{cpvMain}}","CONTRATA-IA","DATOS VARIABLES DEL EXPEDIENTE"],
   sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true,
  },
  PCAP:{
@@ -65,6 +67,7 @@ export const LB102_PANDA_PHYSICAL_SOURCE_PROFILE:Readonly<Record<PandaDocumentKi
    "CONTR 2025 466864",
    "SEVILLA",
   ],
+  forbiddenMarkers:["{{caseId}}","{{title}}","{{object}}","CONTRATA-IA","DATOS VARIABLES DEL EXPEDIENTE"],
   sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true,
  },
  PPT:{
@@ -91,12 +94,13 @@ export const LB102_PANDA_PHYSICAL_SOURCE_PROFILE:Readonly<Record<PandaDocumentKi
    "4.11 Seguridad",
   ],
   requiredMarkers:["CONTR 2025 466864","PANDA SECURITY","Sección de Informática y Sistemas","Página 2 de 16"],
+  forbiddenMarkers:["{{caseId}}","{{object}}","{{technicalRequirements}}","CONTRATA-IA","DATOS VARIABLES DEL EXPEDIENTE"],
   sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true,
  },
 } as const;
 
 export interface PandaPhysicalComparisonInput{kind:PandaDocumentKind;pageCount:number;text:string;}
-export interface PandaPhysicalComparisonResult{kind:PandaDocumentKind;passed:boolean;pageCountMatched:boolean;missingHeadings:readonly string[];missingMarkers:readonly string[];blockers:readonly string[];}
+export interface PandaPhysicalComparisonResult{kind:PandaDocumentKind;passed:boolean;pageCountMatched:boolean;missingHeadings:readonly string[];missingMarkers:readonly string[];forbiddenMarkersFound:readonly string[];blockers:readonly string[];}
 
 function normalize(value:string){return value.normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim().toLowerCase();}
 
@@ -105,10 +109,12 @@ export function comparePandaAgainstPhysicalSource(input:PandaPhysicalComparisonI
  const normalized=normalize(input.text);
  const missingHeadings=profile.requiredHeadings.filter(x=>!normalized.includes(normalize(x)));
  const missingMarkers=profile.requiredMarkers.filter(x=>!normalized.includes(normalize(x)));
+ const forbiddenMarkersFound=profile.forbiddenMarkers.filter(x=>normalized.includes(normalize(x)));
  const pageCountMatched=input.pageCount===profile.sourcePages;
  const blockers:string[]=[];
  if(!pageCountMatched)blockers.push(`${input.kind}: profundidad física ${input.pageCount} páginas; fuente ${profile.sourcePages}.`);
  for(const x of missingHeadings)blockers.push(`${input.kind}: falta epígrafe fuente «${x}».`);
  for(const x of missingMarkers)blockers.push(`${input.kind}: falta marcador físico «${x}».`);
- return{kind:input.kind,passed:blockers.length===0,pageCountMatched,missingHeadings,missingMarkers,blockers};
+ for(const x of forbiddenMarkersFound)blockers.push(`${input.kind}: contiene marcador impropio/no resuelto «${x}».`);
+ return{kind:input.kind,passed:blockers.length===0,pageCountMatched,missingHeadings,missingMarkers,forbiddenMarkersFound,blockers};
 }
