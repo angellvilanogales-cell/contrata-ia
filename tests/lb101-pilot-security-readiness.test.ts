@@ -28,6 +28,16 @@ describe("LB101 seguridad de piloto",()=>{
     expect(cookie).toContain("HttpOnly");expect(cookie).toContain("Secure");expect(cookie).toContain("SameSite=Strict");expect(cookie).toContain("Max-Age=604800");
     expect(policy.authenticateToken(internalToken).id).toBe("usuario-piloto-1");
   });
+  it("un JSON nominativo malformado no tumba producción si existe credencial técnica de recuperación",()=>{
+    const fallback="token-admin-recuperacion-0001";
+    const policy=new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:'[{"id":"usuario-piloto-1",',CONTRATA_IA_ADMIN_TOKEN:fallback});
+    expect(policy.namedIdentityCount()).toBe(0);
+    expect(policy.hasNamedIdentities()).toBe(false);
+    expect(policy.authenticateToken(fallback)).toMatchObject({id:"admin",role:"ADMIN",namedIdentity:false});
+  });
+  it("un JSON nominativo malformado sigue bloqueando producción si no existe ninguna credencial válida",()=>{
+    expect(()=>new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:'[{"id":"usuario-piloto-1",'})).toThrow(/Producción requiere al menos una credencial válida/);
+  });
   it("rechaza contraseña igual al token interno",()=>{const secret="credencial-igual-0001";expect(()=>new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"usuario1",role:"ADMIN",token:secret,password:secret}])})).toThrow(/distinta del token/i);});
   it("rechaza credenciales nominativas compartidas",()=>{expect(()=>new SecurityPolicy({NODE_ENV:"production",CONTRATA_IA_USERS_JSON:JSON.stringify([{id:"a1",role:"OPERATOR",token:"token-compartido-0001"},{id:"b2",role:"REVIEWER",token:"token-compartido-0001"}])})).toThrow(/compartir|duplicad/i);});
   it("detecta alteración de auditoría append-only",()=>{const root=tmp();const file=path.join(root,"audit.jsonl");const audit=new PilotAccessAudit(file);audit.record({timestamp:"2026-08-28T10:00:00Z",actor:"gestor.a",action:"OPEN_CASE",caseId:"REG-SUPPLY-001",outcome:"SUCCESS"});audit.record({timestamp:"2026-08-28T10:01:00Z",actor:"revisor.b",action:"VALIDATE",caseId:"REG-SUPPLY-001",outcome:"SUCCESS"});expect(audit.verify().valid).toBe(true);const rows=fs.readFileSync(file,"utf8").replace("OPEN_CASE","DELETE_CASE");fs.writeFileSync(file,rows);expect(new PilotAccessAudit(file).verify().valid).toBe(false);});
