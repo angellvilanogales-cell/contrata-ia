@@ -9,11 +9,11 @@ export const LB102_FERRETERIA_SOURCE_ASSETS:readonly PersistedTemplateAssetDescr
 ] as const;
 export const LB102_FERRETERIA_RUNTIME_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[...LB94_SUPPLY_GENERAL_RUNTIME_ASSETS,...LB102_FERRETERIA_SOURCE_ASSETS] as const;
 
-/** Fuentes físicas Panda del caso real, solo para regresión/piloto: nunca modelo general. */
+/** Fuentes físicas Panda reconstruidas página a página desde los tres PDF primarios. Solo regresión/piloto; nunca modelo general. */
 export const LB102_PANDA_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
- {kind:"PCAP",templateId:"case:CONTR-2025-466864:pcap:sourcebacked:v3",sourceId:"real-case:CONTR-2025-466864:pcap",sha256:"ab12029eb8ffb6189614a80b6833c0e4035a4955367a7985ba0e216d0ae56298",styleFingerprint:"sha256:ea157a48177aeb354f85b3fb06c8f51c211d9aa25faf2b2f1f3a5772a807b5a9",provenanceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE"},
- {kind:"MEMORIA",templateId:"case:CONTR-2025-466864:memoria:sourcebacked:v3",sourceId:"real-case:CONTR-2025-466864:memoria",sha256:"6d8bdf2c5808d60703ca21323a153dcdc666e9dbd7d68b890daff5687966658d",styleFingerprint:"sha256:3c93ff28b61322213029628c4a2d340aff6f2205d7fd00f276e6163e6edaa3ec",provenanceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE"},
- {kind:"PPT",templateId:"case:CONTR-2025-466864:ppt:sourcebacked:v3",sourceId:"real-case:CONTR-2025-466864:ppt",sha256:"bd27f4f13a3deeeffd62516f4d2a611bce5262f9e0235c616ef54f30d44fb137",styleFingerprint:"sha256:739b155049ca76d635e6a6ee093ac79c14186ec07981c0f93b2af7aa8bae492d",provenanceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE"},
+ {kind:"PCAP",templateId:"case:CONTR-2025-466864:pcap:sourcebacked:v4",sourceId:"real-case:CONTR-2025-466864:pcap",sha256:"cd0db26dafd16179f8e11f4a8ef552f21c6cd52917b20ee6d039c7ccd0026856",styleFingerprint:"sha256:f99ddf44c0f09388f25d98faa0028df048fee9b2c15bb57f31e92ffe89021655",provenanceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE"},
+ {kind:"MEMORIA",templateId:"case:CONTR-2025-466864:memoria:sourcebacked:v4",sourceId:"real-case:CONTR-2025-466864:memoria",sha256:"e4213c2f3cc31d4948b0615158f8e256198bf75080b6db66494e04daf13d4090",styleFingerprint:"sha256:0143d7c929be14bc372188e371c72de1fafed589b313501dfee48aee32361971",provenanceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE"},
+ {kind:"PPT",templateId:"case:CONTR-2025-466864:ppt:sourcebacked:v4",sourceId:"real-case:CONTR-2025-466864:ppt",sha256:"74ab3bed8157ce382ffd09e620c385e8200bee9398c6203e696f345104d2dfff",styleFingerprint:"sha256:d263f9a1da846e11ee9edad4f13b4e3ffd1571dc153ee019f747fb4c41c1f7eb",provenanceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE"},
 ] as const;
 export const LB102_SERVICE_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
  {kind:"PCAP",templateId:"contrata-ia:service:pcap:strict-pilot:LB102-V2",sourceId:"source-structural:service:pcap:LB102-V2",sha256:"fe4fd96179c13dfe1ab72150ee17e49190001d2a0920c5040fb8298f94296214",styleFingerprint:SERVICE_STYLE_V2,provenanceRole:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE"},
