@@ -9,7 +9,7 @@ export type LB102PilotPackageId="supply-ferreteria"|"supply-panda"|"service-huel
 export interface LB102PilotPackageDescriptor{id:LB102PilotPackageId;caseId:string;family:"SUPPLY"|"SERVICE";label:string;profile:string;}
 export const LB102_PILOT_PACKAGE_CATALOG:readonly LB102PilotPackageDescriptor[]=[
  {id:"supply-ferreteria",caseId:"CONTR/2026/240267",family:"SUPPLY",label:"Ferretería SAE · ASA · DA 33.ª",profile:"FERRETERIA_SUPPLY_ASA_DA33_LB102_PROTECTED"},
- {id:"supply-panda",caseId:"CONTR 2025 466864",family:"SUPPLY",label:"Panda / licencias software · ASO",profile:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V3"},
+ {id:"supply-panda",caseId:"CONTR 2025 466864",family:"SUPPLY",label:"Panda / licencias software · ASO",profile:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V4"},
  {id:"service-huelva",caseId:"CONTR 2025 0000468715",family:"SERVICE",label:"Limpieza SAE Huelva",profile:"SERVICE_SOURCE_STRUCTURAL_PILOT_LB102_V2"},
  {id:"service-5g",caseId:"CONTR/2023/957915",family:"SERVICE",label:"Formación profesional tecnologías 5G",profile:"SERVICE_SOURCE_STRUCTURAL_PILOT_LB102_V2"},
 ] as const;
@@ -23,7 +23,7 @@ export async function generateLB102PilotPackage(id:LB102PilotPackageId):Promise<
    const out=await generateFerreteriaPilotPackage(store);return{ready:out.ready,descriptor,fileName:out.fileName,bytes:out.bytes,sha256:out.sha256,blockers:out.blockers};
   }
   if(id==="supply-panda"){
-   const store=createLB102PandaTemplateStoreFromEnv();if(!store)throw new Error("Persistencia Panda source-backed V3 no configurada.");
+   const store=createLB102PandaTemplateStoreFromEnv();if(!store)throw new Error("Persistencia Panda source-backed V4 no configurada.");
    const out=await generatePandaSourceBackedPilotPackage({record:LB102_SUPPLY_PANDA,templateStore:store});return{ready:out.ready,descriptor,fileName:out.fileName,bytes:out.bytes,sha256:out.sha256,blockers:out.blockers};
   }
   const store=createLB102ServiceTemplateStoreFromEnv();if(!store)throw new Error("Persistencia de plantillas Service V2 no configurada.");
