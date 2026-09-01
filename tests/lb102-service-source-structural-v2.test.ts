@@ -12,10 +12,13 @@ describe("LB102 Service V2 source-structural gate",()=>{
  it("mantiene sincronizados store y renderer por identidad SHA",()=>{
   const byKind=new Map(LB102_SERVICE_ASSETS.map(x=>[x.kind,x]));expect(byKind.get("PCAP")?.templateId).toBe(SERVICE_V2_TEMPLATES.PCAP.templateId);expect(byKind.get("PCAP")?.sha256).toBe(SERVICE_V2_TEMPLATES.PCAP.sha256);expect(byKind.get("MEMORIA")?.templateId).toBe(SERVICE_V2_TEMPLATES.MEMORY.templateId);expect(byKind.get("MEMORIA")?.sha256).toBe(SERVICE_V2_TEMPLATES.MEMORY.sha256);expect(byKind.get("PPT")?.templateId).toBe(SERVICE_V2_TEMPLATES.PPT.templateId);expect(byKind.get("PPT")?.sha256).toBe(SERVICE_V2_TEMPLATES.PPT.sha256);
  });
- it("no acredita una plantilla estructural demasiado corta aunque Huelva ya tenga triada fuente completa",()=>{
+ it("no acredita una plantilla V2 corta frente a las dos triadas físicas completas",()=>{
   expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-huelva"].documents.MEMORIA?.sourcePages).toBe(13);expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-huelva"].documents.PCAP?.sourcePages).toBe(103);expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-huelva"].documents.PPT?.sourcePages).toBe(28);expect(servicePhysicalSourceBlockers("service-huelva")).toEqual([]);
-  expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-5g"].documents.PCAP?.sourcePages).toBe(111);expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-5g"].documents.PPT?.sourcePages).toBe(50);expect(servicePhysicalSourceBlockers("service-5g").length).toBeGreaterThan(0);
-  for(const id of ["service-huelva","service-5g"] as const){const policy=LB102_SOURCE_FIDELITY_POLICY[id];expect(policy.level).toBe("DERIVED_STYLE_PENDING_COMPARISON");expect(policy.accredited).toBe(false);expect(LB102_PILOT_PACKAGE_CATALOG.find(x=>x.id===id)?.profile).toBe("SERVICE_SOURCE_STRUCTURAL_PILOT_LB102_V2");}
+  expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-sevilla"].documents.MEMORIA?.sourcePages).toBe(13);expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-sevilla"].documents.PCAP?.sourcePages).toBe(113);expect(LB102_SERVICE_PHYSICAL_SOURCE_PROFILE["service-sevilla"].documents.PPT?.sourcePages).toBe(53);expect(servicePhysicalSourceBlockers("service-sevilla")).toEqual([]);
+  for(const id of ["service-huelva","service-sevilla"] as const){const policy=LB102_SOURCE_FIDELITY_POLICY[id];expect(policy.level).toBe("DERIVED_STYLE_PENDING_COMPARISON");expect(policy.accredited).toBe(false);expect(LB102_PILOT_PACKAGE_CATALOG.find(x=>x.id===id)?.profile).toBe("SERVICE_SOURCE_STRUCTURAL_PILOT_LB102_V2");}
+ });
+ it("mantiene 5G como fuente de regresión parcial, fuera de los cuatro pilotos UAT",()=>{
+  expect(servicePhysicalSourceBlockers("service-5g").length).toBeGreaterThan(0);expect(LB102_PILOT_PACKAGE_CATALOG.some(x=>x.id===("service-5g" as never))).toBe(false);
  });
  it("mantiene V2 como estructura derivada, no modelo oficial",()=>{
   expect(SERVICE_V2_TEMPLATES.PCAP.minBytes).toBeGreaterThanOrEqual(10000);expect(SERVICE_V2_TEMPLATES.MEMORY.minBytes).toBeGreaterThanOrEqual(7000);expect(SERVICE_V2_TEMPLATES.PPT.minBytes).toBeGreaterThanOrEqual(9000);expect(LB102_SERVICE_ASSETS.every(x=>x.provenanceRole==="CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE")).toBe(true);
