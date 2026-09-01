@@ -8,14 +8,15 @@ describe("LB102 pre-human machine simulation",()=>{
    {id:"supply-ferreteria",generationReady:true,sha256:hash,sourceFidelityLevel:LB102_SOURCE_FIDELITY_POLICY["supply-ferreteria"].level,sourceFidelityAccredited:true,blockers:[]},
    {id:"supply-panda",generationReady:true,sha256:hash,sourceFidelityLevel:LB102_SOURCE_FIDELITY_POLICY["supply-panda"].level,sourceFidelityAccredited:false,blockers:[]},
    {id:"service-huelva",generationReady:true,sha256:hash,sourceFidelityLevel:LB102_SOURCE_FIDELITY_POLICY["service-huelva"].level,sourceFidelityAccredited:false,blockers:[]},
-   {id:"service-5g",generationReady:true,sha256:hash,sourceFidelityLevel:LB102_SOURCE_FIDELITY_POLICY["service-5g"].level,sourceFidelityAccredited:false,blockers:[]},
+   {id:"service-sevilla",generationReady:true,sha256:hash,sourceFidelityLevel:LB102_SOURCE_FIDELITY_POLICY["service-sevilla"].level,sourceFidelityAccredited:false,blockers:[]},
   ]);
   expect(status.passed).toBe(false);expect(status.humanSimulationAllowed).toBe(false);
   expect(status.blockers.some(x=>x.includes("supply-panda")&&x.includes("similitud física"))).toBe(true);
   expect(status.blockers.some(x=>x.includes("service-huelva")&&x.includes("similitud física"))).toBe(true);
+  expect(status.blockers.some(x=>x.includes("service-sevilla")&&x.includes("similitud física"))).toBe(true);
  });
  it("solo permite UAT cuando generación y fidelidad física están acreditadas en los cuatro escenarios",()=>{
-  const ids=["supply-ferreteria","supply-panda","service-huelva","service-5g"] as const;
+  const ids=["supply-ferreteria","supply-panda","service-huelva","service-sevilla"] as const;
   const status=evaluateLB102PreHumanMachineSimulation(ids.map(id=>({id,generationReady:true,sha256:hash,sourceFidelityLevel:"PROMOTED_SOURCE_DERIVED_STYLE" as const,sourceFidelityAccredited:true,blockers:[]})));
   expect(status.passed).toBe(true);expect(status.humanSimulationAllowed).toBe(true);expect(status.blockers).toEqual([]);
  });
