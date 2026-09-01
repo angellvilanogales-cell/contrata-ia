@@ -1,4 +1,4 @@
-export type ServicePhysicalPilotId="service-huelva"|"service-5g";
+export type ServicePhysicalPilotId="service-huelva"|"service-sevilla"|"service-5g";
 export type ServicePhysicalDocumentKind="PCAP"|"MEMORIA"|"PPT";
 
 export interface ServicePhysicalDocumentProfile{
@@ -21,7 +21,7 @@ export interface ServicePhysicalCaseProfile{
 /**
  * Evidencia física primaria del corpus Service. Un expediente real se usa como
  * regresión/precedente, nunca como modelo general. Un null en sourcePages significa
- * que el documento primario no está todavía acreditado y bloquea la promoción.
+ * que el documento primario no está acreditado y bloquea la promoción.
  */
 export const LB102_SERVICE_PHYSICAL_SOURCE_PROFILE:Readonly<Record<ServicePhysicalPilotId,ServicePhysicalCaseProfile>>={
  "service-huelva":{
@@ -33,13 +33,22 @@ export const LB102_SERVICE_PHYSICAL_SOURCE_PROFILE:Readonly<Record<ServicePhysic
   },
   blockers:[],
  },
+ "service-sevilla":{
+  id:"service-sevilla",caseId:"CONTR 2026 38892",fullyAccreditable:true,
+  documents:{
+   MEMORIA:{kind:"MEMORIA",sourceLabel:"ilovepdf_merged 4 memorias.pdf · bloque físico 12-24",sourcePages:13,requiredMarkers:["MEMORIA JUSTIFICATIVA PARA LA CONTRATACIÓN DEL SERVICIO DE MANTENIMIENTO INTEGRAL","CONTR 2026 38892","DIRECCIÓN PROVINCIAL DEL SERVICIO ANDALUZ DE EMPLEO DE SEVILLA","PÁGINA: 1 / 13"],sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true},
+   PCAP:{kind:"PCAP",sourceLabel:"ilovepdf_merged 4 PCAP (1).pdf · bloque físico 1-113",sourcePages:113,requiredMarkers:["CONTR 2026 38892","PROCEDIMIENTO ABIERTO","SERVICIO DE MANTENIMIENTO INTEGRAL","PÁGINA 1 / 113"],sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true},
+   PPT:{kind:"PPT",sourceLabel:"ilovepdf_merged 4 PPT.pdf · bloque físico 42-94",sourcePages:53,requiredMarkers:["PLIEGO DE PRESCRIPCIONES TÉCNICAS","SERVICIO DE MANTENIMIENTO INTEGRAL","DIRECCIÓN PROVINCIAL DEL SERVICIO ANDALUZ DE EMPLEO DE SEVILLA","PÁGINA: 1 / 53"],sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true},
+  },
+  blockers:[],
+ },
  "service-5g":{
   id:"service-5g",caseId:"CONTR/2023/957915",fullyAccreditable:false,
   documents:{
    PCAP:{kind:"PCAP",sourceLabel:"ilovepdf_merged 4 PCAP (1).pdf · bloque físico 114-224",sourcePages:111,requiredMarkers:["CONTRATACIÓN DE SERVICIOS MEDIANTE PROCEDIMIENTO ABIERTO","CONTR/2023/957915","ENTORNOS 5G","PCAP Servicios Abierto","PÁGINA 83 / 111"],sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true},
    PPT:{kind:"PPT",sourceLabel:"ilovepdf_merged 4 PPT.pdf · bloque físico 5G",sourcePages:50,requiredMarkers:["PLIEGO DE PRESCRIPCIONES TÉCNICAS","ACCIONES FORMATIVAS","ENTORNOS 5G","Pliego de Prescripciones Técnicas","PÁGINA: 29 / 50"],sourceRole:"VALIDATED_REAL_CASE_REGRESSION_SOURCE",neverGeneralModel:true},
   },
-  blockers:["Memoria justificativa primaria de CONTR/2023/957915 no está todavía acreditada en el corpus como documento físico independiente; solo se ha localizado una diligencia de aprobación. No se puede promover el paquete completo solo con PCAP y PPT."],
+  blockers:["Memoria justificativa primaria de CONTR/2023/957915 no está acreditada como documento físico independiente; solo se ha localizado la diligencia de aprobación. El caso 5G se conserva como regresión parcial y deja de ser el segundo piloto Service de LB102."],
  },
 } as const;
 
