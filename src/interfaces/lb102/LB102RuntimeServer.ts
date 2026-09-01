@@ -1,4 +1,3 @@
-import {createHash} from "node:crypto";
 import fs from "node:fs";
 import http,{type IncomingMessage,type ServerResponse} from "node:http";
 import os from "node:os";
@@ -13,9 +12,7 @@ import {generateLB102PilotPackage,LB102_PILOT_PACKAGE_CATALOG,pilotPackageDescri
 import {evaluateLB102PreHumanMachineSimulation,LB102_SOURCE_FIDELITY_POLICY} from "../../application/operations/lb102/LB102PreHumanMachineSimulation";
 import {countExecutableRealCases} from "../../application/operations/lb102/RealCaseRegressionCorpus";
 import {evaluateLB102TechnicalPrePilot} from "../../application/operations/lb102/LB102TechnicalPrePilotStatus";
-import {LB102_FERRETERIA_SOURCE_ASSETS} from "../../application/intake/lb102/LB102PersistedPilotTemplateStores";
-import {computeOdtStyleFingerprint} from "../../application/intake/lb23/UniversalOdtProductionRenderer";
-import {readOdtZip} from "../../application/intake/lb23/OdtPackageCodec";
+import {lb102ProtectedSourceStatus,parseLB102ProtectedSourceGroup,parseLB102ProtectedSourceKind,persistLB102ProtectedSource,type LB102ProtectedSourceGroup} from "../../application/intake/lb102/LB102ProtectedSourceIngress";
 import {SecurityPolicy} from "../lb7/SecurityPolicy";
 import {createLB99RuntimeServer} from "../lb99/LB99RuntimeServer";
 import {LB102_PILOT_ACCEPTANCE_UI} from "./LB102PilotAcceptanceUi";
@@ -26,10 +23,6 @@ function sendZip(r:ServerResponse,bytes:Uint8Array,fileName:string,sha:string){c
 function usersFromEnv(){try{const value=JSON.parse(process.env.CONTRATA_IA_USERS_JSON??"[]");return Array.isArray(value)?value:[];}catch{return[];}}
 async function readJson(request:IncomingMessage){const chunks:Buffer[]=[];let total=0;for await(const chunk of request){const b=Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk);total+=b.length;if(total>64*1024)throw new Error("Payload demasiado grande.");chunks.push(b);}const raw=Buffer.concat(chunks).toString("utf8");return raw?JSON.parse(raw):{};}
 async function readBinary(request:IncomingMessage,maxBytes=2_000_000){const chunks:Buffer[]=[];let total=0;for await(const chunk of request){const b=Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk);total+=b.length;if(total>maxBytes)throw new Error("Archivo demasiado grande.");chunks.push(b);}if(total<100)throw new Error("Archivo ODT vacío o inválido.");return Buffer.concat(chunks);}
-function sha256(bytes:Uint8Array){return createHash("sha256").update(bytes).digest("hex");}
-function persistenceConfig(){const endpoint=(process.env.CONTRATA_IA_PERSISTENCE_URL??"").trim().replace(/\/+$/,"");const token=(process.env.CONTRATA_IA_PERSISTENCE_TOKEN??"").trim();if(!endpoint.startsWith("https://")||token.length<16)throw new Error("Persistencia autenticada no configurada.");return{endpoint,token};}
-async function persistFerreteriaSource(kind:string,bytes:Uint8Array){const descriptor=LB102_FERRETERIA_SOURCE_ASSETS.find(x=>x.kind===kind);if(!descriptor)throw new Error("Fuente Ferretería desconocida.");const calculatedSha=sha256(bytes);if(calculatedSha!==descriptor.sha256)throw new Error(`${kind}: SHA-256 no coincide con el binario fuente validado.`);let style:string;try{style=computeOdtStyleFingerprint(readOdtZip(bytes));}catch{throw new Error(`${kind}: el archivo no es un ODT válido.`);}if(style!==descriptor.styleFingerprint)throw new Error(`${kind}: huella de estilo no coincide con la fuente validada.`);const {endpoint,token}=persistenceConfig();const response=await fetch(`${endpoint}/templates/${encodeURIComponent(descriptor.templateId)}`,{method:"PUT",headers:{"x-contrata-ia-persistence-token":token,"content-type":"application/json"},body:JSON.stringify({kind:descriptor.kind,mediaType:"application/vnd.oasis.opendocument.text",sha256:descriptor.sha256,styleFingerprint:descriptor.styleFingerprint,provenance:{role:"VALIDATED_REAL_CASE_SOURCE",family:"SUPPLY",caseId:"CONTR/2026/240267",sourceAuthority:"VALIDATED_REAL_EXPEDIENTE",officialModelClaimed:false,humanValidationRequired:true},contentBase64:Buffer.from(bytes).toString("base64")})});const text=await response.text();let payload:unknown={raw:text};try{payload=JSON.parse(text);}catch{}if(!response.ok)throw new Error(`${kind}: persistencia rechazó el activo (HTTP ${response.status}).`);return{descriptor,payload};}
-async function ferreteriaSourcesStatus(){const {endpoint,token}=persistenceConfig();const assets=[];for(const descriptor of LB102_FERRETERIA_SOURCE_ASSETS){try{const response=await fetch(`${endpoint}/templates/${encodeURIComponent(descriptor.templateId)}`,{headers:{"x-contrata-ia-persistence-token":token,accept:"application/json"}});if(response.status===404){assets.push({kind:descriptor.kind,available:false,templateId:descriptor.templateId});continue;}if(!response.ok)throw new Error(`HTTP ${response.status}`);const p=await response.json() as Record<string,unknown>;assets.push({kind:descriptor.kind,available:p.sha256===descriptor.sha256&&p.styleFingerprint===descriptor.styleFingerprint,templateId:descriptor.templateId,sha256:p.sha256});}catch(error){assets.push({kind:descriptor.kind,available:false,templateId:descriptor.templateId,error:error instanceof Error?error.message:String(error)});}}return{ready:assets.every(x=>x.available),assets};}
 
 export function runLB101LivePreflight(){
  const users=usersFromEnv();const roles=new Set(users.map(x=>x?.role).filter(Boolean));let namedIdentityCount=0;let policyConfigured=true;
@@ -51,7 +44,7 @@ export async function runLB102GenerationSelfTest(){const packages=[];for(const d
 export async function runLB102PreHumanMachineSimulation(){
  const generation=await runLB102GenerationSelfTest();
  let ferreteriaReady=false;let ferreteriaBlocker="";
- try{const status=await ferreteriaSourcesStatus();ferreteriaReady=status.ready;if(!status.ready)ferreteriaBlocker="Faltan Memoria V12 y/o PPT V6 exactos persistidos con SHA y huella de estilo validados.";}catch(error){ferreteriaBlocker=error instanceof Error?error.message:String(error);}
+ try{const status=await lb102ProtectedSourceStatus("ferreteria");ferreteriaReady=status.ready;if(!status.ready)ferreteriaBlocker="Faltan Memoria V12 y/o PPT V6 exactos persistidos con SHA, longitud y huella de estilo validados.";}catch(error){ferreteriaBlocker=error instanceof Error?error.message:String(error);}
  const evidence=generation.packages.map(item=>{
   const policy=LB102_SOURCE_FIDELITY_POLICY[item.id as LB102PilotPackageId];
   const exactFerreteria=item.id!=="supply-ferreteria"||ferreteriaReady;
@@ -61,7 +54,9 @@ export async function runLB102PreHumanMachineSimulation(){
 }
 async function requireLB102PreHumanMachineSimulation(){const simulation=await runLB102PreHumanMachineSimulation();if(!simulation.passed)throw new Error(`SIMULACIÓN TÉCNICA PREVIA NO SUPERADA: ${simulation.blockers.join(" | ")}`);return simulation;}
 
-/** Runtime LB102: conserva LB99 y añade preflight, autodiagnóstico y aceptación humana auditable. */
+async function protectedSourceStatuses(groups:readonly LB102ProtectedSourceGroup[]){const statuses=[];for(const group of groups){try{statuses.push(await lb102ProtectedSourceStatus(group));}catch(error){statuses.push({group,ready:false,assets:[],blockers:[error instanceof Error?error.message:String(error)]});}}return statuses;}
+
+/** Runtime LB102: conserva LB99 y añade preflight, autodiagnóstico, ingreso binario protegido y aceptación humana auditable. */
 export function createLB102RuntimeServer():http.Server{
  const base=createLB99RuntimeServer();const security=new SecurityPolicy();const dataRoot=path.resolve(process.env.CONTRATA_IA_DATA_DIR??"var/contrata-ia");const acceptance=new LB102PilotAcceptanceStore(path.join(dataRoot,"lb102","acceptance.json"));
  return http.createServer(async(request,response)=>{security.applySecurityHeaders(response);try{const url=new URL(request.url??"/","http://localhost");const parts=url.pathname.split("/").filter(Boolean);
@@ -72,11 +67,24 @@ export function createLB102RuntimeServer():http.Server{
   if(request.method==="POST"&&url.pathname==="/api/lb102/session/logout"){response.setHeader("set-cookie",security.clearSessionCookie());sendJson(response,200,{signedOut:true});return;}
   if(request.method==="GET"&&url.pathname==="/api/lb102/session/me"){const actor=security.authenticate(request);sendJson(response,200,{actor:{id:actor.id,role:actor.role,displayName:actor.displayName,namedIdentity:actor.namedIdentity===true}});return;}
   if(request.method==="GET"&&url.pathname==="/api/lb102/preflight"){const lb101=runLB101LivePreflight();const simulation=await runLB102PreHumanMachineSimulation();const lb102=evaluateLB102TechnicalPrePilot({lb101SecurityReady:lb101.pilotSecurityReady,deployedGenerationReady:simulation.passed,negativeRegressionConflictPassed:true,negativeRegressionMissingValidationPassed:true,negativeRegressionTemplateIntegrityPassed:true});sendJson(response,lb102.technicalPrePilotReady?200:503,{block:"LB102",technicalPrePilotReady:lb102.technicalPrePilotReady,appViableForPilot:false,lb101:{pilotSecurityReady:lb101.pilotSecurityReady,blockers:lb101.blockers,ensComplianceClaimed:false},preHumanMachineSimulation:simulation,blockers:lb102.blockers,productionReady:false,humanAcceptanceRequired:true});return;}
+
+  // Compatibilidad: la ruta histórica de Ferretería usa ahora el mismo ingreso binario universal fail-closed.
   if(parts[0]==="api"&&parts[1]==="lb102"&&parts[2]==="ferreteria-sources"){
    const actor=security.authenticate(request);security.require(actor,"ADMIN");if(actor.namedIdentity!==true)throw new Error("La carga de fuentes exige identidad nominativa ADMIN.");
-   if(request.method==="GET"&&parts.length===3){sendJson(response,200,{...(await ferreteriaSourcesStatus()),productionReady:false});return;}
-   if(request.method==="PUT"&&parts.length===4){const kind=parts[3]==="memoria"?"MEMORIA":parts[3]==="ppt"?"PPT":"";if(!kind)throw new Error("Tipo de fuente no soportado.");const bytes=await readBinary(request);const saved=await persistFerreteriaSource(kind,bytes);sendJson(response,200,{saved:true,kind,templateId:saved.descriptor.templateId,sha256:saved.descriptor.sha256,styleFingerprint:saved.descriptor.styleFingerprint,productionReady:false});return;}
+   if(request.method==="GET"&&parts.length===3){sendJson(response,200,{...(await lb102ProtectedSourceStatus("ferreteria")),productionReady:false});return;}
+   if(request.method==="PUT"&&parts.length===4){const kind=parseLB102ProtectedSourceKind(parts[3]??"");if(kind!=="MEMORIA"&&kind!=="PPT")throw new Error("Tipo de fuente Ferretería no soportado.");const bytes=await readBinary(request);const saved=await persistLB102ProtectedSource("ferreteria",kind,bytes);sendJson(response,200,{saved:true,group:"ferreteria",kind,templateId:saved.descriptor.templateId,sha256:saved.sha256,styleFingerprint:saved.styleFingerprint,byteLength:saved.byteLength,productionReady:false});return;}
   }
+
+  // Ingreso protegido común: /api/lb102/source-assets/{ferreteria|panda|service-huelva|service-sevilla}/{pcap|memoria|ppt}
+  if(parts[0]==="api"&&parts[1]==="lb102"&&parts[2]==="source-assets"){
+   const actor=security.authenticate(request);security.require(actor,"ADMIN");if(actor.namedIdentity!==true)throw new Error("El ingreso de activos físicos exige identidad nominativa ADMIN.");
+   if(request.method==="GET"&&parts.length===3){const groups:readonly LB102ProtectedSourceGroup[]=["ferreteria","panda","service-huelva","service-sevilla"];const statuses=await protectedSourceStatuses(groups);sendJson(response,200,{ready:statuses.every(item=>item.ready),groups:statuses,productionReady:false});return;}
+   const group=parseLB102ProtectedSourceGroup(parts[3]??"");if(!group)throw new Error("Grupo de fuentes LB102 no permitido por la allowlist.");
+   if(request.method==="GET"&&parts.length===4){sendJson(response,200,{...(await lb102ProtectedSourceStatus(group)),productionReady:false});return;}
+   if(request.method==="PUT"&&parts.length===5){const kind=parseLB102ProtectedSourceKind(parts[4]??"");if(!kind)throw new Error("Tipo documental no permitido por la allowlist.");const bytes=await readBinary(request);const saved=await persistLB102ProtectedSource(group,kind,bytes);sendJson(response,200,{saved:true,group,kind,templateId:saved.descriptor.templateId,sha256:saved.sha256,styleFingerprint:saved.styleFingerprint,byteLength:saved.byteLength,productionReady:false});return;}
+   throw new Error("Operación de ingreso de activos LB102 no soportada.");
+  }
+
   if(parts[0]==="api"&&parts[1]==="lb102"&&parts[2]==="pilot-packages"){
    const actor=security.authenticate(request);security.require(actor,"REVIEWER");if(actor.namedIdentity!==true)throw new Error("Los paquetes del piloto exigen identidad nominativa.");
    if(request.method==="GET"&&parts.length===3){sendJson(response,200,{packages:LB102_PILOT_PACKAGE_CATALOG,productionReady:false});return;}
