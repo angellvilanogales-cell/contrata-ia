@@ -20,9 +20,10 @@ export function ferreteriaInterventionConsistencyAudit(pcapText:string,memoryTex
  if(!/cuatro\s+o\s+m[aá]s\s+licitadores/i.test(pcapText))blockers.push("INTERVENCION: PCAP no acredita regla de ofertas anormalmente bajas para cuatro o más licitadores.");
  const pbl25=/(?:25\s+unidades\s+porcentuales.{0,160}presupuesto\s+base\s+de\s+licitaci[oó]n|presupuesto\s+base\s+de\s+licitaci[oó]n.{0,160}25\s+unidades\s+porcentuales)/i.test(pcapText);
  if(!pbl25)blockers.push("INTERVENCION: PCAP no explicita que la baja superior al 25% se refiere al presupuesto base de licitación.");
- const pcapDefect=/material\s+defectuoso/i.test(pcapText)&&/tres\s*\(3\)\s+d[ií]as\s+h[aá]biles/i.test(pcapText);
- const pptDefect=/material\s+defectuoso/i.test(pptText)&&/tres\s*\(3\)\s+d[ií]as\s+h[aá]biles/i.test(pptText);
- const pptDefectStillFive=/material\s+defectuoso.{0,320}cinco\s*\(5\).{0,120}d[ií]as\s+h[aá]biles/i.test(pptText);
+ const pcapCompact=compact(pcapText),pptCompact=compact(pptText);
+ const pcapDefect=pcapCompact.includes("MATERIALDEFECTUOSO")&&pcapCompact.includes("3DIASHABILES");
+ const pptDefect=pptCompact.includes("MATERIALDEFECTUOSO")&&pptCompact.includes("3DIASHABILES");
+ const pptDefectStillFive=pptCompact.includes("CINCO5TRES3DIASHABILES")||pptCompact.includes("5TRES3DIASHABILES");
  if(pptDefectStillFive)blockers.push("INTERVENCION: PPT mantiene 5 días hábiles en la cláusula de sustitución de material defectuoso.");
  if(!pcapDefect||!pptDefect)blockers.push("INTERVENCION: PCAP y PPT no acreditan conjuntamente 3 días hábiles para material defectuoso.");
  if(/adjudicaci[oó]n\s+del\s+(?:contrato\s+)?acuerdo\s+marco/i.test(pptText))blockers.push("INTERVENCION: PPT conserva referencia improcedente a adjudicación del acuerdo marco.");
