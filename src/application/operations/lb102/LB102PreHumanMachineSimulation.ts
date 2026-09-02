@@ -31,12 +31,16 @@ export function evaluateLB102PreHumanMachineSimulation(packages:readonly LB102Ma
 }
 
 /**
- * La acreditación solo se activa cuando el paquete completo cuenta con evidencia física suficiente.
- * Tener una plantilla estructural o una fuente parcial no equivale a promoción física completa.
+ * Política después de la materialización física LB102 del 02/09/2026.
+ * Ferretería conserva identidad exacta de la tríada post-Intervención humanamente validada.
+ * Panda, Huelva y Sevilla son reconstrucciones editables derivadas de sus fuentes primarias: se
+ * promueven únicamente como estilo/fidelidad de caso de regresión, nunca como ODT fuente original
+ * ni como modelo general. La acreditación efectiva sigue condicionada a que el self-test vivo
+ * recupere desde persistencia, valide SHA + huella de estilo + marcadores y genere el ZIP completo.
  */
 export const LB102_SOURCE_FIDELITY_POLICY:Readonly<Record<LB102PilotPackageId,{level:LB102SourceFidelityLevel;accredited:boolean;reason:string}>>={
- "supply-ferreteria":{level:"EXACT_VALIDATED_SOURCE_STYLE",accredited:true,reason:"La identidad física esperada de PCAP y Memoria/PPT está protegida; la generación sigue bloqueada si faltan los binarios exactos persistidos."},
- "supply-panda":{level:"DERIVED_STYLE_PENDING_COMPARISON",accredited:false,reason:"Panda source-backed reproduce la profundidad 5/85/16, pero no se acredita hasta persistir y recuperar los tres binarios íntegros y superar el E2E físico."},
- "service-huelva":{level:"DERIVED_STYLE_PENDING_COMPARISON",accredited:false,reason:"Tríada primaria completa acreditada: Memoria 13, PCAP 103 y PPT 28 páginas. El conversor físico ya reproduce 13/103/28 en ODT editable; falta materializar esos activos en la persistencia protegida y cerrar el E2E antes de promover fidelidad."},
- "service-sevilla":{level:"DERIVED_STYLE_PENDING_COMPARISON",accredited:false,reason:"Tríada primaria completa acreditada para CONTR 2026 38892: Memoria 13, PCAP 113 y PPT 53 páginas. El conversor físico reproduce 13/113/53 en ODT editable; falta persistencia protegida y E2E antes de promover fidelidad."},
+ "supply-ferreteria":{level:"EXACT_VALIDATED_SOURCE_STYLE",accredited:true,reason:"Tríada PCAP V8 + Memoria V14 + PPT V8 post-Intervención, humanamente validada y protegida por identidad física exacta."},
+ "supply-panda":{level:"PROMOTED_SOURCE_DERIVED_STYLE",accredited:true,reason:"Reconstrucción editable V8 derivada de la fuente primaria Panda 5/85/16, persistida y protegida por SHA, huella de estilo y marcadores físicos; nunca se presenta como ODT fuente original ni como modelo general."},
+ "service-huelva":{level:"PROMOTED_SOURCE_DERIVED_STYLE",accredited:true,reason:"Reconstrucción editable V8 derivada de la tríada primaria Huelva 13/103/28, persistida y protegida por SHA, huella de estilo y marcadores físicos; nunca modelo general."},
+ "service-sevilla":{level:"PROMOTED_SOURCE_DERIVED_STYLE",accredited:true,reason:"Reconstrucción editable V8 derivada de la tríada primaria Sevilla 13/113/53, persistida y protegida por SHA, huella de estilo y marcadores físicos; conserva las variantes de identificador como evidencia de fuente y nunca se eleva a modelo general."},
 };
