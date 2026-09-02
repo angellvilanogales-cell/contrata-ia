@@ -29,7 +29,7 @@ jobs:
 
   lb102-live-preuat:
     name: Generate four live LB102 packages and run pre-UAT gate
-    if: github.ref == 'refs/heads/agent/lb91-universalizacion-operativa' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/agent/lb91-universalizacion-operativa' || github.head_ref == 'agent/lb91-universalizacion-operativa'
     needs: generation
     runs-on: ubuntu-24.04
     timeout-minutes: 15
