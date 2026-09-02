@@ -25,9 +25,8 @@ describe("LB102 Service physical source profiles",()=>{
   expect(servicePhysicalSourceBlockers("service-5g").some(x=>x.includes("MEMORIA"))).toBe(true);
  });
 
- it("no acredita Huelva/Sevilla por el mero hecho de localizar la fuente o igualar páginas",()=>{
-  expect(LB102_SOURCE_FIDELITY_POLICY["service-huelva"].accredited).toBe(false);
-  expect(LB102_SOURCE_FIDELITY_POLICY["service-sevilla"].accredited).toBe(false);
+ it("promueve Huelva y Sevilla tras persistencia protegida V8 sin convertirlas en modelos generales",()=>{
+  for(const id of ["service-huelva","service-sevilla"] as const){const policy=LB102_SOURCE_FIDELITY_POLICY[id];expect(policy.accredited).toBe(true);expect(policy.level).toBe("PROMOTED_SOURCE_DERIVED_STYLE");expect(policy.reason).toContain("persistida");expect(policy.reason).toContain("nunca");}
   expect(LB102_SOURCE_FIDELITY_POLICY["service-huelva"].reason).toContain("13/103/28");
   expect(LB102_SOURCE_FIDELITY_POLICY["service-sevilla"].reason).toContain("13/113/53");
  });
