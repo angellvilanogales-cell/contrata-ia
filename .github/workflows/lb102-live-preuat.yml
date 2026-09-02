@@ -18,7 +18,7 @@ jobs:
   live-preuat:
     name: Generate four live packages and run pre-UAT gate
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 6
     steps:
       - name: Wait for Render deployment and execute live gates
         env:
@@ -27,11 +27,13 @@ jobs:
         run: |
           set -euo pipefail
           ok=0
-          for attempt in $(seq 1 36); do
-            echo "LB102 live attempt ${attempt}/36"
-            gen_code=$(curl --connect-timeout 20 --max-time 120 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
-            sim_code=$(curl --connect-timeout 20 --max-time 120 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
+          for attempt in $(seq 1 10); do
+            echo "LB102 live attempt ${attempt}/10"
+            gen_code=$(curl --connect-timeout 20 --max-time 90 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
+            sim_code=$(curl --connect-timeout 20 --max-time 90 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
             echo "generation HTTP=$gen_code simulation HTTP=$sim_code"
+            if [[ "$gen_code" != "200" ]]; then echo "generation body:"; cat generation.json || true; echo; fi
+            if [[ "$sim_code" != "200" ]]; then echo "simulation body:"; cat simulation.json || true; echo; fi
             if [[ "$gen_code" == "200" && "$sim_code" == "200" ]]; then
               node <<'NODE'
           const fs=require('node:fs');
@@ -51,20 +53,19 @@ jobs:
               ok=1
               break
             fi
-            sleep 20
+            sleep 15
           done
           if [[ "$ok" != "1" ]]; then
             echo "No se alcanzó estado vivo LB102 pre-UAT dentro de la ventana de despliegue."
-            echo "generation:"; cat generation.json || true
-            echo "simulation:"; cat simulation.json || true
             exit 1
           fi
       - name: Preserve live LB102 evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lb102-live-preuat-evidence
           path: |
             generation.json
             simulation.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
