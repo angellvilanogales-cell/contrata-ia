@@ -28,7 +28,7 @@ describe("LB102 Panda physical source gate",()=>{
   const out=comparePandaAgainstPhysicalSource({kind:"MEMORIA",pageCount:5,text,visualFeatures:visuals("MEMORIA")});
   expect(out.passed).toBe(true);expect(out.blockers).toEqual([]);expect(out.forbiddenMarkersFound).toEqual([]);expect(out.missingVisualFeatures).toEqual([]);
  });
- it("mantiene Panda fuera de UAT mientras la plantilla desplegada no supere el perfil físico",()=>{
-  expect(LB102_SOURCE_FIDELITY_POLICY["supply-panda"].accredited).toBe(false);expect(LB102_SOURCE_FIDELITY_POLICY["supply-panda"].level).toBe("DERIVED_STYLE_PENDING_COMPARISON");
+ it("promueve Panda solo como estilo derivado protegido tras persistencia V8, nunca como ODT fuente original",()=>{
+  const policy=LB102_SOURCE_FIDELITY_POLICY["supply-panda"];expect(policy.accredited).toBe(true);expect(policy.level).toBe("PROMOTED_SOURCE_DERIVED_STYLE");expect(policy.reason).toContain("persistida");expect(policy.reason).toContain("nunca");
  });
 });
