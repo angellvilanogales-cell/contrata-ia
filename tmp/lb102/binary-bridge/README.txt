@@ -1,0 +1,1 @@
+LB102 temporary binary bridge. Binary ZIP is committed as a Git blob in the temporary branch only; do not merge into the operational branch.
