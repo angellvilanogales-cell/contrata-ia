@@ -1,11 +1,16 @@
 import {HttpPersistedTemplateAssetStore,type PersistedTemplateAssetDescriptor,LB94_SUPPLY_GENERAL_RUNTIME_ASSETS} from "../lb94/HttpPersistedTemplateAssetStore";
-import {FERRETERIA_MEMORY_TEMPLATE_ID,FERRETERIA_PPT_TEMPLATE_ID} from "../lb59/FerreteriaSourceBackedProtectedRenderers";
 
 const SERVICE_STYLE_V2="sha256:7caa80e68cf19d03cfd70538125c1762f79fadbe2b4a4e3f9af2203f7492027d";
 
+export const FERRETERIA_POST_INTERVENCION_PCAP_TEMPLATE_ID="case:CONTR-2026-240267:pcap:v8:post-intervencion:editable" as const;
+export const FERRETERIA_POST_INTERVENCION_MEMORY_TEMPLATE_ID="case:CONTR-2026-240267:memoria:v14:post-intervencion:editable" as const;
+export const FERRETERIA_POST_INTERVENCION_PPT_TEMPLATE_ID="case:CONTR-2026-240267:ppt:v8:post-intervencion:editable" as const;
+
+/** Tríada editable post-Intervención corregida y humanamente validada el 02/09/2026. No es modelo general. */
 export const LB102_FERRETERIA_SOURCE_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
- {kind:"MEMORIA",templateId:FERRETERIA_MEMORY_TEMPLATE_ID,sourceId:"real-case:CONTR/2026/240267:memoria:v12",sha256:"36ed482048e19bc8b1f9c4fe1b8f1bd47eb81ac9e256dd4f0488e7bc97b8e4dc",styleFingerprint:"sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d",provenanceRole:"VALIDATED_REAL_CASE_SOURCE"},
- {kind:"PPT",templateId:FERRETERIA_PPT_TEMPLATE_ID,sourceId:"real-case:CONTR/2026/240267:ppt:v6",sha256:"c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09",styleFingerprint:"sha256:deadf7c2a176c83de774fad7022a0ac1d5adfcca514d8c0cddeb0b01029d1390",provenanceRole:"VALIDATED_REAL_CASE_SOURCE"},
+ {kind:"PCAP",templateId:FERRETERIA_POST_INTERVENCION_PCAP_TEMPLATE_ID,sourceId:"human-validated-corrected:CONTR/2026/240267:pcap:v8:post-intervencion",sha256:"9c5cdc5b42238c44994e1fc68759c3433a8fe8a84238da8efe113af73edf3a82",styleFingerprint:"sha256:e8dea86fa199b0fcd330445c9cca988da816caea17a8498cecce2f5da2411bb3",provenanceRole:"HUMAN_VALIDATED_CORRECTED_REAL_CASE_SOURCE"},
+ {kind:"MEMORIA",templateId:FERRETERIA_POST_INTERVENCION_MEMORY_TEMPLATE_ID,sourceId:"human-validated-corrected:CONTR/2026/240267:memoria:v14:post-intervencion",sha256:"b10930e825c9fadc574e0e008a07b05746541415aa050bdc42f91dff257ca1c0",styleFingerprint:"sha256:8e7db289d312e786782fb278ef9d4b3d1e41f2425c419f10f5c3ff4113228065",provenanceRole:"HUMAN_VALIDATED_CORRECTED_REAL_CASE_SOURCE"},
+ {kind:"PPT",templateId:FERRETERIA_POST_INTERVENCION_PPT_TEMPLATE_ID,sourceId:"human-validated-corrected:CONTR/2026/240267:ppt:v8:post-intervencion",sha256:"b36ec94e4107c4d95fdb6465c4f46909eb806c49411c90e7fccf9dd288782212",styleFingerprint:"sha256:a483412113912881741809575db2361a627b34647d1a94992384572ab87407d0",provenanceRole:"HUMAN_VALIDATED_CORRECTED_REAL_CASE_SOURCE"},
 ] as const;
 export const LB102_FERRETERIA_RUNTIME_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[...LB94_SUPPLY_GENERAL_RUNTIME_ASSETS,...LB102_FERRETERIA_SOURCE_ASSETS] as const;
 
