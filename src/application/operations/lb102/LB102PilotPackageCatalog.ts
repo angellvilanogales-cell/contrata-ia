@@ -10,7 +10,7 @@ export type LB102PilotPackageId="supply-ferreteria"|"supply-panda"|"service-huel
 export interface LB102PilotPackageDescriptor{id:LB102PilotPackageId;caseId:string;family:"SUPPLY"|"SERVICE";label:string;profile:string;atomicDocumentSet:readonly ["PCAP","MEMORIA","PPT"];}
 const ATOMIC=["PCAP","MEMORIA","PPT"] as const;
 export const LB102_PILOT_PACKAGE_CATALOG:readonly LB102PilotPackageDescriptor[]=[
- {id:"supply-ferreteria",caseId:"CONTR/2026/240267",family:"SUPPLY",label:"Ferretería SAE · ASA · DA 33.ª",profile:"FERRETERIA_SUPPLY_ASA_DA33_LB102_INTERVENCION_V1",atomicDocumentSet:ATOMIC},
+ {id:"supply-ferreteria",caseId:"CONTR/2026/240267",family:"SUPPLY",label:"Ferretería SAE · ASA · post-Intervención",profile:"FERRETERIA_SUPPLY_ASA_LB102_POST_INTERVENCION_V2",atomicDocumentSet:ATOMIC},
  {id:"supply-panda",caseId:"CONTR 2025 466864",family:"SUPPLY",label:"Panda / licencias software · ASO",profile:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V8",atomicDocumentSet:ATOMIC},
  {id:"service-huelva",caseId:"CONTR 2025 0000468715",family:"SERVICE",label:"Limpieza SAE Huelva",profile:"SERVICE_HUELVA_SOURCE_BACKED_REGRESSION_LB102_V8",atomicDocumentSet:ATOMIC},
  {id:"service-sevilla",caseId:"CONTR 2026 38892",family:"SERVICE",label:"Mantenimiento integral SAE Sevilla",profile:"SERVICE_SEVILLA_SOURCE_BACKED_REGRESSION_LB102_V8",atomicDocumentSet:ATOMIC},
