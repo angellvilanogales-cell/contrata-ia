@@ -24,16 +24,16 @@ describe("LB102 atomic document package gate",()=>{
 
 describe("Ferretería · observaciones de Intervención",()=>{
  it("detecta las discrepancias reales que motivaron la revisión",()=>{
-  const pcap="sin informe; tres licitadores; 3 días hábiles; garantía 3 años";
-  const memoria="se podrán incorporar otros artículos no contemplados en el listado";
-  const ppt="material defectuoso 5 días hábiles; adjudicación del acuerdo marco; plazo de garantía de tres (3) años para cada uno de los suministros realizados";
+  const pcap="sin informe; tres licitadores; material defectuoso: tres (3) días hábiles; garantía 3 años";
+  const memoria="Incorporación al contrato de otros artículos no contemplados en el listado de material de ferretería.";
+  const ppt="material defectuoso en un plazo máximo de cinco (5) días hábiles; adjudicación del acuerdo marco; plazo de garantía de tres (3) años para cada uno de los suministros realizados";
   const out=ferreteriaInterventionConsistencyAudit(pcap,memoria,ppt).join(" | ");
   expect(out).toMatch(/informe del letrado/);expect(out).toMatch(/artículos no contemplados/);expect(out).toMatch(/cuatro o más licitadores/);expect(out).toMatch(/5 días hábiles/);expect(out).toMatch(/acuerdo marco/);expect(out).toMatch(/garantía genérica/);expect(out).toMatch(/fungibles/);
  });
  it("acepta la coherencia declarada en la respuesta a Intervención",()=>{
-  const pcap="Informe del letrado AJ-SAE 2026/16. Cuando concurran cuatro o más licitadores. Baja superior al 25% respecto al presupuesto base de licitación. Material defectuoso: 3 días hábiles. Los productos de carácter fungible quedan exceptuados.";
+  const pcap="Sus anexos han sido informados por la Asesoría Jurídica del Servicio Andaluz de Empleo (nº de informe: AJ-SAE 2026/16). Cuando concurran cuatro o más licitadores. En cualquier caso, se considerará desproporcionada la baja superior a 25 unidades porcentuales respecto al presupuesto base de licitación. Material defectuoso: tres (3) días hábiles. Los productos de carácter fungible quedan exceptuados.";
   const memoria="Catálogo cerrado de artículos.";
-  const ppt="Material defectuoso: 3 días hábiles. Precio establecido en la adjudicación del contrato. Garantía de bienes duraderos y excepción de productos de carácter fungible.";
+  const ppt="Material defectuoso: tres (3) días hábiles. Precio establecido en la adjudicación del contrato. Garantía de bienes duraderos y excepción de productos de carácter fungible.";
   expect(ferreteriaInterventionConsistencyAudit(pcap,memoria,ppt)).toEqual([]);
  });
 });
