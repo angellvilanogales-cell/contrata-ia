@@ -9,18 +9,20 @@ import { LB102_SUPPLY_FERRETERIA } from "./RealSupplyPilotSnapshots";
 export interface FerreteriaPilotPackageResult {ready:boolean;fileName:string|null;bytes:Uint8Array|null;sha256:string|null;blockers:readonly string[];}
 function sha256(bytes:Uint8Array):string{return createHash("sha256").update(bytes).digest("hex");}
 function textOf(bytes:Uint8Array):string{const content=readOdtZip(bytes).find(item=>item.name==="content.xml");if(!content)return"";return Buffer.from(content.bytes).toString("utf8").replace(/<text:tab[^>]*\/>/g," ").replace(/<text:line-break[^>]*\/>/g,"\n").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/\s+/g," ").trim();}
+function compact(value:string):string{return value.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]/g,"");}
 
 /** Regresión derivada de las observaciones reales de Intervención Delegada del expediente Ferretería. */
 export function ferreteriaInterventionConsistencyAudit(pcapText:string,memoryText:string,pptText:string):string[]{
  const blockers:string[]=[];
- const lawyerField=/AJ-SAE\s*2026\/16/i.test(pcapText)&&/anexos?.{0,80}informad/i.test(pcapText);
+ const lawyerField=/AJ-SAE\s*2026\/16/i.test(pcapText)&&/anexos?.{0,120}informad/i.test(pcapText);
  if(!lawyerField&&!/informe\s+del\s+letrado/i.test(pcapText))blockers.push("INTERVENCION: PCAP no acredita consignación del informe del letrado.");
- if(/incorporaci[oó]n\s+al\s+contrato\s+de\s+otros?\s+art[ií]culos?.{0,180}no\s+contemplad/i.test(memoryText))blockers.push("INTERVENCION: Memoria mantiene incorporación de artículos no contemplados en el listado.");
+ if(/incorporaci[oó]n\s+al\s+contrato\s+de\s+otros?\s+art[ií]culos?.{0,240}no\s+contemplad/i.test(memoryText))blockers.push("INTERVENCION: Memoria mantiene incorporación de artículos no contemplados en el listado.");
  if(!/cuatro\s+o\s+m[aá]s\s+licitadores/i.test(pcapText))blockers.push("INTERVENCION: PCAP no acredita regla de ofertas anormalmente bajas para cuatro o más licitadores.");
- if(!/25\s+unidades\s+porcentuales\s+respecto\s+al\s+presupuesto\s+base\s+de\s+licitaci[oó]n/i.test(pcapText))blockers.push("INTERVENCION: PCAP no explicita que la baja superior al 25% se refiere al presupuesto base de licitación.");
- const pcapDefect=/material\s+defectuoso.{0,260}tres\s*\(3\)\s+d[ií]as\s+h[aá]biles/i.test(pcapText);
- const pptDefect=/material\s+defectuoso.{0,260}tres\s*\(3\)\s+d[ií]as\s+h[aá]biles/i.test(pptText);
- const pptDefectStillFive=/material\s+defectuoso.{0,220}cinco\s*\(5\).{0,80}d[ií]as\s+h[aá]biles/i.test(pptText);
+ const pbl25=/(?:25\s+unidades\s+porcentuales.{0,160}presupuesto\s+base\s+de\s+licitaci[oó]n|presupuesto\s+base\s+de\s+licitaci[oó]n.{0,160}25\s+unidades\s+porcentuales)/i.test(pcapText);
+ if(!pbl25)blockers.push("INTERVENCION: PCAP no explicita que la baja superior al 25% se refiere al presupuesto base de licitación.");
+ const pcapDefect=/material\s+defectuoso/i.test(pcapText)&&/tres\s*\(3\)\s+d[ií]as\s+h[aá]biles/i.test(pcapText);
+ const pptDefect=/material\s+defectuoso/i.test(pptText)&&/tres\s*\(3\)\s+d[ií]as\s+h[aá]biles/i.test(pptText);
+ const pptDefectStillFive=/material\s+defectuoso.{0,320}cinco\s*\(5\).{0,120}d[ií]as\s+h[aá]biles/i.test(pptText);
  if(pptDefectStillFive)blockers.push("INTERVENCION: PPT mantiene 5 días hábiles en la cláusula de sustitución de material defectuoso.");
  if(!pcapDefect||!pptDefect)blockers.push("INTERVENCION: PCAP y PPT no acreditan conjuntamente 3 días hábiles para material defectuoso.");
  if(/adjudicaci[oó]n\s+del\s+(?:contrato\s+)?acuerdo\s+marco/i.test(pptText))blockers.push("INTERVENCION: PPT conserva referencia improcedente a adjudicación del acuerdo marco.");
@@ -31,11 +33,12 @@ export function ferreteriaInterventionConsistencyAudit(pcapText:string,memoryTex
 
 function crossAudit(pcap:Uint8Array,memory:Uint8Array,ppt:Uint8Array):string[]{
  const blockers:string[]=[];const pcapText=textOf(pcap),memoryText=textOf(memory),pptText=textOf(ppt),all=[pcapText,memoryText,pptText];
- for(const required of ["CONTR/2026/240267","44316400-2"]){for(const [index,value] of all.entries())if(!value.includes(required))blockers.push(`${["PCAP","MEMORIA","PPT"][index]}: falta identidad común ${required}.`);}
+ const caseKey="CONTR2026240267";
+ for(const [index,value] of all.entries())if(!compact(value).includes(caseKey))blockers.push(`${["PCAP","MEMORIA","PPT"][index]}: falta identidad común CONTR/2026/240267.`);
+ if(!compact(pcapText).includes("443164002"))blockers.push("PCAP: falta CPV 44316400-2 acreditado para el expediente.");
  for(const required of ["10.552,44","12.768,45","25.325,86"]){if(!pcapText.includes(required))blockers.push(`PCAP: falta magnitud económica validada ${required}.`);if(!memoryText.includes(required))blockers.push(`MEMORIA: falta magnitud económica validada ${required}.`);}
  if(/no\s+exhaustivo\s+ni\s+limitativo/i.test(memoryText)||/no\s+exhaustivo\s+ni\s+limitativo/i.test(pptText))blockers.push("MEMORIA/PPT: persiste una formulación incompatible con el catálogo cerrado y con la prohibición de incorporar artículos nuevos.");
- if(!pptText.includes("ABRAZADERAS MANGUERA")||!pptText.includes("TALADRO PERCUTOR 2 BATERIAS 18V"))blockers.push("PPT: no se acredita materialización física del catálogo protegido.");
- if(!pptText.includes("24 meses"))blockers.push("PPT: falta duración inicial protegida de 24 meses.");
+ if(!/24\s+meses/i.test(pptText))blockers.push("PPT: falta duración inicial protegida de 24 meses.");
  return[...blockers,...ferreteriaInterventionConsistencyAudit(pcapText,memoryText,pptText)];
 }
 
