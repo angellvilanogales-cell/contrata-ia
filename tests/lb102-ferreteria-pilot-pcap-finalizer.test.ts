@@ -14,23 +14,26 @@ describe("LB102 Ferretería: ruta física protegida del piloto", () => {
     expect(renderer).not.toContain("content.replace(/<text:p");
   });
 
-  it("exige Memoria/PPT protegidos LB59 y bloquea si faltan los binarios fuente", () => {
+  it("mantiene el paquete indivisible y las regresiones de Intervención", () => {
     const generator = source("src/application/operations/lb102/FerreteriaPilotPackageGenerator.ts");
     expect(generator).toContain("renderFerreteriaProtectedMemory");
     expect(generator).toContain("renderFerreteriaProtectedPpt");
-    expect(generator).toContain("MISSING_SOURCE");
+    expect(generator).toContain("assertAtomicDocumentPackage");
+    expect(generator).toContain("ferreteriaInterventionConsistencyAudit");
+    expect(generator).toContain("canonicalSnapshot:LB102_SUPPLY_FERRETERIA");
     expect(generator).not.toContain("generateSupplyGeneralEvidenceDocuments");
   });
 
-  it("el catálogo LB102 no permite fallback al paquete Supply general", () => {
+  it("el catálogo LB102 no permite fallback y marca la revisión de Intervención", () => {
     const catalog = source("src/application/operations/lb102/LB102PilotPackageCatalog.ts");
     expect(catalog).toContain("generateFerreteriaPilotPackage");
     expect(catalog).not.toContain("generateSupplyUserDocumentPackage");
     const ferreteria = LB102_PILOT_PACKAGE_CATALOG.find(item => item.id === "supply-ferreteria");
-    expect(ferreteria?.profile).toBe("FERRETERIA_SUPPLY_ASA_DA33_LB102_PROTECTED");
+    expect(ferreteria?.profile).toBe("FERRETERIA_SUPPLY_ASA_DA33_LB102_INTERVENCION_V1");
+    expect(ferreteria?.atomicDocumentSet).toEqual(["PCAP","MEMORIA","PPT"]);
   });
 
-  it("mantiene el cierre PCAP final histórico como contrato de regresión", () => {
+  it("mantiene el cierre PCAP histórico solo como contrato de regresión", () => {
     expect(FERRETERIA_PCAP_FINAL_DOCUMENT.catalogueRows).toBe(98);
     expect(FERRETERIA_PCAP_FINAL_DOCUMENT.residualAuthorityPlaceholdersBlocked).toBe(true);
     expect(evaluateFerreteriaPcapFinalClosure().engineeringClosed).toBe(true);
