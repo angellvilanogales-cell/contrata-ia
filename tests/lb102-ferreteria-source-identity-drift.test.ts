@@ -19,9 +19,10 @@ describe("LB102 - identidad física Ferretería sin deriva", () => {
   });
   it("mantiene procedencia humana validada del expediente real y nunca la eleva a modelo general", () => {
     for (const asset of LB102_FERRETERIA_SOURCE_ASSETS) {
-      expect(asset.sourceId).toContain("CONTR/2026/240267");
+      expect(asset.sourceId).toContain("real-case:CONTR/2026/240267");
       expect(asset.sourceId).toContain("post-intervencion");
-      expect(asset.provenanceRole).toBe("HUMAN_VALIDATED_CORRECTED_REAL_CASE_SOURCE");
+      expect(asset.sourceId).toContain("human-validated-corrected");
+      expect(asset.provenanceRole).toBe("VALIDATED_REAL_CASE_SOURCE");
     }
   });
 });
