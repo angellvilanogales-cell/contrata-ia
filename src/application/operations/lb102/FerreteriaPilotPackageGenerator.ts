@@ -23,7 +23,7 @@ export function ferreteriaInterventionConsistencyAudit(pcapText:string,memoryTex
  const pcapCompact=compact(pcapText),pptCompact=compact(pptText);
  const pcapDefect=pcapCompact.includes("MATERIALDEFECTUOSO")&&pcapCompact.includes("3DIASHABILES");
  const pptDefect=pptCompact.includes("MATERIALDEFECTUOSO")&&pptCompact.includes("3DIASHABILES");
- const pptDefectStillFive=pptCompact.includes("MATERIALDEFECTUOSO")&&(pptCompact.includes("CINCO5DIASHABILES")||pptCompact.includes("5DIASHABILES"));
+ const pptDefectStillFive=/material\s+defectuoso.{0,180}(?:cinco\s*\(\s*5\s*\)|cinco\s+5|5\s+d[ií]as\s+h[aá]biles)/i.test(pptText);
  if(pptDefectStillFive)blockers.push("INTERVENCION: PPT mantiene 5 días hábiles en la cláusula de sustitución de material defectuoso.");
  if(!pcapDefect||!pptDefect)blockers.push("INTERVENCION: PCAP y PPT no acreditan conjuntamente 3 días hábiles para material defectuoso.");
  if(/adjudicaci[oó]n\s+del\s+(?:contrato\s+)?acuerdo\s+marco/i.test(pptText))blockers.push("INTERVENCION: PPT conserva referencia improcedente a adjudicación del acuerdo marco.");
