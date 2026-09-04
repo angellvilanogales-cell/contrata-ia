@@ -1,5 +1,6 @@
 import {HttpPersistedTemplateAssetStore,type PersistedTemplateAssetDescriptor,LB94_SUPPLY_GENERAL_RUNTIME_ASSETS} from "../lb94/HttpPersistedTemplateAssetStore";
 import {resolveJdaOfficialPcapModel} from "./JdaOfficialPcapModelManifest2025";
+import {PandaOfficialAsoRemoteFallbackStore} from "./PandaOfficialAsoRemoteFallbackStore";
 
 const SERVICE_STYLE_V2="sha256:7caa80e68cf19d03cfd70538125c1762f79fadbe2b4a4e3f9af2203f7492027d";
 
@@ -50,6 +51,6 @@ export const LB102_SERVICE_SOURCEBACKED_ASSETS:readonly PersistedTemplateAssetDe
 
 function env(manifest:readonly PersistedTemplateAssetDescriptor[]){const endpoint=process.env.CONTRATA_IA_PERSISTENCE_URL?.trim();const token=process.env.CONTRATA_IA_PERSISTENCE_TOKEN?.trim();if(!endpoint||!token)return null;return new HttpPersistedTemplateAssetStore(endpoint,token,manifest);}
 export function createLB102FerreteriaTemplateStoreFromEnv(){return env(LB102_FERRETERIA_RUNTIME_ASSETS);}
-export function createLB102PandaTemplateStoreFromEnv(){return env(lb102PandaRuntimeAssets());}
+export function createLB102PandaTemplateStoreFromEnv(){const persisted=env(lb102PandaRuntimeAssets());if(!persisted)return null;return new PandaOfficialAsoRemoteFallbackStore(persisted,lb102PandaOfficialAsoPcapAsset(),PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL);}
 export function createLB102ServiceTemplateStoreFromEnv(){return env(LB102_SERVICE_ASSETS);}
 export function createLB102ServiceSourceBackedTemplateStoreFromEnv(){return env(LB102_SERVICE_SOURCEBACKED_ASSETS);}
