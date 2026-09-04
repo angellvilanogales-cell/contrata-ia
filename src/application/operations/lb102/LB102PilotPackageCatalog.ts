@@ -2,18 +2,20 @@ import {createLB102FerreteriaTemplateStoreFromEnv,createLB102PandaTemplateStoreF
 import {generatePandaSourceBackedPilotPackage} from "../../intake/lb102/PandaSourceBackedPilotPackageGenerator";
 import {generateServiceSourceBackedPilotPackage} from "../../intake/lb102/ServiceSourceBackedPilotPackageGenerator";
 import {generateFerreteriaPilotPackage} from "./FerreteriaPilotPackageGenerator";
+import {requiredPilotCaseById,type LB102PilotPackageId} from "./LB102PilotAcceptancePolicy";
 import {LB102_SUPPLY_PANDA} from "./RealSupplyPilotSnapshots";
 import {LB102_SERVICE_HUELVA} from "./RealServicePilotSnapshots";
 import {LB102_SERVICE_SEVILLA} from "./RealServicePilotSnapshotSevilla";
 
-export type LB102PilotPackageId="supply-ferreteria"|"supply-panda"|"service-huelva"|"service-sevilla";
+export type {LB102PilotPackageId} from "./LB102PilotAcceptancePolicy";
 export interface LB102PilotPackageDescriptor{id:LB102PilotPackageId;caseId:string;family:"SUPPLY"|"SERVICE";label:string;profile:string;atomicDocumentSet:readonly ["PCAP","MEMORIA","PPT"];}
 const ATOMIC=["PCAP","MEMORIA","PPT"] as const;
+function descriptor(id:LB102PilotPackageId,label:string,profile:string):LB102PilotPackageDescriptor{const required=requiredPilotCaseById(id);if(!required)throw new Error(`Caso UAT canónico no encontrado: ${id}.`);return{id,caseId:required.caseId,family:required.family,label,profile,atomicDocumentSet:ATOMIC};}
 export const LB102_PILOT_PACKAGE_CATALOG:readonly LB102PilotPackageDescriptor[]=[
- {id:"supply-ferreteria",caseId:"CONTR/2026/240267",family:"SUPPLY",label:"Ferretería SAE · ASA · post-Intervención",profile:"FERRETERIA_SUPPLY_ASA_LB102_POST_INTERVENCION_V2",atomicDocumentSet:ATOMIC},
- {id:"supply-panda",caseId:"CONTR 2025 466864",family:"SUPPLY",label:"Panda / licencias software · ASO",profile:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V8",atomicDocumentSet:ATOMIC},
- {id:"service-huelva",caseId:"CONTR 2025 0000468715",family:"SERVICE",label:"Limpieza SAE Huelva",profile:"SERVICE_HUELVA_SOURCE_BACKED_REGRESSION_LB102_V8",atomicDocumentSet:ATOMIC},
- {id:"service-sevilla",caseId:"CONTR 2026 38892",family:"SERVICE",label:"Mantenimiento integral SAE Sevilla",profile:"SERVICE_SEVILLA_SOURCE_BACKED_REGRESSION_LB102_V8",atomicDocumentSet:ATOMIC},
+ descriptor("supply-ferreteria","Ferretería SAE · ASA · post-Intervención","FERRETERIA_SUPPLY_ASA_LB102_POST_INTERVENCION_V2"),
+ descriptor("supply-panda","Panda / licencias software · ASO","PANDA_SOURCE_BACKED_REGRESSION_LB102_V8"),
+ descriptor("service-huelva","Limpieza SAE Huelva","SERVICE_HUELVA_SOURCE_BACKED_REGRESSION_LB102_V8"),
+ descriptor("service-sevilla","Mantenimiento integral SAE Sevilla","SERVICE_SEVILLA_SOURCE_BACKED_REGRESSION_LB102_V8"),
 ] as const;
 export function pilotPackageDescriptor(id:string){return LB102_PILOT_PACKAGE_CATALOG.find(x=>x.id===id)??null;}
 export interface GeneratedLB102PilotPackage{ready:boolean;descriptor:LB102PilotPackageDescriptor;fileName:string|null;bytes:Uint8Array|null;sha256:string|null;blockers:readonly string[];}
