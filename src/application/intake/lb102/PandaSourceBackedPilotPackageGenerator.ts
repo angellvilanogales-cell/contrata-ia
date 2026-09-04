@@ -3,43 +3,50 @@ import {readOdtZip} from "../lb23/OdtPackageCodec";
 import {computeOdtStyleFingerprint,type UniversalEditableTemplateBinaryStore} from "../lb23/UniversalOdtProductionRenderer";
 import {zipStoredFiles} from "../lb95/StoredZipPackage";
 import type {UniversalEvidenceRecord} from "../lb52/UniversalEvidenceWorkspace";
-import {LB102_PANDA_ASSETS} from "./LB102PersistedPilotTemplateStores";
+import {LB102_PANDA_ASSETS,PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL} from "./LB102PersistedPilotTemplateStores";
 import {assertAtomicDocumentPackage} from "./AtomicDocumentPackageGate";
 import {harmonizePandaOdtLayout,PANDA_FERRETERIA_LAYOUT_POLICY} from "./PandaFerreteriaLayoutHarmonizer";
+import {assertNoOdtSignatureResidue,sanitizeOdtSignatureResidue} from "./OdtSignatureResidueSanitizer";
+import {renderPandaOfficialAsoPcap} from "./PandaOfficialAsoPcapRenderer";
 
 function sha(bytes:Uint8Array){return createHash("sha256").update(bytes).digest("hex");}
 function odtText(bytes:Uint8Array){const e=readOdtZip(bytes).find(x=>x.name==="content.xml");return e?Buffer.from(e.bytes).toString("utf8").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/\s+/g," "):"";}
-function validatedText(record:UniversalEvidenceRecord,path:string){const f=record.fields[path];if(!f||f.status!=="HUMAN_VALIDATED"||!f.humanValidated||typeof f.value!=="string"||!f.value.trim())throw new Error(`${path} no está validado para Panda source-backed.`);return f.value.trim();}
-function requiredAsset(index:number){const asset=LB102_PANDA_ASSETS[index];if(!asset)throw new Error(`Manifiesto Panda V8 incompleto en índice ${index}.`);return asset;}
+function validatedText(record:UniversalEvidenceRecord,path:string){const f=record.fields[path];if(!f||f.status!=="HUMAN_VALIDATED"||!f.humanValidated||typeof f.value!=="string"||!f.value.trim())throw new Error(`${path} no está validado para Panda V10.`);return f.value.trim();}
+function requiredAsset(kind:"MEMORIA"|"PPT"){const asset=LB102_PANDA_ASSETS.find(item=>item.kind===kind);if(!asset)throw new Error(`Manifiesto Panda V10 incompleto para ${kind}.`);return asset;}
 
-const SPECS={
- PCAP:{asset:requiredAsset(0),markers:["PROCEDIMIENTO ABIERTO SIMPLIFICADO ORDINARIO","I. ELEMENTOS DEL CONTRATO","IV. PRERROGATIVAS DE LA ADMINISTRACIÓN, JURISDICCIÓN Y RECURSOS","CONTR 2025 466864","48760000-3"]},
- MEMORIA:{asset:requiredAsset(1),markers:["1. NATURALEZA Y OBJETO DEL CONTRATO","14. SOLICITUD DE INFORME PRECEPTIVO PREVIO A LA CONTRATACIÓN","CONTR 2025 466864","48760000-3"]},
- PPT:{asset:requiredAsset(2),markers:["1 INTRODUCCIÓN","4.11 Seguridad","CONTR 2025 466864","PANDA SECURITY"]},
+const EVIDENCE_SPECS={
+ MEMORIA:{asset:requiredAsset("MEMORIA"),markers:["1. NATURALEZA Y OBJETO DEL CONTRATO","14. SOLICITUD DE INFORME PRECEPTIVO PREVIO A LA CONTRATACIÓN","CONTR 2025 466864","48760000-3"]},
+ PPT:{asset:requiredAsset("PPT"),markers:["1 INTRODUCCIÓN","4.11 Seguridad","CONTR 2025 466864","PANDA SECURITY"]},
 } as const;
+type EvidenceKind=keyof typeof EVIDENCE_SPECS;
 
-type Kind=keyof typeof SPECS;
-async function loadPhysical(kind:Kind,store:UniversalEditableTemplateBinaryStore){
- const spec=SPECS[kind],source=await store.get(spec.asset.templateId);if(!source)throw new Error(`Falta activo Panda ${kind} V8.`);
- if(sha(source.bytes)!==spec.asset.sha256)throw new Error(`SHA Panda ${kind} V8 incorrecto.`);
- const entries=readOdtZip(source.bytes);if(computeOdtStyleFingerprint(entries)!==spec.asset.styleFingerprint)throw new Error(`Huella Panda ${kind} V8 incorrecta.`);
+async function loadCleanEvidence(kind:EvidenceKind,store:UniversalEditableTemplateBinaryStore){
+ const spec=EVIDENCE_SPECS[kind],source=await store.get(spec.asset.templateId);if(!source)throw new Error(`Falta activo Panda ${kind} de evidencia.`);
+ if(sha(source.bytes)!==spec.asset.sha256)throw new Error(`SHA Panda ${kind} de evidencia incorrecto.`);
+ const entries=readOdtZip(source.bytes);if(computeOdtStyleFingerprint(entries)!==spec.asset.styleFingerprint)throw new Error(`Huella Panda ${kind} de evidencia incorrecta.`);
  const sourceText=odtText(source.bytes);if(/\{\{[^}]+\}\}|DATOS VARIABLES DEL EXPEDIENTE/.test(sourceText))throw new Error(`Panda ${kind} conserva marcadores técnicos.`);
  for(const marker of spec.markers)if(!sourceText.toLowerCase().includes(marker.toLowerCase()))throw new Error(`Panda ${kind}: falta marcador físico ${marker}.`);
- const harmonized=harmonizePandaOdtLayout(source.bytes);
- const outputText=odtText(harmonized);
- if(outputText!==sourceText)throw new Error(`Panda ${kind}: la armonización de formato alteró el texto acreditado.`);
- return harmonized;
+ const sanitized=sanitizeOdtSignatureResidue(source.bytes);
+ const cleanedText=odtText(sanitized);
+ for(const marker of spec.markers)if(!cleanedText.toLowerCase().includes(marker.toLowerCase()))throw new Error(`Panda ${kind}: el saneado de firma eliminó contenido material ${marker}.`);
+ const harmonized=harmonizePandaOdtLayout(sanitized);assertNoOdtSignatureResidue(harmonized,`Panda ${kind} V10`);return harmonized;
 }
 
-/** Panda V9: contenido source-backed exacto y presentación armonizada determinísticamente con el patrón visual Ferretería. */
+/**
+ * Panda V10: PCAP exclusivamente desde el modelo oficial ASO de la Junta;
+ * Memoria/PPT desde evidencia real saneada de huellas de firma. Ninguna firma
+ * digital, CSV o bloque de verificación puede formar parte del documento generado.
+ */
 export async function generatePandaSourceBackedPilotPackage(input:{record:UniversalEvidenceRecord;templateStore:UniversalEditableTemplateBinaryStore}){
  try{
-  if(input.record.caseId!=="CONTR 2025 466864")throw new Error("El renderer Panda source-backed V9 solo admite el caso de regresión CONTR 2025 466864.");
-  if(validatedText(input.record,"contractType")!=="SUPPLY"||validatedText(input.record,"procedure")!=="ABIERTO_SIMPLIFICADO_ORDINARIO"||validatedText(input.record,"technical.supplyVariant")!=="ICT_LICENSE_OR_SOFTWARE"||validatedText(input.record,"cpvMain")!=="48760000-3")throw new Error("El caso no coincide con el perfil Panda de regresión.");
-  const [pcap,memoria,ppt]=await Promise.all([loadPhysical("PCAP",input.templateStore),loadPhysical("MEMORIA",input.templateStore),loadPhysical("PPT",input.templateStore)]);
-  const safe=input.record.caseId.replaceAll("/","-").replaceAll(" ","-");const docs=[{kind:"PCAP" as const,fileName:`PCAP_${safe}_Panda_SourceBacked_V9.odt`,bytes:pcap},{kind:"MEMORIA" as const,fileName:`Memoria_${safe}_Panda_SourceBacked_V9.odt`,bytes:memoria},{kind:"PPT" as const,fileName:`PPT_${safe}_Panda_SourceBacked_V9.odt`,bytes:ppt}];
-  const atomic=assertAtomicDocumentPackage({caseId:input.record.caseId,packageVersion:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V9_FORMAT_HARMONIZED",canonicalSnapshot:input.record,documents:docs});
-  const manifest={schemaVersion:3,caseId:input.record.caseId,profile:"PANDA_SOURCE_BACKED_REGRESSION_LB102_V9_FORMAT_HARMONIZED" as const,...atomic,sourceAuthority:"REG-SUPPLY-002_PHYSICAL_SOURCE",templateProvenance:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE" as const,layoutTransformation:{basis:"FERRETERIA_INSTITUTIONAL_VISUAL_PATTERN" as const,deterministic:true as const,textPreserved:true as const,...PANDA_FERRETERIA_LAYOUT_POLICY},neverGeneralModel:true as const,documents:docs.map(d=>({kind:d.kind,fileName:d.fileName,sha256:sha(d.bytes),snapshotHash:atomic.snapshotHash,generationId:atomic.generationId,provenance:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE" as const,sourceBasis:"VALIDATED_REAL_CASE_REGRESSION_SOURCE" as const,officialModel:false as const})),sourcePhysicalPages:{MEMORIA:5,PCAP:85,PPT:16},humanAcceptanceRequired:true as const,productionReady:false as const};
-  const bytes=zipStoredFiles([...docs.map(d=>({name:d.fileName,bytes:d.bytes})),{name:"manifest.json",bytes:Buffer.from(JSON.stringify(manifest,null,2),"utf8")}]);return{ready:true,fileName:`Contrata-IA_${safe}_Panda_SourceBacked_V9.zip`,bytes,sha256:sha(bytes),manifest,blockers:[] as string[]};
+  if(input.record.caseId!=="CONTR 2025 466864")throw new Error("El renderer Panda V10 solo admite el caso de regresión CONTR 2025 466864.");
+  if(validatedText(input.record,"contractType")!=="SUPPLY"||validatedText(input.record,"procedure")!=="ABIERTO_SIMPLIFICADO_ORDINARIO"||validatedText(input.record,"technical.supplyVariant")!=="ICT_LICENSE_OR_SOFTWARE"||validatedText(input.record,"cpvMain")!=="48760000-3")throw new Error("El caso no coincide con el perfil Panda V10.");
+  const pcap=await renderPandaOfficialAsoPcap({templateStore:input.templateStore,caseId:input.record.caseId});
+  const [memoria,ppt]=await Promise.all([loadCleanEvidence("MEMORIA",input.templateStore),loadCleanEvidence("PPT",input.templateStore)]);
+  assertNoOdtSignatureResidue(pcap.bytes,"PCAP Panda V10");
+  const safe=input.record.caseId.replaceAll("/","-").replaceAll(" ","-");const docs=[{kind:"PCAP" as const,fileName:`PCAP_${safe}_JDA_ASO_Official_V10.odt`,bytes:pcap.bytes},{kind:"MEMORIA" as const,fileName:`Memoria_${safe}_Panda_Clean_V10.odt`,bytes:memoria},{kind:"PPT" as const,fileName:`PPT_${safe}_Panda_Clean_V10.odt`,bytes:ppt}];
+  const atomic=assertAtomicDocumentPackage({caseId:input.record.caseId,packageVersion:"PANDA_LB102_V10_OFFICIAL_PCAP_CLEAN_SIGNATURES",canonicalSnapshot:input.record,documents:docs});
+  const manifest={schemaVersion:4,caseId:input.record.caseId,profile:"PANDA_LB102_V10_OFFICIAL_PCAP_CLEAN_SIGNATURES" as const,...atomic,pcapModel:{officialModel:true as const,sourceAuthority:"JDA_COMISION_CONSULTIVA_RECOMMENDED_MODEL" as const,sourceUrl:PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL},evidenceAuthority:"REG-SUPPLY-002_PHYSICAL_SOURCE",layoutTransformation:{basis:"FERRETERIA_INSTITUTIONAL_VISUAL_PATTERN" as const,deterministic:true as const,...PANDA_FERRETERIA_LAYOUT_POLICY},signaturePolicy:{digitalSignatureResidueAllowed:false as const,verificationCodesAllowed:false as const,visibleSignedDocumentFooterAllowed:false as const,signerNameMayRemainOnlyAsEditableBusinessData:true as const},documents:docs.map(d=>({kind:d.kind,fileName:d.fileName,sha256:sha(d.bytes),snapshotHash:atomic.snapshotHash,generationId:atomic.generationId,provenance:d.kind==="PCAP"?"OFFICIAL_MODEL":"VALIDATED_REAL_CASE_EVIDENCE_CLEANED",officialModel:d.kind==="PCAP"})),humanAcceptanceRequired:true as const,productionReady:false as const};
+  const bytes=zipStoredFiles([...docs.map(d=>({name:d.fileName,bytes:d.bytes})),{name:"manifest.json",bytes:Buffer.from(JSON.stringify(manifest,null,2),"utf8")}]);return{ready:true,fileName:`Contrata-IA_${safe}_Panda_V10.zip`,bytes,sha256:sha(bytes),manifest,blockers:[] as string[]};
  }catch(error){return{ready:false,fileName:null,bytes:null,sha256:null,manifest:null,blockers:[error instanceof Error?error.message:String(error)]};}
 }
