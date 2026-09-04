@@ -4,7 +4,12 @@ const SIGNATURE_ENTRY=/^(?:META-INF\/)?(?:document|macro|xades)?signatures?\.xml
 const HARD_MARKERS=[/C[ÓO]DIGO SEGURO DE VERIFICACI[ÓO]N/i,/ws050\.juntadeandalucia\.es\/verificarFirma/i] as const;
 
 function plain(value:string){return value.replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();}
-function isVerificationLine(line:string){const text=plain(line);return /VERIFICACI[ÓO]N/i.test(text)&&(/[A-Za-z0-9]{12,}/.test(text)||/P[ÁA]G(?:INA)?\.?\s*[:.]?\s*\d+/i.test(text)||/verificarFirma/i.test(text));}
+function isVerificationLine(line:string){
+ const text=plain(line);
+ if(/verificarFirma/i.test(text))return true;
+ if(/C[ÓO]DIGO SEGURO DE VERIFICACI[ÓO]N/i.test(text))return true;
+ return /VERIFICACI[ÓO]N/i.test(text)&&/P[ÁA]G(?:INA)?\.?\s*[:.]?\s*\d+/i.test(text);
+}
 function isSignedIdentityLine(line:string){const text=plain(line);return /^FIRMADO POR\b/i.test(text)||(/\b\d{2}\/\d{2}\/\d{4}(?:\s+\d{2}:\d{2}:\d{2})?\b/.test(text)&&/P[ÁA]G(?:INA)?\.?\s*[:.]?\s*\d+/i.test(text));}
 function isVerificationIntro(line:string){const text=plain(line);return /Puede verificar la integridad de este documento/i.test(text)||(/direcci[óo]n/i.test(text)&&/verificarFirma/i.test(text));}
 function isAuthenticCopyLine(line:string){return /Es copia aut[ée]ntica de documento electr[óo]nico/i.test(plain(line));}
@@ -27,7 +32,7 @@ function sanitizeContentXml(xml:string){
  return xml.replace(/(<text:p\b[^>]*>)([\s\S]*?)(<\/text:p>)/g,(_all:string,open:string,body:string,close:string)=>open+sanitizeParagraphBody(body)+close);
 }
 
-/** Elimina únicamente huellas de firma/verificación heredadas del documento fuente. No elimina menciones jurídicas ordinarias a "firma". */
+/** Elimina únicamente huellas de firma/verificación heredadas del documento fuente. No elimina menciones jurídicas ordinarias a "firma" o "verificación". */
 export function sanitizeOdtSignatureResidue(sourceBytes:Uint8Array):Uint8Array{
  const entries=readOdtZip(sourceBytes).filter(entry=>!SIGNATURE_ENTRY.test(entry.name));
  const transformed:OdtZipEntry[]=entries.map(entry=>{
