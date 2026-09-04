@@ -6,15 +6,17 @@ function validated(key:string,value:unknown,sourceId:string):EvidenceField<unkno
 function record(caseId:string,sourceId:string,values:Record<string,unknown>):UniversalEvidenceRecord{return{caseId,updatedAt:"2026-09-02T11:00:00.000Z",fields:Object.fromEntries(Object.entries(values).map(([k,v])=>[k,validated(k,v,sourceId)]))};}
 
 export const LB102_SUPPLY_PANDA=record("CONTR 2025 466864","REG-SUPPLY-002",{
- contractType:"SUPPLY",procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO","economic.fundingSource":"AUTOFINANCED","technical.supplyVariant":"ICT_LICENSE_OR_SOFTWARE","technical.hasSuccessiveOrders":false,
+ contractType:"SUPPLY",procedure:"ABIERTO_SIMPLIFICADO_ORDINARIO","economic.fundingSource":"AUTOFINANCED","processing.processingType":"ORDINARIA","technical.supplyVariant":"ICT_LICENSE_OR_SOFTWARE","technical.hasSuccessiveOrders":false,
+ "administrative.title":"CONTRATACIÓN DEL SUMINISTRO PARA LA RENOVACIÓN DE LA SUSCRIPCIÓN DEL SOFTWARE ANTIVIRUS PANDA SECURITY EN LA AGENCIA DE VIVIENDA Y REHABILITACIÓN DE ANDALUCIA.","administrative.locality":"SEVILLA","administrative.nuts":"ES0618","administrative.reservedContractDa4":false,
  need:"Mantener la protección antimalware corporativa mediante renovación de licencias del producto Panda.",object:"Suministro de licencias de software de seguridad Panda y soporte asociado.",cpvMain:"48760000-3",
- "lots.divisionIntoLots":false,"lots.noDivisionJustification":"La prestación constituye una unidad funcional y técnica vinculada a una única solución de seguridad.",
+ "lots.divisionIntoLots":false,"lots.noDivisionJustification":"El contrato no puede dividirse en lotes porque la suscripción de software constituye una unidad funcional y técnica vinculada a una única solución de seguridad existente en el mercado.","lots.integratedOfferAllowed":false,
  baseTenderBudgetCents:6119225,"economic.initialVatAmountCents":1285037,"economic.initialPblVatIncludedCents":7404262,"economic.legalEstimatedValueCents":6119225,
- "economic.estimatedValueCalculationMethod":"Valor estimado declarado en la fuente primaria, sin prórrogas ni modificaciones previstas.","economic.priceDeterminationRegime":"Precios unitarios por componentes/licencias.",
- durationMonths:36,extensionMonths:0,"execution.extensionStructure":"Sin prórroga declarada en la fuente primaria.",
+ "economic.estimatedValueCalculationMethod":"Coincide con el presupuesto base de licitación.","economic.priceDeterminationRegime":"PRECIOS UNITARIOS referidos a los distintos componentes de la prestación.","economic.priceRevisionRegime":"No procede.","economic.needsBasedContractDa33":false,
+ durationMonths:36,extensionMonths:0,"execution.extensionStructure":"Sin prórroga.",
+ "criteria.registryException":true,"criteria.businessAuthorizationRequired":true,"criteria.businessAuthorization":"La empresa adjudicataria deberá ser socio o partner del fabricante del producto ofertado, propietario del mismo, a nivel GOLD o equivalente.",
  "criteria.economicSolvency":"Volumen anual de negocios conforme al PCAP del expediente.","criteria.technicalSolvency":"Experiencia y medios técnicos; se exige acreditación Partner Gold del fabricante conforme a la fuente.",
  "criteria.awardCriteria":["Oferta económica y demás criterios automáticos declarados en el expediente"],"execution.specialExecutionConditions":["Condiciones especiales de ejecución según PCAP del expediente"],
- "technical.executionLocations":["Servicios Centrales del Servicio Andaluz de Empleo"],"technical.technicalRequirements":"Renovación de la solución de seguridad, protección antimalware y funcionalidades técnicas definidas en el PPT.",
+ "technical.executionLocations":["Agencia de Vivienda y Rehabilitación de Andalucía, Sevilla"],"technical.deliveryLocation":"C/ Pablo Picasso, nº 6. 41018 – Sevilla","technical.technicalRequirements":"Renovación de la solución de seguridad, protección antimalware y funcionalidades técnicas definidas en el PPT.",
  "technical.licenseRequirements":"Derechos de uso de las licencias durante 36 meses; compatibilidad y continuidad con la solución instalada; requisito Partner Gold acreditado.","technical.supportRequirements":"Mantenimiento, actualizaciones y soporte durante toda la vigencia contractual según PPT.",
  "execution.receiptAndAcceptanceRegime":"Conformidad previa comprobación de licencias, activación y soporte contratado."
 });
