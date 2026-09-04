@@ -13,7 +13,7 @@ const ATOMIC=["PCAP","MEMORIA","PPT"] as const;
 function descriptor(id:LB102PilotPackageId,label:string,profile:string):LB102PilotPackageDescriptor{const required=requiredPilotCaseById(id);if(!required)throw new Error(`Caso UAT canónico no encontrado: ${id}.`);return{id,caseId:required.caseId,family:required.family,label,profile,atomicDocumentSet:ATOMIC};}
 export const LB102_PILOT_PACKAGE_CATALOG:readonly LB102PilotPackageDescriptor[]=[
  descriptor("supply-ferreteria","Ferretería SAE · ASA · post-Intervención","FERRETERIA_SUPPLY_ASA_LB102_POST_INTERVENCION_V2"),
- descriptor("supply-panda","Panda / licencias software · ASO","PANDA_SOURCE_BACKED_REGRESSION_LB102_V8"),
+ descriptor("supply-panda","Panda / licencias software · ASO","PANDA_SOURCE_BACKED_REGRESSION_LB102_V9_FORMAT_HARMONIZED"),
  descriptor("service-huelva","Limpieza SAE Huelva","SERVICE_HUELVA_SOURCE_BACKED_REGRESSION_LB102_V8"),
  descriptor("service-sevilla","Mantenimiento integral SAE Sevilla","SERVICE_SEVILLA_SOURCE_BACKED_REGRESSION_LB102_V8"),
 ] as const;
