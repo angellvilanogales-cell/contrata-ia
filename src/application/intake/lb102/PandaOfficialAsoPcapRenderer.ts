@@ -10,6 +10,7 @@ function sha256(bytes:Uint8Array){return createHash("sha256").update(bytes).dige
 function esc(value:string){return value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&apos;");}
 function decodeXml(value:string){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'\"').replace(/&apos;/g,"'");}
 function plain(xml:string){return decodeXml(xml.replace(/<[^>]+>/g," ")).replace(/\s+/g," ").trim();}
+function compact(value:string){return plain(value).replace(/\s+/g,"").toLocaleLowerCase("es");}
 function text(bytes:Uint8Array){const content=readOdtZip(bytes).find(entry=>entry.name==="content.xml");return content?plain(Buffer.from(content.bytes).toString("utf8")):"";}
 function field(record:UniversalEvidenceRecord,key:string){const f=record.fields[key];if(!f||f.status!=="HUMAN_VALIDATED"||!f.humanValidated)throw new Error(`Panda V10: falta evidencia humana validada para ${key}.`);return f.value;}
 function str(record:UniversalEvidenceRecord,key:string){const value=field(record,key);if(typeof value!=="string"||!value.trim())throw new Error(`Panda V10: ${key} debe ser texto validado.`);return value.trim();}
@@ -18,9 +19,9 @@ function bool(record:UniversalEvidenceRecord,key:string){const value=field(recor
 function euros(cents:number){return new Intl.NumberFormat("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2,useGrouping:true}).format(cents/100);}
 function replaceUniqueLiteral(xml:string,from:string,to:string,label:string){const count=xml.split(from).length-1;if(count!==1)throw new Error(`PCAP oficial ASO: anclaje ${label} aparece ${count} veces; se exige identidad física exacta.`);return xml.replace(from,to);}
 
-function replaceSimpleParagraph(xml:string,expectedText:string,replacementText:string,label:string){
- const re=/<text:p\b[^>]*>[\s\S]*?<\/text:p>/g;let match:RegExpExecArray|null;let found:string|null=null;
- while((match=re.exec(xml))){if(plain(match[0])===expectedText){if(found)throw new Error(`PCAP oficial ASO: anclaje textual duplicado ${label}.`);found=match[0];}}
+function replaceStyledParagraph(xml:string,styleName:string,labelNeedle:string,replacementText:string,label:string){
+ const re=new RegExp(`<text:p\\b[^>]*text:style-name="${styleName}"[^>]*>[\\s\\S]*?<\\/text:p>`,"g");let match:RegExpExecArray|null;let found:string|null=null;const needle=labelNeedle.replace(/\s+/g,"").toLocaleLowerCase("es");
+ while((match=re.exec(xml))){if(compact(match[0]).includes(needle)){if(found)throw new Error(`PCAP oficial ASO: anclaje textual duplicado ${label}.`);found=match[0];}}
  if(!found)throw new Error(`PCAP oficial ASO: no se encuentra anclaje textual ${label}.`);
  const open=found.match(/^<text:p\b[^>]*>/)?.[0];if(!open)throw new Error(`PCAP oficial ASO: párrafo inválido en ${label}.`);
  return xml.replace(found,`${open}${esc(replacementText)}</text:p>`);
@@ -39,30 +40,27 @@ function fillFrontPage(xml:string,record:UniversalEvidenceRecord){
 function fillAnnexI(xml:string,record:UniversalEvidenceRecord){
  const title=str(record,"administrative.title"),locality=str(record,"administrative.locality"),object=str(record,"object"),cpv=str(record,"cpvMain"),delivery=str(record,"technical.deliveryLocation"),noLots=str(record,"lots.noDivisionJustification");
  const pbl=num(record,"baseTenderBudgetCents"),vat=num(record,"economic.initialVatAmountCents"),pblVat=num(record,"economic.initialPblVatIncludedCents"),ve=num(record,"economic.legalEstimatedValueCents"),duration=num(record,"durationMonths"),extension=num(record,"extensionMonths");
- const lots=bool(record,"lots.divisionIntoLots"),integrated=bool(record,"lots.integratedOfferAllowed"),reserved=bool(record,"administrative.reservedContractDa4"),da33=bool(record,"economic.needsBasedContractDa33");
- xml=replaceSimpleParagraph(xml,"TÍTULO DEL CONTRATO: _______",`TÍTULO DEL CONTRATO: ${title}`,"anexo1.titulo");
- xml=replaceSimpleParagraph(xml,"EXPEDIENTE: _______",`EXPEDIENTE: ${record.caseId}`,"anexo1.expediente");
- xml=replaceSimpleParagraph(xml,"LOCALIDAD: _______",`LOCALIDAD: ${locality}`,"anexo1.localidad");
- xml=replaceSimpleParagraph(xml,"Objeto del contrato: _______",`Objeto del contrato: ${object}`,"anexo1.objeto");
- xml=replaceSimpleParagraph(xml,"Lugar de entrega del suministro: _______",`Lugar de entrega del suministro: ${delivery}`,"anexo1.lugarEntrega");
- xml=replaceSimpleParagraph(xml,"División en lotes: Sí/No",`División en lotes: ${lots?"Sí":"No"}`,"anexo1.lotes");
- xml=replaceSimpleParagraph(xml,"Justificación de la no división del contrato en lotes: _______",`Justificación de la no división del contrato en lotes: ${lots?"No procede.":noLots}`,"anexo1.justificacionNoLotes");
- xml=replaceSimpleParagraph(xml,"Oferta integradora: Sí/No",`Oferta integradora: ${integrated?"Sí":"No"}`,"anexo1.ofertaIntegradora");
- xml=replaceSimpleParagraph(xml,"Importe total (IVA excluido): _______euros.",`Importe total (IVA excluido): ${euros(pbl)} euros.`,"anexo1.pblSinIva");
- xml=replaceSimpleParagraph(xml,"Importe del IVA: _______euros.",`Importe del IVA: ${euros(vat)} euros.`,"anexo1.iva");
- xml=replaceSimpleParagraph(xml,"Importe total (IVA incluido): _______euros.",`Importe total (IVA incluido): ${euros(pblVat)} euros.`,"anexo1.pblIva");
- xml=replaceSimpleParagraph(xml,"Valor estimado del contrato: _______ euros.",`Valor estimado del contrato: ${euros(ve)} euros.`,"anexo1.valorEstimado");
- xml=replaceSimpleParagraph(xml,"Método de cálculo: _______",`Método de cálculo: ${str(record,"economic.estimatedValueCalculationMethod")}`,"anexo1.metodoVe");
- xml=replaceSimpleParagraph(xml,"Plazo total (en meses): _______",`Plazo total (en meses): ${duration} meses`,"anexo1.plazo");
- xml=replaceSimpleParagraph(xml,"Posibilidad de prórroga: Sí/No",`Posibilidad de prórroga: ${extension>0?"Sí":"No"}`,"anexo1.prorroga");
- xml=replaceSimpleParagraph(xml,"Duración de la prórroga: _______",`Duración de la prórroga: ${extension>0?`${extension} meses`:"No procede."}`,"anexo1.duracionProrroga");
- xml=replaceSimpleParagraph(xml,"Tramitación del gasto: Ordinaria/Anticipada.",`Tramitación del gasto: ${str(record,"processing.processingType")==="ORDINARIA"?"Ordinaria":"Anticipada"}.`,"anexo1.tramitacionGasto");
- const fullText=plain(xml);if(!fullText.includes(cpv)){
-  const marker="Código CPV";const idx=xml.indexOf(marker);if(idx<0)throw new Error("PCAP oficial ASO: no se localiza anexo1.cpv.");const next=xml.indexOf("_______",idx);if(next<0)throw new Error("PCAP oficial ASO: no se localiza hueco anexo1.cpv.");xml=xml.slice(0,next)+esc(cpv)+xml.slice(next+7);
- }
+ const lots=bool(record,"lots.divisionIntoLots"),integrated=bool(record,"lots.integratedOfferAllowed");
+ xml=replaceStyledParagraph(xml,"P133","TÍTULO DEL CONTRATO",`TÍTULO DEL CONTRATO: ${title}`,"anexo1.titulo");
+ xml=replaceStyledParagraph(xml,"P134","EXPEDIENTE",`EXPEDIENTE: ${record.caseId}`,"anexo1.expediente");
+ xml=replaceStyledParagraph(xml,"P134","LOCALIDAD",`LOCALIDAD: ${locality}`,"anexo1.localidad");
+ xml=replaceStyledParagraph(xml,"P515","Objeto del contrato",`Objeto del contrato: ${object}`,"anexo1.objeto");
+ xml=replaceStyledParagraph(xml,"P138","Lugar de entrega del suministro",`Lugar de entrega del suministro: ${delivery}`,"anexo1.lugarEntrega");
+ xml=replaceStyledParagraph(xml,"P51","División en lotes",`División en lotes: ${lots?"Sí":"No"}`,"anexo1.lotes");
+ xml=replaceStyledParagraph(xml,"P571","Justificación de la no división",`Justificación de la no división del contrato en lotes: ${lots?"No procede.":noLots}`,"anexo1.justificacionNoLotes");
+ xml=replaceStyledParagraph(xml,"P67","Oferta integradora",`Oferta integradora: ${integrated?"Sí":"No"}`,"anexo1.ofertaIntegradora");
+ xml=replaceStyledParagraph(xml,"P559","Importe total (IVA excluido)",`Importe total (IVA excluido): ${euros(pbl)} euros.`,"anexo1.pblSinIva");
+ xml=replaceStyledParagraph(xml,"P560","Importe del IVA",`Importe del IVA: ${euros(vat)} euros.`,"anexo1.iva");
+ xml=replaceStyledParagraph(xml,"P560","Importe total (IVA incluido)",`Importe total (IVA incluido): ${euros(pblVat)} euros.`,"anexo1.pblIva");
+ xml=replaceStyledParagraph(xml,"P581","Valor estimado del contrato",`Valor estimado del contrato: ${euros(ve)} euros.`,"anexo1.valorEstimado");
+ xml=replaceStyledParagraph(xml,"P582","Método de cálculo",`Método de cálculo: ${str(record,"economic.estimatedValueCalculationMethod")}`,"anexo1.metodoVe");
+ xml=replaceStyledParagraph(xml,"P586","Plazo total",`Plazo total (en meses): ${duration} meses`,"anexo1.plazo");
+ xml=replaceStyledParagraph(xml,"P191","Posibilidad de prórroga",`Posibilidad de prórroga: ${extension>0?"Sí":"No"}`,"anexo1.prorroga");
+ xml=replaceStyledParagraph(xml,"P192","Duración de la prórroga",`Duración de la prórroga: ${extension>0?`${extension} meses`:"No procede."}`,"anexo1.duracionProrroga");
+ xml=replaceStyledParagraph(xml,"P444","Tramitación del gasto",`Tramitación del gasto: ${str(record,"processing.processingType")==="ORDINARIA"?"Ordinaria":"Anticipada"}.`,"anexo1.tramitacionGasto");
+ const annexStart=xml.indexOf('<text:p text:style-name="P20">ANEXO I</text:p>');if(annexStart<0)throw new Error("PCAP oficial ASO: no se localiza inicio físico del Anexo I.");const cpvLabel=xml.indexOf("Código CPV",annexStart);if(cpvLabel<0)throw new Error("PCAP oficial ASO: no se localiza anexo1.cpv.");const cpvGap=xml.indexOf("_______",cpvLabel);if(cpvGap<0)throw new Error("PCAP oficial ASO: no se localiza hueco anexo1.cpv.");xml=xml.slice(0,cpvGap)+esc(cpv)+xml.slice(cpvGap+7);
  const mandatory=[record.caseId,title,object,cpv,euros(pbl),euros(ve),String(duration)];const rendered=plain(xml);for(const value of mandatory)if(!rendered.includes(value))throw new Error(`PCAP oficial ASO: no se materializó dato obligatorio ${value}.`);
  if(rendered.includes("FIRMADO POR")||rendered.includes("VERIFICACIÓN"))throw new Error("PCAP oficial ASO: se detecta residuo de firma en el modelo de salida.");
- void reserved;void da33;
  return xml;
 }
 
