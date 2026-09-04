@@ -23,7 +23,7 @@ export const LB102_PANDA_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
  {kind:"PPT",templateId:"case:CONTR-2025-466864:ppt:sourcebacked:v8",sourceId:"derived-from-real-case:CONTR-2025-466864:ppt:v8",sha256:"5d1a46369ae202287352d7bb79fd584807e370775fd8dc007367337027c6a25c",styleFingerprint:"sha256:5e15f66b9d11748f2e10b40d0bf9554fd0fcce738b7cb31c99671f6fd1da9072",provenanceRole:"CONTRATA_IA_DERIVED_SOURCE_STRUCTURAL_TEMPLATE"},
 ] as const;
 
-function officialAsoPcapAssetFromEnv():PersistedTemplateAssetDescriptor|null{
+export function lb102PandaOfficialAsoPcapAsset():PersistedTemplateAssetDescriptor|null{
  const sha256=process.env.CONTRATA_IA_JDA_PCAP_SUPPLY_ASO_SHA256?.trim().toLowerCase();
  const styleFingerprint=process.env.CONTRATA_IA_JDA_PCAP_SUPPLY_ASO_STYLE_FINGERPRINT?.trim();
  if(!sha256&&!styleFingerprint)return null;
@@ -31,8 +31,8 @@ function officialAsoPcapAssetFromEnv():PersistedTemplateAssetDescriptor|null{
  if(!styleFingerprint||!/^sha256:[a-f0-9]{64}$/.test(styleFingerprint))throw new Error("CONTRATA_IA_JDA_PCAP_SUPPLY_ASO_STYLE_FINGERPRINT debe contener la huella de estilo acreditada del modelo oficial ASO.");
  return{kind:"PCAP",templateId:PANDA_OFFICIAL_ASO_PCAP_TEMPLATE_ID,sourceId:"jda:cccp:pcap:supply:aso:autofinanced:2025-12-17:odt",sha256,styleFingerprint,provenanceRole:"OFFICIAL_MODEL"};
 }
-export function lb102PandaOfficialAsoPcapConfigured(){return Boolean(officialAsoPcapAssetFromEnv());}
-export function lb102PandaRuntimeAssets():readonly PersistedTemplateAssetDescriptor[]{const official=officialAsoPcapAssetFromEnv();return official?[...LB102_PANDA_ASSETS,official]:LB102_PANDA_ASSETS;}
+export function lb102PandaOfficialAsoPcapConfigured(){return Boolean(lb102PandaOfficialAsoPcapAsset());}
+export function lb102PandaRuntimeAssets():readonly PersistedTemplateAssetDescriptor[]{const official=lb102PandaOfficialAsoPcapAsset();return official?[...LB102_PANDA_ASSETS,official]:LB102_PANDA_ASSETS;}
 
 /** V2 se conserva como plantilla estructural genérica de desarrollo, pero ya no es la evidencia física de los pilotos UAT. */
 export const LB102_SERVICE_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
