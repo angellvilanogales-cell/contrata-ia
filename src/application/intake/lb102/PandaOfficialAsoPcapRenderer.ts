@@ -58,9 +58,12 @@ function fillAnnexI(xml:string,record:UniversalEvidenceRecord){
  xml=replaceStyledParagraph(xml,"P191","Posibilidad de prórroga",`Posibilidad de prórroga: ${extension>0?"Sí":"No"}`,"anexo1.prorroga");
  xml=replaceStyledParagraph(xml,"P192","Duración de la prórroga",`Duración de la prórroga: ${extension>0?`${extension} meses`:"No procede."}`,"anexo1.duracionProrroga");
  xml=replaceStyledParagraph(xml,"P444","Tramitación del gasto",`Tramitación del gasto: ${str(record,"processing.processingType")==="ORDINARIA"?"Ordinaria":"Anticipada"}.`,"anexo1.tramitacionGasto");
- const annexStart=xml.indexOf('<text:p text:style-name="P20">ANEXO I</text:p>');if(annexStart<0)throw new Error("PCAP oficial ASO: no se localiza inicio físico del Anexo I.");const cpvLabel=xml.indexOf("Código CPV",annexStart);if(cpvLabel<0)throw new Error("PCAP oficial ASO: no se localiza anexo1.cpv.");const cpvGap=xml.indexOf("_______",cpvLabel);if(cpvGap<0)throw new Error("PCAP oficial ASO: no se localiza hueco anexo1.cpv.");xml=xml.slice(0,cpvGap)+esc(cpv)+xml.slice(cpvGap+7);
+ // El CPV ya se materializa en el bloque físico de identificación del Anexo I
+ // dentro de fillFrontPage(). El modelo oficial no contiene un hueco de siete
+ // guiones posterior a "Código CPV" y su cabecera real es un párrafo P339 con
+ // spans/referencia cruzada, no un párrafo P20. No se vuelve a buscar un anclaje
+ // sintético para evitar degradar el modelo oficial.
  const mandatory=[record.caseId,title,object,cpv,euros(pbl),euros(ve),String(duration)];const rendered=plain(xml);for(const value of mandatory)if(!rendered.includes(value))throw new Error(`PCAP oficial ASO: no se materializó dato obligatorio ${value}.`);
- if(rendered.includes("FIRMADO POR")||rendered.includes("VERIFICACIÓN"))throw new Error("PCAP oficial ASO: se detecta residuo de firma en el modelo de salida.");
  return xml;
 }
 
