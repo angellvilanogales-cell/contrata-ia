@@ -27,6 +27,8 @@ const EVIDENCE_BINDINGS: Readonly<Record<string, { fieldPath: string; transform?
   "common:cpv": { fieldPath: "cpvMain" },
   "common:lots": { fieldPath: "lots.divisionIntoLots" },
   "common:no-lots-justification": { fieldPath: "lots.noDivisionJustification" },
+  "common:procedure": { fieldPath: "procedure" },
+  "common:financing-profile": { fieldPath: "economic.fundingSource" },
   "supply:delivery-mode": { fieldPath: "economic.needsBasedContractDa33", transform: "DELIVERY_MODE_TO_DA33_BOOLEAN" },
   "supply:pbl": { fieldPath: "baseTenderBudgetCents" },
   "supply:estimated-value": { fieldPath: "economic.legalEstimatedValueCents" },
