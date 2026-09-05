@@ -49,6 +49,14 @@ describe("LB103 · integración guiada en /adaptive", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("selección del modelo documental permanecerá bloqueada");
   });
 
+  it("ejecuta el preflight en servidor y presenta SHA, modelos y bloqueos", () => {
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("/lb103-preflight");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Construir snapshot y comprobar modelos");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Snapshot canónico validado");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("SHA-256");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Selección documental");
+  });
+
   it("no confunde revisión final con producción institucional", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("READY_FOR_DOCUMENT_GENERATION");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("todavía no implica generación ni producción institucional");
