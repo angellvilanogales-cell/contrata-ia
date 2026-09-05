@@ -62,12 +62,19 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
   });
 
   it("bloquea el snapshot si una decisión aplicable carece de validación trazable", () => {
-    const value = supplyCase();
-    value.universalEvidence!["baseTenderBudgetCents"] = {
-      ...value.universalEvidence!["baseTenderBudgetCents"],
-      status: "SOURCE_DECLARED",
-      humanValidated: false,
-      humanValidation: undefined,
+    const original = supplyCase();
+    const current = original.universalEvidence!["baseTenderBudgetCents"];
+    const value: AdaptiveStoredCase = {
+      ...original,
+      universalEvidence: {
+        ...original.universalEvidence,
+        baseTenderBudgetCents: {
+          ...current,
+          status: "SOURCE_DECLARED",
+          humanValidated: false,
+          humanValidation: undefined,
+        },
+      },
     };
     const result = evaluateLB103ServerValidatedPreflight(value);
     expect(result.snapshotReady).toBe(false);
