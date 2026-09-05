@@ -10,6 +10,7 @@ on:
       - agent/lb5-documentos-administrativos
       - agent/lb6-api-ui-integracion
       - agent/lb7-qa-seguridad-v1
+      - agent/lb91-universalizacion-operativa
   pull_request:
     branches:
       - main
@@ -158,6 +159,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Verify deployed LB94 runtime import graph
+        env:
+          CONTRATA_IA_AUTH_REQUIRED: "0"
+        run: node --input-type=module -e "await import('./dist/interfaces/lb94/LB94RuntimeServer.js')"
       - name: Smoke test application start
         run: npm start
       - name: Execute LB-3 vertical flow

@@ -1,0 +1,92 @@
+name: Contrata-IA Generation Gate
+
+on:
+  push:
+    branches:
+      - agent/lb91-universalizacion-operativa
+      - agent/lb7-qa-seguridad-v1
+  pull_request:
+    branches:
+      - agent/lb7-qa-seguridad-v1
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generation:
+    name: Generate and audit editable procurement packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:generation
+
+  lb102-live-preuat:
+    name: Generate four live LB102 packages and run pre-UAT gate
+    if: github.ref == 'refs/heads/agent/lb91-universalizacion-operativa' || github.head_ref == 'agent/lb91-universalizacion-operativa'
+    needs: generation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Wait for Render deployment and execute live LB102 gates
+        env:
+          BASE_URL: https://contrata-ia.onrender.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          rm -f generation.json simulation.json
+          for attempt in $(seq 1 24); do
+            echo "LB102 live attempt ${attempt}/24"
+            gen_code=$(curl --connect-timeout 15 --max-time 90 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
+            echo "generation HTTP=$gen_code"
+            if [[ "$gen_code" != "200" ]]; then
+              sleep 20
+              continue
+            fi
+
+            sim_code=$(curl --connect-timeout 15 --max-time 90 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
+            echo "simulation HTTP=$sim_code"
+            if [[ "$sim_code" == "200" ]]; then
+              node <<'NODE'
+          const fs=require('node:fs');
+          const generation=JSON.parse(fs.readFileSync('generation.json','utf8'));
+          const simulation=JSON.parse(fs.readFileSync('simulation.json','utf8'));
+          if(generation.ready!==true) throw new Error('generation.ready != true');
+          if(!Array.isArray(generation.packages)||generation.packages.length!==4) throw new Error('se esperaban 4 paquetes');
+          for(const p of generation.packages){
+            if(p.ready!==true) throw new Error(`${p.id}: paquete no listo`);
+            if(!/^[a-f0-9]{64}$/.test(p.sha256||'')) throw new Error(`${p.id}: SHA final inválido`);
+            if(Array.isArray(p.blockers)&&p.blockers.length) throw new Error(`${p.id}: blockers ${p.blockers.join(' | ')}`);
+          }
+          if(simulation.passed!==true||simulation.humanSimulationAllowed!==true) throw new Error(`simulación pre-UAT bloqueada: ${(simulation.blockers||[]).join(' | ')}`);
+          if(simulation.productionReady!==false) throw new Error('productionReady debe permanecer false');
+          console.log(JSON.stringify({generation,simulation},null,2));
+          NODE
+              ok=1
+              break
+            fi
+            sleep 20
+          done
+          if [[ "$ok" != "1" ]]; then
+            echo "No se alcanzó estado vivo LB102 pre-UAT dentro de la ventana de despliegue."
+            echo "generation:"; cat generation.json || true
+            echo "simulation:"; cat simulation.json || true
+            exit 1
+          fi
+      - name: Preserve live LB102 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lb102-live-preuat-evidence
+          path: |
+            generation.json
+            simulation.json
+          if-no-files-found: warn
+          retention-days: 30

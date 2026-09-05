@@ -5,9 +5,7 @@
   "description": "Asistente inteligente para la contratación pública y la generación de expedientes conforme a la Ley 9/2017 de Contratos del Sector Público (LCSP).",
   "license": "UNLICENSED",
   "main": "dist/main.js",
-  "engines": {
-    "node": ">=24 <25"
-  },
+  "engines": {"node": ">=24 <25"},
   "scripts": {
     "typecheck": "node scripts/typecheck.mjs",
     "build": "tsc -p tsconfig.json",
@@ -17,6 +15,8 @@
     "serve:pilot": "node scripts/start-pilot.mjs",
     "install:v1-runtime-assets": "node scripts/install-v1-runtime-assets.mjs",
     "pilot:v1-preflight": "node scripts/v1-pilot-preflight.mjs",
+    "pilot:lb101-preflight": "node scripts/lb101-pilot-preflight.mjs",
+    "pilot:lb102-upload-sources": "node scripts/lb102-upload-local-sources.mjs",
     "demo:vertical": "node dist/main.js --vertical-demo",
     "demo:lb4": "node dist/main.js --lb4-cleaning-demo",
     "demo:lb5": "node dist/main.js --lb5-documents-demo",
@@ -29,15 +29,11 @@
     "audit:documents": "node scripts/audit-lb5-documents.mjs",
     "audit:lb6": "node scripts/audit-lb6.mjs",
     "audit:lb7": "node scripts/audit-lb7.mjs",
-    "audit:lb25": "node scripts/audit-lb25.mjs"
+    "audit:lb25": "node scripts/audit-lb25.mjs",
+    "audit:lb100": "node scripts/audit-lb100-source-governance.mjs",
+    "audit:lb103": "vitest run tests/lb103-universal-decision-engine.test.ts tests/lb103-universal-guided-contract-flow.test.ts tests/lb103-universal-validated-snapshot.test.ts tests/lb103-adaptive-guided-ui.test.ts tests/lb103-server-validated-preflight.test.ts",
+    "audit:generation": "vitest run tests/lb102-universal-document-quality-gate.test.ts tests/lb102-atomic-document-package-gate.test.ts tests/lb102-ferreteria-intervention-source-gate.test.ts tests/lb102-source-package-ingress-profiles.test.ts tests/lb102-universal-atomic-generation-policy.test.ts tests/lb102-protected-source-ingress.test.ts tests/lb102-protected-source-chunked-ingress.test.ts tests/lb102-service-physical-source-profile.test.ts tests/lb102-panda-physical-source-profile.test.ts tests/lb102-signature-residue-false-positive.test.ts tests/lb102-panda-v11-institutional-format.test.ts tests/lb102-service-source-structural-v2.test.ts tests/lb102-pre-human-machine-simulation.test.ts tests/lb102-technical-prepilot-generation-gate.test.ts tests/lb102-generated-package-integrity-e2e.test.ts tests/lb102-panda-aso-positive-e2e.test.ts tests/lb102-service-real-positive-e2e.test.ts tests/lb102-ferreteria-source-identity-drift.test.ts tests/lb59-ferreteria-source-backed-protected-renderers.test.ts tests/lb60-ferreteria-pcap-final-postprocessor.test.ts tests/lb49-ferreteria-three-document-closure-gate.test.ts tests/lb97-works-positive-package-e2e.test.ts tests/lb98-concession-package-e2e.test.ts tests/lb98-works-concession-package-e2e.test.ts tests/lb99-mixed-supply-service-package-e2e.test.ts"
   },
-  "dependencies": {
-    "js-yaml": "^4.1.0"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.0.0",
-    "typescript": "^7.0.2",
-    "vitest": "^3.0.0"
-  }
+  "dependencies": {"js-yaml": "^4.1.0"},
+  "devDependencies": {"@types/js-yaml": "^4.0.9","@types/node": "^24.0.0","typescript": "^7.0.2","vitest": "^3.0.0"}
 }
