@@ -21,6 +21,8 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "object", label: "Objeto del contrato", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "contractType", label: "Tipo de contrato", control: "SELECT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true, help: "Clave canónica de clasificación; no es un slot documental directo del registro LB22." },
   { fieldPath: "cpvMain", label: "CPV principal", control: "TEXT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "procedure", label: "Procedimiento de adjudicación", control: "SELECT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "economic.fundingSource", label: "Perfil/origen de financiación", control: "SELECT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true, help: "Se utiliza también para seleccionar el modelo documental compatible; no sustituye la acreditación presupuestaria." },
   { fieldPath: "administrative.contractingAuthority", label: "Órgano de contratación", control: "TEXT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "technical.executionLocations", label: "Lugar/es de ejecución o entrega", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "lots.divisionIntoLots", label: "División en lotes", control: "BOOLEAN", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
