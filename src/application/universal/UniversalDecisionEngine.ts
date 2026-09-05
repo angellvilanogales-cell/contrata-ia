@@ -91,6 +91,26 @@ const COMMON: readonly UniversalDecisionDefinition[] = [
     risk: "HIGH",
     applicability: answers => answers.dividedIntoLots === false,
   },
+  {
+    id: "common:procedure",
+    family: "COMMON",
+    section: "PROCEDIMIENTO",
+    field: "procedure",
+    question: "¿Qué procedimiento de adjudicación se tramitará?",
+    explanation: "La selección del procedimiento tiene efectos jurídicos y documentales. El aplicativo puede ayudar a comprobar su encaje, pero no lo dará por validado sin decisión expresa.",
+    legalBasis: [{ sourceId: "LCSP-131-159", citation: `${LCSP}, arts. 131 y 159 y demás preceptos aplicables`, rule: "La adjudicación debe seguir uno de los procedimientos legalmente previstos y cumplir sus requisitos específicos.", application: "El procedimiento validado determinará las reglas aplicables y la selección del modelo PCAP compatible.", authority: "A" }],
+    risk: "HIGH",
+  },
+  {
+    id: "common:financing-profile",
+    family: "COMMON",
+    section: "FINANCIACION",
+    field: "financingProfile",
+    question: "¿Qué perfil de financiación corresponde al expediente?",
+    explanation: "La financiación condiciona la selección del modelo documental oficial y determinadas cláusulas. No se inferirá del objeto ni del CPV.",
+    legalBasis: [{ sourceId: "DOCUMENTARY-MODEL-SELECTION", citation: "Modelos oficiales y documentación financiera del expediente", rule: "La selección del modelo debe respetar la modalidad de financiación realmente acreditada.", application: "La respuesta se usa como dimensión documental; no sustituye la acreditación presupuestaria ni la normativa específica de fondos.", authority: "B" }],
+    risk: "MEDIUM",
+  },
 ];
 
 const SUPPLY: readonly UniversalDecisionDefinition[] = [
