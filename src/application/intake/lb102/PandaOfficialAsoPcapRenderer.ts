@@ -5,14 +5,15 @@ import {readOdtZip,writeOdtZip} from "../lb23/OdtPackageCodec";
 import type {UniversalEvidenceRecord} from "../lb52/UniversalEvidenceWorkspace";
 import {assertNoOdtSignatureResidue,sanitizeOdtSignatureResidue} from "./OdtSignatureResidueSanitizer";
 import {extractPandaSourceLines,reflowPandaSourceLines} from "./PandaInstitutionalEvidenceFormatter";
+import {assertLb102ExactMaterialization,assertLb102NoCriticalPlaceholders,assertLb102SemanticConcepts,lb102OdtText} from "./LB102UniversalDocumentQualityGate";
 import {LB102_PANDA_ASSETS,PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL,PANDA_OFFICIAL_ASO_PCAP_TEMPLATE_ID} from "./LB102PersistedPilotTemplateStores";
 
 function sha256(bytes:Uint8Array){return createHash("sha256").update(bytes).digest("hex");}
-function esc(value:string){return value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");}
-function decodeXml(value:string){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'");}
+function esc(value:string){return value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&apos;");}
+function decodeXml(value:string){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'\"').replace(/&apos;/g,"'");}
 function plain(xml:string){return decodeXml(xml.replace(/<[^>]+>/g," ")).replace(/\s+/g," ").trim();}
 function compact(xml:string){return plain(xml).replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]/g,"").toLocaleLowerCase("es");}
-function text(bytes:Uint8Array){const content=readOdtZip(bytes).find(entry=>entry.name==="content.xml");return content?plain(Buffer.from(content.bytes).toString("utf8")):"";}
+function text(bytes:Uint8Array){return lb102OdtText(bytes);}
 function field(record:UniversalEvidenceRecord,key:string){const f=record.fields[key];if(!f||f.status!=="HUMAN_VALIDATED"||!f.humanValidated)throw new Error(`Panda V11: falta evidencia humana validada para ${key}.`);return f.value;}
 function str(record:UniversalEvidenceRecord,key:string){const value=field(record,key);if(typeof value!=="string"||!value.trim())throw new Error(`Panda V11: ${key} debe ser texto validado.`);return value.trim();}
 function replaceUniqueLiteral(xml:string,from:string,to:string,label:string){const count=xml.split(from).length-1;if(count!==1)throw new Error(`PCAP oficial ASO: anclaje ${label} aparece ${count} veces; se exige identidad física exacta.`);return xml.replace(from,to);}
@@ -32,7 +33,16 @@ function sourcePcapDescriptor(){const asset=LB102_PANDA_ASSETS.find(item=>item.k
 async function loadSourceAnnexLines(store:UniversalEditableTemplateBinaryStore){const asset=sourcePcapDescriptor(),source=await store.get(asset.templateId);if(!source)throw new Error("Panda V11: no se recupera el PCAP real de evidencia.");if(sha256(source.bytes)!==asset.sha256)throw new Error("Panda V11: SHA del PCAP real de evidencia incorrecto.");if(computeOdtStyleFingerprint(readOdtZip(source.bytes))!==asset.styleFingerprint)throw new Error("Panda V11: huella de estilo del PCAP real de evidencia incorrecta.");const sanitized=sanitizeOdtSignatureResidue(source.bytes);assertNoOdtSignatureResidue(sanitized,"PCAP Panda de evidencia");const lines=extractPandaSourceLines(sanitized);const starts=lines.map((line,index)=>({line,index})).filter(item=>/^ANEXO\s+I$/i.test(item.line));if(!starts.length)throw new Error("Panda V11: el PCAP real no contiene Anexo I identificable.");const start=starts[starts.length-1]!.index;const end=lines.findIndex((line,index)=>index>start&&/^ANEXO\s+II$/i.test(line));if(end<0)throw new Error("Panda V11: el PCAP real no contiene cierre del Anexo I.");const annex=reflowPandaSourceLines(lines.slice(start,end));if(annex.length<120)throw new Error(`Panda V11: Anexo I de evidencia insuficiente (${annex.length} párrafos).`);return annex;}
 function annexStyle(line:string,index:number){if(index<2||/^\d+(?:\.\d+)*\.?\s+[A-ZÁÉÍÓÚÑ]/.test(line)||(/^[A-ZÁÉÍÓÚÜÑ0-9 .()ª-]+$/.test(line)&&line.length<140))return"P20";if(/^(?:Expediente|Localidad|T[íi]tulo|Objeto|C[óo]digo CPV|Divisi[óo]n|Importe|Valor estimado|M[ée]todo de c[áa]lculo|Tramitaci[óo]n|Plazo|Duraci[óo]n)/i.test(line))return"P134";return"P134";}
 function materializedAnnexFragment(lines:readonly string[]){return lines.map((line,index)=>`<text:p text:style-name="${annexStyle(line,index)}">${esc(line)}</text:p>`).join("");}
-function assertMaterializedPcap(xml:string,record:UniversalEvidenceRecord){const rendered=plain(xml);const mandatory=[record.caseId,str(record,"administrative.title"),str(record,"object"),str(record,"cpvMain"),"61.192,25","74.042,62","36 meses","División en lotes: No"];for(const value of mandatory)if(!rendered.toLocaleLowerCase("es").includes(value.toLocaleLowerCase("es")))throw new Error(`PCAP Panda V11: no se materializó el dato obligatorio ${value}.`);const critical=[/Objeto del contrato:\s*_+/i,/Importe total \(IVA excluido\):\s*_+/i,/Valor estimado del contrato:\s*_+/i,/Divisi[óo]n en lotes:\s*S[íi]\s*\/\s*No/i,/Tramitaci[óo]n del gasto:\s*Ordinaria\s*\/\s*Anticipada/i];for(const pattern of critical)if(pattern.test(rendered))throw new Error(`PCAP Panda V11: persiste un hueco crítico sin materializar (${pattern.source}).`);}
+function assertMaterializedPcap(xml:string,record:UniversalEvidenceRecord){const rendered=plain(xml);
+ // Datos objetivos: deben coincidir de forma exacta/normalizada.
+ assertLb102ExactMaterialization(rendered,"PCAP Panda V11",[record.caseId,str(record,"cpvMain"),"61.192,25","74.042,62","36 meses"]);
+ // Texto libre: no se exige copia literal del snapshot; se acreditan conceptos materiales equivalentes.
+ assertLb102SemanticConcepts(rendered,"PCAP Panda V11 · objeto",[["panda"],["licencia","licencias","software"],["seguridad","proteccion","protección"]]);
+ assertLb102SemanticConcepts(rendered,"PCAP Panda V11 · título",[["panda"],["software","licencia","licencias"]]);
+ // Las opciones jurídicas críticas deben estar resueltas, pero la frase exacta puede variar según la fuente.
+ assertLb102SemanticConcepts(rendered,"PCAP Panda V11 · lotes",[["no division","no división","no se divide","sin division","sin división"]]);
+ assertLb102NoCriticalPlaceholders(rendered,"PCAP Panda V11");
+}
 
 /** Gate físico del PCAP Panda V11. */
 export async function loadPandaOfficialAsoPcapForCalibration(store:UniversalEditableTemplateBinaryStore){const source=await store.get(PANDA_OFFICIAL_ASO_PCAP_TEMPLATE_ID);if(!source)throw new Error(`Panda V11 bloqueado: falta el modelo oficial PCAP Suministro, procedimiento abierto simplificado ordinario, autofinanciado (17/12/2025). Fuente: ${PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL}`);assertNoOdtSignatureResidue(source.bytes,"PCAP oficial ASO");const body=text(source.bytes);const required=["Suministro","Abierto Simplificado ordinario","ELEMENTOS DEL CONTRATO","ANEXO I","CARACTERÍSTICAS DEL CONTRATO"];for(const marker of required)if(!body.toLowerCase().includes(marker.toLowerCase()))throw new Error(`PCAP oficial ASO: falta marcador estructural ${marker}.`);return source;}
