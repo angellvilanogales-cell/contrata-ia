@@ -30,10 +30,6 @@ function userReference(sourceId: string, note?: string): EvidenceReference {
   return { kind: "USER_INPUT", sourceId, ...(note ? { note } : {}) };
 }
 
-/**
- * Entrada del operador: queda SOURCE_DECLARED y exige revisión humana posterior.
- * No se promociona automáticamente por el mero hecho de haber sido introducida en UI.
- */
 export function declareUniversalUiEvidence(mutation: UniversalUiDraftMutation, actorId: string): EvidenceField<unknown> {
   const definition = manifestField(mutation.fieldPath);
   assertControlValue(definition.control, mutation.value);
@@ -49,20 +45,18 @@ export function declareUniversalUiEvidence(mutation: UniversalUiDraftMutation, a
   };
 }
 
-/**
- * Validación explícita por perfil revisor. Mantiene las fuentes originales y registra
- * la intervención humana sin convertirla en una fuente jurídica o documental ficticia.
- */
-export function validateUniversalUiEvidence(field: EvidenceField<unknown>, reviewerId: string): EvidenceField<unknown> {
+export function validateUniversalUiEvidence(field: EvidenceField<unknown>, reviewerId: string, validatedAt = new Date().toISOString()): EvidenceField<unknown> {
   manifestField(field.key);
   if (field.status === "SOURCE_CONFLICT") throw new Error(`No se puede validar ${field.key} mientras exista un conflicto de fuentes.`);
   if (field.value === null || field.value === undefined) throw new Error(`No se puede validar ${field.key} sin valor.`);
+  if (!reviewerId.trim()) throw new Error("La identidad de la persona revisora es obligatoria.");
   return {
     ...field,
     status: "HUMAN_VALIDATED",
     humanValidationRequired: true,
     humanValidated: true,
-    diagnostics: [...(field.diagnostics ?? []), `Validación humana registrada por ${reviewerId}.`],
+    humanValidation: { by: reviewerId, at: validatedAt },
+    diagnostics: [...(field.diagnostics ?? []), `Validación humana registrada por ${reviewerId} en ${validatedAt}.`],
   };
 }
 
