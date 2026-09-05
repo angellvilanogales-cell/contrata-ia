@@ -20,6 +20,7 @@ import { generateFerreteriaV1ProtectedPackage } from "../../application/intake/l
 import { DurableUniversalEvidenceWorkspace } from "../../application/universal/DurableUniversalEvidenceWorkspace";
 import { createUniversalCaseMirrorFromEnv } from "../../application/universal/HttpUniversalCaseMirror";
 import { UniversalDurableCaseStore } from "../../application/universal/UniversalDurableCaseStore";
+import { evaluateLB103ServerValidatedPreflight } from "../../application/universal/LB103ServerValidatedPreflight";
 import type { PreLegalReviewInput } from "../../application/legal-review/lb7/PreLegalReview";
 import { AdaptiveCaseStore, type AdaptiveStoredCase } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { FileCaseRepository } from "../../infrastructure/operations/lb7/FileCaseRepository";
@@ -125,6 +126,7 @@ export function createLB6Server(): http.Server {
         const caseId = decodeURIComponent(parts[3]);
         if (request.method === "GET" && parts.length === 4) { requireRole(request, "VIEWER"); sendJson(response, 200, adaptiveCases.get(caseId)); return; }
         if (request.method === "PUT" && parts.length === 4) { requireRole(request, "OPERATOR"); const body = await readJson(request); const value = adaptiveCases.save(caseId, adaptiveAnswers(body.answers), body.supplyCatalogue); await persistAdaptiveCase(value); sendJson(response, 200, value); return; }
+        if (request.method === "GET" && parts[4] === "lb103-preflight" && parts.length === 5) { requireRole(request, "VIEWER"); sendJson(response, 200, evaluateLB103ServerValidatedPreflight(adaptiveCases.get(caseId))); return; }
         if (request.method === "GET" && parts[4] === "universal-evidence" && parts.length === 5) { requireRole(request, "VIEWER"); sendJson(response, 200, { caseId, evidence: universalEvidenceCases.list(caseId) }); return; }
         if (request.method === "PUT" && parts[4] === "universal-evidence" && parts.length === 5) { const actor = requireRole(request, "OPERATOR"); const body = await readJson(request); const mutation: UniversalUiDraftMutation = { fieldPath: String(body.fieldPath ?? ""), value: body.value, ...(body.sourceId ? { sourceId: String(body.sourceId) } : {}), ...(body.note ? { note: String(body.note) } : {}) }; const result = universalEvidenceCases.declare(caseId, mutation, actor.id); await persistAdaptiveCase(adaptiveCases.get(caseId)); sendJson(response, 200, result); return; }
         if (request.method === "POST" && parts[4] === "universal-evidence" && parts[5] === "validate" && parts.length === 6) { const actor = requireRole(request, "REVIEWER"); const body = await readJson(request); const result = universalEvidenceCases.validate(caseId, String(body.fieldPath ?? ""), actor.id); await persistAdaptiveCase(adaptiveCases.get(caseId)); sendJson(response, 200, result); return; }
