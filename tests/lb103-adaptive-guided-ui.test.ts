@@ -23,19 +23,30 @@ describe("LB103 · integración guiada en /adaptive", () => {
     expect(supply["common:object"].evidenceFieldPath).toBe("object");
     expect(supply["common:cpv"].evidenceFieldPath).toBe("cpvMain");
     expect(supply["common:lots"].evidenceFieldPath).toBe("lots.divisionIntoLots");
+    expect(supply["common:procedure"].evidenceFieldPath).toBe("procedure");
+    expect(supply["common:financing-profile"].evidenceFieldPath).toBe("economic.fundingSource");
     expect(supply["supply:pbl"].evidenceFieldPath).toBe("baseTenderBudgetCents");
     expect(supply["supply:estimated-value"].evidenceFieldPath).toBe("economic.legalEstimatedValueCents");
     expect(supply["supply:delivery-mode"].evidenceFieldPath).toBe("economic.needsBasedContractDa33");
     expect(supply["supply:delivery-mode"].evidenceTransform).toBe("DELIVERY_MODE_TO_DA33_BOOLEAN");
   });
 
-  it("valida cada respuesta mediante la API de evidencia universal antes de promoverla", () => {
+  it("valida el tipo contractual antes de iniciar y cada respuesta mediante evidencia universal", () => {
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain('evidence(caseId,"contractType",t,"ui:lb103:contract-type")');
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("/universal-evidence");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("/universal-evidence/validate");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("UNIVERSAL_EVIDENCE_API");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("ui:lb103:");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Validar esta respuesta");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Fundamento jurídico");
+  });
+
+  it("ofrece opciones cerradas para procedimiento y perfil de financiación", () => {
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("ABIERTO_SIMPLIFICADO_ORDINARIO");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("ABIERTO_SIMPLIFICADO_ABREVIADO");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("AUTOFINANCED");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("EU_FUNDS");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("selección del modelo documental permanecerá bloqueada");
   });
 
   it("no confunde revisión final con producción institucional", () => {
