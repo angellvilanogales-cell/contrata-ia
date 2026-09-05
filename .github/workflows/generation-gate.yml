@@ -32,7 +32,7 @@ jobs:
     if: github.ref == 'refs/heads/agent/lb91-universalizacion-operativa' || github.head_ref == 'agent/lb91-universalizacion-operativa'
     needs: generation
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Wait for Render deployment and execute live LB102 gates
         env:
@@ -41,12 +41,19 @@ jobs:
         run: |
           set -euo pipefail
           ok=0
-          for attempt in $(seq 1 36); do
-            echo "LB102 live attempt ${attempt}/36"
-            gen_code=$(curl --connect-timeout 20 --max-time 120 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
-            sim_code=$(curl --connect-timeout 20 --max-time 120 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
-            echo "generation HTTP=$gen_code simulation HTTP=$sim_code"
-            if [[ "$gen_code" == "200" && "$sim_code" == "200" ]]; then
+          rm -f generation.json simulation.json
+          for attempt in $(seq 1 24); do
+            echo "LB102 live attempt ${attempt}/24"
+            gen_code=$(curl --connect-timeout 15 --max-time 90 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
+            echo "generation HTTP=$gen_code"
+            if [[ "$gen_code" != "200" ]]; then
+              sleep 20
+              continue
+            fi
+
+            sim_code=$(curl --connect-timeout 15 --max-time 90 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
+            echo "simulation HTTP=$sim_code"
+            if [[ "$sim_code" == "200" ]]; then
               node <<'NODE'
           const fs=require('node:fs');
           const generation=JSON.parse(fs.readFileSync('generation.json','utf8'));
@@ -74,11 +81,12 @@ jobs:
             exit 1
           fi
       - name: Preserve live LB102 evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lb102-live-preuat-evidence
           path: |
             generation.json
             simulation.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
