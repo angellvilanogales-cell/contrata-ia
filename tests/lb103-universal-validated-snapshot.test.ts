@@ -19,6 +19,8 @@ describe("LB103 UniversalValidatedSnapshotBuilder", () => {
       ["common:object", "Servicio de mantenimiento"],
       ["common:cpv", "50000000-5"],
       ["common:lots", true],
+      ["common:procedure", "OPEN"],
+      ["common:financing-profile", "SELF_FUNDED"],
       ["service:pbl", 1000000],
       ["service:estimated-value", 2000000],
     ] as const) {
@@ -30,8 +32,10 @@ describe("LB103 UniversalValidatedSnapshotBuilder", () => {
     const b = builder.build(state);
     expect(a.sha256).toMatch(/^[a-f0-9]{64}$/);
     expect(a.sha256).toBe(b.sha256);
-    expect(a.decisions).toHaveLength(5);
+    expect(a.decisions).toHaveLength(7);
     expect(a.humanValidated).toBe(true);
     expect(a.answers.object).toBe("Servicio de mantenimiento");
+    expect(a.answers.procedure).toBe("OPEN");
+    expect(a.answers.financingProfile).toBe("SELF_FUNDED");
   });
 });
