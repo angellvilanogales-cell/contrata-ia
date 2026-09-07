@@ -4,7 +4,7 @@ import type { EvidenceField } from "../../domain/expediente/EvidenceField";
 import { isPromotableEvidenceField } from "../../domain/expediente/EvidenceField";
 import { DocumentType } from "../../domain/documentModel/DocumentType";
 import { selectUniversalDocumentSource } from "../../domain/documentModel/UniversalDocumentSourceSelector";
-import type { FinancingProfile } from "../../domain/documentModel/DocumentarySourceEvidenceCatalogue";
+import type { DocumentaryProvenanceRole, FinancingProfile } from "../../domain/documentModel/DocumentarySourceEvidenceCatalogue";
 import { TipoProcedimiento } from "../../domain/procedimiento/TipoProcedimiento";
 import type { UniversalTargetContractType } from "../../domain/capabilities/UniversalContractCoverage";
 import { UNIVERSAL_GUIDED_UI_MANIFEST, type UniversalGuidedUiDecision } from "../../interfaces/lb103/UniversalGuidedUiManifest";
@@ -34,6 +34,9 @@ export interface LB103DocumentPreflightRow {
   documentType: DocumentType;
   status: "GENERAL_EDITABLE_SELECTED" | "BLOCKED";
   selectedSourceId?: string;
+  selectedSourceSha256?: string;
+  selectedProvenanceRole?: DocumentaryProvenanceRole;
+  officialModelClaimed?: boolean;
   blockers: readonly string[];
 }
 
@@ -41,6 +44,7 @@ export interface LB103DocumentPreflightRow {
  * Selección documental inmutable derivada exclusivamente del snapshot canónico
  * ya validado en servidor. Su hash impide que /adaptive o un generador posterior
  * vuelvan a inferir silenciosamente tipo, procedimiento, financiación o fuentes.
+ * La identidad protegida incluye además el SHA y la procedencia de cada binario.
  */
 export interface LB103ProtectedDocumentarySelection {
   schemaVersion: "LB103-DOCUMENT-SELECTION-1";
@@ -176,6 +180,9 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
           documentType,
           status: ready ? "GENERAL_EDITABLE_SELECTED" : "BLOCKED",
           selectedSourceId: ready ? selection.selected?.id : undefined,
+          selectedSourceSha256: ready ? selection.selected?.sha256 : undefined,
+          selectedProvenanceRole: ready ? selection.selected?.provenanceRole : undefined,
+          officialModelClaimed: ready ? selection.selected?.officialModelClaimed : undefined,
           blockers: ready ? [] : selection.blockers,
         };
       })
