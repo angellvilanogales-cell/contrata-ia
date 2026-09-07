@@ -79,6 +79,18 @@ function adaptiveUiWithGeneration(): string {
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
+function runtimeVersion() {
+  return {
+    service: "contrata-ia",
+    runtime: "LB103_AUTHORITATIVE_OVER_LB102",
+    lb103Authoritative: true,
+    lb102SourceIngressPreserved: true,
+    commit: process.env.RENDER_GIT_COMMIT ?? process.env.GITHUB_SHA ?? "unknown",
+    humanAcceptanceRequired: true,
+    productionReady: false,
+  };
+}
+
 export function createLB103AuthoritativeServer(): http.Server {
   const baseServer = createLB102RuntimeServerWithSourceIngress();
   const baseRequest = baseServer.listeners("request")[0] as ((request: IncomingMessage, response: ServerResponse) => void) | undefined;
@@ -88,6 +100,10 @@ export function createLB103AuthoritativeServer(): http.Server {
     const url = new URL(request.url ?? "/", "http://localhost");
     try {
       security.applySecurityHeaders(response);
+      if (request.method === "GET" && url.pathname === "/api/runtime-version") {
+        sendJson(response, 200, runtimeVersion());
+        return;
+      }
       if (request.method === "GET" && url.pathname === "/adaptive") {
         sendText(response, 200, adaptiveUiWithGeneration(), "text/html; charset=utf-8");
         return;
