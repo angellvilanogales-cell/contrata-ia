@@ -10,10 +10,11 @@ describe("LB91.66-75 - descubrimiento y cobertura universal", () => {
     expect(assessDiscoveryCoverage("SUPPLY", DocumentType.PPT).independentCases).toBeGreaterThanOrEqual(5);
   });
 
-  it("no confunde multicaso documentado con generación física universal", () => {
+  it("distingue el multicaso histórico de la promoción física posterior acreditada", () => {
     const row = reconcileUniversalDocumentCoverage("SUPPLY", DocumentType.PPT);
     expect(row.independentCases).toBeGreaterThanOrEqual(5);
-    expect(row.physicalUniversalGenerationReady).toBe(false);
+    expect(row.physicalUniversalGenerationReady).toBe(true);
+    expect(row.status).toBe("PRODUCTION_READY");
   });
 
   it("mantiene PCAP supply físicamente listo cuando existe modelo general editable", () => {
@@ -22,12 +23,15 @@ describe("LB91.66-75 - descubrimiento y cobertura universal", () => {
     expect(row.physicalUniversalGenerationReady).toBe(true);
   });
 
-  it("mantiene bloqueado el paquete supply hasta Memory y PPT generales", () => {
+  it("reconoce el paquete supply físicamente completo tras la promoción LB94 de Memory y PPT", () => {
     const forecast = forecastUniversalPackagePromotion("SUPPLY");
-    expect(forecast.packageReady).toBe(false);
-    expect(forecast.readyDocuments).toContain(DocumentType.PCAP);
-    expect(forecast.blockedDocuments).toContain(DocumentType.MEMORY);
-    expect(forecast.blockedDocuments).toContain(DocumentType.PPT);
+    expect(forecast.packageReady).toBe(true);
+    expect(forecast.readyDocuments).toEqual(expect.arrayContaining([
+      DocumentType.PCAP,
+      DocumentType.MEMORY,
+      DocumentType.PPT,
+    ]));
+    expect(forecast.blockedDocuments).toEqual([]);
     expect(forecast.humanAcceptanceStillRequired).toBe(true);
   });
 
