@@ -6,16 +6,18 @@ import {
 } from "../src/engines/DocumentarySourceCoverageEngine";
 
 describe("LB91.39-40 - cobertura documental basada en fuentes", () => {
-  it("reconoce el PCAP supply ASA como único general editable físicamente listo", () => {
+  it("reconoce el PCAP supply ASA como general editable físicamente listo", () => {
     const result = evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.PCAP);
     expect(result.status).toBe("GENERAL_EDITABLE");
     expect(result.physicalUniversalGenerationReady).toBe(true);
     expect(result.blockers).toEqual([]);
   });
 
-  it("mantiene memoria y PPT supply como editables de caso, no universales", () => {
-    expect(evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.MEMORY).status).toBe("CASE_EDITABLE");
-    expect(evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.PPT).status).toBe("CASE_EDITABLE");
+  it("reconoce Memoria y PPT supply como generales editables tras la promoción LB94", () => {
+    expect(evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.MEMORY).status).toBe("GENERAL_EDITABLE");
+    expect(evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.PPT).status).toBe("GENERAL_EDITABLE");
+    expect(evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.MEMORY).physicalUniversalGenerationReady).toBe(true);
+    expect(evaluateDocumentarySourceCoverage("SUPPLY", DocumentType.PPT).physicalUniversalGenerationReady).toBe(true);
   });
 
   it("clasifica los PPT de servicios como contraste multifuente estructural", () => {
@@ -25,11 +27,11 @@ describe("LB91.39-40 - cobertura documental basada en fuentes", () => {
     expect(result.physicalUniversalGenerationReady).toBe(false);
   });
 
-  it("no declara listo el paquete universal supply mientras falten memoria y PPT generales", () => {
+  it("declara listo el paquete físico universal supply cuando existen los tres modelos generales acreditados", () => {
     const result = evaluateDocumentaryPackageSourceReadiness("SUPPLY");
-    expect(result.physicalUniversalPackageReady).toBe(false);
-    expect(result.blockers.some(item => item.startsWith("MEMORY:"))).toBe(true);
-    expect(result.blockers.some(item => item.startsWith("PPT:"))).toBe(true);
+    expect(result.physicalUniversalPackageReady).toBe(true);
+    expect(result.blockers).toEqual([]);
+    expect(result.documents.every(item => item.physicalUniversalGenerationReady)).toBe(true);
   });
 
   it("mantiene servicios bloqueado físicamente aunque tenga varias fuentes PCAP/PPT reales", () => {
