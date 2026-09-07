@@ -5,6 +5,7 @@ import { UniversalTargetContractType } from "../capabilities/UniversalContractCo
 export type DocumentarySourceFormat = "ODT" | "DOCX" | "PDF" | "MIXED";
 export type DocumentaryEvidenceRole = "GENERAL_MODEL" | "CASE_SOURCE" | "STRUCTURAL_REFERENCE" | "ISOLATION_PENDING";
 export type FinancingProfile = "AUTOFINANCED" | "EU_FUNDS" | "OTHER" | "UNKNOWN";
+export type DocumentaryProvenanceRole = "OFFICIAL_MODEL" | "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE";
 export type TechnicalDocumentFamily =
   | "GENERAL_ADMINISTRATIVE"
   | "CLEANING"
@@ -28,6 +29,12 @@ export interface DocumentarySourceEvidence {
   generalizable: boolean;
   sourceTitle: string;
   expediente?: string;
+  /** SHA-256 del binario físico acreditado. Obligatorio para cualquier GENERAL_MODEL seleccionable. */
+  sha256?: string;
+  /** Naturaleza de procedencia del activo físico; nunca equipara una plantilla derivada a un modelo oficial. */
+  provenanceRole?: DocumentaryProvenanceRole;
+  officialModelClaimed?: boolean;
+  humanValidationRequired?: boolean;
   observations: readonly string[];
 }
 
@@ -48,7 +55,56 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     editableBinaryVerified: true,
     generalizable: true,
     sourceTitle: "Modelo PCAP suministro abierto simplificado abreviado - presentación electrónica - autofinanciación",
-    observations: ["Modelo general recomendado por la Comisión Consultiva; activo general físicamente verificado."],
+    sha256: "45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc",
+    provenanceRole: "OFFICIAL_MODEL",
+    officialModelClaimed: true,
+    humanValidationRequired: true,
+    observations: [
+      "Modelo general recomendado por la Comisión Consultiva; activo general físicamente verificado.",
+      "Identidad física runtime: JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17.",
+    ],
+  },
+  {
+    id: "contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",
+    contractType: "SUPPLY",
+    documentType: DocumentType.MEMORY,
+    format: "ODT",
+    role: "GENERAL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    financing: "AUTOFINANCED",
+    technicalFamily: "GENERAL_ADMINISTRATIVE",
+    editableBinaryVerified: true,
+    generalizable: true,
+    sourceTitle: "Memoria justificativa general Supply LB94",
+    sha256: "b032748897f02858d3cce3d3671e4185ef984e8ced68a0c2f5988c6527f7016f",
+    provenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
+    officialModelClaimed: false,
+    humanValidationRequired: true,
+    observations: [
+      "Plantilla general derivada por Contrata-IA y persistida como activo físico verificado; no es modelo oficial de la Junta de Andalucía.",
+      "Se habilita conservadoramente en este preflight para el alcance Supply ASA autofinanciado acreditado por LB94.",
+    ],
+  },
+  {
+    id: "contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",
+    contractType: "SUPPLY",
+    documentType: DocumentType.PPT,
+    format: "ODT",
+    role: "GENERAL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    financing: "AUTOFINANCED",
+    technicalFamily: "OTHER",
+    editableBinaryVerified: true,
+    generalizable: true,
+    sourceTitle: "PPT general Supply LB94",
+    sha256: "6c73d9671a1f8cfe816239d13ead9aaa415acca730d298a4148e770ea947feca",
+    provenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
+    officialModelClaimed: false,
+    humanValidationRequired: true,
+    observations: [
+      "Plantilla general derivada por Contrata-IA y persistida como activo físico verificado; no es modelo oficial de la Junta de Andalucía.",
+      "Núcleo técnico común Supply; los overlays de subfamilia siguen sujetos a las reglas de aplicabilidad del expediente.",
+    ],
   },
   {
     id: "SERVICE-ASA-EU-FUNDS-ODT-ISOLATION-PENDING",
@@ -189,8 +245,18 @@ export function findDocumentarySourcesByDimensions(input: {
   );
 }
 
+export function isAccreditedGeneralDocumentarySource(item: DocumentarySourceEvidence): boolean {
+  return item.role === "GENERAL_MODEL" &&
+    item.generalizable &&
+    item.editableBinaryVerified &&
+    typeof item.sha256 === "string" &&
+    /^[a-f0-9]{64}$/.test(item.sha256) &&
+    (item.provenanceRole === "OFFICIAL_MODEL" || item.provenanceRole === "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE") &&
+    item.humanValidationRequired === true;
+}
+
 export function getGeneralizableEditableEvidence(): readonly DocumentarySourceEvidence[] {
-  return DOCUMENTARY_SOURCE_EVIDENCE.filter(item => item.generalizable && item.editableBinaryVerified);
+  return DOCUMENTARY_SOURCE_EVIDENCE.filter(isAccreditedGeneralDocumentarySource);
 }
 
 export function getIsolationPendingEvidence(): readonly DocumentarySourceEvidence[] {
