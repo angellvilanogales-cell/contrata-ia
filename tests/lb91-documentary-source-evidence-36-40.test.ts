@@ -35,18 +35,25 @@ describe("LB91.36-40 - explotación conservadora de fuentes documentales", () =>
     expect(source.generalizable).toBe(false);
   });
 
-  it("mantiene Memoria y PPT editables de ferretería como fuentes de caso, no universales", () => {
-    const memory = findDocumentarySourceEvidence("SUPPLY", DocumentType.MEMORY)[0]!;
-    const ppt = findDocumentarySourceEvidence("SUPPLY", DocumentType.PPT)[0]!;
+  it("reconoce la promoción LB94 de Memoria y PPT supply a plantillas generales derivadas acreditadas", () => {
+    const memory = findDocumentarySourceEvidence("SUPPLY", DocumentType.MEMORY)
+      .find(item => item.generalizable && item.editableBinaryVerified)!;
+    const ppt = findDocumentarySourceEvidence("SUPPLY", DocumentType.PPT)
+      .find(item => item.generalizable && item.editableBinaryVerified)!;
     expect(memory.format).toBe("ODT");
     expect(ppt.format).toBe("ODT");
-    expect(memory.generalizable).toBe(false);
-    expect(ppt.generalizable).toBe(false);
+    expect(memory.generalizable).toBe(true);
+    expect(ppt.generalizable).toBe(true);
   });
 
-  it("solo considera generalizable y editable el PCAP oficial supply ASA actualmente acreditado", () => {
-    const general = getGeneralizableEditableEvidence();
-    expect(general).toHaveLength(1);
-    expect(general[0].id).toBe("JDA-SUPPLY-ASA-PCAP-GENERAL-ODT");
+  it("considera generalizables y editables los tres modelos supply actualmente acreditados", () => {
+    const general = getGeneralizableEditableEvidence().filter(item => item.contractType === "SUPPLY");
+    expect(general).toHaveLength(3);
+    expect(general.map(item => item.documentType)).toEqual(expect.arrayContaining([
+      DocumentType.PCAP,
+      DocumentType.MEMORY,
+      DocumentType.PPT,
+    ]));
+    expect(general.map(item => item.id)).toContain("JDA-SUPPLY-ASA-PCAP-GENERAL-ODT");
   });
 });
