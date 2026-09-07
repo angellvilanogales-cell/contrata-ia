@@ -1,6 +1,7 @@
 import {HttpPersistedTemplateAssetStore,type PersistedTemplateAssetDescriptor,LB94_SUPPLY_GENERAL_RUNTIME_ASSETS} from "../lb94/HttpPersistedTemplateAssetStore";
 import {resolveJdaOfficialPcapModel} from "./JdaOfficialPcapModelManifest2025";
 import {PandaOfficialAsoRemoteFallbackStore} from "./PandaOfficialAsoRemoteFallbackStore";
+import {JdaOfficialPcapRemoteFallbackStore} from "./JdaOfficialPcapRemoteFallbackStore";
 
 const SERVICE_STYLE_V2="sha256:7caa80e68cf19d03cfd70538125c1762f79fadbe2b4a4e3f9af2203f7492027d";
 
@@ -8,8 +9,11 @@ export const FERRETERIA_POST_INTERVENCION_PCAP_TEMPLATE_ID="case:CONTR-2026-2402
 export const FERRETERIA_POST_INTERVENCION_MEMORY_TEMPLATE_ID="case:CONTR-2026-240267:memoria:v14:post-intervencion:editable" as const;
 export const FERRETERIA_POST_INTERVENCION_PPT_TEMPLATE_ID="case:CONTR-2026-240267:ppt:v8:post-intervencion:editable" as const;
 const PANDA_ASO_OFFICIAL_MODEL=resolveJdaOfficialPcapModel({family:"SUPPLY",procedure:"ASO",financing:"SELF_FUNDED"});
+const SERVICE_OPEN_OFFICIAL_MODEL=resolveJdaOfficialPcapModel({family:"SERVICE",procedure:"OPEN",financing:"SELF_FUNDED"});
 export const PANDA_OFFICIAL_ASO_PCAP_TEMPLATE_ID=PANDA_ASO_OFFICIAL_MODEL.templateId;
 export const PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL="https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/02/2025_12_17_pcap_suministro_abierto_simplificado_ordinario_autofinanciada.odt" as const;
+export const SERVICE_OFFICIAL_OPEN_PCAP_TEMPLATE_ID=SERVICE_OPEN_OFFICIAL_MODEL.templateId;
+export const SERVICE_OFFICIAL_OPEN_PCAP_SOURCE_URL="https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/02/2025_12_17_pcap_servicios_abierto_autofinanciada.odt" as const;
 
 /** Tríada editable post-Intervención corregida y humanamente validada el 02/09/2026. No es modelo general. */
 export const LB102_FERRETERIA_SOURCE_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
@@ -28,6 +32,9 @@ export const LB102_PANDA_ASSETS:readonly PersistedTemplateAssetDescriptor[]=[
 
 export function lb102PandaOfficialAsoPcapAsset():PersistedTemplateAssetDescriptor{
  return{kind:"PCAP",templateId:PANDA_ASO_OFFICIAL_MODEL.templateId,sourceId:"jda:cccp:pcap:supply:aso:autofinanced:2025-12-17:odt",sha256:PANDA_ASO_OFFICIAL_MODEL.sha256,styleFingerprint:PANDA_ASO_OFFICIAL_MODEL.styleFingerprint,provenanceRole:"OFFICIAL_MODEL"};
+}
+export function lb102ServiceOfficialOpenPcapAsset():PersistedTemplateAssetDescriptor{
+ return{kind:"PCAP",templateId:SERVICE_OPEN_OFFICIAL_MODEL.templateId,sourceId:"jda:cccp:pcap:service:open:autofinanced:2025-12-17:odt",sha256:SERVICE_OPEN_OFFICIAL_MODEL.sha256,styleFingerprint:SERVICE_OPEN_OFFICIAL_MODEL.styleFingerprint,provenanceRole:"OFFICIAL_MODEL"};
 }
 export function lb102PandaOfficialAsoPcapConfigured(){return true;}
 export function lb102PandaRuntimeAssets():readonly PersistedTemplateAssetDescriptor[]{return[...LB102_PANDA_ASSETS,lb102PandaOfficialAsoPcapAsset()];}
@@ -53,4 +60,4 @@ function env(manifest:readonly PersistedTemplateAssetDescriptor[]){const endpoin
 export function createLB102FerreteriaTemplateStoreFromEnv(){return env(LB102_FERRETERIA_RUNTIME_ASSETS);}
 export function createLB102PandaTemplateStoreFromEnv(){const persisted=env(lb102PandaRuntimeAssets());if(!persisted)return null;return new PandaOfficialAsoRemoteFallbackStore(persisted,lb102PandaOfficialAsoPcapAsset(),PANDA_OFFICIAL_ASO_PCAP_SOURCE_URL);}
 export function createLB102ServiceTemplateStoreFromEnv(){return env(LB102_SERVICE_ASSETS);}
-export function createLB102ServiceSourceBackedTemplateStoreFromEnv(){return env(LB102_SERVICE_SOURCEBACKED_ASSETS);}
+export function createLB102ServiceSourceBackedTemplateStoreFromEnv(){const official=lb102ServiceOfficialOpenPcapAsset();const persisted=env([...LB102_SERVICE_SOURCEBACKED_ASSETS,official]);if(!persisted)return null;return new JdaOfficialPcapRemoteFallbackStore(persisted,official,SERVICE_OFFICIAL_OPEN_PCAP_SOURCE_URL,"PCAP oficial Junta de Servicios · procedimiento abierto · autofinanciado");}
