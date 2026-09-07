@@ -17,8 +17,10 @@ describe("LB102 - puertas transversales aprendidas en Panda",()=>{
   expect(()=>assertLb102NoCriticalPlaceholders("Tramitación del gasto: Ordinaria / Anticipada","pcap")).toThrow(/tramitación sin resolver/);
   expect(()=>assertLb102NoCriticalPlaceholders("Documento limpio y materializado.","pcap")).not.toThrow();
  });
- it("impide que Huelva y Sevilla lleguen a UAT con PCAP derivado de expediente real",()=>{
-  expect(()=>assertServiceOfficialPcapPreUat("HUELVA")).toThrow(/officialModel=false/);
-  expect(()=>assertServiceOfficialPcapPreUat("SEVILLA")).toThrow(/modelo oficial Junta/);
+ it("impide que Huelva y Sevilla lleguen a UAT salvo que el renderer acredite PCAP oficial Junta",()=>{
+  expect(()=>assertServiceOfficialPcapPreUat("HUELVA",false)).toThrow(/modelo oficial Junta/);
+  expect(()=>assertServiceOfficialPcapPreUat("SEVILLA",false)).toThrow(/modelo oficial Junta/);
+  expect(()=>assertServiceOfficialPcapPreUat("HUELVA",true)).not.toThrow();
+  expect(()=>assertServiceOfficialPcapPreUat("SEVILLA",true)).not.toThrow();
  });
 });
