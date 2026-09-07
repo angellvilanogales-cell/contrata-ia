@@ -1,0 +1,27 @@
+import {describe,expect,it} from "vitest";
+import {readOdtZip,writeOdtZip,type OdtZipEntry} from "../src/application/intake/lb23/OdtPackageCodec";
+import {injectPandaInstitutionalStyles} from "../src/application/intake/lb102/PandaInstitutionalEvidenceFormatter";
+import {institutionalizeServiceMemoryOdt} from "../src/application/intake/lb102/ServiceInstitutionalEvidenceFormatter";
+import {assertServiceOfficialPcapPreUat} from "../src/application/intake/lb102/ServiceSourceBackedPilotPackageGenerator";
+
+function entry(name:string,content:string,method:0|8=8):OdtZipEntry{return{name,bytes:Buffer.from(content,"utf8"),method,modTime:0,modDate:0,externalAttributes:0};}
+function serviceMemoryWithThirteenPhysicalParagraphs(){
+ const paragraphs=Array.from({length:13},(_,i)=>`<text:p>SECCIÓN ${i+1}. CONTENIDO MATERIAL.<text:line-break/>Detalle administrativo ${i+1}.<text:line-break/>Justificación técnica ${i+1}.</text:p>`).join("");
+ const content=`<?xml version="1.0" encoding="UTF-8"?><office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"><office:body><office:text>${paragraphs}</office:text></office:body></office:document-content>`;
+ return writeOdtZip([entry("mimetype","application/vnd.oasis.opendocument.text",0),entry("content.xml",content)]);
+}
+
+describe("LB102 · regresiones de blockers vivos Render 2026-09-07",()=>{
+ it("Panda crea office:automatic-styles cuando el ODT fuente válido no lo trae",()=>{
+  const xml=`<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"><office:body/></office:document-content>`;
+  const out=injectPandaInstitutionalStyles(xml);expect(out).toContain("<office:automatic-styles>");expect(out).toContain('style:name="CI_Body"');expect(out.indexOf("<office:automatic-styles>")).toBeLessThan(out.indexOf("<office:body"));
+ });
+
+ it("Service reconstruye más de 20 párrafos materiales aunque la fuente física tenga 13 text:p de página",()=>{
+  const out=institutionalizeServiceMemoryOdt(serviceMemoryWithThirteenPhysicalParagraphs(),"Service TEST/MEMORIA");const content=readOdtZip(out).find(x=>x.name==="content.xml");expect(content).toBeTruthy();const xml=Buffer.from(content!.bytes).toString("utf8");expect((xml.match(/<text:p\b/g)??[]).length).toBeGreaterThanOrEqual(20);expect(xml).toContain('style:name="CI_Service_Body"');
+ });
+
+ it("Service mantiene la puerta de PCAP oficial: bloquea false y admite únicamente true",()=>{
+  expect(()=>assertServiceOfficialPcapPreUat("HUELVA",false)).toThrow(/modelo oficial Junta/i);expect(()=>assertServiceOfficialPcapPreUat("SEVILLA",true)).not.toThrow();
+ });
+});
