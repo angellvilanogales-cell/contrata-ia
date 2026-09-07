@@ -50,7 +50,7 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(first.snapshot?.decisions.every(item => item.validatedBy === "reviewer-1")).toBe(true);
   });
 
-  it("liga de forma determinista la selección documental al snapshot validado", () => {
+  it("liga de forma determinista la selección documental y los SHA físicos al snapshot validado", () => {
     const first = evaluateLB103ServerValidatedPreflight(supplyCase());
     const second = evaluateLB103ServerValidatedPreflight(supplyCase());
     expect(first.documentarySelection?.schemaVersion).toBe("LB103-DOCUMENT-SELECTION-1");
@@ -60,25 +60,61 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(first.documentarySelection?.caseId).toBe(first.snapshot?.caseId);
     expect(first.documentarySelection?.procedure).toBe(first.snapshot?.procedure);
     expect(first.documentarySelection?.financing).toBe(first.snapshot?.financing);
+    expect(first.documentarySelection?.documents.every(item => item.selectedSourceSha256?.match(/^[a-f0-9]{64}$/))).toBe(true);
     expect(first.productionReady).toBe(false);
   });
 
-  it("selecciona el PCAP general acreditado sin promover Memoria/PPT de caso", () => {
+  it("selecciona la terna universal Supply ASA acreditada sin promover fuentes de expediente", () => {
     const result = evaluateLB103ServerValidatedPreflight(supplyCase());
     const pcap = result.documents.find(item => item.documentType === "PCAP");
     const memory = result.documents.find(item => item.documentType === "MEMORY");
     const ppt = result.documents.find(item => item.documentType === "PPT");
-    expect(pcap?.status).toBe("GENERAL_EDITABLE_SELECTED");
-    expect(pcap?.selectedSourceId).toBe("JDA-SUPPLY-ASA-PCAP-GENERAL-ODT");
-    expect(memory?.status).toBe("BLOCKED");
-    expect(memory?.selectedSourceId).toBeUndefined();
-    expect(ppt?.status).toBe("BLOCKED");
-    expect(ppt?.selectedSourceId).toBeUndefined();
+
+    expect(memory).toMatchObject({
+      status: "GENERAL_EDITABLE_SELECTED",
+      selectedSourceId: "contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",
+      selectedSourceSha256: "b032748897f02858d3cce3d3671e4185ef984e8ced68a0c2f5988c6527f7016f",
+      selectedProvenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
+      officialModelClaimed: false,
+    });
+    expect(pcap).toMatchObject({
+      status: "GENERAL_EDITABLE_SELECTED",
+      selectedSourceId: "JDA-SUPPLY-ASA-PCAP-GENERAL-ODT",
+      selectedSourceSha256: "45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc",
+      selectedProvenanceRole: "OFFICIAL_MODEL",
+      officialModelClaimed: true,
+    });
+    expect(ppt).toMatchObject({
+      status: "GENERAL_EDITABLE_SELECTED",
+      selectedSourceId: "contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",
+      selectedSourceSha256: "6c73d9671a1f8cfe816239d13ead9aaa415acca730d298a4148e770ea947feca",
+      selectedProvenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
+      officialModelClaimed: false,
+    });
+    expect(result.documents.some(item => item.selectedSourceId?.startsWith("FERRETERIA-"))).toBe(false);
     expect(result.documentarySelection?.documents).toEqual(result.documents);
-    expect(result.packageReady).toBe(false);
+    expect(result.packageReady).toBe(true);
+    expect(result.blockers).toEqual([]);
+    expect(result.humanAcceptanceStillRequired).toBe(true);
     expect(result.productionReady).toBe(false);
-    expect(result.blockers.some(item => item.startsWith("MEMORY:"))).toBe(true);
-    expect(result.blockers.some(item => item.startsWith("PPT:"))).toBe(true);
+  });
+
+  it("bloquea la terna si procedimiento o financiación salen del ámbito acreditado", () => {
+    const original = supplyCase();
+    const wrongScope: AdaptiveStoredCase = {
+      ...original,
+      universalEvidence: {
+        ...original.universalEvidence,
+        procedure: validated("procedure", "ABIERTO_SIMPLIFICADO"),
+        "economic.fundingSource": validated("economic.fundingSource", "EU_FUNDS"),
+      },
+    };
+    const result = evaluateLB103ServerValidatedPreflight(wrongScope);
+    expect(result.snapshotReady).toBe(true);
+    expect(result.packageReady).toBe(false);
+    expect(result.documents.every(item => item.status === "BLOCKED")).toBe(true);
+    expect(result.documents.every(item => item.selectedSourceId === undefined)).toBe(true);
+    expect(result.productionReady).toBe(false);
   });
 
   it("bloquea el snapshot si una decisión aplicable carece de validación trazable", () => {
