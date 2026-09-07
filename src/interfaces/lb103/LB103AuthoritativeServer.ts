@@ -1,0 +1,152 @@
+import http, { type IncomingMessage, type ServerResponse } from "node:http";
+import path from "node:path";
+import { createLB6Server } from "../lb6/LB6Server";
+import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
+import { SecurityPolicy } from "../lb7/SecurityPolicy";
+import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
+import { HttpAdaptiveCaseMirror } from "../../infrastructure/operations/lb85/ExternalAdaptiveCaseMirror";
+import { createHttpPersistedTemplateAssetStoreFromEnv } from "../../application/intake/lb94/HttpPersistedTemplateAssetStore";
+import { generateLB103AuthoritativeSupplyPackage } from "../../application/universal/LB103AuthoritativeSupplyGeneration";
+import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGenerationScript";
+
+const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
+const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
+const adaptiveCases = new AdaptiveCaseStore(path.join(DATA_ROOT, "adaptive-cases"));
+const security = new SecurityPolicy();
+
+function sendJson(response: ServerResponse, status: number, value: unknown): void {
+  const body = Buffer.from(JSON.stringify(value));
+  response.writeHead(status, {
+    "content-type": "application/json; charset=utf-8",
+    "content-length": body.length,
+    "cache-control": "no-store",
+  });
+  response.end(body);
+}
+
+function sendText(response: ServerResponse, status: number, text: string, contentType: string): void {
+  const body = Buffer.from(text);
+  response.writeHead(status, {
+    "content-type": contentType,
+    "content-length": body.length,
+    "cache-control": "no-store",
+  });
+  response.end(body);
+}
+
+function sendZip(response: ServerResponse, data: Uint8Array, fileName: string): void {
+  const body = Buffer.from(data);
+  response.setHeader("x-contrata-ia-production-ready", "false");
+  response.setHeader("x-contrata-ia-human-acceptance-required", "true");
+  response.writeHead(200, {
+    "content-type": "application/zip",
+    "content-length": body.length,
+    "content-disposition": `attachment; filename="${fileName}"`,
+    "cache-control": "no-store",
+  });
+  response.end(body);
+}
+
+async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
+  const chunks: Buffer[] = [];
+  let total = 0;
+  for await (const chunk of request) {
+    const value = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    total += value.length;
+    if (total > MAX_SEAL_REQUEST_BYTES) throw new Error("Solicitud de generación demasiado grande.");
+    chunks.push(value);
+  }
+  if (!chunks.length) return {};
+  return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
+}
+
+function generationCaseId(pathname: string): string | null {
+  const match = /^\/api\/adaptive\/cases\/([^/]+)\/lb103-generate$/.exec(pathname);
+  if (!match?.[1]) return null;
+  return decodeURIComponent(match[1]);
+}
+
+function statusFor(error: Error): number {
+  if (/autenticación|credencial|sesión segura/i.test(error.message)) return 401;
+  if (/permiso insuficiente/i.test(error.message)) return 403;
+  if (/no encontrado/i.test(error.message)) return 404;
+  if (/demasiado grande/i.test(error.message)) return 413;
+  return 400;
+}
+
+function adaptiveUiWithGeneration(): string {
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script>';
+  return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
+}
+
+export function createLB103AuthoritativeServer(): http.Server {
+  const legacyServer = createLB6Server();
+  const legacyRequest = legacyServer.listeners("request")[0] as ((request: IncomingMessage, response: ServerResponse) => void) | undefined;
+  if (!legacyRequest) throw new Error("No se ha podido recuperar el handler HTTP canónico del servidor existente.");
+
+  return http.createServer(async (request, response) => {
+    const url = new URL(request.url ?? "/", "http://localhost");
+    try {
+      security.applySecurityHeaders(response);
+      if (request.method === "GET" && url.pathname === "/adaptive") {
+        sendText(response, 200, adaptiveUiWithGeneration(), "text/html; charset=utf-8");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/lb103-authoritative-generation.js") {
+        sendText(response, 200, LB103_AUTHORITATIVE_GENERATION_SCRIPT, "application/javascript; charset=utf-8");
+        return;
+      }
+
+      const caseId = request.method === "POST" ? generationCaseId(url.pathname) : null;
+      if (caseId) {
+        const actor = security.authenticate(request);
+        security.require(actor, "OPERATOR");
+        const body = await readJson(request);
+        const snapshotSha256 = typeof body.snapshotSha256 === "string" ? body.snapshotSha256 : "";
+        const documentarySelectionSha256 = typeof body.documentarySelectionSha256 === "string" ? body.documentarySelectionSha256 : "";
+        const templateStore = createHttpPersistedTemplateAssetStoreFromEnv();
+        if (!templateStore) {
+          sendJson(response, 503, {
+            error: "La generación universal exige la persistencia remota acreditada de plantillas.",
+            productionReady: false,
+          });
+          return;
+        }
+        const result = await generateLB103AuthoritativeSupplyPackage({
+          caseValue: adaptiveCases.get(caseId),
+          presentedSeals: { snapshotSha256, documentarySelectionSha256 },
+          templateStore,
+        });
+        if (!result.ready || !result.package?.bytes || !result.package.fileName) {
+          sendJson(response, 409, {
+            error: "La generación autoritativa ha sido bloqueada.",
+            blockers: result.blockers,
+            preflight: result.preflight,
+            humanAcceptanceStillRequired: true,
+            productionReady: false,
+          });
+          return;
+        }
+        sendZip(response, result.package.bytes, result.package.fileName);
+        return;
+      }
+
+      legacyRequest(request, response);
+    } catch (error) {
+      const value = error instanceof Error ? error : new Error(String(error));
+      if (!response.headersSent) sendJson(response, statusFor(value), { error: value.message, productionReady: false });
+      else response.end();
+    }
+  });
+}
+
+export async function startLB103AuthoritativeServer(port = Number(process.env.PORT ?? 3000)): Promise<http.Server> {
+  const remote = HttpAdaptiveCaseMirror.fromEnvironment();
+  if (remote) await remote.hydrate(adaptiveCases);
+  const server = createLB103AuthoritativeServer();
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, "127.0.0.1", () => resolve());
+  });
+  return server;
+}
