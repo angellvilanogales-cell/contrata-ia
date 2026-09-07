@@ -7,6 +7,7 @@ import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveC
 import { HttpAdaptiveCaseMirror } from "../../infrastructure/operations/lb85/ExternalAdaptiveCaseMirror";
 import { createHttpPersistedTemplateAssetStoreFromEnv } from "../../application/intake/lb94/HttpPersistedTemplateAssetStore";
 import { generateLB103AuthoritativeSupplyPackage } from "../../application/universal/LB103AuthoritativeSupplyGeneration";
+import { evaluateLB103ServerValidatedPreflight } from "../../application/universal/LB103ServerValidatedPreflight";
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGenerationScript";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
@@ -60,8 +61,11 @@ async function readJson(request: IncomingMessage): Promise<Record<string, unknow
   return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Record<string, unknown>;
 }
 
-function generationCaseId(pathname: string): string | null {
-  const match = /^\/api\/adaptive\/cases\/([^/]+)\/lb103-generate$/.exec(pathname);
+function routeCaseId(pathname: string, action: "lb103-preflight" | "lb103-generate"): string | null {
+  const pattern = action === "lb103-preflight"
+    ? /^\/api\/adaptive\/cases\/([^/]+)\/lb103-preflight$/
+    : /^\/api\/adaptive\/cases\/([^/]+)\/lb103-generate$/;
+  const match = pattern.exec(pathname);
   if (!match?.[1]) return null;
   return decodeURIComponent(match[1]);
 }
@@ -91,7 +95,7 @@ function runtimeVersion() {
   };
 }
 
-export function createLB103AuthoritativeServer(): http.Server {
+export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = adaptiveCases): http.Server {
   const baseServer = createLB102RuntimeServerWithSourceIngress();
   const baseRequest = baseServer.listeners("request")[0] as ((request: IncomingMessage, response: ServerResponse) => void) | undefined;
   if (!baseRequest) throw new Error("No se ha podido recuperar el handler HTTP canónico del runtime LB102 existente.");
@@ -113,8 +117,16 @@ export function createLB103AuthoritativeServer(): http.Server {
         return;
       }
 
-      const caseId = request.method === "POST" ? generationCaseId(url.pathname) : null;
-      if (caseId) {
+      const preflightCaseId = request.method === "GET" ? routeCaseId(url.pathname, "lb103-preflight") : null;
+      if (preflightCaseId) {
+        const actor = security.authenticate(request);
+        security.require(actor, "VIEWER");
+        sendJson(response, 200, evaluateLB103ServerValidatedPreflight(caseStore.get(preflightCaseId)));
+        return;
+      }
+
+      const generationCaseId = request.method === "POST" ? routeCaseId(url.pathname, "lb103-generate") : null;
+      if (generationCaseId) {
         const actor = security.authenticate(request);
         security.require(actor, "OPERATOR");
         const body = await readJson(request);
@@ -129,7 +141,7 @@ export function createLB103AuthoritativeServer(): http.Server {
           return;
         }
         const result = await generateLB103AuthoritativeSupplyPackage({
-          caseValue: adaptiveCases.get(caseId),
+          caseValue: caseStore.get(generationCaseId),
           presentedSeals: { snapshotSha256, documentarySelectionSha256 },
           templateStore,
         });
