@@ -6,6 +6,7 @@ import {
   FinancingProfile,
   TechnicalDocumentFamily,
   findDocumentarySourcesByDimensions,
+  isAccreditedGeneralDocumentarySource,
 } from "./DocumentarySourceEvidenceCatalogue";
 
 export type DocumentarySourceSelectionStatus =
@@ -25,6 +26,8 @@ export interface DocumentarySourceSelection {
 /**
  * Selección conservadora por naturaleza, documento, procedimiento, financiación
  * y subfamilia técnica. Nunca promueve una fuente de expediente a plantilla general.
+ * Un GENERAL_MODEL solo puede seleccionarse si conserva SHA físico, procedencia y
+ * obligación de validación humana acreditados en catálogo.
  */
 export function selectUniversalDocumentSource(input: {
   contractType: UniversalTargetContractType;
@@ -38,8 +41,18 @@ export function selectUniversalDocumentSource(input: {
     return { status: "NO_MATCH", candidates, blockers: ["No existe fuente documental acreditada para la combinación solicitada."] };
   }
 
-  const general = candidates.find(item => item.generalizable && item.editableBinaryVerified && item.role === "GENERAL_MODEL");
+  const general = candidates.find(isAccreditedGeneralDocumentarySource);
   if (general) return { status: "GENERAL_EDITABLE_SELECTED", selected: general, candidates, blockers: [] };
+
+  const incompleteGeneral = candidates.find(item => item.role === "GENERAL_MODEL");
+  if (incompleteGeneral) {
+    return {
+      status: "ISOLATION_REQUIRED",
+      selected: incompleteGeneral,
+      candidates,
+      blockers: ["La plantilla general carece de acreditación física completa de SHA, procedencia o validación humana."],
+    };
+  }
 
   const pendingIsolation = candidates.find(item => item.role === "ISOLATION_PENDING");
   if (pendingIsolation) {
