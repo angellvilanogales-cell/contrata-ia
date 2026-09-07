@@ -50,11 +50,31 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(first.snapshot?.decisions.every(item => item.validatedBy === "reviewer-1")).toBe(true);
   });
 
+  it("liga de forma determinista la selección documental al snapshot validado", () => {
+    const first = evaluateLB103ServerValidatedPreflight(supplyCase());
+    const second = evaluateLB103ServerValidatedPreflight(supplyCase());
+    expect(first.documentarySelection?.schemaVersion).toBe("LB103-DOCUMENT-SELECTION-1");
+    expect(first.documentarySelection?.snapshotSha256).toBe(first.snapshot?.sha256);
+    expect(first.documentarySelection?.sha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(first.documentarySelection?.sha256).toBe(second.documentarySelection?.sha256);
+    expect(first.documentarySelection?.caseId).toBe(first.snapshot?.caseId);
+    expect(first.documentarySelection?.procedure).toBe(first.snapshot?.procedure);
+    expect(first.documentarySelection?.financing).toBe(first.snapshot?.financing);
+    expect(first.productionReady).toBe(false);
+  });
+
   it("selecciona el PCAP general acreditado sin promover Memoria/PPT de caso", () => {
     const result = evaluateLB103ServerValidatedPreflight(supplyCase());
     const pcap = result.documents.find(item => item.documentType === "PCAP");
+    const memory = result.documents.find(item => item.documentType === "MEMORY");
+    const ppt = result.documents.find(item => item.documentType === "PPT");
     expect(pcap?.status).toBe("GENERAL_EDITABLE_SELECTED");
     expect(pcap?.selectedSourceId).toBe("JDA-SUPPLY-ASA-PCAP-GENERAL-ODT");
+    expect(memory?.status).toBe("BLOCKED");
+    expect(memory?.selectedSourceId).toBeUndefined();
+    expect(ppt?.status).toBe("BLOCKED");
+    expect(ppt?.selectedSourceId).toBeUndefined();
+    expect(result.documentarySelection?.documents).toEqual(result.documents);
     expect(result.packageReady).toBe(false);
     expect(result.productionReady).toBe(false);
     expect(result.blockers.some(item => item.startsWith("MEMORY:"))).toBe(true);
@@ -78,6 +98,7 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     };
     const result = evaluateLB103ServerValidatedPreflight(value);
     expect(result.snapshotReady).toBe(false);
+    expect(result.documentarySelection).toBeUndefined();
     expect(result.packageReady).toBe(false);
     expect(result.blockers.join(" ")).toContain("baseTenderBudgetCents");
   });
