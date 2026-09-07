@@ -54,13 +54,13 @@ describe("LB93 SupplyVerticalCoordinator", () => {
     expect(result.blockers.some(item => item.includes("SUPPLY"))).toBe(true);
   });
 
-  it("permite revisión jurídica y reconoce la terna física Supply acreditada sin declarar producción", () => {
+  it("permite revisión jurídica sin atribuir a LB93 la terna física completa de LB103", () => {
     const result = evaluateSupplyVertical(record(completeValues));
     expect(result.workflowReadyForHumanReview).toBe(true);
     expect(result.workflowHumanValidated).toBe(false);
-    expect(result.physicalPackageReady).toBe(true);
+    expect(result.physicalPackageReady).toBe(false);
     expect(result.documents.find(row => row.documentType === "PCAP")?.decision).toBe("RENDER_ALLOWED");
-    expect(result.documents.find(row => row.documentType === "MEMORY")?.decision).toBe("RENDER_ALLOWED");
+    expect(result.documents.find(row => row.documentType === "MEMORY")?.decision).toBe("BLOCKED");
     expect(result.documents.find(row => row.documentType === "PPT")?.decision).toBe("RENDER_ALLOWED");
     expect(result.productionReady).toBe(false);
     expect(result.humanAcceptanceRequired).toBe(true);
