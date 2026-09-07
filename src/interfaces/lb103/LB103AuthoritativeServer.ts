@@ -1,6 +1,6 @@
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import path from "node:path";
-import { createLB6Server } from "../lb6/LB6Server";
+import { createLB102RuntimeServerWithSourceIngress } from "../lb102/LB102SourceIngressServer";
 import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
 import { SecurityPolicy } from "../lb7/SecurityPolicy";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
@@ -80,9 +80,9 @@ function adaptiveUiWithGeneration(): string {
 }
 
 export function createLB103AuthoritativeServer(): http.Server {
-  const legacyServer = createLB6Server();
-  const legacyRequest = legacyServer.listeners("request")[0] as ((request: IncomingMessage, response: ServerResponse) => void) | undefined;
-  if (!legacyRequest) throw new Error("No se ha podido recuperar el handler HTTP canónico del servidor existente.");
+  const baseServer = createLB102RuntimeServerWithSourceIngress();
+  const baseRequest = baseServer.listeners("request")[0] as ((request: IncomingMessage, response: ServerResponse) => void) | undefined;
+  if (!baseRequest) throw new Error("No se ha podido recuperar el handler HTTP canónico del runtime LB102 existente.");
 
   return http.createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://localhost");
@@ -131,7 +131,7 @@ export function createLB103AuthoritativeServer(): http.Server {
         return;
       }
 
-      legacyRequest(request, response);
+      baseRequest(request, response);
     } catch (error) {
       const value = error instanceof Error ? error : new Error(String(error));
       if (!response.headersSent) sendJson(response, statusFor(value), { error: value.message, productionReady: false });
@@ -140,13 +140,16 @@ export function createLB103AuthoritativeServer(): http.Server {
   });
 }
 
-export async function startLB103AuthoritativeServer(port = Number(process.env.PORT ?? 3000)): Promise<http.Server> {
+export async function startLB103AuthoritativeServer(
+  port = Number(process.env.PORT ?? 3000),
+  host = process.env.HOST ?? "0.0.0.0",
+): Promise<http.Server> {
   const remote = HttpAdaptiveCaseMirror.fromEnvironment();
   if (remote) await remote.hydrate(adaptiveCases);
   const server = createLB103AuthoritativeServer();
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
-    server.listen(port, "127.0.0.1", () => resolve());
+    server.listen(port, host, () => resolve());
   });
   return server;
 }
