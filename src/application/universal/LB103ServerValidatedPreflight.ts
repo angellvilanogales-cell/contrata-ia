@@ -37,9 +37,26 @@ export interface LB103DocumentPreflightRow {
   blockers: readonly string[];
 }
 
+/**
+ * Selección documental inmutable derivada exclusivamente del snapshot canónico
+ * ya validado en servidor. Su hash impide que /adaptive o un generador posterior
+ * vuelvan a inferir silenciosamente tipo, procedimiento, financiación o fuentes.
+ */
+export interface LB103ProtectedDocumentarySelection {
+  schemaVersion: "LB103-DOCUMENT-SELECTION-1";
+  caseId: string;
+  snapshotSha256: string;
+  contractType: "SUPPLY" | "SERVICE";
+  procedure: TipoProcedimiento;
+  financing: FinancingProfile;
+  documents: readonly LB103DocumentPreflightRow[];
+  sha256: string;
+}
+
 export interface LB103ServerValidatedPreflight {
   snapshotReady: boolean;
   snapshot?: LB103ServerValidatedSnapshot;
+  documentarySelection?: LB103ProtectedDocumentarySelection;
   packageReady: boolean;
   documents: readonly LB103DocumentPreflightRow[];
   blockers: readonly string[];
@@ -56,6 +73,10 @@ function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
   const record = value as Record<string, unknown>;
   return `{${Object.keys(record).sort().map(key => `${JSON.stringify(key)}:${stable(record[key])}`).join(",")}}`;
+}
+
+function sha256(value: unknown): string {
+  return createHash("sha256").update(stable(value)).digest("hex");
 }
 
 function requireValidatedField(
@@ -135,7 +156,7 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
       decisions,
       humanValidated: true as const,
     };
-    snapshot = Object.freeze({ ...payload, sha256: createHash("sha256").update(stable(payload)).digest("hex") });
+    snapshot = Object.freeze({ ...payload, sha256: sha256(payload) });
   } catch (error) {
     blockers.push(error instanceof Error ? error.message : "No se pudo construir el snapshot validado en servidor.");
   }
@@ -154,11 +175,26 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
         return {
           documentType,
           status: ready ? "GENERAL_EDITABLE_SELECTED" : "BLOCKED",
-          selectedSourceId: selection.selected?.id,
+          selectedSourceId: ready ? selection.selected?.id : undefined,
           blockers: ready ? [] : selection.blockers,
         };
       })
     : documentTypes.map(documentType => ({ documentType, status: "BLOCKED" as const, blockers: ["Snapshot validado no disponible."] }));
+
+  const documentarySelection: LB103ProtectedDocumentarySelection | undefined = snapshot
+    ? (() => {
+        const payload = {
+          schemaVersion: "LB103-DOCUMENT-SELECTION-1" as const,
+          caseId: snapshot!.caseId,
+          snapshotSha256: snapshot!.sha256,
+          contractType: snapshot!.contractType,
+          procedure: snapshot!.procedure,
+          financing: snapshot!.financing,
+          documents: documents.map(item => ({ ...item, blockers: [...item.blockers] })),
+        };
+        return Object.freeze({ ...payload, sha256: sha256(payload) });
+      })()
+    : undefined;
 
   const documentBlockers = documents
     .filter(item => item.status === "BLOCKED")
@@ -168,6 +204,7 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
   return {
     snapshotReady: Boolean(snapshot),
     snapshot,
+    documentarySelection,
     packageReady: Boolean(snapshot) && documents.every(item => item.status === "GENERAL_EDITABLE_SELECTED"),
     documents,
     blockers,
