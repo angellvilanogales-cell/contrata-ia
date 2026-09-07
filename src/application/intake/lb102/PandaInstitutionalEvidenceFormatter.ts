@@ -45,13 +45,27 @@ const AUTO_STYLES=`
 <style:style style:name="CI_Body" style:family="paragraph"><style:paragraph-properties fo:text-align="justify" fo:line-height="115%" fo:margin-bottom="0.16cm"/><style:text-properties style:font-name="Source Sans Pro" fo:font-family="Source Sans Pro" fo:font-size="10.5pt"/></style:style>
 <style:style style:name="CI_Bullet" style:family="paragraph"><style:paragraph-properties fo:text-align="justify" fo:line-height="115%" fo:margin-left="0.60cm" fo:text-indent="-0.30cm" fo:margin-bottom="0.12cm"/><style:text-properties style:font-name="Source Sans Pro" fo:font-family="Source Sans Pro" fo:font-size="10.5pt"/></style:style>`;
 
-function injectStyles(xml:string){if(xml.includes('style:name="CI_Body"'))return xml;const close="</office:automatic-styles>";if(!xml.includes(close))throw new Error("ODT Panda sin office:automatic-styles.");return xml.replace(close,`${AUTO_STYLES}${close}`);}
+/**
+ * Algunos ODT reconstruidos desde PDF son válidos pero no traen el contenedor
+ * opcional office:automatic-styles en content.xml. En ese caso lo creamos antes
+ * de office:body y añadimos exclusivamente los estilos institucionales CI_*.
+ * No se relaja ninguna comprobación: el resultado sigue teniendo estilos físicos
+ * explícitos y la auditoría posterior exige su materialización.
+ */
+export function injectPandaInstitutionalStyles(xml:string):string{
+ if(xml.includes('style:name="CI_Body"'))return xml;
+ const close="</office:automatic-styles>";
+ if(xml.includes(close))return xml.replace(close,`${AUTO_STYLES}${close}`);
+ const body=xml.search(/<office:body\b/);
+ if(body<0)throw new Error("ODT Panda sin office:body para crear office:automatic-styles.");
+ return `${xml.slice(0,body)}<office:automatic-styles>${AUTO_STYLES}</office:automatic-styles>${xml.slice(body)}`;
+}
 function replaceOfficeText(xml:string,fragment:string){const open=xml.match(/<office:text\b[^>]*>/);if(!open||open.index===undefined)throw new Error("ODT Panda sin office:text.");const start=open.index+open[0].length,end=xml.lastIndexOf("</office:text>");if(end<start)throw new Error("ODT Panda con office:text inválido.");return xml.slice(0,start)+fragment+xml.slice(end);}
 
 export function institutionalizePandaEvidenceOdt(sourceBytes:Uint8Array,kind:PandaEvidenceDocumentKind):Uint8Array{
  const harmonized=harmonizePandaOdtLayout(sourceBytes);const lines=reflowPandaSourceLines(extractPandaSourceLines(harmonized));
  const minimum=kind==="MEMORIA"?28:70;if(lines.length<minimum)throw new Error(`Panda ${kind} V11: estructura documental insuficiente tras reflujo (${lines.length} párrafos; mínimo ${minimum}).`);
- const entries=readOdtZip(harmonized);const transformed:OdtZipEntry[]=entries.map(entry=>{if(entry.name!=="content.xml")return entry;let xml=Buffer.from(entry.bytes).toString("utf8");xml=injectStyles(xml);xml=replaceOfficeText(xml,pandaInstitutionalParagraphFragment(lines));return{...entry,bytes:Buffer.from(xml,"utf8")};});
+ const entries=readOdtZip(harmonized);const transformed:OdtZipEntry[]=entries.map(entry=>{if(entry.name!=="content.xml")return entry;let xml=Buffer.from(entry.bytes).toString("utf8");xml=injectPandaInstitutionalStyles(xml);xml=replaceOfficeText(xml,pandaInstitutionalParagraphFragment(lines));return{...entry,bytes:Buffer.from(xml,"utf8")};});
  const out=writeOdtZip(transformed);assertPandaInstitutionalEvidenceQuality(out,kind);return out;
 }
 
