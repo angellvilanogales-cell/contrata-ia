@@ -5,7 +5,7 @@ import {zipStoredFiles} from "../lb95/StoredZipPackage";
 import {LB102_SERVICE_SOURCEBACKED_ASSETS,SERVICE_OFFICIAL_OPEN_PCAP_SOURCE_URL} from "./LB102PersistedPilotTemplateStores";
 import {assertAtomicDocumentPackage} from "./AtomicDocumentPackageGate";
 import {sanitizeOdtSignatureResidue} from "./OdtSignatureResidueSanitizer";
-import {assertLb102GeneratedDocumentQuality,lb102OdtText} from "./LB102UniversalDocumentQualityGate";
+import {assertLb102ExactMaterialization,assertLb102GeneratedDocumentQuality,assertLb102NoCriticalPlaceholders,assertLb102SemanticConcepts,lb102OdtText} from "./LB102UniversalDocumentQualityGate";
 import {institutionalizeServiceMemoryOdt,institutionalizeServicePptOdt} from "./ServiceInstitutionalEvidenceFormatter";
 import {renderServiceOfficialOpenPcap} from "./ServiceOfficialOpenPcapRenderer";
 import type {StrictServicePilotSnapshot} from "./StrictServicePilotPackageGenerator";
@@ -31,8 +31,11 @@ const CASES:Readonly<Record<CaseKey,{caseId:string;sourceAuthority:string;pages:
 
 function caseKey(snapshot:StrictServicePilotSnapshot):CaseKey{if(snapshot.caseId==="CONTR 2025 0000468715"||snapshot.caseId==="CONTR 2025 468715")return"HUELVA";if(snapshot.caseId==="CONTR 2026 38892")return"SEVILLA";throw new Error(`El renderer Service source-backed no admite ${snapshot.caseId}.`);}
 function descriptor(templateId:string){const out=LB102_SERVICE_SOURCEBACKED_ASSETS.find(x=>x.templateId===templateId);if(!out)throw new Error(`No existe descriptor físico ${templateId}.`);return out;}
+
+function assertSourcePcapEvidence(bytes:Uint8Array,key:CaseKey){const spec=CASES[key],q=spec.quality.PCAP,text=odtText(bytes);assertLb102NoCriticalPlaceholders(text,`Service ${key}/PCAP evidencia`);assertLb102ExactMaterialization(text,`Service ${key}/PCAP evidencia`,q.exact);assertLb102SemanticConcepts(text,`Service ${key}/PCAP evidencia`,q.semantic);}
+
 async function loadEvidence(kind:Kind,key:CaseKey,store:UniversalEditableTemplateBinaryStore){const spec=CASES[key],asset=descriptor(spec.assetIds[kind]),source=await store.get(asset.templateId);if(!source)throw new Error(`Falta activo Service ${key}/${kind} V8.`);if(sha(source.bytes)!==asset.sha256)throw new Error(`SHA Service ${key}/${kind} V8 incorrecto.`);const entries=readOdtZip(source.bytes);if(computeOdtStyleFingerprint(entries)!==asset.styleFingerprint)throw new Error(`Huella Service ${key}/${kind} V8 incorrecta.`);const sourceText=odtText(source.bytes);if(/\{\{[^}]+\}\}|DATOS VARIABLES DEL EXPEDIENTE/.test(sourceText))throw new Error(`Service ${key}/${kind} conserva marcadores técnicos.`);for(const marker of spec.markers[kind])if(!sourceText.toLowerCase().includes(marker.toLowerCase()))throw new Error(`Service ${key}/${kind}: falta marcador físico ${marker}.`);
- const sanitized=sanitizeOdtSignatureResidue(source.bytes);const output=kind==="MEMORIA"?institutionalizeServiceMemoryOdt(sanitized,`Service ${key}/MEMORIA`):kind==="PPT"?institutionalizeServicePptOdt(sanitized,`Service ${key}/PPT`):sanitized;const q=spec.quality[kind];assertLb102GeneratedDocumentQuality({bytes:output,kind,label:`Service ${key}/${kind}`,exactValues:q.exact,semanticConceptGroups:q.semantic});return output;}
+ const sanitized=sanitizeOdtSignatureResidue(source.bytes);if(kind==="PCAP"){assertSourcePcapEvidence(sanitized,key);return sanitized;}const output=kind==="MEMORIA"?institutionalizeServiceMemoryOdt(sanitized,`Service ${key}/MEMORIA`):institutionalizeServicePptOdt(sanitized,`Service ${key}/PPT`);const q=spec.quality[kind];assertLb102GeneratedDocumentQuality({bytes:output,kind,label:`Service ${key}/${kind}`,exactValues:q.exact,semanticConceptGroups:q.semantic});return output;}
 
 export function assertServiceOfficialPcapPreUat(key:CaseKey,officialModel:boolean){if(!officialModel)throw new Error(`Service ${key}: UAT bloqueada. El PCAP debe reconstruirse sobre el modelo oficial Junta de Servicios correspondiente.`);}
 
