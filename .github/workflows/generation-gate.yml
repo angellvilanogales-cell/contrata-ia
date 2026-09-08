@@ -67,12 +67,26 @@ jobs:
             gen_code=$(curl --connect-timeout 15 --max-time 90 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
             echo "generation HTTP=$gen_code"
             if [[ "$gen_code" != "200" ]]; then
+              # Con el SHA exacto ya desplegado, un 503 con JSON del endpoint no es
+              # una espera de despliegue: es un blocker real de generación. Se
+              # preserva la evidencia y se falla inmediatamente para no ocultarlo
+              # detrás de 24 reintentos idénticos.
+              if [[ "$gen_code" == "503" && -s generation.json ]] && node -e "JSON.parse(require('node:fs').readFileSync('generation.json','utf8'));" >/dev/null 2>&1; then
+                echo "Runtime exacto alcanzado con blocker semántico de generación:"
+                cat generation.json
+                exit 1
+              fi
               sleep 20
               continue
             fi
 
             sim_code=$(curl --connect-timeout 15 --max-time 90 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
             echo "simulation HTTP=$sim_code"
+            if [[ "$sim_code" == "503" && -s simulation.json ]] && node -e "JSON.parse(require('node:fs').readFileSync('simulation.json','utf8'));" >/dev/null 2>&1; then
+              echo "Runtime exacto alcanzado con blocker semántico de simulación:"
+              cat simulation.json
+              exit 1
+            fi
             if [[ "$sim_code" == "200" ]]; then
               node <<'NODE'
           const fs=require('node:fs');
