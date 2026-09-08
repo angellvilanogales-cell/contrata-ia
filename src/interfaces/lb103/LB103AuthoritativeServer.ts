@@ -83,6 +83,20 @@ function adaptiveUiWithGeneration(): string {
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
+function humanUatRoleReadiness() {
+  const users = security.namedUserDirectory().filter(user => user.passwordEnabled);
+  const reviewers = users.filter(user => user.role === "REVIEWER" || user.role === "ADMIN").length;
+  const admins = users.filter(user => user.role === "ADMIN").length;
+  return {
+    passwordEnabledNamedUsers: users.length,
+    reviewerCapableUsers: reviewers,
+    adminCapableUsers: admins,
+    twoDistinctReviewersReady: reviewers >= 2,
+    finalAdminDecisionReady: admins >= 1,
+    ready: reviewers >= 2 && admins >= 1,
+  };
+}
+
 function runtimeVersion() {
   return {
     service: "contrata-ia",
@@ -90,6 +104,7 @@ function runtimeVersion() {
     lb103Authoritative: true,
     lb102SourceIngressPreserved: true,
     commit: process.env.RENDER_GIT_COMMIT ?? process.env.GITHUB_SHA ?? "unknown",
+    humanUatRoleReadiness: humanUatRoleReadiness(),
     humanAcceptanceRequired: true,
     productionReady: false,
   };
