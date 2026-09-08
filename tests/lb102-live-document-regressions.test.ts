@@ -3,6 +3,7 @@ import {readOdtZip,writeOdtZip,type OdtZipEntry} from "../src/application/intake
 import {injectPandaInstitutionalStyles} from "../src/application/intake/lb102/PandaInstitutionalEvidenceFormatter";
 import {institutionalizeServiceMemoryOdt} from "../src/application/intake/lb102/ServiceInstitutionalEvidenceFormatter";
 import {assertServiceOfficialPcapPreUat} from "../src/application/intake/lb102/ServiceSourceBackedPilotPackageGenerator";
+import {materializeServiceOfficialPcapCriticalFieldsForRegression} from "../src/application/intake/lb102/ServiceOfficialOpenPcapRenderer";
 
 function entry(name:string,content:string,method:0|8=8):OdtZipEntry{return{name,bytes:Buffer.from(content,"utf8"),method,modTime:0,modDate:0,externalAttributes:0};}
 function serviceMemoryWithThirteenPhysicalParagraphs(){
@@ -23,5 +24,14 @@ describe("LB102 · regresiones de blockers vivos Render 2026-09-07",()=>{
 
  it("Service mantiene la puerta de PCAP oficial: bloquea false y admite únicamente true",()=>{
   expect(()=>assertServiceOfficialPcapPreUat("HUELVA",false)).toThrow(/modelo oficial Junta/i);expect(()=>assertServiceOfficialPcapPreUat("SEVILLA",true)).not.toThrow();
+ });
+
+ it("Service no trata un text:p autocerrado como apertura al materializar campos críticos",()=>{
+  const xml='<office:text><text:p>EXPEDIENTE: _______</text:p><text:p>Código CPV: _______</text:p><text:p>Objeto del contrato: _______</text:p><text:p>Importe total (IVA excluido): _______</text:p><text:p/><text:p>Tramitación del gasto: Ordinaria / Anticipada</text:p><text:p>Valor estimado del contrato: _______</text:p><text:p>División en lotes: Sí / No</text:p></office:text>';
+  const out=materializeServiceOfficialPcapCriticalFieldsForRegression(xml,{caseId:"CONTR TEST",mainCpv:"90911200-8",objectValue:"SERVICIO DE PRUEBA",pblExVat:"100,00",estimatedValue:"120,00",divisionIntoLots:"No",expenseProcessing:"Anticipada"});
+  expect(out).toContain('<text:p/>');
+  expect(out).toContain('<text:p>Tramitación del gasto: Anticipada.</text:p>');
+  expect(out).not.toContain('<text:p/>Tramitación del gasto: Anticipada.</text:p>');
+  expect(out).toContain('<text:p>Valor estimado del contrato: 120,00 €</text:p>');
  });
 });
