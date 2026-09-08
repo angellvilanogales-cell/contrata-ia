@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - name: Wait for exact Render deployment and execute live LB102 gates
+      - name: Wait for exact Render deployment and execute live LB102/LB103 gates
         env:
           BASE_URL: https://contrata-ia.onrender.com
           EXPECTED_SHA: ${{ github.sha }}
@@ -46,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           ok=0
-          rm -f runtime-version.json generation.json simulation.json
+          rm -f runtime-version.json adaptive.html lb103-authoritative-generation.js adaptive-preflight-unauth.json adaptive-generate-unauth.json generation.json simulation.json
           for attempt in $(seq 1 24); do
             echo "Runtime live attempt ${attempt}/24; expected SHA=$EXPECTED_SHA"
             version_code=$(curl --connect-timeout 15 --max-time 45 -sS -o runtime-version.json -w '%{http_code}' "$BASE_URL/api/runtime-version" || true)
@@ -63,6 +63,33 @@ jobs:
               sleep 20
               continue
             fi
+
+            adaptive_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive.html -w '%{http_code}' "$BASE_URL/adaptive" || true)
+            script_code=$(curl --connect-timeout 15 --max-time 45 -sS -o lb103-authoritative-generation.js -w '%{http_code}' "$BASE_URL/lb103-authoritative-generation.js" || true)
+            preflight_unauth_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive-preflight-unauth.json -w '%{http_code}' "$BASE_URL/api/adaptive/cases/LB103-UAT-SMOKE/lb103-preflight" || true)
+            generate_unauth_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive-generate-unauth.json -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{"snapshotSha256":"0000000000000000000000000000000000000000000000000000000000000000","documentarySelectionSha256":"0000000000000000000000000000000000000000000000000000000000000000"}' "$BASE_URL/api/adaptive/cases/LB103-UAT-SMOKE/lb103-generate" || true)
+            echo "adaptive HTTP=$adaptive_code script HTTP=$script_code preflight unauth HTTP=$preflight_unauth_code generate unauth HTTP=$generate_unauth_code"
+
+            if [[ "$adaptive_code" != "200" || "$script_code" != "200" || "$preflight_unauth_code" != "401" || "$generate_unauth_code" != "401" ]]; then
+              echo "Superficie LB103 /adaptive no cumple el contrato vivo esperado."
+              cat adaptive-preflight-unauth.json || true
+              cat adaptive-generate-unauth.json || true
+              exit 1
+            fi
+
+            node <<'NODE'
+          const fs=require('node:fs');
+          const html=fs.readFileSync('adaptive.html','utf8');
+          const script=fs.readFileSync('lb103-authoritative-generation.js','utf8');
+          if(!html.includes('/lb103-authoritative-generation.js')) throw new Error('/adaptive no carga el script autoritativo LB103');
+          for(const expected of ['contrataIaAdaptiveCaseId','lb103-preflight','lb103-generate']) {
+            if(!script.includes(expected)) throw new Error(`script LB103 vivo no contiene ${expected}`);
+          }
+          for(const file of ['adaptive-preflight-unauth.json','adaptive-generate-unauth.json']) {
+            const value=JSON.parse(fs.readFileSync(file,'utf8'));
+            if(value.productionReady!==false) throw new Error(`${file}: productionReady debe permanecer false`);
+          }
+          NODE
 
             gen_code=$(curl --connect-timeout 15 --max-time 90 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
             echo "generation HTTP=$gen_code"
@@ -113,19 +140,25 @@ jobs:
             sleep 20
           done
           if [[ "$ok" != "1" ]]; then
-            echo "No se alcanzó el runtime exacto y el estado vivo LB102 pre-UAT dentro de la ventana de despliegue."
+            echo "No se alcanzó el runtime exacto y el estado vivo LB102/LB103 pre-UAT dentro de la ventana de despliegue."
             echo "runtime-version:"; cat runtime-version.json || true
+            echo "adaptive preflight unauth:"; cat adaptive-preflight-unauth.json || true
+            echo "adaptive generate unauth:"; cat adaptive-generate-unauth.json || true
             echo "generation:"; cat generation.json || true
             echo "simulation:"; cat simulation.json || true
             exit 1
           fi
-      - name: Preserve live runtime and LB102 evidence
+      - name: Preserve live runtime, adaptive and LB102 evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lb102-live-preuat-evidence
+          name: lb102-lb103-live-preuat-evidence
           path: |
             runtime-version.json
+            adaptive.html
+            lb103-authoritative-generation.js
+            adaptive-preflight-unauth.json
+            adaptive-generate-unauth.json
             generation.json
             simulation.json
           if-no-files-found: warn
