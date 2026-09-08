@@ -11,6 +11,10 @@ function sha256(bytes:Uint8Array){return createHash("sha256").update(bytes).dige
  * Primero consulta la persistencia protegida; si el activo aún no está allí,
  * descarga exclusivamente la URL oficial fijada y exige SHA y huella de estilo
  * exactos. Nunca degrada a una plantilla procedente de un expediente real.
+ *
+ * En caso de divergencia, el error conserva las huellas observadas para poder
+ * auditar si la Junta ha sustituido físicamente el ODT publicado. Esto no
+ * relaja la puerta: cualquier diferencia continúa bloqueando la generación.
  */
 export class JdaOfficialPcapRemoteFallbackStore implements UniversalEditableTemplateBinaryStore{
  public constructor(
@@ -26,9 +30,10 @@ export class JdaOfficialPcapRemoteFallbackStore implements UniversalEditableTemp
   try{response=await fetch(this.officialUrl,{method:"GET",headers:{accept:"application/vnd.oasis.opendocument.text"}});}catch(error){throw new Error(`No se puede recuperar ${this.label} desde la Junta: ${error instanceof Error?error.message:String(error)}`);}
   if(!response.ok)throw new Error(`La Junta no entrega ${this.label}: HTTP ${response.status}.`);
   const bytes=new Uint8Array(await response.arrayBuffer());
-  if(sha256(bytes)!==this.official.sha256)throw new Error(`${this.label}: SHA-256 remoto distinto del acreditado; generación bloqueada.`);
-  let style:string;try{style=computeOdtStyleFingerprint(readOdtZip(bytes));}catch{throw new Error(`${this.label}: el recurso remoto no es un ODT válido.`);}
-  if(style!==this.official.styleFingerprint)throw new Error(`${this.label}: huella de estilo remota distinta de la acreditada; generación bloqueada.`);
+  const observedSha=sha256(bytes);
+  let observedStyle:string;try{observedStyle=computeOdtStyleFingerprint(readOdtZip(bytes));}catch{throw new Error(`${this.label}: el recurso remoto no es un ODT válido (SHA observado ${observedSha}).`);}
+  if(observedSha!==this.official.sha256)throw new Error(`${this.label}: SHA-256 remoto distinto del acreditado; esperado=${this.official.sha256}; observado=${observedSha}; huellaEstiloObservada=${observedStyle}; generación bloqueada.`);
+  if(observedStyle!==this.official.styleFingerprint)throw new Error(`${this.label}: huella de estilo remota distinta de la acreditada; esperada=${this.official.styleFingerprint}; observada=${observedStyle}; SHA=${observedSha}; generación bloqueada.`);
   return{templateId:this.official.templateId,sourceId:this.official.sourceId,bytes};
  }
 }
