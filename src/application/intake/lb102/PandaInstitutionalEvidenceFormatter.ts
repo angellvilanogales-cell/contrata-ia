@@ -58,7 +58,7 @@ function replaceOfficeText(xml:string,fragment:string){const open=xml.match(/<of
 export function institutionalizePandaEvidenceOdt(sourceBytes:Uint8Array,kind:PandaEvidenceDocumentKind):Uint8Array{
  const harmonized=harmonizePandaOdtLayout(sourceBytes);const lines=reflowPandaSourceLines(extractPandaSourceLines(harmonized));
  const minimum=kind==="MEMORIA"?28:70;if(lines.length<minimum)throw new Error(`Panda ${kind} V11: estructura documental insuficiente tras reflujo (${lines.length} párrafos; mínimo ${minimum}).`);
- const entries=readOdtZip(harmonized);const transformed:OdtZipEntry[]=entries.map(entry=>{if(entry.name!=="content.xml")return entry;let xml=Buffer.from(entry.bytes).toString("utf8");xml=injectPandaInstitutionalStyles(xml);xml=replaceOfficeText(xml,pandaInstitutionalParagraphFragment(lines));return{...entry,bytes:Buffer.from(xml,"utf8")}:entry;});
+ const entries=readOdtZip(harmonized);const transformed:OdtZipEntry[]=entries.map(entry=>{if(entry.name!=="content.xml")return entry;let xml=Buffer.from(entry.bytes).toString("utf8");xml=injectPandaInstitutionalStyles(xml);xml=replaceOfficeText(xml,pandaInstitutionalParagraphFragment(lines));return{...entry,bytes:Buffer.from(xml,"utf8")};});
  const out=writeOdtZip(transformed);assertPandaInstitutionalEvidenceQuality(out,kind);return out;
 }
 
