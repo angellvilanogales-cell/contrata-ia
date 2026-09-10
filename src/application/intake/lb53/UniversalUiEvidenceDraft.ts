@@ -2,6 +2,7 @@ import type { EvidenceField, EvidenceReference } from "../../../domain/expedient
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST, type UniversalUiControlKind } from "../lb51/UniversalV1UiFieldManifest";
 import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../lb93/SupplyVerticalFieldManifest";
 import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../lb95/SupplyAsaPcapFieldManifest";
+import { assertSupplyAsaAnnexIResidualDecisions } from "../lb95/SupplyAsaAnnexIResidualCompletion";
 
 export interface UniversalUiDraftMutation {
   fieldPath: string;
@@ -34,7 +35,9 @@ function userReference(sourceId: string, note?: string): EvidenceReference {
 
 export function declareUniversalUiEvidence(mutation: UniversalUiDraftMutation, actorId: string): EvidenceField<unknown> {
   const definition = manifestField(mutation.fieldPath);
-  if (mutation.fieldPath === "execution.plannedModificationRegime" && typeof mutation.value === "object" && mutation.value && !Array.isArray(mutation.value)) {
+  if (mutation.fieldPath === "administrative.pcapAnnexIResidualDecisions") {
+    assertSupplyAsaAnnexIResidualDecisions(mutation.value);
+  } else if (mutation.fieldPath === "execution.plannedModificationRegime" && typeof mutation.value === "object" && mutation.value && !Array.isArray(mutation.value)) {
     // The PCAP renderer validates the structured causes, limits and percentages.
   } else assertControlValue(definition.control, mutation.value);
   if ("options" in definition && definition.options && !definition.options.includes(mutation.value as never)) throw new Error("Seleccione una opción válida para este campo.");

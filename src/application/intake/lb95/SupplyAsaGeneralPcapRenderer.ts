@@ -4,6 +4,7 @@ import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace
 import { UniversalOdtProductionRenderer, type UniversalEditableTemplateBinaryStore, type UniversalOdtRendererConfiguration, type UniversalTemplateValueFormatter } from "../lb23/UniversalOdtProductionRenderer";
 import { JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET, JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE, JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION, FERRETERIA_PLANNED_MODIFICATION_PROFILE_ID } from "../lb34/JuntaSupplyAsaModificationSection";
 import { auditJdaSupplyAsaRenderedOdt } from "../lb35/JuntaSupplyAsaAnexoIResidualAudit";
+import { completeSupplyAsaAnnexIResidualFields } from "./SupplyAsaAnnexIResidualCompletion";
 
 export interface SupplyAsaGeneralPcapResult {
   ready: boolean;
@@ -111,9 +112,10 @@ export async function renderSupplyAsaGeneralPcap(input: { record: UniversalEvide
     const values = JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE.slots.map(slot => ({ slotId: slot.slotId, value: validated(input.record, slot.fieldKey), sourceFieldKey: slot.fieldKey }));
     const renderer = new UniversalOdtProductionRenderer(input.templateStore, JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION);
     const rendered = await renderer.render({ asset: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET, values });
-    const residual = auditJdaSupplyAsaRenderedOdt(rendered.bytes);
+    const completed = completeSupplyAsaAnnexIResidualFields(rendered.bytes, validated(input.record, "administrative.pcapAnnexIResidualDecisions"));
+    const residual = auditJdaSupplyAsaRenderedOdt(completed.bytes);
     if (!residual.ready) throw new Error(`Auditoría residual PCAP: ${residual.blockers.join(" ")}`);
-    const bytes = rendered.bytes;
+    const bytes = completed.bytes;
     return {
       ready: true,
       document: {

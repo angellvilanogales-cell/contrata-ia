@@ -12,8 +12,17 @@ import { NEW_SUPPLY_VALUES } from "../src/application/universal/LB103SyntheticNe
 import { evaluateLB103DocumentCompletion } from "../src/application/universal/LB103DocumentCompletion";
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "../src/interfaces/lb103/LB103AuthoritativeGenerationScript";
 import { runLB103NewCaseSelfTest } from "../src/application/universal/LB103NewCaseSelfTest";
+import { assertSupplyAsaAnnexIResidualDecisions } from "../src/application/intake/lb95/SupplyAsaAnnexIResidualCompletion";
 
 describe("LB103 nuevo expediente y selección física", () => {
+  it("exige una decisión explícita y cerrada para cada residual del Anexo I",()=>{
+    const decisions=NEW_SUPPLY_VALUES["administrative.pcapAnnexIResidualDecisions"];
+    expect(()=>assertSupplyAsaAnnexIResidualDecisions(decisions)).not.toThrow();
+    expect(()=>assertSupplyAsaAnnexIResidualDecisions({...decisions as object,insuranceRequired:"Pendiente"})).toThrow(/Sí o No/);
+    const missing={...decisions as Record<string,string>};delete missing.warrantyTerm;
+    expect(()=>assertSupplyAsaAnnexIResidualDecisions(missing)).toThrow(/Plazo de garantía/);
+  });
+
   it("declara, valida y recupera datos documentales; cualquier cambio técnico invalida el sello anterior", async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "lb103-completion-"));
     try {

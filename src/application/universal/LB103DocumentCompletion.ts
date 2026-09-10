@@ -24,6 +24,7 @@ export function evaluateLB103DocumentCompletion(record: UniversalEvidenceRecord)
   const paths = [...new Set([
     ...journey.stages.filter(stage => stage.id !== "DOCUMENTS" && stage.id !== "FINAL_REVIEW").flatMap(stage => stage.applicablePaths),
     ...supplyAsaPcapRequiredFieldPaths(),
+    "administrative.pcapAnnexIResidualDecisions",
   ])].filter(path => path !== "lots.noDivisionJustification" || !divided);
   const fields = paths.map(fieldPath => {
     const definition = LB103_DOCUMENT_FIELDS.find(item => item.fieldPath === fieldPath);
@@ -34,6 +35,7 @@ export function evaluateLB103DocumentCompletion(record: UniversalEvidenceRecord)
     return { fieldPath, label: definition?.label ?? fieldPath, control: definition?.control ?? "TEXTAREA",
       options: definition && "options" in definition ? definition.options : undefined,
       help: definition && "help" in definition ? definition.help : undefined,
+      rows: definition && "rows" in definition ? definition.rows : undefined,
       value: field?.value, status: field?.status ?? "PENDING", ready };
   });
   const blockers = fields.filter(field => !field.ready).map(field => `${field.label}: pendiente de completar o validar.`);
