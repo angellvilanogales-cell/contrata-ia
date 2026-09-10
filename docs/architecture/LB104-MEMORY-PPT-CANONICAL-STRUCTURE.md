@@ -76,3 +76,12 @@ El canon se apoya en Memorias y PPT de mobiliario de Cádiz, Windows Server de V
 La función `auditCanonicalMemoryPptHeadings` compara literalmente número, título y orden. Un cambio de nomenclatura, una omisión, una duplicación o un overlay no aplicable debe bloquear la promoción de una nueva plantilla física.
 
 La selección Supply se realiza con `canonicalSupplyOverlaysFromFacts` exclusivamente a partir de la subfamilia y la financiación declaradas y validadas; nunca se deduce del CPV ni de un expediente parecido.
+
+`auditCanonicalOdtStructure` aplica la misma comprobación directamente a `content.xml` del ODT. La puerta es literal, detecta omisiones y duplicados y solo exige los subepígrafes cuya especialidad esté activada. Esta puerta debe integrarse en cada generador al migrar su plantilla física; mientras no ocurra, la conformidad lógica no equivale a normalización física.
+
+## Estado de implantación
+
+- Canon lógico y nomenclatura: cerrado en LB104 V1.
+- Auditoría física reutilizable de ODT: implementada.
+- Plantillas físicas generales actuales: pendientes de migración y de activar la puerta en cada familia.
+- PCAP: fuera de este canon; conserva el modelo oficial compatible de la Administración.
