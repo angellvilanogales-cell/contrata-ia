@@ -43,10 +43,13 @@ describe("LB102 · regresiones de blockers vivos Render 2026-09-07/10",()=>{
 
  it("Service descarta falsos Anexo I de cláusulas y conserva el Anexo I administrativo real",()=>{
   const p=(text:string)=>`<text:p>${text}</text:p>`;
-  const trueAnnex=["ANEXO I - CARACTERÍSTICAS DEL CONTRATO","EXPEDIENTE: CONTR TEST","Objeto del contrato: SERVICIO DE PRUEBA","Código CPV: 90911200-8","Presupuesto base de licitación: 100,00 €","Valor estimado del contrato: 120,00 €","División en lotes: No","Tramitación: Ordinaria",...Array.from({length:20},(_,i)=>`Campo administrativo ${i+1}`)];
+  // Complete paragraphs must survive source-line reflow before the quality gate.
+  const trueAnnex=["ANEXO I - CARACTERÍSTICAS DEL CONTRATO","EXPEDIENTE: CONTR TEST","Objeto del contrato: SERVICIO DE PRUEBA","Código CPV: 90911200-8","Presupuesto base de licitación: 100,00 €","Valor estimado del contrato: 120,00 €","División en lotes: No","Tramitación: Ordinaria",...Array.from({length:20},(_,i)=>`Campo administrativo ${i+1}.`)];
   const falseAnnex=["ANEXO I - CARACTERÍSTICAS DEL CONTRATO","La persona cedente debe tener ejecutado al menos un 20 % del importe del contrato.","16. Subcontratación.",...Array.from({length:90},(_,i)=>`Cláusula general ${i+1}`)];
   const xml=`<office:text>${trueAnnex.map(p).join("")}${p("ANEXO II - DECLARACIÓN")}${falseAnnex.map(p).join("")}${p("ANEXO III - MODELO")}</office:text>`;
   const range=selectServiceOfficialAnnexRangeForRegression(xml);expect(xml.slice(range.start,range.end)).toContain("CONTR TEST");expect(xml.slice(range.start,range.end)).not.toContain("Subcontratación");
   const selected=selectServiceSourceAnnexLinesForRegression([...trueAnnex,"ANEXO II - DECLARACIÓN",...falseAnnex,"ANEXO III - MODELO"]);expect(selected.join(" ")).toContain("CONTR TEST");expect(selected.join(" ")).not.toContain("Subcontratación");
+  expect(selected.length).toBeGreaterThanOrEqual(20);
+  expect(()=>selectServiceSourceAnnexLinesForRegression([...trueAnnex.slice(0,8),"ANEXO II - DECLARACIÓN"])).toThrow(/Anexo I insuficiente/);
  });
 });
