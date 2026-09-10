@@ -11,7 +11,7 @@ export const NEW_SUPPLY_VALUES: Record<string, unknown> = {
   "economic.legalEstimatedValueCents": 100000, "economic.budgetCoversEntireContractLife": true,
   "economic.priceDeterminationRegime": "Precio global de prueba.",
   "economic.estimatedValueCalculationMethod": "Importe inicial sin IVA; sin prórrogas ni incrementos en este supuesto sintético.",
-  "economic.priceRevisionRegime": "Sin revisión en este supuesto sintético.",
+  "economic.priceRevisionRegime": "No procede",
   "economic.annualityBudgetRows": [{year: 2026, amountCents: 121000, vatIncluded: true, budgetApplication: "APLICACIÓN FICTICIA DE PRUEBA"}],
   durationMonths: 12, extensionMonths: 0,
   "execution.extensionStructure": "Sin prórrogas.", "execution.extensionNoticeMonths": 0,

@@ -9,6 +9,7 @@ import { evaluateLB103ServerValidatedPreflight } from "../src/application/univer
 import { generateLB103AuthoritativeSupplyPackage } from "../src/application/universal/LB103AuthoritativeSupplyGeneration";
 import { selectedLB103TemplateStore } from "../src/application/universal/LB103SelectedTemplateStore";
 import { NEW_SUPPLY_VALUES } from "../src/application/universal/LB103SyntheticNewCaseFixture";
+import { evaluateLB103DocumentCompletion } from "../src/application/universal/LB103DocumentCompletion";
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "../src/interfaces/lb103/LB103AuthoritativeGenerationScript";
 import { runLB103NewCaseSelfTest } from "../src/application/universal/LB103NewCaseSelfTest";
 
@@ -27,6 +28,8 @@ describe("LB103 nuevo expediente y selección física", () => {
       expect(restored.universalEvidence?.["execution.plannedModificationRegime"].value).toEqual(NEW_SUPPLY_VALUES["execution.plannedModificationRegime"]);
       const before = evaluateLB103ServerValidatedPreflight(restored);
       expect(before.generationReady).toBe(true);
+      const priceRevision = evaluateLB103DocumentCompletion({caseId:restored.caseId,fields:restored.universalEvidence??{},updatedAt:restored.updatedAt}).fields.find(field=>field.fieldPath==="economic.priceRevisionRegime");
+      expect(priceRevision).toMatchObject({control:"SELECT",options:["No procede"],value:"No procede",ready:true});
       const seals = {snapshotSha256:before.snapshot!.sha256,documentarySelectionSha256:before.documentarySelection!.sha256};
       service.declare(created.caseId,{fieldPath:"technical.technicalRequirements",value:"Requisitos técnicos distintos."},"test-operator");
       service.validate(created.caseId,"technical.technicalRequirements","test-reviewer");

@@ -6,6 +6,13 @@ import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../intake/lb93/SupplyVerticalFie
 import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../intake/lb95/SupplyAsaPcapFieldManifest";
 
 export const LB103_DOCUMENT_FIELDS = [
+  {
+    fieldPath: "economic.priceRevisionRegime",
+    label: "Revisión de precios",
+    control: "SELECT" as const,
+    options: ["No procede"] as const,
+    help: "La plantilla física Supply ASA V1 solo está acreditada para expedientes sin revisión de precios.",
+  },
   ...SUPPLY_VERTICAL_FIELD_MANIFEST, ...SUPPLY_ASA_PCAP_FIELD_MANIFEST, ...UNIVERSAL_V1_UI_FIELD_MANIFEST,
   { fieldPath: "lots.lots", label: "Relación y descripción de lotes", control: "TABLE" as const },
 ].filter((item, index, all) => all.findIndex(other => other.fieldPath === item.fieldPath) === index);
