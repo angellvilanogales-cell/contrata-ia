@@ -9,6 +9,7 @@ import { createHttpPersistedTemplateAssetStoreFromEnv } from "../../application/
 import { generateLB103AuthoritativeSupplyPackage } from "../../application/universal/LB103AuthoritativeSupplyGeneration";
 import { evaluateLB103ServerValidatedPreflight } from "../../application/universal/LB103ServerValidatedPreflight";
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGenerationScript";
+import { runLB103NewCaseSelfTest } from "../../application/universal/LB103NewCaseSelfTest";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -119,6 +120,13 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
     const url = new URL(request.url ?? "/", "http://localhost");
     try {
       security.applySecurityHeaders(response);
+      if (request.method === "GET" && url.pathname === "/api/lb103/new-case-selftest") {
+        const store = createHttpPersistedTemplateAssetStoreFromEnv();
+        if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
+        const result = await runLB103NewCaseSelfTest(store);
+        sendJson(response, result.ready ? 200 : 503, result);
+        return;
+      }
       if (request.method === "GET" && url.pathname === "/api/runtime-version") {
         sendJson(response, 200, runtimeVersion());
         return;

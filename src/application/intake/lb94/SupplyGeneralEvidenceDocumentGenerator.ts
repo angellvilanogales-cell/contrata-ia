@@ -107,8 +107,8 @@ function procedureSummary(record: UniversalEvidenceRecord): string {
 
 function awardCriteriaSummary(record: UniversalEvidenceRecord): string {
   const criteria = value(record, "criteria.awardCriteria");
-  const motivation = text(record, "criteria.singleCriterionMotivation");
-  return `Criterios de adjudicación validados: ${stringifyControlled(criteria)}. Motivación asociada: ${motivation}`;
+  const motivation = Array.isArray(criteria) && criteria.length === 1 ? ` Motivación asociada: ${text(record, "criteria.singleCriterionMotivation")}` : "";
+  return `Criterios de adjudicación validados: ${stringifyControlled(criteria)}.${motivation}`;
 }
 
 function executionSummary(record: UniversalEvidenceRecord): string {
@@ -118,7 +118,16 @@ function executionSummary(record: UniversalEvidenceRecord): string {
 }
 
 function modificationSummary(record: UniversalEvidenceRecord): string {
-  return `Régimen de modificación prevista validado: ${text(record, "execution.plannedModificationRegime")}`;
+  const current = value(record, "execution.plannedModificationRegime");
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    const causes = current as Record<string, {applicable?: boolean; maximumPercent?: number; description?: string; limits?: string[]}>;
+    return [["budgetStability", "Estabilidad presupuestaria"], ["needsDa33", "Mayores necesidades"], ["other", "Otras causas"]].map(([key,label]) => {
+      const cause = causes[key!];
+      if (!cause || typeof cause.applicable !== "boolean") throw new Error("Régimen de modificaciones incompleto.");
+      return cause.applicable ? `${label}: porcentaje máximo declarado ${cause.maximumPercent} %. ${cause.description ?? ""} ${(cause.limits ?? []).join(" ")}`.trim() : `${label}: no prevista.`;
+    }).join(" ");
+  }
+  return `Régimen de modificación prevista validado: ${stringifyControlled(current)}`;
 }
 
 function supplyVariantRequirements(record: UniversalEvidenceRecord): string {

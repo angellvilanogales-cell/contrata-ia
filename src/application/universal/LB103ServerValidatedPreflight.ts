@@ -8,6 +8,7 @@ import type { DocumentaryProvenanceRole, FinancingProfile } from "../../domain/d
 import { TipoProcedimiento } from "../../domain/procedimiento/TipoProcedimiento";
 import type { UniversalTargetContractType } from "../../domain/capabilities/UniversalContractCoverage";
 import { UNIVERSAL_GUIDED_UI_MANIFEST, type UniversalGuidedUiDecision } from "../../interfaces/lb103/UniversalGuidedUiManifest";
+import { evaluateLB103DocumentCompletion } from "./LB103DocumentCompletion";
 
 export interface LB103ValidatedEvidenceSnapshotRow {
   decisionId: string;
@@ -28,6 +29,7 @@ export interface LB103ServerValidatedSnapshot {
   decisions: readonly LB103ValidatedEvidenceSnapshotRow[];
   sha256: string;
   humanValidated: true;
+  evidenceSha256: string;
 }
 
 export interface LB103DocumentPreflightRow {
@@ -66,6 +68,8 @@ export interface LB103ServerValidatedPreflight {
   blockers: readonly string[];
   humanAcceptanceStillRequired: true;
   productionReady: false;
+  generationReady: boolean;
+  completion?: ReturnType<typeof evaluateLB103DocumentCompletion>;
 }
 
 const VALID_CONTRACT_TYPES = new Set(["SUPPLY", "SERVICE"]);
@@ -158,6 +162,7 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
       procedure: procedure as TipoProcedimiento,
       financing,
       decisions,
+      evidenceSha256: sha256(evidence),
       humanValidated: true as const,
     };
     snapshot = Object.freeze({ ...payload, sha256: sha256(payload) });
@@ -208,6 +213,7 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
     .flatMap(item => item.blockers.map(blocker => `${item.documentType}: ${blocker}`));
   blockers.push(...documentBlockers);
 
+  const completion = snapshot?.contractType === "SUPPLY" ? evaluateLB103DocumentCompletion({caseId: caseValue.caseId, fields: evidence, updatedAt: caseValue.updatedAt}) : undefined;
   return {
     snapshotReady: Boolean(snapshot),
     snapshot,
@@ -217,5 +223,7 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
     blockers,
     humanAcceptanceStillRequired: true,
     productionReady: false,
+    completion,
+    generationReady: Boolean(snapshot) && documents.every(item => item.status === "GENERAL_EDITABLE_SELECTED") && completion?.ready === true,
   };
 }

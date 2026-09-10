@@ -1,5 +1,7 @@
 import type { EvidenceField, EvidenceReference } from "../../../domain/expediente/EvidenceField";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST, type UniversalUiControlKind } from "../lb51/UniversalV1UiFieldManifest";
+import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../lb93/SupplyVerticalFieldManifest";
+import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../lb95/SupplyAsaPcapFieldManifest";
 
 export interface UniversalUiDraftMutation {
   fieldPath: string;
@@ -9,7 +11,7 @@ export interface UniversalUiDraftMutation {
 }
 
 function manifestField(fieldPath: string) {
-  const definition = UNIVERSAL_V1_UI_FIELD_MANIFEST.find(item => item.fieldPath === fieldPath);
+  const definition = [...SUPPLY_VERTICAL_FIELD_MANIFEST, ...SUPPLY_ASA_PCAP_FIELD_MANIFEST, ...UNIVERSAL_V1_UI_FIELD_MANIFEST, {fieldPath:"lots.lots",control:"TABLE" as const}].find(item => item.fieldPath === fieldPath);
   if (!definition) throw new Error(`Campo universal no expuesto por la UI: ${fieldPath}.`);
   return definition;
 }
@@ -32,7 +34,10 @@ function userReference(sourceId: string, note?: string): EvidenceReference {
 
 export function declareUniversalUiEvidence(mutation: UniversalUiDraftMutation, actorId: string): EvidenceField<unknown> {
   const definition = manifestField(mutation.fieldPath);
-  assertControlValue(definition.control, mutation.value);
+  if (mutation.fieldPath === "execution.plannedModificationRegime" && typeof mutation.value === "object" && mutation.value && !Array.isArray(mutation.value)) {
+    // The PCAP renderer validates the structured causes, limits and percentages.
+  } else assertControlValue(definition.control, mutation.value);
+  if ("options" in definition && definition.options && !definition.options.includes(mutation.value as never)) throw new Error("Seleccione una opción válida para este campo.");
   const sourceId = mutation.sourceId?.trim() || `ui:${actorId}`;
   return {
     key: mutation.fieldPath,

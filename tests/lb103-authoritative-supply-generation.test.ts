@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { NEW_SUPPLY_VALUES } from "../src/application/universal/LB103SyntheticNewCaseFixture";
 import type { EvidenceField } from "../src/domain/expediente/EvidenceField";
 import type { AdaptiveStoredCase } from "../src/infrastructure/operations/lb7/AdaptiveCaseStore";
 import { evaluateLB103ServerValidatedPreflight } from "../src/application/universal/LB103ServerValidatedPreflight";
@@ -23,6 +24,8 @@ function supplyCase(phase = "READY_FOR_DOCUMENT_GENERATION"): AdaptiveStoredCase
       __lb103: { contractType: "SUPPLY", decisions: {}, phase },
     } as any,
     universalEvidence: {
+      ...Object.fromEntries(Object.entries(NEW_SUPPLY_VALUES).map(([key,value])=>[key,validated(key,value)])),
+      "lots.lots": validated("lots.lots", [{id:"1",description:"Lote sintético"}]),
       contractType: validated("contractType", "SUPPLY"),
       object: validated("object", "Suministro de consumibles y materiales"),
       cpvMain: validated("cpvMain", "44510000-8"),

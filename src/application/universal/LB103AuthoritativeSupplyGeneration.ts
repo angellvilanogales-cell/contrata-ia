@@ -5,6 +5,7 @@ import {
   type SupplyUserDocumentPackage,
 } from "../intake/lb95/SupplyUserDocumentPackageGenerator";
 import type { AdaptiveStoredCase } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
+import { selectedLB103TemplateStore } from "./LB103SelectedTemplateStore";
 import {
   evaluateLB103ServerValidatedPreflight,
   type LB103ServerValidatedPreflight,
@@ -27,6 +28,7 @@ export interface LB103AuthoritativeSupplyGenerationResult {
 type SupplyPackageGenerator = (input: {
   record: UniversalEvidenceRecord;
   templateStore: UniversalEditableTemplateBinaryStore;
+  authoritativeSeals?: LB103PresentedGenerationSeals;
 }) => Promise<SupplyUserDocumentPackage>;
 
 function guidedPhase(caseValue: AdaptiveStoredCase): string | undefined {
@@ -56,7 +58,8 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
   templateStore: UniversalEditableTemplateBinaryStore;
   generator?: SupplyPackageGenerator;
 }): Promise<LB103AuthoritativeSupplyGenerationResult> {
-  const preflight = evaluateLB103ServerValidatedPreflight(input.caseValue);
+  const caseValue = structuredClone(input.caseValue);
+  const preflight = evaluateLB103ServerValidatedPreflight(caseValue);
   const blockers: string[] = [];
 
   if (guidedPhase(input.caseValue) !== "READY_FOR_DOCUMENT_GENERATION") {
@@ -68,6 +71,7 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
   if (!preflight.packageReady || !preflight.documentarySelection) {
     blockers.push("La selección documental autoritativa no está preparada para generación.");
   }
+  if (preflight.completion && !preflight.completion.ready) blockers.push(...preflight.completion.blockers);
 
   if (!isSha256(input.presentedSeals.snapshotSha256)) {
     blockers.push("El sello de snapshot presentado por /adaptive no es un SHA-256 válido.");
@@ -108,12 +112,12 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
   }
 
   const record: UniversalEvidenceRecord = {
-    caseId: input.caseValue.caseId,
-    fields: input.caseValue.universalEvidence ?? {},
-    updatedAt: input.caseValue.updatedAt,
+    caseId: caseValue.caseId,
+    fields: caseValue.universalEvidence ?? {},
+    updatedAt: caseValue.updatedAt,
   };
   const generator = input.generator ?? generateSupplyUserDocumentPackage;
-  const pkg = await generator({ record, templateStore: input.templateStore });
+  const pkg = await generator({ record, templateStore: selectedLB103TemplateStore(input.templateStore, preflight.documentarySelection!), authoritativeSeals: {...input.presentedSeals} });
 
   if (!pkg.ready || !pkg.bytes || !pkg.manifest) {
     return {

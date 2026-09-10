@@ -92,6 +92,7 @@ export const JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION: UniversalOdtRendererCon
 };
 
 function validated(record: UniversalEvidenceRecord, fieldKey: string): unknown {
+  if (fieldKey === "lots.noDivisionJustification" && record.fields["lots.divisionIntoLots"]?.value === true) return "No procede: el contrato se divide en lotes.";
   const field = record.fields[fieldKey];
   if (!field) throw new Error(`Falta evidencia PCAP para ${fieldKey}.`);
   if (field.status === "SOURCE_CONFLICT" || field.status === "PENDING") throw new Error(`${fieldKey} está ${field.status}.`);
