@@ -4,6 +4,10 @@ import { supplyAsaPcapRequiredFieldPaths } from "../intake/lb95/SupplyAsaGeneral
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../intake/lb51/UniversalV1UiFieldManifest";
 import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../intake/lb93/SupplyVerticalFieldManifest";
 import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../intake/lb95/SupplyAsaPcapFieldManifest";
+import {
+  auditLb106DecisionMatrix,
+  lb106DecisionCardForField,
+} from "../../domain/decision/lb106/VirginPilotDecisionMatrix";
 
 export const LB103_DOCUMENT_FIELDS = [
   {
@@ -36,8 +40,13 @@ export function evaluateLB103DocumentCompletion(record: UniversalEvidenceRecord)
       options: definition && "options" in definition ? definition.options : undefined,
       help: definition && "help" in definition ? definition.help : undefined,
       rows: definition && "rows" in definition ? definition.rows : undefined,
+      legalDecision: lb106DecisionCardForField(fieldPath),
       value: field?.value, status: field?.status ?? "PENDING", ready };
   });
-  const blockers = fields.filter(field => !field.ready).map(field => `${field.label}: pendiente de completar o validar.`);
-  return { ready: blockers.length === 0, fields, blockers };
+  const matrixAudit = auditLb106DecisionMatrix(paths);
+  const blockers = [
+    ...fields.filter(field => !field.ready).map(field => `${field.label}: pendiente de completar o validar.`),
+    ...matrixAudit.blockers,
+  ];
+  return { ready: blockers.length === 0, fields, matrixAudit, blockers };
 }
