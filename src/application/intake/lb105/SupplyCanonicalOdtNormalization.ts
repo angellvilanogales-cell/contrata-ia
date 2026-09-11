@@ -9,6 +9,7 @@ export const SUPPLY_LB105_JUNTA_LOGO = {
   path: "Pictures/10000000000000D900000092C15C4D5A3F76B932.jpg",
   sha256: "2f8e3d5db6bec32620b59173842b4cf124acd67bf38db87e7161c580a58885de",
 } as const;
+const CONTINUATION_HEADING_STYLE = "CI_LB105_Heading1_Continuation";
 
 const MEMORY_SLOTS: Readonly<Record<string, string>> = {
   "1": "La contratación se promueve por el órgano competente identificado en el expediente.",
@@ -56,7 +57,7 @@ function body(kind: SupplyGeneralTemplateKind): string {
   const title = kind === "MEMORY" ? "MEMORIA JUSTIFICATIVA DEL CONTRATO DE SUMINISTRO" : "PLIEGO DE PRESCRIPCIONES TÉCNICAS DEL CONTRATO DE SUMINISTRO";
   const slots = kind === "MEMORY" ? MEMORY_SLOTS : PPT_SLOTS;
   const sections = canonicalMemoryPptStructure({ document, family: "SUPPLY" });
-  return `<office:text><text:p text:style-name="${PROFILE.styles.title.styleName}">${title}</text:p><text:p text:style-name="${PROFILE.styles.heading2.styleName}">EXPEDIENTE: <text:variable-set text:name="CI_CASE_ID" office:value-type="string">{{caseId}}</text:variable-set></text:p>${sections.map(section => `<text:h text:outline-level="1" text:style-name="${PROFILE.styles.heading1.styleName}">${esc(`${section.number}. ${section.title}`)}</text:h><text:p text:style-name="${PROFILE.styles.body.styleName}">${slots[section.number] ?? "No procede para el alcance declarado."}</text:p>`).join("")}</office:text>`;
+  return `<office:text><text:p text:style-name="${PROFILE.styles.title.styleName}">${title}</text:p><text:p text:style-name="${PROFILE.styles.heading2.styleName}">EXPEDIENTE: <text:variable-set text:name="CI_CASE_ID" office:value-type="string">{{caseId}}</text:variable-set></text:p>${sections.map(section => `<text:h text:outline-level="1" text:style-name="${kind === "MEMORY" && section.number === "12" ? CONTINUATION_HEADING_STYLE : PROFILE.styles.heading1.styleName}">${esc(`${section.number}. ${section.title}`)}</text:h><text:p text:style-name="${PROFILE.styles.body.styleName}">${slots[section.number] ?? "No procede para el alcance declarado."}</text:p>`).join("")}</office:text>`;
 }
 
 function style(name: string, font: string, size: number, weight: string, color: string, align: string, extra = ""): string {
@@ -64,7 +65,9 @@ function style(name: string, font: string, size: number, weight: string, color: 
 }
 
 function styleDefinitions(): string {
-  return Object.values(PROFILE.styles).map(item => style(item.styleName, item.fontFamily, item.fontSizePt, item.fontWeight, item.color, item.alignment, item.styleName === PROFILE.styles.heading1.styleName ? 'fo:keep-with-next="always"' : "")).join("");
+  const canonical = Object.values(PROFILE.styles).map(item => style(item.styleName, item.fontFamily, item.fontSizePt, item.fontWeight, item.color, item.alignment, item.styleName === PROFILE.styles.heading1.styleName ? 'fo:keep-with-next="always"' : "")).join("");
+  const heading = PROFILE.styles.heading1;
+  return `${canonical}${style(CONTINUATION_HEADING_STYLE, heading.fontFamily, heading.fontSizePt, heading.fontWeight, heading.color, heading.alignment, 'fo:keep-with-next="always" fo:break-before="page"')}`;
 }
 
 function replaceEntry(entries: readonly OdtZipEntry[], name: string, value: string): OdtZipEntry[] {
@@ -132,7 +135,10 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
   }
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
   const repeatedMasterPage = styles.includes('style:name="MP0"') ? "MP0" : styles.includes('style:name="Standard"') ? "Standard" : undefined;
-  if (repeatedMasterPage) styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
+  if (repeatedMasterPage) {
+    styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
+    styles = styles.replace(`style:name="${CONTINUATION_HEADING_STYLE}" style:family="paragraph"`, `style:name="${CONTINUATION_HEADING_STYLE}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
+  }
   styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
   styles = normalizePageLayoutRegions(styles);
   styles = normalizeMasterPages(styles, logoPath);
