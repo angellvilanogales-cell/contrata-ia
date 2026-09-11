@@ -24,6 +24,10 @@ describe("LB105 normalización física Supply", () => {
       const bytes = normalizeSupplyGeneralOdtLb105(fixture(), kind);
       expect(auditCanonicalOdtStructure({ bytes, document: kind, family: "SUPPLY" }).ready).toBe(true);
       expect(auditCanonicalOdtVisualProfile(bytes).ready).toBe(true);
+      if (kind === "MEMORY") {
+        const content = Buffer.from(readOdtZip(bytes).find(item => item.name === "content.xml")!.bytes).toString("utf8");
+        expect(content).toContain('text:style-name="CI_LB105_Heading1_Continuation">12. Garantías');
+      }
     });
   }
 
