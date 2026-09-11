@@ -24,6 +24,10 @@ export const LB94_SUPPLY_GENERAL_RUNTIME_ASSETS: readonly PersistedTemplateAsset
   {kind:"PCAP",templateId:"JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17",sourceId:"jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt",sha256:"45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc",styleFingerprint:"sha256:9eb23463f4d56abd03531cb909206ef47d749054bf284087bd45867b39e6ceee",provenanceRole:"OFFICIAL_MODEL"},
   ...SUPPLY_GENERAL_DERIVED_ASSET_MANIFEST.map(item=>({kind:item.kind,templateId:item.templateId,sourceId:item.templateId,sha256:item.sha256,styleFingerprint:item.styleFingerprint,provenanceRole:item.provenanceRole})),
 ] as const;
+export const LB94_SUPPLY_LEGACY_DERIVED_ASSETS: readonly PersistedTemplateAssetDescriptor[] = [
+  {kind:"MEMORIA",templateId:"contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",sourceId:"contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",sha256:"b032748897f02858d3cce3d3671e4185ef984e8ced68a0c2f5988c6527f7016f",styleFingerprint:"sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d",provenanceRole:"CONTRATA_IA_DERIVED_GENERAL_TEMPLATE"},
+  {kind:"PPT",templateId:"contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",sourceId:"contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",sha256:"6c73d9671a1f8cfe816239d13ead9aaa415acca730d298a4148e770ea947feca",styleFingerprint:"sha256:1e8ec6bc5f26597714507c21d702b4f0a2c244e70f2ff0be9121166b6eb5f552",provenanceRole:"CONTRATA_IA_DERIVED_GENERAL_TEMPLATE"},
+] as const;
 interface RemoteTemplatePayload{templateId?:unknown;kind?:unknown;mediaType?:unknown;sha256?:unknown;styleFingerprint?:unknown;provenance?:unknown;contentBase64?:unknown;byteLength?:unknown;}
 function sha256(bytes:Uint8Array){return createHash("sha256").update(bytes).digest("hex");}
 function normalizeEndpoint(value:string){const endpoint=value.trim().replace(/\/+$/,"");if(!endpoint.startsWith("https://"))throw new Error("El almacén remoto de plantillas exige HTTPS.");return endpoint;}
