@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readOdtZip, writeOdtZip, type OdtZipEntry } from "../lb23/OdtPackageCodec";
 import { CANONICAL_MEMORY_PPT_VISUAL_PROFILE as PROFILE } from "../../../domain/documentModel/CanonicalDocumentVisualProfile";
 import { canonicalMemoryPptStructure } from "../../../domain/documentModel/CanonicalMemoryPptStructure";
@@ -86,7 +87,8 @@ function institutionalLogo(entries: readonly OdtZipEntry[], styles: string): str
 function normalizeMasterPages(styles: string, logoPath: string): string {
   const header = `<style:header><text:p><draw:frame draw:name="CI_LB105_Junta_Andalucia" text:anchor-type="paragraph" svg:width="2.2cm" svg:height="1.48cm"><draw:image xlink:href="${logoPath}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/></draw:frame></text:p></style:header>`;
   const footer = `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`;
-  return styles.replace(/<style:master-page\b[^>]*>[\s\S]*?<\/style:master-page>/g, block => {
+  const expanded = styles.replace(/<style:master-page\b([^>]*)\/>/g, (_match, attributes: string) => `<style:master-page${attributes}>${header}${footer}</style:master-page>`);
+  return expanded.replace(/<style:master-page\b[^>]*>[\s\S]*?<\/style:master-page>/g, block => {
     let result = /<style:header(?:\s[^>]*)?>/.test(block)
       ? block.replace(/<style:header(?:\s[^>]*)?>[\s\S]*?<\/style:header>/, header)
       : block.replace(/^(<style:master-page\b[^>]*>)/, `$1${header}`);
@@ -111,10 +113,10 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
     content = content.replace(/<office:body\b/, `<!-- ${SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION} --><office:body`);
   }
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
+  if (styles.includes('style:name="MPF0"')) styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="MPF0"`);
   styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
   styles = normalizeMasterPages(styles, logoPath);
   entries = replaceEntry(entries, "content.xml", content);
   entries = replaceEntry(entries, "styles.xml", styles);
   return writeOdtZip(entries);
 }
-import { createHash } from "node:crypto";
