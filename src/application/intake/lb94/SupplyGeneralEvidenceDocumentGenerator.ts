@@ -3,6 +3,8 @@ import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace
 import type { UniversalEditableTemplateBinaryStore } from "../lb23/UniversalOdtProductionRenderer";
 import { loadPersistedSupplyGeneralTemplate } from "./PersistedSupplyGeneralTemplateRuntime";
 import { renderSupplyGeneralEditableTemplate, type SupplyGeneralRenderedDocument } from "./SupplyGeneralEditableTemplateRenderer";
+import { assertCanonicalOdtStructure } from "../lb104/CanonicalOdtStructureAudit";
+import { assertCanonicalOdtVisualProfile } from "../lb105/CanonicalOdtVisualAudit";
 
 export interface SupplyGeneralEvidenceDocuments {
   ready: boolean;
@@ -173,6 +175,8 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
         { slotId: "modificationSummary", value: modificationSummary(input.record) },
       ],
     });
+    assertCanonicalOdtStructure({ bytes: document.bytes, document: "MEMORY", family: "SUPPLY" });
+    assertCanonicalOdtVisualProfile(document.bytes);
     documents.push(document);
   } catch (error) {
     blockers.push(`MEMORIA: ${error instanceof Error ? error.message : String(error)}`);
@@ -194,6 +198,8 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
         { slotId: "specialExecutionConditions", value: value(input.record, "execution.specialExecutionConditions") },
       ],
     });
+    assertCanonicalOdtStructure({ bytes: document.bytes, document: "PPT", family: "SUPPLY" });
+    assertCanonicalOdtVisualProfile(document.bytes);
     documents.push(document);
   } catch (error) {
     blockers.push(`PPT: ${error instanceof Error ? error.message : String(error)}`);
