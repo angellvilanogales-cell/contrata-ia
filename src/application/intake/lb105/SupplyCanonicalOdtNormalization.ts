@@ -52,12 +52,13 @@ function esc(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;");
 }
 
-function body(kind: SupplyGeneralTemplateKind): string {
+function body(kind: SupplyGeneralTemplateKind, logoPath: string): string {
   const document = kind === "MEMORY" ? "MEMORY" : "PPT";
   const title = kind === "MEMORY" ? "MEMORIA JUSTIFICATIVA DEL CONTRATO DE SUMINISTRO" : "PLIEGO DE PRESCRIPCIONES TÉCNICAS DEL CONTRATO DE SUMINISTRO";
   const slots = kind === "MEMORY" ? MEMORY_SLOTS : PPT_SLOTS;
   const sections = canonicalMemoryPptStructure({ document, family: "SUPPLY" });
-  return `<office:text><text:p text:style-name="${PROFILE.styles.title.styleName}">${title}</text:p><text:p text:style-name="${PROFILE.styles.heading2.styleName}">EXPEDIENTE: <text:variable-set text:name="CI_CASE_ID" office:value-type="string">{{caseId}}</text:variable-set></text:p>${sections.map(section => `<text:h text:outline-level="1" text:style-name="${kind === "MEMORY" && section.number === "12" ? CONTINUATION_HEADING_STYLE : PROFILE.styles.heading1.styleName}">${esc(`${section.number}. ${section.title}`)}</text:h><text:p text:style-name="${PROFILE.styles.body.styleName}">${slots[section.number] ?? "No procede para el alcance declarado."}</text:p>`).join("")}</office:text>`;
+  const coverLogo = `<text:p><draw:frame draw:name="CI_LB105_Cover_Junta_Andalucia" text:anchor-type="paragraph" svg:width="2.2cm" svg:height="1.48cm"><draw:image xlink:href="${logoPath}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/></draw:frame></text:p>`;
+  return `<office:text>${coverLogo}<text:p text:style-name="${PROFILE.styles.title.styleName}">${title}</text:p><text:p text:style-name="${PROFILE.styles.heading2.styleName}">EXPEDIENTE: <text:variable-set text:name="CI_CASE_ID" office:value-type="string">{{caseId}}</text:variable-set></text:p>${sections.map(section => `<text:h text:outline-level="1" text:style-name="${kind === "MEMORY" && section.number === "12" ? CONTINUATION_HEADING_STYLE : PROFILE.styles.heading1.styleName}">${esc(`${section.number}. ${section.title}`)}</text:h><text:p text:style-name="${PROFILE.styles.body.styleName}">${slots[section.number] ?? "No procede para el alcance declarado."}</text:p>`).join("")}</office:text>`;
 }
 
 function style(name: string, font: string, size: number, weight: string, color: string, align: string, extra = ""): string {
@@ -88,7 +89,7 @@ function institutionalLogo(entries: readonly OdtZipEntry[], styles: string): str
 }
 
 function normalizeMasterPages(styles: string, logoPath: string): string {
-  const header = `<style:header><text:p><draw:frame draw:name="CI_LB105_Junta_Andalucia" text:anchor-type="paragraph" svg:width="2.2cm" svg:height="1.48cm"><draw:image xlink:href="${logoPath}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/></draw:frame></text:p></style:header>`;
+  const header = `<style:header><text:p/></style:header>`;
   const footer = `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`;
   const expanded = styles.replace(/<style:master-page\b([^>]*)\/>/g, (_match, attributes: string) => `<style:master-page${attributes}>${header}${footer}</style:master-page>`);
   return expanded.replace(/<style:master-page\b[^>]*>[\s\S]*?<\/style:master-page>/g, block => {
@@ -129,7 +130,7 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
   let content = Buffer.from(contentEntry.bytes).toString("utf8");
   let styles = Buffer.from(stylesEntry.bytes).toString("utf8");
   const logoPath = institutionalLogo(entries, styles);
-  content = content.replace(/<office:text\b[\s\S]*?<\/office:text>/, body(kind));
+  content = content.replace(/<office:text\b[\s\S]*?<\/office:text>/, body(kind, logoPath));
   if (!content.includes(SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION)) {
     content = content.replace(/<office:body\b/, `<!-- ${SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION} --><office:body`);
   }
