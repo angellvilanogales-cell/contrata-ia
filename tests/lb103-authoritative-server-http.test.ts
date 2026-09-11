@@ -87,6 +87,13 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         synthetic: true,
         productionReady: false,
       });
+
+      const candidates = await fetch(`${base}/api/lb105/normalized-template-candidates`);
+      expect(candidates.status).toBe(503);
+      expect(await candidates.json()).toMatchObject({
+        synthetic: true,
+        productionReady: false,
+      });
     } finally {
       await new Promise<void>(resolve => server.close(() => resolve()));
       fs.rmSync(root, { recursive: true, force: true });
