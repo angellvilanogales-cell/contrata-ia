@@ -12,6 +12,13 @@ import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGener
 import { runLB103NewCaseSelfTest } from "../../application/universal/LB103NewCaseSelfTest";
 import { loadPersistedSupplyGeneralTemplate } from "../../application/intake/lb94/PersistedSupplyGeneralTemplateRuntime";
 import { ensurePersistedLb105SupplyTemplates } from "../../application/intake/lb105/LB105SupplyTemplatePromotion";
+import {
+  auditLb106DecisionMatrix,
+  lb106DecisionCards,
+  LB106_LEGAL_BASES,
+} from "../../domain/decision/lb106/VirginPilotDecisionMatrix";
+import { evaluateLB106VirginPilotReadiness } from "../../application/universal/LB106VirginPilotReadiness";
+import { LB106_VIRGIN_PILOT_SCRIPT } from "./LB106VirginPilotScript";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -82,7 +89,7 @@ function statusFor(error: Error): number {
 }
 
 function adaptiveUiWithGeneration(): string {
-  const tag = '<script src="/lb103-authoritative-generation.js" defer></script>';
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script>';
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
@@ -127,6 +134,23 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
         const result = await runLB103NewCaseSelfTest(store);
         sendJson(response, result.ready ? 200 : 503, result);
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/lb106/decision-matrix") {
+        const audit = auditLb106DecisionMatrix();
+        sendJson(response, audit.ready ? 200 : 503, {
+          ready: audit.ready,
+          audit,
+          decisions: lb106DecisionCards(),
+          officialSources: [...new Set(LB106_LEGAL_BASES.map(item => item.officialUrl.split("#")[0]))],
+          humanConsentRequired: true,
+          productionReady: false,
+        });
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/lb106/virgin-pilot") {
+        const readiness = evaluateLB106VirginPilotReadiness();
+        sendJson(response, readiness.readyForHumanStart ? 200 : 503, readiness);
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/lb105/normalized-synthetic-package") {
@@ -176,6 +200,10 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
       }
       if (request.method === "GET" && url.pathname === "/lb103-authoritative-generation.js") {
         sendText(response, 200, LB103_AUTHORITATIVE_GENERATION_SCRIPT, "application/javascript; charset=utf-8");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/lb106-virgin-pilot.js") {
+        sendText(response, 200, LB106_VIRGIN_PILOT_SCRIPT, "application/javascript; charset=utf-8");
         return;
       }
 
