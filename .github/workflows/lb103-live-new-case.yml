@@ -8,9 +8,13 @@ on:
       - "src/application/intake/lb53/**"
       - "src/application/intake/lb94/**"
       - "src/application/intake/lb95/**"
+      - "src/application/intake/lb104/**"
+      - "src/application/intake/lb105/**"
       - "src/application/universal/LB103*"
       - "src/interfaces/lb103/**"
       - "tests/lb103-*.test.ts"
+      - "tests/lb104-*.test.ts"
+      - "tests/lb105-*.test.ts"
       - "package.json"
       - ".github/workflows/lb103-live-new-case.yml"
   workflow_dispatch:
