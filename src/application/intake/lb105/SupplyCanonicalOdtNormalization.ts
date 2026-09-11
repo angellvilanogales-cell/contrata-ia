@@ -56,7 +56,7 @@ function body(kind: SupplyGeneralTemplateKind): string {
   const title = kind === "MEMORY" ? "MEMORIA JUSTIFICATIVA DEL CONTRATO DE SUMINISTRO" : "PLIEGO DE PRESCRIPCIONES TÉCNICAS DEL CONTRATO DE SUMINISTRO";
   const slots = kind === "MEMORY" ? MEMORY_SLOTS : PPT_SLOTS;
   const sections = canonicalMemoryPptStructure({ document, family: "SUPPLY" });
-  return `<office:text><text:p text:style-name="${PROFILE.styles.title.styleName}">${title}</text:p><text:p text:style-name="${PROFILE.styles.heading2.styleName}">EXPEDIENTE: <text:variable-set text:name="CI_CASE_ID" office:value-type="string">{{caseId}}</text:variable-set></text:p>${sections.map(section => `<text:h text:outline-level="1" text:style-name="${PROFILE.styles.heading1.styleName}">${esc(`${section.number}. ${section.title}`)}</text:h><text:p text:style-name="${PROFILE.styles.body.styleName}">${slots[section.number] ?? "No procede para el alcance declarado."}</text:p>`).join("")}<text:p text:style-name="${PROFILE.styles.body.styleName}">Documento editable generado por Contrata-IA. Requiere revisión y validación humana antes de su aprobación o firma.</text:p></office:text>`;
+  return `<office:text><text:p text:style-name="${PROFILE.styles.title.styleName}">${title}</text:p><text:p text:style-name="${PROFILE.styles.heading2.styleName}">EXPEDIENTE: <text:variable-set text:name="CI_CASE_ID" office:value-type="string">{{caseId}}</text:variable-set></text:p>${sections.map(section => `<text:h text:outline-level="1" text:style-name="${PROFILE.styles.heading1.styleName}">${esc(`${section.number}. ${section.title}`)}</text:h><text:p text:style-name="${PROFILE.styles.body.styleName}">${slots[section.number] ?? "No procede para el alcance declarado."}</text:p>`).join("")}</office:text>`;
 }
 
 function style(name: string, font: string, size: number, weight: string, color: string, align: string, extra = ""): string {
@@ -113,7 +113,8 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
     content = content.replace(/<office:body\b/, `<!-- ${SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION} --><office:body`);
   }
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
-  if (styles.includes('style:name="MPF0"')) styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="MPF0"`);
+  const repeatedMasterPage = styles.includes('style:name="MP0"') ? "MP0" : styles.includes('style:name="Standard"') ? "Standard" : undefined;
+  if (repeatedMasterPage) styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
   styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
   styles = normalizeMasterPages(styles, logoPath);
   entries = replaceEntry(entries, "content.xml", content);
