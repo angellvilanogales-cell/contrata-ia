@@ -72,8 +72,8 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
 
     expect(memory).toMatchObject({
       status: "GENERAL_EDITABLE_SELECTED",
-      selectedSourceId: "contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",
-      selectedSourceSha256: "b032748897f02858d3cce3d3671e4185ef984e8ced68a0c2f5988c6527f7016f",
+      selectedSourceId: "contrata-ia:supply:memory:general:LB105-SUPPLY-CANONICAL-ODT-V1",
+      selectedSourceSha256: "66742bee04da4703832bc41d36d107035c4acd47122a35e2ccb75f0896aa01e2",
       selectedProvenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
       officialModelClaimed: false,
     });
@@ -86,8 +86,8 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     });
     expect(ppt).toMatchObject({
       status: "GENERAL_EDITABLE_SELECTED",
-      selectedSourceId: "contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",
-      selectedSourceSha256: "6c73d9671a1f8cfe816239d13ead9aaa415acca730d298a4148e770ea947feca",
+      selectedSourceId: "contrata-ia:supply:ppt:general:LB105-SUPPLY-CANONICAL-ODT-V1",
+      selectedSourceSha256: "37fd7c3cb2f5cf010ffe9982c8d19d2b9b88372a53bd1ad5ba5405f1a11d84c5",
       selectedProvenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
       officialModelClaimed: false,
     });
