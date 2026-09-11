@@ -127,6 +127,21 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         sendJson(response, result.ready ? 200 : 503, result);
         return;
       }
+      if (request.method === "GET" && url.pathname === "/api/lb105/normalized-synthetic-package") {
+        const store = createHttpPersistedTemplateAssetStoreFromEnv();
+        if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
+        const result = await runLB103NewCaseSelfTest(store, { includePackageBytes: true });
+        const packageBytes = "packageBytes" in result ? result.packageBytes : undefined;
+        const packageFileName = "packageFileName" in result ? result.packageFileName : undefined;
+        if (!result.ready || !packageBytes || !packageFileName) {
+          sendJson(response, 503, { ...result, packageBytes: undefined });
+          return;
+        }
+        response.setHeader("x-contrata-ia-synthetic", "true");
+        response.setHeader("x-contrata-ia-counts-as-human-acceptance", "false");
+        sendZip(response, packageBytes, packageFileName);
+        return;
+      }
       if (request.method === "GET" && url.pathname === "/api/runtime-version") {
         sendJson(response, 200, runtimeVersion());
         return;
