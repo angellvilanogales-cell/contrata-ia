@@ -137,7 +137,6 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
   const repeatedMasterPage = styles.includes('style:name="MP0"') ? "MP0" : styles.includes('style:name="Standard"') ? "Standard" : undefined;
   if (repeatedMasterPage) {
-    styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
     styles = styles.replace(`style:name="${CONTINUATION_HEADING_STYLE}" style:family="paragraph"`, `style:name="${CONTINUATION_HEADING_STYLE}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
   }
   styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
