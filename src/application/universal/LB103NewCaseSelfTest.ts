@@ -9,7 +9,7 @@ import { generateLB103AuthoritativeSupplyPackage } from "./LB103AuthoritativeSup
 import { NEW_SUPPLY_VALUES } from "./LB103SyntheticNewCaseFixture";
 
 /** Isolated technical probe. It never registers a human UAT session or acceptance. */
-export async function runLB103NewCaseSelfTest(templateStore: UniversalEditableTemplateBinaryStore) {
+export async function runLB103NewCaseSelfTest(templateStore: UniversalEditableTemplateBinaryStore, options: { includePackageBytes?: boolean } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "contrata-lb103-synthetic-"));
   const result = { synthetic: true, countsAsHumanAcceptance: false, productionReady: false, humanAcceptanceRequired: true } as const;
   try {
@@ -35,6 +35,7 @@ export async function runLB103NewCaseSelfTest(templateStore: UniversalEditableTe
     const deterministic = second.ready && first.package.sha256 === second.package?.sha256;
     return {...result, ready: deterministic, persisted, deterministic, packageSha256: first.package.sha256,
       documents: first.package.manifest?.documents, authoritativeSeals: presentedSeals,
+      ...(options.includePackageBytes ? { packageBytes: first.package.bytes, packageFileName: first.package.fileName } : {}),
       blockers: deterministic ? [] : ["El mismo expediente no produjo el mismo paquete.", ...second.blockers]};
   } catch (error) {
     return {...result, ready: false, blockers: [error instanceof Error ? error.message : String(error)]};
