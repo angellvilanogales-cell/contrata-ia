@@ -26,8 +26,8 @@ El perfil es propio de Contrata-IA y no se presenta como manual corporativo ofic
 | 2. Expediente estructurado | Datos declarados, validados, persistidos y sellados | Cerrada para Supply ASA autofinanciado |
 | 3. Selección del PCAP | Modelo oficial compatible y SHA comprobado | Cerrada para Supply ASA autofinanciado |
 | 4. Canon de Memoria/PPT | Epígrafes comunes y especiales exactos | Cerrada en LB104 V1 |
-| 5. Perfil visual | Reglas y auditor ODT de tipografía, alineación, color, página, logo y pie | Parcial: auditoría de estilos declarados; falta aplicación efectiva y revisión visual |
-| 6. Plantillas físicas | Nuevos ODT conformes, versionados, persistidos y sin contaminación | Pendiente |
+| 5. Perfil visual | Reglas y auditor ODT de tipografía, alineación, color, página, logo y pie | Aplicación determinista y puerta automática cerradas para Supply; revisión visual del render real pendiente |
+| 6. Plantillas físicas | Nuevos ODT conformes, versionados, persistidos y sin contaminación | Transición activa sobre activos LB94 autenticados; promoción binaria independiente pendiente |
 | 7. Generación integral | Nuevo expediente produce PCAP, Memoria y PPT deterministas y auditados | Debe repetirse con las plantillas LB105 |
 | 8. Asesoramiento | Preguntas aplicables, propuestas motivadas, conflictos visibles y trazabilidad hasta documentos | Parcial; completar por familia |
 | 9. Piloto humano | Revisión nominativa, cero defectos críticos y aceptación motivada | Pendiente de las personas revisoras |
@@ -48,3 +48,9 @@ El perfil es propio de Contrata-IA y no se presenta como manual corporativo ofic
 El auditor inicial comprueba las declaraciones de estilos, interlineado y separación del cuerpo, dimensiones de página, correspondencia de referencias a imágenes embebidas no vacías y numeración dentro del pie. Su resultado no acredita todavía que todos los párrafos usen esos estilos, que no existan sobrescrituras ni que la imagen corresponda al organismo correcto. Tampoco certifica tablas, proporciones, disponibilidad de fuentes ni composición visual final. `requiresVisualReview=true` se mantiene incluso cuando estas comprobaciones pasan.
 
 Antes de activar el perfil deben cerrarse: trazabilidad de cada propiedad hasta archivo y página fuente; identidad y SHA del logotipo autorizado; resolución efectiva de estilos y fuentes; tablas y saltos de página; pie completo; renderizado y revisión visual. Los tamaños, márgenes y colores anteriores constituyen un perfil de trabajo derivado, pendiente de contraste visual de los nuevos binarios, no una exigencia normativa.
+
+## Transición física Supply
+
+`LB105-SUPPLY-CANONICAL-ODT-V1` verifica primero la identidad, SHA, naturaleza y procedencia del activo persistido LB94. Después sustituye de forma determinista el cuerpo de Memoria o PPT por el canon LB104, incorpora los estilos LB105 y normaliza página y pie. El generador autoritativo vuelve a auditar estructura y perfil visual sobre cada ODT ya cumplimentado antes de incluirlo en el ZIP.
+
+Esta transición permite probar el recorrido real sin declarar todavía una promoción binaria. La nueva versión persistida solo podrá registrarse cuando sus bytes reales se hayan renderizado, revisado visualmente y fijado mediante SHA-256. Hasta entonces se mantienen `requiresVisualReview=true`, `humanAcceptanceRequired=true` y `productionReady=false`.
