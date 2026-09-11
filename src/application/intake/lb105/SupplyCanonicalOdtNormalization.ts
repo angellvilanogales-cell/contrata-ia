@@ -87,11 +87,7 @@ function institutionalLogo(entries: readonly OdtZipEntry[], styles: string): str
 function normalizeMasterPages(styles: string, logoPath: string): string {
   const header = `<style:header><text:p><draw:frame draw:name="CI_LB105_Junta_Andalucia" text:anchor-type="paragraph" svg:width="2.2cm" svg:height="1.48cm"><draw:image xlink:href="${logoPath}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/></draw:frame></text:p></style:header>`;
   const footer = `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`;
-  const repeatedPageLayout = styles.match(/<style:master-page\b(?=[^>]*style:name="MP0")(?=[^>]*style:page-layout-name="([^"]+)")[^>]*>/)?.[1];
-  const unified = repeatedPageLayout
-    ? styles.replace(/(<style:master-page\b[^>]*\bstyle:page-layout-name=")[^"]+("[^>]*>)/g, `$1${repeatedPageLayout}$2`)
-    : styles;
-  const expanded = unified.replace(/<style:master-page\b([^>]*)\/>/g, (_match, attributes: string) => `<style:master-page${attributes}>${header}${footer}</style:master-page>`);
+  const expanded = styles.replace(/<style:master-page\b([^>]*)\/>/g, (_match, attributes: string) => `<style:master-page${attributes}>${header}${footer}</style:master-page>`);
   return expanded.replace(/<style:master-page\b[^>]*>[\s\S]*?<\/style:master-page>/g, block => {
     let result = /<style:header(?:\s[^>]*)?>/.test(block)
       ? block.replace(/<style:header(?:\s[^>]*)?>[\s\S]*?<\/style:header>/, header)
@@ -99,6 +95,24 @@ function normalizeMasterPages(styles: string, logoPath: string): string {
     result = /<style:footer(?:\s[^>]*)?>/.test(result)
       ? result.replace(/<style:footer(?:\s[^>]*)?>[\s\S]*?<\/style:footer>/, footer)
       : result.replace(/<\/style:master-page>$/, `${footer}</style:master-page>`);
+    return result;
+  });
+}
+
+function normalizePageLayoutRegions(styles: string): string {
+  const headerStyle = '<style:header-style><style:header-footer-properties fo:min-height="1.5cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-bottom="0.2cm" style:dynamic-spacing="true"/></style:header-style>';
+  const footerStyle = '<style:footer-style><style:header-footer-properties fo:min-height="0.6cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0.2cm" style:dynamic-spacing="true"/></style:footer-style>';
+  return styles.replace(/<style:page-layout\b[^>]*>[\s\S]*?<\/style:page-layout>/g, block => {
+    let result = /<style:header-style(?:\s[^>]*)?\/>/.test(block)
+      ? block.replace(/<style:header-style(?:\s[^>]*)?\/>/, headerStyle)
+      : /<style:header-style(?:\s[^>]*)?>/.test(block)
+        ? block.replace(/<style:header-style(?:\s[^>]*)?>[\s\S]*?<\/style:header-style>/, headerStyle)
+        : block.replace(/<\/style:page-layout>$/, `${headerStyle}</style:page-layout>`);
+    result = /<style:footer-style(?:\s[^>]*)?\/>/.test(result)
+      ? result.replace(/<style:footer-style(?:\s[^>]*)?\/>/, footerStyle)
+      : /<style:footer-style(?:\s[^>]*)?>/.test(result)
+        ? result.replace(/<style:footer-style(?:\s[^>]*)?>[\s\S]*?<\/style:footer-style>/, footerStyle)
+        : result.replace(/<\/style:page-layout>$/, `${footerStyle}</style:page-layout>`);
     return result;
   });
 }
@@ -120,6 +134,7 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
   const repeatedMasterPage = styles.includes('style:name="MP0"') ? "MP0" : styles.includes('style:name="Standard"') ? "Standard" : undefined;
   if (repeatedMasterPage) styles = styles.replace(`style:name="${PROFILE.styles.title.styleName}" style:family="paragraph"`, `style:name="${PROFILE.styles.title.styleName}" style:family="paragraph" style:master-page-name="${repeatedMasterPage}"`);
   styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
+  styles = normalizePageLayoutRegions(styles);
   styles = normalizeMasterPages(styles, logoPath);
   entries = replaceEntry(entries, "content.xml", content);
   entries = replaceEntry(entries, "styles.xml", styles);
