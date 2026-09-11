@@ -87,7 +87,11 @@ function institutionalLogo(entries: readonly OdtZipEntry[], styles: string): str
 function normalizeMasterPages(styles: string, logoPath: string): string {
   const header = `<style:header><text:p><draw:frame draw:name="CI_LB105_Junta_Andalucia" text:anchor-type="paragraph" svg:width="2.2cm" svg:height="1.48cm"><draw:image xlink:href="${logoPath}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/></draw:frame></text:p></style:header>`;
   const footer = `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`;
-  const expanded = styles.replace(/<style:master-page\b([^>]*)\/>/g, (_match, attributes: string) => `<style:master-page${attributes}>${header}${footer}</style:master-page>`);
+  const repeatedPageLayout = styles.match(/<style:master-page\b(?=[^>]*style:name="MP0")(?=[^>]*style:page-layout-name="([^"]+)")[^>]*>/)?.[1];
+  const unified = repeatedPageLayout
+    ? styles.replace(/(<style:master-page\b[^>]*\bstyle:page-layout-name=")[^"]+("[^>]*>)/g, `$1${repeatedPageLayout}$2`)
+    : styles;
+  const expanded = unified.replace(/<style:master-page\b([^>]*)\/>/g, (_match, attributes: string) => `<style:master-page${attributes}>${header}${footer}</style:master-page>`);
   return expanded.replace(/<style:master-page\b[^>]*>[\s\S]*?<\/style:master-page>/g, block => {
     let result = /<style:header(?:\s[^>]*)?>/.test(block)
       ? block.replace(/<style:header(?:\s[^>]*)?>[\s\S]*?<\/style:header>/, header)
