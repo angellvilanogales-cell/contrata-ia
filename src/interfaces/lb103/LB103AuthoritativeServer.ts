@@ -11,6 +11,7 @@ import { evaluateLB103ServerValidatedPreflight } from "../../application/univers
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGenerationScript";
 import { runLB103NewCaseSelfTest } from "../../application/universal/LB103NewCaseSelfTest";
 import { loadPersistedSupplyGeneralTemplate } from "../../application/intake/lb94/PersistedSupplyGeneralTemplateRuntime";
+import { ensurePersistedLb105SupplyTemplates } from "../../application/intake/lb105/LB105SupplyTemplatePromotion";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -233,6 +234,7 @@ export async function startLB103AuthoritativeServer(
   port = Number(process.env.PORT ?? 3000),
   host = process.env.HOST ?? "0.0.0.0",
 ): Promise<http.Server> {
+  await ensurePersistedLb105SupplyTemplates();
   const remote = HttpAdaptiveCaseMirror.fromEnvironment();
   if (remote) await remote.hydrate(adaptiveCases);
   const server = createLB103AuthoritativeServer();
