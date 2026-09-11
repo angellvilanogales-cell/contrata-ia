@@ -10,6 +10,7 @@ import { generateLB103AuthoritativeSupplyPackage } from "../../application/unive
 import { evaluateLB103ServerValidatedPreflight } from "../../application/universal/LB103ServerValidatedPreflight";
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGenerationScript";
 import { runLB103NewCaseSelfTest } from "../../application/universal/LB103NewCaseSelfTest";
+import { loadPersistedSupplyGeneralTemplate } from "../../application/intake/lb94/PersistedSupplyGeneralTemplateRuntime";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -140,6 +141,28 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         response.setHeader("x-contrata-ia-synthetic", "true");
         response.setHeader("x-contrata-ia-counts-as-human-acceptance", "false");
         sendZip(response, packageBytes, packageFileName);
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/lb105/normalized-template-candidates") {
+        const store = createHttpPersistedTemplateAssetStoreFromEnv();
+        if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
+        const candidates = await Promise.all((["MEMORY", "PPT"] as const).map(async kind => {
+          const candidate = await loadPersistedSupplyGeneralTemplate(store, kind);
+          if (!candidate.ready) throw new Error(`Candidato LB105 ${kind} bloqueado: ${candidate.blockers.join(" | ")}`);
+          return {
+            kind: kind === "MEMORY" ? "MEMORIA" : "PPT",
+            proposedTemplateId: `contrata-ia:supply:${kind === "MEMORY" ? "memory" : "ppt"}:general:LB105-SUPPLY-CANONICAL-ODT-V1`,
+            sha256: candidate.derivedSha256,
+            styleFingerprint: candidate.derivedStyleFingerprint,
+            structuralStyleFingerprint: candidate.derivedStructuralStyleFingerprint,
+            transformationVersion: candidate.transformationVersion,
+            byteLength: candidate.bytes.byteLength,
+            contentBase64: Buffer.from(candidate.bytes).toString("base64"),
+            officialModelClaimed: false,
+            humanValidationRequired: true,
+          };
+        }));
+        sendJson(response, 200, {ready:true, candidates, changesPersistence:false, productionReady:false, humanAcceptanceRequired:true});
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/runtime-version") {
