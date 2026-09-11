@@ -8,7 +8,7 @@ export interface SupplyGeneralDerivedAssetDescriptor {
   donorAssetId: string;
   donorSha256: string;
   donorStyleFingerprint: string;
-  derivationVersion: "LB94-SUPPLY-GENERAL-ODT-V2";
+  derivationVersion: "LB105-SUPPLY-CANONICAL-ODT-V1";
   provenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE";
   officialModelClaimed: false;
   humanValidationRequired: true;
@@ -23,30 +23,30 @@ export interface SupplyGeneralDerivedAssetDescriptor {
 export const SUPPLY_GENERAL_DERIVED_ASSET_MANIFEST: readonly SupplyGeneralDerivedAssetDescriptor[] = [
   {
     kind: "MEMORIA",
-    templateId: "contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",
-    fileName: "LB94_MEMORY_SUPPLY_GENERAL_V1.odt",
-    sha256: "b032748897f02858d3cce3d3671e4185ef984e8ced68a0c2f5988c6527f7016f",
-    styleFingerprint: "sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d",
-    structuralStyleFingerprint: "sha256:72534e58fe42156973521a0e50940ce98317dd83a8a80c38d8d36abf12b0388a",
-    donorAssetId: "case:CONTR-2026-240267:memoria:v12:editable",
-    donorSha256: "36ed482048e19bc8b1f9c4fe1b8f1bd47eb81ac9e256dd4f0488e7bc97b8e4dc",
+    templateId: "contrata-ia:supply:memory:general:LB105-SUPPLY-CANONICAL-ODT-V1",
+    fileName: "LB105_MEMORY_SUPPLY_CANONICAL_V1.odt",
+    sha256: "66742bee04da4703832bc41d36d107035c4acd47122a35e2ccb75f0896aa01e2",
+    styleFingerprint: "sha256:7102333e7a4e164bb860faf27a11848b768d557f319cd06f723825b5f6996222",
+    structuralStyleFingerprint: "sha256:825a07ea999b5556b5fa818bcef9ac9b90c0d47246eb7d4172a20a074235f85a",
+    donorAssetId: "contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2",
+    donorSha256: "b032748897f02858d3cce3d3671e4185ef984e8ced68a0c2f5988c6527f7016f",
     donorStyleFingerprint: "sha256:60bdf03935c18ee8c925e3184fc7bc864db873ffc7d32154098885b47e78448d",
-    derivationVersion: "LB94-SUPPLY-GENERAL-ODT-V2",
+    derivationVersion: "LB105-SUPPLY-CANONICAL-ODT-V1",
     provenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
     officialModelClaimed: false,
     humanValidationRequired: true,
   },
   {
     kind: "PPT",
-    templateId: "contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",
-    fileName: "LB94_PPT_SUPPLY_GENERAL_V1.odt",
-    sha256: "6c73d9671a1f8cfe816239d13ead9aaa415acca730d298a4148e770ea947feca",
-    styleFingerprint: "sha256:1e8ec6bc5f26597714507c21d702b4f0a2c244e70f2ff0be9121166b6eb5f552",
-    structuralStyleFingerprint: "sha256:88387a3ce5d17fc66ad8e28b4de55cc09c5f0d696bf5e31254195b4b51f4d1db",
-    donorAssetId: "case:CONTR-2026-240267:ppt:v6:editable",
-    donorSha256: "c3f4199e3929718f278cc7d77c04d7e6082b79858e52ff193f1a79b17edd3f09",
-    donorStyleFingerprint: "sha256:deadf7c2a176c83de774fad7022a0ac1d5adfcca514d8c0cddeb0b01029d1390",
-    derivationVersion: "LB94-SUPPLY-GENERAL-ODT-V2",
+    templateId: "contrata-ia:supply:ppt:general:LB105-SUPPLY-CANONICAL-ODT-V1",
+    fileName: "LB105_PPT_SUPPLY_CANONICAL_V1.odt",
+    sha256: "37fd7c3cb2f5cf010ffe9982c8d19d2b9b88372a53bd1ad5ba5405f1a11d84c5",
+    styleFingerprint: "sha256:1980e059b6b4a58eab4e893ae6bd1fcc8c6c3f91dbf00804f0b225ddd799ad45",
+    structuralStyleFingerprint: "sha256:f729aae4f7c93169244eff1abe103344056885211f75bfbdf28a75fc46857caa",
+    donorAssetId: "contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2",
+    donorSha256: "6c73d9671a1f8cfe816239d13ead9aaa415acca730d298a4148e770ea947feca",
+    donorStyleFingerprint: "sha256:1e8ec6bc5f26597714507c21d702b4f0a2c244e70f2ff0be9121166b6eb5f552",
+    derivationVersion: "LB105-SUPPLY-CANONICAL-ODT-V1",
     provenanceRole: "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE",
     officialModelClaimed: false,
     humanValidationRequired: true,
