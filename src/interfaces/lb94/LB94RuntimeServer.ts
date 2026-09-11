@@ -89,8 +89,8 @@ const ASSET_UI = `<!doctype html>
 <div id="session" class="status">Comprobando sesión…</div>
 <div id="auth"><form method="post" action="/lb94/login"><label>Credencial administrativa <input name="token" type="password" autocomplete="current-password"></label> <button>Iniciar sesión</button></form></div>
 <fieldset><legend>PCAP oficial Supply ASA</legend><input type="file" id="pcap" accept=".odt"><button data-id="JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" data-file="pcap">Instalar PCAP</button></fieldset>
-<fieldset><legend>Memoria Supply general derivada</legend><input type="file" id="memory" accept=".odt"><button data-id="contrata-ia:supply:memory:general:LB94-SUPPLY-GENERAL-ODT-V2" data-file="memory">Instalar Memoria</button></fieldset>
-<fieldset><legend>PPT Supply general derivado</legend><input type="file" id="ppt" accept=".odt"><button data-id="contrata-ia:supply:ppt:general:LB94-SUPPLY-GENERAL-ODT-V2" data-file="ppt">Instalar PPT</button></fieldset>
+<fieldset><legend>Memoria Supply canónica LB105</legend><input type="file" id="memory" accept=".odt"><button data-id="contrata-ia:supply:memory:general:LB105-SUPPLY-CANONICAL-ODT-V1" data-file="memory">Instalar Memoria</button></fieldset>
+<fieldset><legend>PPT Supply canónico LB105</legend><input type="file" id="ppt" accept=".odt"><button data-id="contrata-ia:supply:ppt:general:LB105-SUPPLY-CANONICAL-ODT-V1" data-file="ppt">Instalar PPT</button></fieldset>
 <button id="check">Comprobar readiness de activos</button>
 <fieldset><legend>Prueba E2E documental LB94</legend>
 <label>Expediente de regresión <input id="caseId" value="REG-SUPPLY-LB94-E2E-001" size="34"></label>
