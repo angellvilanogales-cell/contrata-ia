@@ -79,8 +79,8 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
     content = content.replace(/<office:body\b/, `<!-- ${SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION} --><office:body`);
   }
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
-  styles = styles.replace(/<style:page-layout-properties\b[^>]*>/, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
-  styles = styles.replace(/<style:footer\b[^>]*>[\s\S]*?<\/style:footer>/, `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`);
+  styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
+  styles = styles.replace(/<style:footer(?:\s[^>]*)?>[\s\S]*?<\/style:footer>/, `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`);
   entries = replaceEntry(entries, "content.xml", content);
   entries = replaceEntry(entries, "styles.xml", styles);
   return writeOdtZip(entries);
