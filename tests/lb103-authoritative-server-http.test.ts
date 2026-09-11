@@ -58,7 +58,13 @@ describe("LB103 · runtime HTTP autoritativo", () => {
 
       const adaptive = await fetch(`${base}/adaptive`);
       expect(adaptive.status).toBe(200);
-      expect(await adaptive.text()).toContain('/lb103-authoritative-generation.js');
+      const adaptiveHtml = await adaptive.text();
+      expect(adaptiveHtml).toContain('/lb103-authoritative-generation.js');
+      expect(adaptiveHtml).toContain('/lb106-virgin-pilot.js');
+
+      const virginScript = await fetch(`${base}/lb106-virgin-pilot.js`);
+      expect(virginScript.status).toBe(200);
+      expect(await virginScript.text()).toContain("Crear expediente piloto virgen");
 
       const response = await fetch(`${base}/api/adaptive/cases/EXP-HTTP12345678/lb103-preflight`);
       expect(response.status).toBe(200);
@@ -79,6 +85,25 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         lb102SourceIngressPreserved: true,
         humanAcceptanceRequired: true,
         productionReady: false,
+      });
+
+      const matrixResponse = await fetch(`${base}/api/lb106/decision-matrix`);
+      expect(matrixResponse.status).toBe(200);
+      expect(await matrixResponse.json()).toMatchObject({
+        ready: true,
+        audit: { decisionCount: 20, coveredMemorySections: 19, coveredPptSections: 12 },
+        humanConsentRequired: true,
+        productionReady: false,
+      });
+
+      const virginResponse = await fetch(`${base}/api/lb106/virgin-pilot`);
+      expect(virginResponse.status).toBe(200);
+      expect(await virginResponse.json()).toMatchObject({
+        readyForHumanStart: true,
+        readyForGeneration: false,
+        virgin: true,
+        answersPreloaded: false,
+        sourceCaseIdsUsed: [],
       });
 
       const syntheticDownload = await fetch(`${base}/api/lb105/normalized-synthetic-package`);
