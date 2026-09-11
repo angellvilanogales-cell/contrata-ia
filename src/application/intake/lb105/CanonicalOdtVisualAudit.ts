@@ -47,6 +47,8 @@ export function auditCanonicalOdtVisualProfile(bytes:Uint8Array){
   if(!imageHrefs.some(href => imageEntries.some(entry => entry.name === href && entry.bytes.length > 0)))blockers.push("Falta un logotipo institucional embebido y referenciado.");
   const footer = styles.match(/<style:footer\b[^>]*>[\s\S]*?<\/style:footer>/)?.[0] ?? "";
   if(!/<text:page-number\b/.test(footer))blockers.push("El pie no contiene numeración de página automática.");
+  if(!/EXPEDIENTE:/i.test(footer)||!/<text:variable-get\b[^>]*text:name="CI_CASE_ID"/.test(footer))blockers.push("El pie no contiene el identificador variable del expediente.");
+  if(!/REVISI(?:Ó|O)N HUMANA OBLIGATORIA/i.test(footer))blockers.push("El pie no contiene el aviso de revisión humana obligatoria.");
   return{ready:blockers.length===0,scope:"DECLARED_STYLES_AND_PACKAGE_REFERENCES" as const,requiresVisualReview:true as const,version:CANONICAL_DOCUMENT_VISUAL_PROFILE_VERSION,blockers,imageHrefs,embeddedImages:imageEntries.map(item=>item.name)} as const;
 }
 
