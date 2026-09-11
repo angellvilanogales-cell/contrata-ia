@@ -46,7 +46,8 @@ describe("LB105 normalización física Supply", () => {
     expect(styles).not.toContain('<style:master-page style:name="Standard" style:page-layout-name="pm"/>');
     expect(styles).not.toContain('draw:name="CI_LB105_Junta_Andalucia"');
     expect(styles.match(/REVISIÓN HUMANA OBLIGATORIA/g)).toHaveLength(3);
-    expect(styles).toContain('style:name="CI_LB105_Title" style:family="paragraph" style:master-page-name="MP0"');
+    expect(styles).not.toContain('style:name="CI_LB105_Title" style:family="paragraph" style:master-page-name=');
+    expect(styles).toContain('style:name="CI_LB105_Heading1_Continuation" style:family="paragraph" style:master-page-name="MP0"');
     expect(styles).toContain('style:page-layout-name="pm"');
     expect(styles.match(/fo:min-height="1.5cm"/g)).toHaveLength(2);
     expect(styles.match(/fo:min-height="0.6cm"/g)).toHaveLength(2);
