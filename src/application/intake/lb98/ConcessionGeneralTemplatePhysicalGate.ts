@@ -1,0 +1,25 @@
+import { createHash } from "node:crypto";
+import { readOdtZip, type OdtZipEntry } from "../lb23/OdtPackageCodec";
+import { computeOdtStyleFingerprint } from "../lb23/UniversalOdtProductionRenderer";
+import type { ConcessionGeneralTemplateManifestRecord } from "./ConcessionGeneralTemplateManifest";
+
+export interface ConcessionTemplatePhysicalGateResult {
+  ready:boolean; actualSha256:string; actualStyleFingerprint:string|null; discoveredSlots:readonly string[]; blockers:readonly string[]; officialModel:false; humanValidationRequired:true;
+}
+function hash(bytes:Uint8Array){return createHash("sha256").update(bytes).digest("hex");}
+function entry(entries:readonly OdtZipEntry[],name:string){const e=entries.find(x=>x.name===name);if(!e)throw new Error(`ODT inválido: falta ${name}.`);return e;}
+function same(a:readonly string[],b:readonly string[]){return JSON.stringify([...a].sort())===JSON.stringify([...b].sort());}
+
+export function evaluateConcessionGeneralTemplateBytes(manifest:ConcessionGeneralTemplateManifestRecord,bytes:Uint8Array):ConcessionTemplatePhysicalGateResult{
+  const blockers:string[]=[];const actualSha256=hash(bytes);let actualStyleFingerprint:string|null=null;let discoveredSlots:string[]=[];
+  if(actualSha256!==manifest.expectedSha256)blockers.push(`SHA-256 incorrecto para ${manifest.kind} Concession.`);
+  try{
+    const entries=readOdtZip(bytes);const mime=Buffer.from(entry(entries,"mimetype").bytes).toString("utf8").trim();if(mime!==manifest.mediaType)blockers.push(`Media type incorrecto para ${manifest.kind} Concession.`);
+    const content=Buffer.from(entry(entries,"content.xml").bytes).toString("utf8");entry(entries,"styles.xml");entry(entries,"META-INF/manifest.xml");
+    discoveredSlots=[...content.matchAll(/\{\{([A-Za-z0-9.]+)\}\}/g)].map(m=>m[1]!).sort();if(!same(discoveredSlots,manifest.slots))blockers.push(`Inventario de slots incorrecto para ${manifest.kind} Concession.`);
+    for(const slot of manifest.slots)if(content.split(`{{${slot}}}`).length-1!==1)blockers.push(`El slot ${slot} no tiene anclaje físico único.`);
+    actualStyleFingerprint=computeOdtStyleFingerprint(entries);if(actualStyleFingerprint!==manifest.expectedStyleFingerprint)blockers.push(`Huella de estilo incorrecta para ${manifest.kind} Concession.`);
+  }catch(error){blockers.push(error instanceof Error?error.message:String(error));}
+  if(manifest.officialModel!==false||manifest.provenance!=="CONTRATA_IA_DERIVED_GENERAL_TEMPLATE")blockers.push("Procedencia Concession incompatible: ningún caso real se promociona como modelo oficial/general.");
+  return{ready:blockers.length===0,actualSha256,actualStyleFingerprint,discoveredSlots,blockers,officialModel:false,humanValidationRequired:true};
+}

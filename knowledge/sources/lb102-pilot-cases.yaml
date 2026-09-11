@@ -1,0 +1,72 @@
+version: 1
+reviewedAt: 2026-08-28
+policy:
+  realCaseEvidenceOnly: true
+  neverPromoteCaseToGeneralTemplate: true
+  unresolvedFieldsRemainUnresolved: true
+  completedRunRequiresHumanReview: true
+cases:
+  - id: CONTR-2026-240267
+    family: SUPPLY
+    authority: Servicio Andaluz de Empleo / Junta de Andalucía
+    title: Suministro de materiales de ferretería para instalaciones de los Servicios Centrales del SAE y oficinas anexas
+    evidenceClass: REAL_VALIDATED_CASE
+    sourceCoverage:
+      memoria: true
+      pcap: true
+      ppt: true
+      generatedPackageManifest: true
+    controlledRunEligible: true
+    fullDocumentSetVerified: true
+    notes:
+      - Golden case de regresión; no es plantilla universal.
+      - Protege DA 33ª, precios unitarios, catálogo cerrado y presupuesto máximo.
+  - id: GGI0263OSV0
+    externalExpedient: CONTR 2025 0000265459
+    family: SUPPLY
+    authority: Agencia de Obra Pública de la Junta de Andalucía
+    title: Suministro, instalación y renovación de infraestructuras TIC para los sistemas informáticos de la AOPJA
+    evidenceClass: REAL_SOURCE_BACKED_CASE
+    sourceUrls:
+      memoria: https://www.juntadeandalucia.es/haciendayadministracionpublica/apl/pdc_sirec_documentacion/rest/descargar/documento/299509
+      ppt: https://www.juntadeandalucia.es/haciendayadministracionpublica/apl/pdc_sirec_documentacion/rest/descargar/documento/299428
+    sourceCoverage:
+      memoria: true
+      pcap: false
+      ppt: true
+      generatedPackageManifest: false
+    controlledRunEligible: true
+    fullDocumentSetVerified: false
+    notes:
+      - Segundo Supply real independiente del caso ferretería.
+      - Tipo suministro y procedimiento abierto simplificado contrastados en la ficha de licitación.
+      - No cuenta todavía como PASS documental completo hasta recuperar/verificar el PCAP exacto y revisar el paquete generado.
+  - id: REG-SERVICE-005
+    externalExpedient: ADM-2024-0004 / CONTR/2024/636510
+    family: SERVICE
+    authority: Consejo Andaluz de Relaciones Laborales / Junta de Andalucía
+    title: Limpieza de la sede del CARL
+    evidenceClass: REAL_VALIDATED_CASE
+    sourceCoverage:
+      memoria: true
+      pcap: true
+      ppt: true
+    controlledRunEligible: true
+    fullDocumentSetVerified: true
+    notes:
+      - Mantener visibles los extremos que las fuentes marcan pendientes.
+      - Protege insuficiencia de medios, subrogación y no herencia Supply.
+  - id: REG-SERVICE-007
+    family: SERVICE
+    authority: Servicio Andaluz de Empleo / Junta de Andalucía
+    title: Mantenimiento integral y gestión técnica de instalaciones SAE Sevilla
+    evidenceClass: REAL_VALIDATED_CASE
+    sourceCoverage:
+      memoria: true
+      pcap: true
+      ppt: true
+    controlledRunEligible: true
+    fullDocumentSetVerified: true
+    notes:
+      - Segundo patrón Service real, multilote y SARA.
+      - No corregir valores declarados por la fuente ni resolver conflictos automáticamente.

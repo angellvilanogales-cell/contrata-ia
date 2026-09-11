@@ -1,0 +1,67 @@
+version: 1
+status: production-source-registry
+reviewedAt: 2026-08-28
+policy:
+  normativeAuthorityRequired: true
+  webSearchIsEvidenceOnly: true
+  historicalExamplesAreNeverNormativeByThemselves: true
+  unverifiedHistoricalKnowledgeMustRemainQuarantined: true
+  officialModelClaimRequiresExactBinaryVerification: true
+  humanValidationRequiredForMaterialDecisions: true
+sources:
+  - id: BOE-LCSP-9-2017-CONSOLIDATED-2026-04-09
+    class: NORMATIVE_PRIMARY
+    authority: BOE
+    title: Ley 9/2017, de 8 de noviembre, de Contratos del Sector Público
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902
+    consolidatedLastUpdatePublished: 2026-04-09
+    use: Base normativa principal de calificación, preparación, adjudicación, ejecución y documentación contractual.
+    productionEligible: true
+  - id: JDA-RECOMMENDED-PCAP-MODELS-2025-12
+    class: OFFICIAL_RECOMMENDED_MODEL_CATALOGUE
+    authority: Junta de Andalucía - Comisión Consultiva de Contratación Pública
+    title: Modelos de pliegos y contratos
+    url: https://www.juntadeandalucia.es/temas/contratacion-publica/gestion/comision-consultiva/paginas/pliegos.html
+    modelUpdateReference: diciembre-2025
+    use: Autoridad documental preferente para PCAP de obras, servicios y suministros cuando exista modelo aplicable.
+    productionEligible: true
+    exactBinaryVerificationRequiredBeforeOfficialModelClaim: true
+  - id: BOE-ENS-RD311-2022-CONSOLIDATED-2024-11-06
+    class: NORMATIVE_PRIMARY
+    authority: BOE
+    title: Real Decreto 311/2022, de 3 de mayo, Esquema Nacional de Seguridad
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-7191
+    consolidatedLastUpdatePublished: 2024-11-06
+    use: Marco de seguridad para preparación de piloto e institucionalización.
+    productionEligible: true
+  - id: BOE-LOPDGDD-3-2018
+    class: NORMATIVE_PRIMARY
+    authority: BOE
+    title: Ley Orgánica 3/2018, de 5 de diciembre, de Protección de Datos Personales y garantía de los derechos digitales
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673
+    use: Marco nacional de protección de datos y derechos digitales.
+    productionEligible: true
+  - id: EU-GDPR-2016-679
+    class: NORMATIVE_PRIMARY
+    authority: Unión Europea
+    title: Reglamento (UE) 2016/679 General de Protección de Datos
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    use: Marco europeo de protección de datos.
+    productionEligible: true
+  - id: JDA-REAL-CONTRACT-CORPUS
+    class: REAL_CASE_EVIDENCE
+    authority: Junta de Andalucía y entidades del sector público andaluz
+    title: Expedientes reales acreditados usados para contraste y regresión
+    use: Evidencia de estructura y casuística; nunca sustituye la norma ni se promociona automáticamente como modelo general.
+    productionEligible: true
+    generalizable: false
+quarantine:
+  rule: Todo conocimiento histórico sin sourceId resoluble y autoridad acreditada permanece fuera de decisiones productivas automáticas.
+  allowedUses:
+    - búsqueda orientativa
+    - comparación
+    - detección de posibles reglas a verificar
+  forbiddenUses:
+    - decidir automáticamente una cláusula material
+    - atribuir vigencia normativa
+    - afirmar que un documento es modelo oficial

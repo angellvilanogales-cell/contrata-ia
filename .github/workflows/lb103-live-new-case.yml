@@ -1,0 +1,83 @@
+name: Contrata-IA LB103 Live New Case
+
+on:
+  push:
+    branches:
+      - agent/lb91-universalizacion-operativa
+    paths:
+      - "src/application/intake/lb53/**"
+      - "src/application/intake/lb94/**"
+      - "src/application/intake/lb95/**"
+      - "src/application/intake/lb104/**"
+      - "src/application/intake/lb105/**"
+      - "src/application/universal/LB103*"
+      - "src/interfaces/lb103/**"
+      - "tests/lb103-*.test.ts"
+      - "tests/lb104-*.test.ts"
+      - "tests/lb105-*.test.ts"
+      - "package.json"
+      - ".github/workflows/lb103-live-new-case.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-new-case:
+    name: Persist, restore and generate a new synthetic case
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Wait for the exact Render deployment and execute the LB103 probe
+        env:
+          BASE_URL: https://contrata-ia.onrender.com
+          EXPECTED_COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for attempt in $(seq 1 16); do
+            echo "LB103 live attempt ${attempt}/16"
+            version_code=$(curl --connect-timeout 20 --max-time 45 -sS -o runtime-version.json -w '%{http_code}' "$BASE_URL/api/runtime-version" || true)
+            deployed_commit=$(node -e "try{const x=require('./runtime-version.json');process.stdout.write(String(x.commit||''))}catch{}")
+            echo "runtime HTTP=$version_code deployed=$deployed_commit expected=$EXPECTED_COMMIT"
+            if [[ "$version_code" == "200" && "$deployed_commit" == "$EXPECTED_COMMIT" ]]; then
+              probe_code=$(curl --connect-timeout 20 --max-time 150 -sS -o new-case-selftest.json -w '%{http_code}' "$BASE_URL/api/lb103/new-case-selftest" || true)
+              echo "new-case-selftest HTTP=$probe_code"
+              if [[ "$probe_code" == "200" ]]; then
+                node <<'NODE'
+          const fs=require('node:fs');
+          const result=JSON.parse(fs.readFileSync('new-case-selftest.json','utf8'));
+          if(result.ready!==true) throw new Error(`new case not ready: ${(result.blockers||[]).join(' | ')}`);
+          if(result.synthetic!==true||result.countsAsHumanAcceptance!==false) throw new Error('the technical probe must not claim human acceptance');
+          if(result.productionReady!==false||result.humanAcceptanceRequired!==true) throw new Error('the production and human-review gates changed');
+          if(result.persisted!==true||result.deterministic!==true) throw new Error('persistence or determinism failed');
+          if(!/^[a-f0-9]{64}$/.test(result.packageSha256||'')) throw new Error('invalid package SHA-256');
+          if(!Array.isArray(result.documents)||result.documents.length!==3) throw new Error('expected PCAP, Memoria and PPT');
+          const kinds=[...result.documents.map(x=>x.kind)].sort().join(',');
+          if(kinds!=='MEMORIA,PCAP,PPT') throw new Error(`unexpected documents: ${kinds}`);
+          if(!/^[a-f0-9]{64}$/.test(result.authoritativeSeals?.snapshotSha256||'')) throw new Error('invalid snapshot seal');
+          if(!/^[a-f0-9]{64}$/.test(result.authoritativeSeals?.documentarySelectionSha256||'')) throw new Error('invalid documentary-selection seal');
+          console.log(JSON.stringify(result,null,2));
+          NODE
+                ok=1
+                break
+              fi
+              cat new-case-selftest.json || true
+            fi
+            sleep 20
+          done
+          if [[ "$ok" != "1" ]]; then
+            echo "The exact deployed commit did not pass the live LB103 new-case probe."
+            exit 1
+          fi
+      - name: Preserve live LB103 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lb103-live-new-case-evidence
+          path: |
+            runtime-version.json
+            new-case-selftest.json
+          if-no-files-found: warn
+          retention-days: 30

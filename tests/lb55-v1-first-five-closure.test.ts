@@ -17,6 +17,7 @@ function sha(bytes: Uint8Array): string { return createHash("sha256").update(byt
 function fillRequired(workspace: UniversalEvidenceWorkspace, caseId: string): void {
   const definitions = [
     ["object", "Suministro de ferretería"], ["contractType", "SUPPLY"], ["cpvMain", "44316400-2"],
+    ["procedure", "OPEN_SIMPLIFIED_ABBREVIATED"], ["economic.fundingSource", "SELF_FUNDED"],
     ["administrative.contractingAuthority", "Dirección Gerencia SAE"], ["technical.executionLocations", ["Sevilla"]],
     ["lots.divisionIntoLots", false], ["lots.noDivisionJustification", "Gestión unificada"], ["administrative.reservedContractDa4", false],
     ["baseTenderBudgetCents", 1055244], ["economic.initialVatAmountCents", 221601], ["economic.initialPblVatIncludedCents", 1276845],
