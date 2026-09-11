@@ -80,6 +80,13 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         humanAcceptanceRequired: true,
         productionReady: false,
       });
+
+      const syntheticDownload = await fetch(`${base}/api/lb105/normalized-synthetic-package`);
+      expect(syntheticDownload.status).toBe(503);
+      expect(await syntheticDownload.json()).toMatchObject({
+        synthetic: true,
+        productionReady: false,
+      });
     } finally {
       await new Promise<void>(resolve => server.close(() => resolve()));
       fs.rmSync(root, { recursive: true, force: true });
