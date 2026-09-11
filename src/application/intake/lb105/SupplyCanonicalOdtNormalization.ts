@@ -4,6 +4,10 @@ import { canonicalMemoryPptStructure } from "../../../domain/documentModel/Canon
 import type { SupplyGeneralTemplateKind } from "../lb94/SupplyGeneralEditableTemplateDerivation";
 
 export const SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION = "LB105-SUPPLY-CANONICAL-ODT-V1" as const;
+export const SUPPLY_LB105_JUNTA_LOGO = {
+  path: "Pictures/10000000000000D900000092C15C4D5A3F76B932.jpg",
+  sha256: "2f8e3d5db6bec32620b59173842b4cf124acd67bf38db87e7161c580a58885de",
+} as const;
 
 const MEMORY_SLOTS: Readonly<Record<string, string>> = {
   "1": "La contratación se promueve por el órgano competente identificado en el expediente.",
@@ -66,6 +70,33 @@ function replaceEntry(entries: readonly OdtZipEntry[], name: string, value: stri
   return entries.map(item => item.name === name ? { ...item, bytes: Buffer.from(value, "utf8") } : item);
 }
 
+function institutionalLogo(entries: readonly OdtZipEntry[], styles: string): string {
+  const exact = entries.find(item => item.name === SUPPLY_LB105_JUNTA_LOGO.path);
+  if (exact) {
+    const actual = createHash("sha256").update(exact.bytes).digest("hex");
+    if (actual !== SUPPLY_LB105_JUNTA_LOGO.sha256) throw new Error("El logotipo Junta de Andalucía no coincide con el activo gráfico validado LB105.");
+    return exact.name;
+  }
+  const referenced = [...styles.matchAll(/<draw:image\b[^>]*xlink:href="(Pictures\/[^"]+)"/g)].map(match => match[1]!);
+  const fallback = referenced.find(name => entries.some(item => item.name === name && item.bytes.length > 0));
+  if (!fallback) throw new Error("La plantilla Supply no contiene un activo gráfico institucional utilizable.");
+  return fallback;
+}
+
+function normalizeMasterPages(styles: string, logoPath: string): string {
+  const header = `<style:header><text:p><draw:frame draw:name="CI_LB105_Junta_Andalucia" text:anchor-type="paragraph" svg:width="2.2cm" svg:height="1.48cm"><draw:image xlink:href="${logoPath}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/></draw:frame></text:p></style:header>`;
+  const footer = `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`;
+  return styles.replace(/<style:master-page\b[^>]*>[\s\S]*?<\/style:master-page>/g, block => {
+    let result = /<style:header(?:\s[^>]*)?>/.test(block)
+      ? block.replace(/<style:header(?:\s[^>]*)?>[\s\S]*?<\/style:header>/, header)
+      : block.replace(/^(<style:master-page\b[^>]*>)/, `$1${header}`);
+    result = /<style:footer(?:\s[^>]*)?>/.test(result)
+      ? result.replace(/<style:footer(?:\s[^>]*)?>[\s\S]*?<\/style:footer>/, footer)
+      : result.replace(/<\/style:master-page>$/, `${footer}</style:master-page>`);
+    return result;
+  });
+}
+
 /** Transforma el activo LB94 ya autenticado en la representación física LB104/LB105. */
 export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGeneralTemplateKind): Uint8Array {
   let entries = readOdtZip(bytes);
@@ -74,14 +105,16 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
   if (!contentEntry || !stylesEntry) throw new Error("El ODT Supply no contiene content.xml y styles.xml.");
   let content = Buffer.from(contentEntry.bytes).toString("utf8");
   let styles = Buffer.from(stylesEntry.bytes).toString("utf8");
+  const logoPath = institutionalLogo(entries, styles);
   content = content.replace(/<office:text\b[\s\S]*?<\/office:text>/, body(kind));
   if (!content.includes(SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION)) {
     content = content.replace(/<office:body\b/, `<!-- ${SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION} --><office:body`);
   }
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
   styles = styles.replace(/<style:page-layout-properties\b[^>]*>/g, match => `<style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" fo:margin-top="1.8cm" fo:margin-right="2cm" fo:margin-bottom="1.8cm" fo:margin-left="2cm"${match.endsWith("/>") ? "/" : ""}>`);
-  styles = styles.replace(/<style:footer(?:\s[^>]*)?>[\s\S]*?<\/style:footer>/, `<style:footer><text:p text:style-name="${PROFILE.styles.footer.styleName}">EXPEDIENTE: <text:variable-get text:name="CI_CASE_ID"/> · REVISIÓN HUMANA OBLIGATORIA · PÁGINA <text:page-number/></text:p></style:footer>`);
+  styles = normalizeMasterPages(styles, logoPath);
   entries = replaceEntry(entries, "content.xml", content);
   entries = replaceEntry(entries, "styles.xml", styles);
   return writeOdtZip(entries);
 }
+import { createHash } from "node:crypto";
