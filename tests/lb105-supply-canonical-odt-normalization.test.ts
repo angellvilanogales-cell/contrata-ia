@@ -42,5 +42,6 @@ describe("LB105 normalización física Supply", () => {
     expect(styles).not.toContain('<style:master-page style:name="Standard" style:page-layout-name="pm"/>');
     expect(styles.match(/draw:name="CI_LB105_Junta_Andalucia"/g)).toHaveLength(2);
     expect(styles.match(/REVISIÓN HUMANA OBLIGATORIA/g)).toHaveLength(2);
+    expect(styles).toContain('style:name="CI_LB105_Title" style:family="paragraph" style:master-page-name="Standard"');
   });
 });
