@@ -21,6 +21,8 @@ import { evaluateLB106VirginPilotReadiness } from "../../application/universal/L
 import { LB106_VIRGIN_PILOT_SCRIPT } from "./LB106VirginPilotScript";
 import { createInitialProposal } from "../../application/intake/lb107/InitialProposalEngine";
 import { LB107_INITIAL_PROPOSAL_SCRIPT } from "./LB107InitialProposalScript";
+import { evaluateEconomicStartingPoint, type EconomicStartingPointInput } from "../../application/intake/lb108/EconomicStartingPointEngine";
+import { LB108_ECONOMIC_STARTING_POINT_SCRIPT } from "./LB108EconomicStartingPointScript";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -91,7 +93,7 @@ function statusFor(error: Error): number {
 }
 
 function adaptiveUiWithGeneration(): string {
-  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script>';
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script>';
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
@@ -162,6 +164,12 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         sendJson(response, 200, createInitialProposal(description));
         return;
       }
+      if (request.method === "POST" && url.pathname === "/api/lb108/economic-starting-point") {
+        security.require(security.authenticate(request), "VIEWER");
+        const body = await readJson(request);
+        sendJson(response, 200, evaluateEconomicStartingPoint(body as unknown as EconomicStartingPointInput));
+        return;
+      }
       if (request.method === "GET" && url.pathname === "/api/lb105/normalized-synthetic-package") {
         const store = createHttpPersistedTemplateAssetStoreFromEnv();
         if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
@@ -217,6 +225,10 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
       }
       if (request.method === "GET" && url.pathname === "/lb107-initial-proposal.js") {
         sendText(response, 200, LB107_INITIAL_PROPOSAL_SCRIPT, "application/javascript; charset=utf-8");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/lb108-economic-starting-point.js") {
+        sendText(response, 200, LB108_ECONOMIC_STARTING_POINT_SCRIPT, "application/javascript; charset=utf-8");
         return;
       }
 
