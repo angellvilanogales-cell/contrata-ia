@@ -18,6 +18,7 @@ export interface UniversalV1UiFieldDefinition {
  * No se inventan rutas de presentación que no existan en el modelo universal.
  */
 export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefinition[] = [
+  { fieldPath: "need", label: "Necesidad e idoneidad de la contratación", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true, help: "Texto motivado desde los hechos y confirmado por la unidad promotora; arts. 28 y 116 LCSP." },
   { fieldPath: "object", label: "Objeto del contrato", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "contractType", label: "Tipo de contrato", control: "SELECT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true, help: "Clave canónica de clasificación; no es un slot documental directo del registro LB22." },
   { fieldPath: "cpvMain", label: "CPV principal", control: "TEXT", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
@@ -35,12 +36,18 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "economic.budgetCoversEntireContractLife", label: "El presupuesto máximo cubre toda la vigencia", control: "BOOLEAN", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.maximumApprovedBudgetCents", label: "Presupuesto máximo aprobado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.legalEstimatedValueCents", label: "Valor estimado jurídico", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "economic.initialEstimatedValueBaseCents", label: "Componente inicial del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.extensionAmountExVatCents", label: "Componente de prórrogas del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.modificationAmountExVatCents", label: "Componente de modificaciones previstas del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.optionsAmountExVatCents", label: "Componente de opciones del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.otherEstimatedValueComponentsCents", label: "Otros componentes del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.estimatedValueCalculationMethod", label: "Método de cálculo del valor estimado", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.priceDeterminationRegime", label: "Sistema de determinación del precio", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.priceRevisionRegime", label: "Revisión de precios", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.annualityBudgetRows", label: "Anualidades y aplicaciones presupuestarias", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "durationMonths", label: "Duración inicial en meses", control: "INTEGER", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "extensionMonths", label: "Duración máxima de prórrogas en meses", control: "INTEGER", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "modificationPercent", label: "Porcentaje máximo de modificación prevista", control: "INTEGER", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "execution.extensionStructure", label: "Estructura de prórrogas", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "execution.extensionNoticeMonths", label: "Preaviso de prórroga en meses", control: "INTEGER", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "execution.plannedModificationRegime", label: "Régimen de modificaciones previstas", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
@@ -51,7 +58,7 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
 ] as const;
 
 const LB22_CANONICAL_OR_DOMAIN_PATHS = new Set([
-  "object", "cpvMain", "lots", "estimatedValueCents", "baseTenderBudgetCents", "procedure", "durationMonths", "extensionMonths", "modificationPercent", "awardCriteria", "solvency", "publicity",
+  "need", "object", "cpvMain", "lots", "estimatedValueCents", "baseTenderBudgetCents", "procedure", "durationMonths", "extensionMonths", "modificationPercent", "awardCriteria", "solvency", "publicity",
   "processing.processingType", "processing.urgency", "processing.emergency", "regulation.harmonizedRegulation", "regulation.europeanFunding", "regulation.threshold", "regulation.deadlines",
   "economic.vatPercent", "economic.budgetApplication", "economic.annualities", "economic.annualityBudgetRows", "economic.fundingSource", "economic.priceRevisionRegime", "economic.unitPrices", "economic.referenceConsumption", "economic.projectedConsumption", "economic.maximumApprovedBudgetCents", "economic.initialEstimatedValueBaseCents", "economic.extensionAmountExVatCents", "economic.modificationAmountExVatCents", "economic.optionsAmountExVatCents", "economic.otherEstimatedValueComponentsCents", "economic.legalEstimatedValueCents", "economic.initialVatAmountCents", "economic.initialPblVatIncludedCents", "economic.needsBasedContractDa33", "economic.budgetCoversEntireContractLife", "economic.estimatedValueCalculationMethod", "economic.priceDeterminationRegime",
   "administrative.contractingAuthority", "administrative.promotingUnit", "administrative.competentBody", "administrative.administrativeFileNumber", "administrative.contractManager", "administrative.reservedContractDa4",
