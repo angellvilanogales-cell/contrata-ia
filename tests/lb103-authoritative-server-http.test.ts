@@ -61,10 +61,15 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       const adaptiveHtml = await adaptive.text();
       expect(adaptiveHtml).toContain('/lb103-authoritative-generation.js');
       expect(adaptiveHtml).toContain('/lb106-virgin-pilot.js');
+      expect(adaptiveHtml).toContain('/lb107-initial-proposal.js');
 
       const virginScript = await fetch(`${base}/lb106-virgin-pilot.js`);
       expect(virginScript.status).toBe(200);
       expect(await virginScript.text()).toContain("Crear expediente piloto virgen");
+
+      const initialScript = await fetch(`${base}/lb107-initial-proposal.js`);
+      expect(initialScript.status).toBe(200);
+      expect(await initialScript.text()).toContain("Confirmar decisiones iniciales");
 
       const response = await fetch(`${base}/api/adaptive/cases/EXP-HTTP12345678/lb103-preflight`);
       expect(response.status).toBe(200);
@@ -105,6 +110,20 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         answersPreloaded: false,
         sourceCaseIdsUsed: [],
       });
+
+      const initialProposal = await fetch(`${base}/api/lb107/initial-proposal`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ description: "Necesitamos adquirir artículos de ferretería para pequeñas reparaciones en edificios públicos." }),
+      });
+      expect(initialProposal.status).toBe(200);
+      const initialProposalBody = await initialProposal.json() as any;
+      expect(initialProposalBody).toMatchObject({
+        contractType: { recommended: "SUPPLY" },
+        humanValidationRequired: true,
+        productionReady: false,
+      });
+      expect(initialProposalBody.cpvCandidates[0]).toMatchObject({ code: "44316400-2", suggestedRole: "PRIMARY" });
 
       const syntheticDownload = await fetch(`${base}/api/lb105/normalized-synthetic-package`);
       expect(syntheticDownload.status).toBe(503);
