@@ -65,6 +65,7 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       expect(adaptiveHtml).toContain('/lb108-economic-starting-point.js');
       expect(adaptiveHtml).toContain('/lb109-procedure-processing.js');
       expect(adaptiveHtml).toContain('/lb110-capacity-solvency.js');
+      expect(adaptiveHtml).toContain('/lb111-award-criteria.js');
 
       const virginScript = await fetch(`${base}/lb106-virgin-pilot.js`);
       expect(virginScript.status).toBe(200);
@@ -85,6 +86,10 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       const solvencyScript = await fetch(`${base}/lb110-capacity-solvency.js`);
       expect(solvencyScript.status).toBe(200);
       expect(await solvencyScript.text()).toContain("Capacidad, habilitación y solvencia");
+
+      const awardScript = await fetch(`${base}/lb111-award-criteria.js`);
+      expect(awardScript.status).toBe(200);
+      expect(await awardScript.text()).toContain("Criterios de adjudicación");
 
       const response = await fetch(`${base}/api/adaptive/cases/EXP-HTTP12345678/lb103-preflight`);
       expect(response.status).toBe(200);
@@ -190,6 +195,12 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         generationBlocked: true,
         productionReady: false,
       });
+
+      const awardProposal = await fetch(`${base}/api/lb111/award-criteria`, {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ procedure:"ABIERTO_SIMPLIFICADO_ABREVIADO",contractType:"SUPPLY",intellectualService:false,laborIntensiveOrSpecialService:false,technicallyImprovableOrComplex:false,criteria:[{name:"Precio",weight:100,kind:"COST",evaluation:"FORMULA",formulaOrMethod:"P = 100 × oferta mínima / oferta valorada",objectLinkReason:"Coste del suministro"}],singleCriterionMotivation:"Suministro completamente definido.",abnormalityRegime:"RGLCAP_ART85_PRICE_ONLY",tieBreakRegime:"STATUTORY_ART147_2" }),
+      });
+      expect(awardProposal.status).toBe(200);
+      expect(await awardProposal.json()).toMatchObject({ formulaWeight:100, judgmentWeight:0, humanValidationRequired:true, generationBlocked:true, productionReady:false });
 
       const syntheticDownload = await fetch(`${base}/api/lb105/normalized-synthetic-package`);
       expect(syntheticDownload.status).toBe(503);
