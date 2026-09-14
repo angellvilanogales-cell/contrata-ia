@@ -53,6 +53,9 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "execution.plannedModificationRegime", label: "Régimen de modificaciones previstas", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "criteria.awardCriteria", label: "Criterios de adjudicación", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "criteria.singleCriterionMotivation", label: "Motivación del criterio único", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "criteria.formulaJustification", label: "Justificación de fórmulas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "criteria.abnormallyLowTenderParameters", label: "Parámetros de ofertas anormalmente bajas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "criteria.tieBreakCriteria", label: "Criterios de desempate", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "execution.specialExecutionConditions", label: "Condiciones especiales de ejecución", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.unitPrices", label: "Precios unitarios del catálogo", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true, help: "El catálogo detallado puede conservar además cantidades/consumos en la ficha adaptativa, pero los precios unitarios se promueven a la semántica universal existente; no se inventa technical.catalogue." },
 ] as const;
@@ -66,7 +69,7 @@ const LB22_CANONICAL_OR_DOMAIN_PATHS = new Set([
   "lots.divisionIntoLots", "lots.lots", "lots.maxOfferableLots", "lots.maxAwardableLots", "lots.noDivisionJustification",
   "guarantees.provisionalGuaranteeRequired", "guarantees.provisionalGuaranteePercent", "guarantees.definitiveGuaranteePercent", "guarantees.complementaryGuaranteePercent",
   "execution.specialExecutionConditions", "execution.specificPenalties", "execution.subcontractingRegime", "execution.assignmentRegime", "execution.paymentRegime", "execution.receiptAndAcceptanceRegime", "execution.extensionStructure", "execution.extensionNoticeMonths", "execution.plannedModificationRegime",
-  "criteria.awardCriteria", "criteria.economicSolvency", "criteria.technicalSolvency", "criteria.judgmentCriteriaExist", "criteria.singleCriterionMotivation",
+  "criteria.awardCriteria", "criteria.economicSolvency", "criteria.technicalSolvency", "criteria.judgmentCriteriaExist", "criteria.singleCriterionMotivation", "criteria.formulaJustification", "criteria.abnormallyLowTenderParameters", "criteria.tieBreakCriteria",
 ]);
 
 export function evaluateUniversalV1UiFieldManifest() {
