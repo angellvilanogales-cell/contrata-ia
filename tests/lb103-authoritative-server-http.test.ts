@@ -63,6 +63,7 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       expect(adaptiveHtml).toContain('/lb106-virgin-pilot.js');
       expect(adaptiveHtml).toContain('/lb107-initial-proposal.js');
       expect(adaptiveHtml).toContain('/lb108-economic-starting-point.js');
+      expect(adaptiveHtml).toContain('/lb109-procedure-processing.js');
 
       const virginScript = await fetch(`${base}/lb106-virgin-pilot.js`);
       expect(virginScript.status).toBe(200);
@@ -75,6 +76,10 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       const economicScript = await fetch(`${base}/lb108-economic-starting-point.js`);
       expect(economicScript.status).toBe(200);
       expect(await economicScript.text()).toContain("Crédito máximo disponible");
+
+      const procedureScript = await fetch(`${base}/lb109-procedure-processing.js`);
+      expect(procedureScript.status).toBe(200);
+      expect(await procedureScript.text()).toContain("Procedimiento y tramitación");
 
       const response = await fetch(`${base}/api/adaptive/cases/EXP-HTTP12345678/lb103-preflight`);
       expect(response.status).toBe(200);
@@ -141,6 +146,30 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         procedure: { code: "PENDING" },
         generationBlocked: true,
         humanValidationRequired: true,
+        productionReady: false,
+      });
+
+      const procedureProposal = await fetch(`${base}/api/lb109/procedure-processing`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          contractType: "SUPPLY",
+          pblVatIncludedCents: 6_050_000,
+          legalEstimatedValueExVatCents: 5_000_000,
+          authorityProfile: "OTHER_PUBLIC_ADMINISTRATION",
+          recurrentOrForeseeableNeed: false,
+          artificialSplittingRisk: false,
+          allAwardCriteriaFormulaBased: true,
+          judgmentCriteriaPercent: 0,
+          processingPreference: "ORDINARY",
+        }),
+      });
+      expect(procedureProposal.status).toBe(200);
+      expect(await procedureProposal.json()).toMatchObject({
+        proposedProcedure: "ABIERTO_SIMPLIFICADO_ABREVIADO",
+        thresholdBasis: { magnitude: "LEGAL_ESTIMATED_VALUE_EX_VAT" },
+        humanValidationRequired: true,
+        generationBlocked: true,
         productionReady: false,
       });
 
