@@ -41,6 +41,11 @@ describe("LB103 · integración guiada en /adaptive", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Fundamento jurídico");
   });
 
+  it("deja el bloque inicial a la propuesta LB107 y evita una tercera entrevista manual", () => {
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Tramitación guiada LB103");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).not.toContain("lb107-initial-proposal");
+  });
+
   it("ofrece opciones cerradas para procedimiento y perfil de financiación", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("ABIERTO_SIMPLIFICADO_ORDINARIO");
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("ABIERTO_SIMPLIFICADO_ABREVIADO");
