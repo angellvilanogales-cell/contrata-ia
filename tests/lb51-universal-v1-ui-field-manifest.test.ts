@@ -30,6 +30,9 @@ describe("LB51 - manifiesto UI universal V1", () => {
       "execution.extensionNoticeMonths",
       "execution.plannedModificationRegime",
       "criteria.singleCriterionMotivation",
+      "criteria.formulaJustification",
+      "criteria.abnormallyLowTenderParameters",
+      "criteria.tieBreakCriteria",
     ]));
   });
 
