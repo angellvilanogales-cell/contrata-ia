@@ -56,6 +56,11 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "criteria.formulaJustification", label: "Justificación de fórmulas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "criteria.abnormallyLowTenderParameters", label: "Parámetros de ofertas anormalmente bajas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "criteria.tieBreakCriteria", label: "Criterios de desempate", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.provisionalGuaranteeJustification", label: "Motivación de garantía provisional", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.definitiveGuaranteeRegime", label: "Régimen y base de garantía definitiva", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.complementaryGuaranteeJustification", label: "Motivación de garantía complementaria", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.warrantyPeriodMonths", label: "Plazo de garantía contractual en meses", control: "INTEGER", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.warrantyPeriodRegime", label: "Régimen del plazo de garantía", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "execution.specialExecutionConditions", label: "Condiciones especiales de ejecución", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.unitPrices", label: "Precios unitarios del catálogo", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true, help: "El catálogo detallado puede conservar además cantidades/consumos en la ficha adaptativa, pero los precios unitarios se promueven a la semántica universal existente; no se inventa technical.catalogue." },
 ] as const;
@@ -67,7 +72,7 @@ const LB22_CANONICAL_OR_DOMAIN_PATHS = new Set([
   "administrative.contractingAuthority", "administrative.promotingUnit", "administrative.competentBody", "administrative.administrativeFileNumber", "administrative.contractManager", "administrative.reservedContractDa4",
   "technical.technicalPurpose", "technical.technicalRequirements", "technical.executionLocations", "technical.subrogationRequired", "technical.subrogationRegime",
   "lots.divisionIntoLots", "lots.lots", "lots.maxOfferableLots", "lots.maxAwardableLots", "lots.noDivisionJustification",
-  "guarantees.provisionalGuaranteeRequired", "guarantees.provisionalGuaranteePercent", "guarantees.definitiveGuaranteePercent", "guarantees.complementaryGuaranteePercent",
+  "guarantees.provisionalGuaranteeRequired", "guarantees.provisionalGuaranteePercent", "guarantees.provisionalGuaranteeJustification", "guarantees.definitiveGuaranteePercent", "guarantees.definitiveGuaranteeRegime", "guarantees.complementaryGuaranteePercent", "guarantees.complementaryGuaranteeJustification", "guarantees.warrantyPeriodMonths", "guarantees.warrantyPeriodRegime",
   "execution.specialExecutionConditions", "execution.specificPenalties", "execution.subcontractingRegime", "execution.assignmentRegime", "execution.paymentRegime", "execution.receiptAndAcceptanceRegime", "execution.extensionStructure", "execution.extensionNoticeMonths", "execution.plannedModificationRegime",
   "criteria.awardCriteria", "criteria.economicSolvency", "criteria.technicalSolvency", "criteria.judgmentCriteriaExist", "criteria.singleCriterionMotivation", "criteria.formulaJustification", "criteria.abnormallyLowTenderParameters", "criteria.tieBreakCriteria",
 ]);
