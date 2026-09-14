@@ -62,6 +62,7 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       expect(adaptiveHtml).toContain('/lb103-authoritative-generation.js');
       expect(adaptiveHtml).toContain('/lb106-virgin-pilot.js');
       expect(adaptiveHtml).toContain('/lb107-initial-proposal.js');
+      expect(adaptiveHtml).toContain('/lb108-economic-starting-point.js');
 
       const virginScript = await fetch(`${base}/lb106-virgin-pilot.js`);
       expect(virginScript.status).toBe(200);
@@ -70,6 +71,10 @@ describe("LB103 · runtime HTTP autoritativo", () => {
       const initialScript = await fetch(`${base}/lb107-initial-proposal.js`);
       expect(initialScript.status).toBe(200);
       expect(await initialScript.text()).toContain("Confirmar decisiones iniciales");
+
+      const economicScript = await fetch(`${base}/lb108-economic-starting-point.js`);
+      expect(economicScript.status).toBe(200);
+      expect(await economicScript.text()).toContain("Crédito máximo disponible");
 
       const response = await fetch(`${base}/api/adaptive/cases/EXP-HTTP12345678/lb103-preflight`);
       expect(response.status).toBe(200);
@@ -124,6 +129,20 @@ describe("LB103 · runtime HTTP autoritativo", () => {
         productionReady: false,
       });
       expect(initialProposalBody.cpvCandidates[0]).toMatchObject({ code: "44316400-2", suggestedRole: "PRIMARY" });
+
+      const pendingValuation = await fetch(`${base}/api/lb108/economic-starting-point`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ startingPoint: "NEED_PENDING_VALUATION", contractType: "SUPPLY", valuationRoute: "MARKET_CONSULTATION" }),
+      });
+      expect(pendingValuation.status).toBe(200);
+      expect(await pendingValuation.json()).toMatchObject({
+        status: "VALUATION_REQUIRED",
+        procedure: { code: "PENDING" },
+        generationBlocked: true,
+        humanValidationRequired: true,
+        productionReady: false,
+      });
 
       const syntheticDownload = await fetch(`${base}/api/lb105/normalized-synthetic-package`);
       expect(syntheticDownload.status).toBe(503);
