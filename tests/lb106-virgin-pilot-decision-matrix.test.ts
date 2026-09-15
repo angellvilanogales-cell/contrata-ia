@@ -31,7 +31,7 @@ describe("LB106 · matriz jurídica y expediente piloto virgen", () => {
     expect(audit).toMatchObject({
       ready: true,
       decisionCount: 20,
-      legalBasisCount: 45,
+      legalBasisCount: 49,
       coveredMemorySections: 19,
       coveredPptSections: 12,
       humanConsentRequired: true,

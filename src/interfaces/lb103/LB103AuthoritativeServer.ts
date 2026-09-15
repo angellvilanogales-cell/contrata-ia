@@ -35,6 +35,8 @@ import { evaluateSpecialExecutionConditions, type SpecialExecutionInput } from "
 import { LB113_SPECIAL_EXECUTION_SCRIPT } from "./LB113SpecialExecutionScript";
 import { evaluateSubcontractingAssignment, type SubcontractingAssignmentInput } from "../../application/intake/lb114/SubcontractingAssignmentEngine";
 import { LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT } from "./LB114SubcontractingAssignmentScript";
+import { evaluatePlannedModification, type PlannedModificationInput } from "../../application/intake/lb115/PlannedModificationEngine";
+import { LB115_PLANNED_MODIFICATION_SCRIPT } from "./LB115PlannedModificationScript";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
 const DATA_ROOT = path.resolve(process.env.CONTRATA_IA_DATA_DIR ?? "var/contrata-ia");
@@ -105,7 +107,7 @@ function statusFor(error: Error): number {
 }
 
 function adaptiveUiWithGeneration(): string {
-  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script>';
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script>';
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
@@ -214,6 +216,10 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         security.require(security.authenticate(request), "VIEWER"); const body=await readJson(request);
         sendJson(response,200,evaluateSubcontractingAssignment(body as unknown as SubcontractingAssignmentInput)); return;
       }
+      if (request.method === "POST" && url.pathname === "/api/lb115/planned-modification") {
+        security.require(security.authenticate(request), "VIEWER"); const body=await readJson(request);
+        sendJson(response,200,evaluatePlannedModification(body as unknown as PlannedModificationInput)); return;
+      }
       if (request.method === "GET" && url.pathname === "/api/lb105/normalized-synthetic-package") {
         const store = createHttpPersistedTemplateAssetStoreFromEnv();
         if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
@@ -293,6 +299,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
       }
       if (request.method === "GET" && url.pathname === "/lb113-special-execution.js") { sendText(response,200,LB113_SPECIAL_EXECUTION_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb114-subcontracting-assignment.js") { sendText(response,200,LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT,"application/javascript; charset=utf-8"); return; }
+      if (request.method === "GET" && url.pathname === "/lb115-planned-modification.js") { sendText(response,200,LB115_PLANNED_MODIFICATION_SCRIPT,"application/javascript; charset=utf-8"); return; }
 
       const preflightCaseId = request.method === "GET" ? routeCaseId(url.pathname, "lb103-preflight") : null;
       if (preflightCaseId) {
