@@ -38,6 +38,8 @@ import { LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT } from "./LB114SubcontractingAss
 import { evaluatePlannedModification, type PlannedModificationInput } from "../../application/intake/lb115/PlannedModificationEngine";
 import { LB115_PLANNED_MODIFICATION_SCRIPT } from "./LB115PlannedModificationScript";
 import { evaluatePriceRevisionDecision, type PriceRevisionDecisionInput } from "../../application/intake/lb116/PriceRevisionDecisionEngine";
+import { evaluateExecutionReceiptPayment, type ExecutionReceiptPaymentInput } from "../../application/intake/lb117/ExecutionReceiptPaymentEngine";
+import { LB117_EXECUTION_RECEIPT_PAYMENT_SCRIPT } from "./LB117ExecutionReceiptPaymentScript";
 import { LB116_PRICE_REVISION_SCRIPT } from "./LB116PriceRevisionScript";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
@@ -109,7 +111,7 @@ function statusFor(error: Error): number {
 }
 
 function adaptiveUiWithGeneration(): string {
-  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script>';
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script><script src="/lb117-execution-receipt-payment.js" defer></script>';
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
@@ -226,6 +228,10 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         security.require(security.authenticate(request), "VIEWER"); const body=await readJson(request);
         sendJson(response,200,evaluatePriceRevisionDecision(body as unknown as PriceRevisionDecisionInput)); return;
       }
+      if (request.method === "POST" && url.pathname === "/api/lb117/execution-receipt-payment") {
+        security.require(security.authenticate(request), "VIEWER"); const body=await readJson(request);
+        sendJson(response,200,evaluateExecutionReceiptPayment(body as unknown as ExecutionReceiptPaymentInput)); return;
+      }
       if (request.method === "GET" && url.pathname === "/api/lb105/normalized-synthetic-package") {
         const store = createHttpPersistedTemplateAssetStoreFromEnv();
         if (!store) { sendJson(response, 503, {ready:false, synthetic:true, productionReady:false, blockers:["Persistencia de plantillas no configurada."]}); return; }
@@ -307,6 +313,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
       if (request.method === "GET" && url.pathname === "/lb114-subcontracting-assignment.js") { sendText(response,200,LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb115-planned-modification.js") { sendText(response,200,LB115_PLANNED_MODIFICATION_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb116-price-revision.js") { sendText(response,200,LB116_PRICE_REVISION_SCRIPT,"application/javascript; charset=utf-8"); return; }
+      if (request.method === "GET" && url.pathname === "/lb117-execution-receipt-payment.js") { sendText(response,200,LB117_EXECUTION_RECEIPT_PAYMENT_SCRIPT,"application/javascript; charset=utf-8"); return; }
 
       const preflightCaseId = request.method === "GET" ? routeCaseId(url.pathname, "lb103-preflight") : null;
       if (preflightCaseId) {
