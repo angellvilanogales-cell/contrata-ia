@@ -50,6 +50,15 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(first.snapshot?.decisions.every(item => item.validatedBy === "reviewer-1")).toBe(true);
   });
 
+  it("mantiene estable el snapshot al añadir el consentimiento de cierre, evitando una huella circular", () => {
+    const value=supplyCase();
+    const before=evaluateLB103ServerValidatedPreflight(value);
+    value.universalEvidence={...value.universalEvidence,"closure.finalConsentRecord":validated("closure.finalConsentRecord",{consentSha256:"a".repeat(64)})};
+    const after=evaluateLB103ServerValidatedPreflight(value);
+    expect(after.snapshot?.sha256).toBe(before.snapshot?.sha256);
+    expect(after.documentarySelection?.sha256).toBe(before.documentarySelection?.sha256);
+  });
+
   it("liga de forma determinista la selección documental y los SHA físicos al snapshot validado", () => {
     const first = evaluateLB103ServerValidatedPreflight(supplyCase());
     const second = evaluateLB103ServerValidatedPreflight(supplyCase());

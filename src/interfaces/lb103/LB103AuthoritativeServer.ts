@@ -44,6 +44,8 @@ import { evaluateTechnicalSpecifications, type TechnicalSpecificationsInput } fr
 import { LB118_TECHNICAL_SPECIFICATIONS_SCRIPT } from "./LB118TechnicalSpecificationsScript";
 import { evaluateDataProtectionSecurity, type DataProtectionSecurityInput } from "../../application/intake/lb119/DataProtectionSecurityEngine";
 import { LB119_DATA_PROTECTION_SECURITY_SCRIPT } from "./LB119DataProtectionSecurityScript";
+import { LB120_DOCUMENT_CONCLUSION_SCRIPT } from "./LB120DocumentConclusionScript";
+import { createLB120DocumentPreview, createLB120FinalConsent, validateLB120FinalConsent, type LB120ConsentInput } from "../../application/universal/LB120DocumentConclusion";
 import { LB116_PRICE_REVISION_SCRIPT } from "./LB116PriceRevisionScript";
 
 const MAX_SEAL_REQUEST_BYTES = 64 * 1024;
@@ -106,6 +108,11 @@ function routeCaseId(pathname: string, action: "lb103-preflight" | "lb103-genera
   return decodeURIComponent(match[1]);
 }
 
+function lb120CaseId(pathname: string, action: "preview" | "consent"): string | null {
+  const match = new RegExp(`^/api/adaptive/cases/([^/]+)/lb120-${action}$`).exec(pathname);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
 function statusFor(error: Error): number {
   if (/autenticación|credencial|sesión segura/i.test(error.message)) return 401;
   if (/permiso insuficiente/i.test(error.message)) return 403;
@@ -115,7 +122,7 @@ function statusFor(error: Error): number {
 }
 
 function adaptiveUiWithGeneration(): string {
-  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script><script src="/lb117-execution-receipt-payment.js" defer></script><script src="/lb118-technical-specifications.js" defer></script><script src="/lb119-data-protection-security.js" defer></script>';
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script><script src="/lb117-execution-receipt-payment.js" defer></script><script src="/lb118-technical-specifications.js" defer></script><script src="/lb119-data-protection-security.js" defer></script><script src="/lb120-document-conclusion.js" defer></script>';
   return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
 }
 
@@ -325,6 +332,30 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
       if (request.method === "GET" && url.pathname === "/lb117-execution-receipt-payment.js") { sendText(response,200,LB117_EXECUTION_RECEIPT_PAYMENT_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb118-technical-specifications.js") { sendText(response,200,LB118_TECHNICAL_SPECIFICATIONS_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb119-data-protection-security.js") { sendText(response,200,LB119_DATA_PROTECTION_SECURITY_SCRIPT,"application/javascript; charset=utf-8"); return; }
+      if (request.method === "GET" && url.pathname === "/lb120-document-conclusion.js") { sendText(response,200,LB120_DOCUMENT_CONCLUSION_SCRIPT,"application/javascript; charset=utf-8"); return; }
+
+      const lb120PreviewCaseId = request.method === "POST" ? lb120CaseId(url.pathname, "preview") : null;
+      if (lb120PreviewCaseId) {
+        const actor = security.authenticate(request); security.require(actor, "OPERATOR");
+        const body = await readJson(request);
+        const templateStore = createHttpPersistedTemplateAssetStoreFromEnv();
+        if (!templateStore) { sendJson(response,503,{error:"La vista previa exige la persistencia remota acreditada de plantillas.",productionReady:false}); return; }
+        const result = await generateLB103AuthoritativeSupplyPackage({caseValue:caseStore.get(lb120PreviewCaseId),presentedSeals:{snapshotSha256:typeof body.snapshotSha256==="string"?body.snapshotSha256:"",documentarySelectionSha256:typeof body.documentarySelectionSha256==="string"?body.documentarySelectionSha256:""},templateStore});
+        if (!result.ready || !result.package) { sendJson(response,409,{error:"La vista previa D20 ha sido bloqueada.",blockers:result.blockers,productionReady:false}); return; }
+        sendJson(response,200,createLB120DocumentPreview(result.preflight,result.package)); return;
+      }
+
+      const lb120ConsentCaseId = request.method === "POST" ? lb120CaseId(url.pathname, "consent") : null;
+      if (lb120ConsentCaseId) {
+        const actor = security.authenticate(request); security.require(actor, "REVIEWER");
+        const body = await readJson(request) as unknown as LB120ConsentInput;
+        const templateStore = createHttpPersistedTemplateAssetStoreFromEnv();
+        if (!templateStore) { sendJson(response,503,{error:"El consentimiento exige la persistencia remota acreditada de plantillas.",productionReady:false}); return; }
+        const result = await generateLB103AuthoritativeSupplyPackage({caseValue:caseStore.get(lb120ConsentCaseId),presentedSeals:{snapshotSha256:body.snapshotSha256??"",documentarySelectionSha256:body.documentarySelectionSha256??""},templateStore});
+        if (!result.ready || !result.package) { sendJson(response,409,{error:"El consentimiento D20 ha sido bloqueado.",blockers:result.blockers,productionReady:false}); return; }
+        const preview=createLB120DocumentPreview(result.preflight,result.package);
+        sendJson(response,200,{record:createLB120FinalConsent(preview,body,actor.id),humanValidationRequired:true,productionReady:false}); return;
+      }
 
       const preflightCaseId = request.method === "GET" ? routeCaseId(url.pathname, "lb103-preflight") : null;
       if (preflightCaseId) {
@@ -364,6 +395,9 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
           });
           return;
         }
+        const preview=createLB120DocumentPreview(result.preflight,result.package);
+        const consentBlockers=validateLB120FinalConsent(caseStore.get(generationCaseId).universalEvidence?.["closure.finalConsentRecord"],preview);
+        if(consentBlockers.length){sendJson(response,409,{error:"La descarga exige consentimiento final D20 vigente.",blockers:consentBlockers,humanAcceptanceStillRequired:true,productionReady:false});return;}
         sendZip(response, result.package.bytes, result.package.fileName);
         return;
       }

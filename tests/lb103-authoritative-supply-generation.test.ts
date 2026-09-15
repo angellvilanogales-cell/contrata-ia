@@ -88,6 +88,16 @@ describe("LB103 · generación Supply autoritativa sellada", () => {
     expect(result.productionReady).toBe(false);
   });
 
+  it("excluye el cierre D20 del contenido documental y conserva la fecha de la última decisión sustantiva", async () => {
+    const original=supplyCase();
+    const caseValue={...original,updatedAt:"2026-09-15T12:00:00.000Z",universalEvidence:{...original.universalEvidence,"closure.finalConsentRecord":validated("closure.finalConsentRecord",{consentSha256:"f".repeat(64)})}};
+    const preflight=evaluateLB103ServerValidatedPreflight(caseValue);
+    let received:any;
+    await generateLB103AuthoritativeSupplyPackage({caseValue,presentedSeals:{snapshotSha256:preflight.snapshot!.sha256,documentarySelectionSha256:preflight.documentarySelection!.sha256},templateStore:fakeStore,generator:async input=>{received=input.record;return successfulPackage(caseValue.caseId);}});
+    expect(received.fields["closure.finalConsentRecord"]).toBeUndefined();
+    expect(received.updatedAt).toBe("2026-09-07T09:00:00.000Z");
+  });
+
   it("rechaza un snapshot SHA divergente sin ejecutar el generador", async () => {
     const caseValue = supplyCase();
     const preflight = evaluateLB103ServerValidatedPreflight(caseValue);

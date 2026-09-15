@@ -43,6 +43,19 @@ function isSha256(value: string): boolean {
   return /^[a-f0-9]{64}$/.test(value);
 }
 
+function documentaryEvidence(evidence: UniversalEvidenceRecord["fields"]): UniversalEvidenceRecord["fields"] {
+  return Object.fromEntries(Object.entries(evidence).filter(([key]) => !key.startsWith("closure.")));
+}
+
+function documentaryUpdatedAt(evidence: UniversalEvidenceRecord["fields"], fallback: string): string {
+  const validated = Object.entries(evidence)
+    .filter(([key]) => !key.startsWith("closure."))
+    .map(([, field]) => field.humanValidation?.at)
+    .filter((value): value is string => Boolean(value))
+    .sort();
+  return validated.at(-1) ?? fallback;
+}
+
 /**
  * Unión autoritativa entre /adaptive y el generador Supply ya existente.
  *
@@ -113,8 +126,8 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
 
   const record: UniversalEvidenceRecord = {
     caseId: caseValue.caseId,
-    fields: caseValue.universalEvidence ?? {},
-    updatedAt: caseValue.updatedAt,
+    fields: documentaryEvidence(caseValue.universalEvidence ?? {}),
+    updatedAt: documentaryUpdatedAt(caseValue.universalEvidence ?? {}, caseValue.updatedAt),
   };
   const generator = input.generator ?? generateSupplyUserDocumentPackage;
   const pkg = await generator({ record, templateStore: selectedLB103TemplateStore(input.templateStore, preflight.documentarySelection!), authoritativeSeals: {...input.presentedSeals} });

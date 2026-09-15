@@ -87,6 +87,10 @@ function sha256(value: unknown): string {
   return createHash("sha256").update(stable(value)).digest("hex");
 }
 
+function decisionEvidence(evidence: Readonly<Record<string, EvidenceField<unknown>>>): Readonly<Record<string, EvidenceField<unknown>>> {
+  return Object.fromEntries(Object.entries(evidence).filter(([key]) => !key.startsWith("closure.")));
+}
+
 function requireValidatedField(
   evidence: Readonly<Record<string, EvidenceField<unknown>>>,
   fieldPath: string,
@@ -162,7 +166,9 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
       procedure: procedure as TipoProcedimiento,
       financing,
       decisions,
-      evidenceSha256: sha256(evidence),
+      // El consentimiento D20 se vincula a esta huella. Se excluye el propio
+      // registro de cierre para evitar una identidad circular.
+      evidenceSha256: sha256(decisionEvidence(evidence)),
       humanValidated: true as const,
     };
     snapshot = Object.freeze({ ...payload, sha256: sha256(payload) });
