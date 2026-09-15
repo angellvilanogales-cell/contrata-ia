@@ -1,0 +1,29 @@
+import { describe, expect, it } from "vitest";
+import { LB108_ECONOMIC_STARTING_POINT_SCRIPT } from "../src/interfaces/lb103/LB108EconomicStartingPointScript";
+
+describe("LB108 · interfaz del bloque económico", () => {
+  it("ofrece los dos puntos de partida antes de pedir importes", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Existe un límite máximo de crédito");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La necesidad aún debe definirse y valorarse");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("el procedimiento se analiza mediante el valor estimado sin IVA");
+  });
+
+  it("bloquea procedimiento y pliegos mientras falta la valoración", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("El aplicativo no inventará un importe ni un procedimiento");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La generación de pliegos permanece bloqueada");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("MARKET_CONSULTATION");
+  });
+
+  it("registra cada magnitud económica únicamente tras confirmación humana", () => {
+    for (const path of [
+      "baseTenderBudgetCents",
+      "economic.initialVatAmountCents",
+      "economic.initialPblVatIncludedCents",
+      "economic.legalEstimatedValueCents",
+      "economic.estimatedValueCalculationMethod",
+      "durationMonths",
+      "extensionMonths",
+    ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidence(id,"${path}"`);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('validateEvidence(id,"procedure"');
+  });
+});
