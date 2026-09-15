@@ -5,6 +5,25 @@ import type { LB103ServerValidatedPreflight } from "./LB103ServerValidatedPrefli
 
 export const LB120_CONSENT_FIELD = "closure.finalConsentRecord";
 
+const PRIOR_DECISION_ANCHORS = [
+  ["D01", "object", "contractType", "cpvMain"], ["D02", "lots.divisionIntoLots"], ["D03", "need"],
+  ["D04", "technical.executionLocations"], ["D05", "economic.priceDeterminationRegime"], ["D06", "economic.legalEstimatedValueCents"],
+  ["D07", "economic.fundingSource"], ["D08", "durationMonths"], ["D09", "procedure", "processing.processingType"],
+  ["D10", "criteria.economicSolvency", "criteria.technicalSolvency"], ["D11", "criteria.awardCriteria"],
+  ["D12", "guarantees.definitiveGuaranteeRegime"], ["D13", "execution.specialExecutionConditions"],
+  ["D14", "execution.subcontractingRegime", "execution.assignmentRegime"], ["D15", "execution.plannedModificationRegime"],
+  ["D16", "economic.priceRevisionRegime"], ["D17", "administrative.contractManager", "execution.receiptAndAcceptanceRegime", "execution.paymentRegime"],
+  ["D18", "technical.technicalPurpose", "technical.technicalRequirements"], ["D19", "dataProtection.processingScenario", "security.informationSecurityRegime"],
+] as const;
+
+export function auditLB120PriorDecisionEvidence(evidence: Readonly<Record<string, EvidenceField<unknown>>>): readonly string[] {
+  const blockers: string[]=[];
+  for(const [decisionId,...paths] of PRIOR_DECISION_ANCHORS){
+    for(const path of paths){const field=evidence[path];if(!field||field.status!=="HUMAN_VALIDATED"||!field.humanValidated||!field.humanValidation?.by||!field.humanValidation.at)blockers.push(`${decisionId}: falta validación humana de ${path}.`);}
+  }
+  return blockers;
+}
+
 export interface LB120DocumentPreview {
   readonly schemaVersion: "LB120-PREVIEW-1";
   readonly caseId: string;

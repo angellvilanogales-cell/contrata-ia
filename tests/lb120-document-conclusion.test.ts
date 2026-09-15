@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createLB120DocumentPreview, createLB120FinalConsent, validateLB120FinalConsent } from "../src/application/universal/LB120DocumentConclusion";
+import { auditLB120PriorDecisionEvidence, createLB120DocumentPreview, createLB120FinalConsent, validateLB120FinalConsent } from "../src/application/universal/LB120DocumentConclusion";
 import type { LB103ServerValidatedPreflight } from "../src/application/universal/LB103ServerValidatedPreflight";
 import type { SupplyUserDocumentPackage } from "../src/application/intake/lb95/SupplyUserDocumentPackageGenerator";
 
@@ -10,6 +10,7 @@ const pkg={ready:true,sha256:hash("c"),manifest:{crossDocumentAuditReady:true,do
 function input(){return{snapshotSha256:hash("a"),documentarySelectionSha256:hash("b"),packageSha256:hash("c"),factsAndDecisionsConfirmed:true,legalGroundsConfirmed:true,crossDocumentConsistencyConfirmed:true,officialPcapIntegrityConfirmed:true,memoryAndPptStructureConfirmed:true,noCriticalBlockersConfirmed:true,finalStatement:"Confirmo motivadamente la coherencia de la terna documental."};}
 
 describe("LB120 · conclusión, coherencia documental y consentimiento final",()=>{
+  it("no permite cerrar si falta evidencia humana de un bloque anterior",()=>{expect(auditLB120PriorDecisionEvidence({})).toContain("D01: falta validación humana de object.");});
   it("prepara una vista previa ligada a las huellas de la terna",()=>{const x=createLB120DocumentPreview(preflight,pkg);expect(x.documents.map(d=>d.kind)).toEqual(["PCAP","MEMORIA","PPT"]);expect(x.packageSha256).toBe(hash("c"));expect(x.humanConsentRequired).toBe(true);});
   it("crea consentimiento nominativo solo con todas las confirmaciones",()=>{const preview=createLB120DocumentPreview(preflight,pkg);const record=createLB120FinalConsent(preview,input(),"revisora.a","2026-09-15T10:00:00.000Z");expect(record.consentSha256).toMatch(/^[a-f0-9]{64}$/);expect(record.humanValidated).toBe(true);expect(()=>createLB120FinalConsent(preview,{...input(),officialPcapIntegrityConfirmed:false},"revisora.a")).toThrow(/todos los extremos/);});
   it("rechaza huellas distintas de las reconstruidas",()=>{const preview=createLB120DocumentPreview(preflight,pkg);expect(()=>createLB120FinalConsent(preview,{...input(),packageSha256:hash("9")},"revisora.a")).toThrow(/no coinciden/);});
