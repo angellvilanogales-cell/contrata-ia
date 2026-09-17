@@ -37,4 +37,11 @@ describe("LB107 · interfaz del bloque inicial", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain('guided.decisions["common:cpv"]');
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain('guided.decisions["common:lots"]');
   });
+
+  it("ofrece una revisión visible de lotes y CPV conservando la selección", () => {
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Revisar lotes y CPV");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain('id="lb107ReviewLotsCpvs"');
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("s.selectedCpvs=selected");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("s.mainCpvKey=mainKey");
+  });
 });
