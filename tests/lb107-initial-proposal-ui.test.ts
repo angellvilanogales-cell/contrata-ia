@@ -10,9 +10,17 @@ describe("LB107 · interfaz del bloque inicial", () => {
   });
 
   it("registra objeto, tipo, CPV, necesidad y lotes como evidencias separadas", () => {
-    for (const path of ["object", "contractType", "cpvMain", "need", "lots.divisionIntoLots"]) {
+    for (const path of ["object", "contractType", "cpvMain", "cpvAdditional", "lots.cpvAssignments", "need", "lots.divisionIntoLots"]) {
       expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain(`validateEvidence(id,"${path}"`);
     }
+  });
+
+  it("permite varios CPV y exige su asignación cuando existen lotes", () => {
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("CPV complementarios");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Asignación de CPV por lote");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("cpvCodes(value)");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("if(lots&&!assignments.length)");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("debe seleccionarse antes como CPV principal o complementario");
   });
 
   it("conserva la incertidumbre de lotes como aclaración pendiente sin validarla", () => {
