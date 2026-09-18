@@ -22,6 +22,7 @@ describe("LB107 · interfaz del bloque inicial", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("p.lots.suggestedDefinitions");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("puede aceptarla sin escribir o modificarla antes de validarla");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("c.officialDescription");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Por qué puede encajar:");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain('type="checkbox" class="lb107CpvChoice"');
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Seleccione al menos un CPV para ");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Los códigos no se introducen manualmente");

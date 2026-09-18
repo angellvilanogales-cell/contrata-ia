@@ -60,6 +60,8 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
       ],
     );
     expect(result.cpvCandidates[0]?.code).toBe("80580000-3");
+    expect(result.cpvCandidates[0]?.explanation).toContain("cursos de idiomas");
+    expect(result.cpvCandidates[0]?.explanation).toContain("principal");
     expect(result.cpvCandidates.map(item => item.code)).not.toContain("34962230-9");
     expect(result.cpvCandidates.map(item => item.code)).not.toContain("37451730-0");
     expect(result.cpvCandidates.map(item => item.code)).not.toContain("37452740-0");
@@ -76,6 +78,7 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
       ],
     );
     expect(result.cpvCandidates[0]?.code).toBe("79634000-7");
+    expect(result.cpvCandidates[0]?.explanation).toContain("empleabilidad");
     expect(result.cpvCandidates.map(item => item.code)).toEqual(["79634000-7", "85312310-5"]);
   });
 

@@ -125,6 +125,16 @@ const CPV_CONTEXT_PROFILES: readonly CpvContextProfile[] = [
   },
 ];
 
+const CPV_SELECTION_GUIDANCE: Readonly<Record<string, string>> = {
+  "80580000-3": "Código específico para la impartición de cursos de idiomas; es el candidato más directo cuando el lote tiene por objeto formación lingüística.",
+  "79632000-3": "Código general de formación de personal; puede utilizarse como complementario cuando se quiere reflejar que las personas destinatarias pertenecen a la plantilla.",
+  "80511000-9": "Código general de servicios de formación del personal; resulta menos específico que el de cursos de idiomas y normalmente será complementario.",
+  "80570000-0": "Código de perfeccionamiento personal; solo conviene seleccionarlo si el contenido incluye desarrollo o mejora personal además de la formación lingüística.",
+  "79634000-7": "Código específico para orientación profesional; encaja directamente con actuaciones de empleabilidad, acompañamiento laboral o movilidad profesional.",
+  "85312310-5": "Código general de servicios de orientación; puede complementar al código profesional cuando el acompañamiento excede el ámbito estrictamente laboral.",
+  "85312300-2": "Código general de orientación y asesoramiento; debe elegirse solo si el lote incluye también asesoramiento individual o grupal diferenciado.",
+};
+
 function contractType(description: string): InitialProposalResult["contractType"] {
   const text = normalize(description);
   const supplyTerms = ["adquirir", "adquisicion", "suministro", "comprar", "bienes", "productos", "material", "materiales", "equipos", "licencias", "mobiliario", "articulos"];
@@ -171,7 +181,7 @@ function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpv
       score: relative,
       confidence: relative >= 80 && item.matching.length >= 2 ? "HIGH" : relative >= 55 ? "MEDIUM" : "LOW",
       suggestedRole: index === 0 ? "PRIMARY" : "COMPLEMENTARY",
-      explanation: `Coincidencias con la descripción: ${item.matching.join(", ") || "coincidencia de expresión"}. La puntuación es orientativa y no sustituye la elección humana.`,
+      explanation: `${CPV_SELECTION_GUIDANCE[item.entry.codigo] ?? `Coincide con estos términos del lote: ${item.matching.join(", ") || "coincidencia de expresión"}.`} ${index === 0 ? "Se propone como principal por ser la opción más específica encontrada." : "Se propone como posible complementario; no debe marcarse si no añade una prestación real distinta."}`,
     } satisfies InitialCpvCandidate;
   });
 }
