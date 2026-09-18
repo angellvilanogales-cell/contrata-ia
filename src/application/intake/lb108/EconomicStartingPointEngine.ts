@@ -22,6 +22,10 @@ export interface KnownCreditInput {
   contractType: InitialEconomicContractType;
   grossCreditLimitCents: number;
   contractBudgetVatIncludedCents?: number;
+  directCostsExVatCents?: number;
+  indirectCostsExVatCents?: number;
+  otherCostsExVatCents?: number;
+  lotPblAllocations?: readonly { lotId: string; lot: string; pblVatIncludedCents: number }[];
   vatRatePercent: number;
   creditScope: CreditScope;
   initialDurationMonths: number;
@@ -62,6 +66,8 @@ export interface EconomicStartingPointResult {
     baseTenderBudgetVatIncludedCents: number;
     maximumApprovedBudgetCents?: number;
     budgetCoversEntireContractLife: boolean;
+    costBreakdown: { directCostsExVatCents: number; indirectCostsExVatCents: number; otherCostsExVatCents: number };
+    lotPblAllocations: readonly { lotId: string; lot: string; pblVatIncludedCents: number }[];
   };
   estimatedValue?: {
     initialBaseCents: number;
@@ -205,6 +211,14 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
 
   const base = Math.round(contractBudgetGross * 100 / (100 + vatRate));
   const vat = contractBudgetGross - base;
+  const noBreakdownProvided = input.directCostsExVatCents == null && input.indirectCostsExVatCents == null && input.otherCostsExVatCents == null;
+  const directCosts = integer(input.directCostsExVatCents ?? (noBreakdownProvided ? base : 0), "Los costes directos");
+  const indirectCosts = integer(input.indirectCostsExVatCents ?? 0, "Los costes indirectos");
+  const otherCosts = integer(input.otherCostsExVatCents ?? 0, "Los demás gastos del PBL");
+  if (directCosts + indirectCosts + otherCosts !== base) throw new Error("La suma de costes directos, costes indirectos y otros gastos debe coincidir con el PBL sin IVA.");
+  const lotPblAllocations = [...(input.lotPblAllocations ?? [])].map(item => ({ lotId: String(item.lotId || "").trim(), lot: String(item.lot || "").trim(), pblVatIncludedCents: integer(item.pblVatIncludedCents, `El PBL de ${item.lot || "cada lote"}`) }));
+  if (lotPblAllocations.some(item => !item.lotId || !item.lot || item.pblVatIncludedCents === 0)) throw new Error("Cada lote debe conservar su identificación y tener asignada una parte positiva del PBL.");
+  if (lotPblAllocations.length && lotPblAllocations.reduce((sum, item) => sum + item.pblVatIncludedCents, 0) !== contractBudgetGross) throw new Error("La suma del PBL asignado a los lotes debe coincidir con el PBL total del contrato, IVA incluido.");
   const modification = Math.round(base * modificationPercent / 100);
   const estimated = base + extension + modification + options + other;
   const scopeText = input.creditScope === "ENTIRE_CONTRACT_LIFE"
@@ -230,6 +244,8 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
       baseTenderBudgetVatIncludedCents: contractBudgetGross,
       ...(input.successiveNeeds ? { maximumApprovedBudgetCents: base } : {}),
       budgetCoversEntireContractLife: input.creditScope === "ENTIRE_CONTRACT_LIFE",
+      costBreakdown: { directCostsExVatCents: directCosts, indirectCostsExVatCents: indirectCosts, otherCostsExVatCents: otherCosts },
+      lotPblAllocations,
     },
     estimatedValue: {
       initialBaseCents: base,

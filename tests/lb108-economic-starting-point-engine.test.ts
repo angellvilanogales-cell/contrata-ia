@@ -29,6 +29,8 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
       baseTenderBudgetVatIncludedCents: 1_210_000,
       maximumApprovedBudgetCents: 1_000_000,
       budgetCoversEntireContractLife: true,
+      costBreakdown: { directCostsExVatCents: 1_000_000, indirectCostsExVatCents: 0, otherCostsExVatCents: 0 },
+      lotPblAllocations: [],
     });
     expect(result.estimatedValue).toMatchObject({
       initialBaseCents: 1_000_000,
@@ -123,6 +125,29 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     expect(result.procedure.code).toBe("PENDING");
     expect(result.generationBlocked).toBe(true);
     expect(result.nextActions.join(" ")).toContain("MARKET_CONSULTATION");
+  });
+
+  it("mantiene un solo crédito contractual y exige que el reparto por lotes cuadre con el PBL total", () => {
+    const result = evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 5_500_000,
+      contractBudgetVatIncludedCents: 5_500_000, directCostsExVatCents: 4_000_000,
+      indirectCostsExVatCents: 400_000, otherCostsExVatCents: 145_455, vatRatePercent: 21,
+      creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Estudio de costes fechado.",
+      lotPblAllocations: [
+        { lotId: "lot-1", lot: "Lote 1", pblVatIncludedCents: 3_500_000 },
+        { lotId: "lot-2", lot: "Lote 2", pblVatIncludedCents: 2_000_000 },
+      ],
+    });
+    expect(result.budget?.availableCreditVatIncludedCents).toBe(5_500_000);
+    expect(result.budget?.lotPblAllocations).toHaveLength(2);
+    expect(() => evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 5_500_000,
+      contractBudgetVatIncludedCents: 5_500_000, directCostsExVatCents: 4_545_455,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Estudio de costes fechado.",
+      lotPblAllocations: [{ lotId: "lot-1", lot: "Lote 1", pblVatIncludedCents: 3_500_000 }],
+    })).toThrow(/suma del PBL asignado a los lotes/);
   });
 
   it("propone procedimientos solo como candidatos dependientes del valor estimado", () => {
