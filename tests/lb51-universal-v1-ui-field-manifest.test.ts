@@ -5,8 +5,12 @@ describe("LB51 - manifiesto UI universal V1", () => {
   it("incluye las semánticas exactas que el caso real obligó a separar", () => {
     const paths = UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath);
     expect(paths).toEqual(expect.arrayContaining([
+      "need",
       "object",
       "cpvMain",
+      "cpvMainDescription",
+      "cpvAdditional",
+      "lots.cpvAssignments",
       "baseTenderBudgetCents",
       "durationMonths",
       "lots.noDivisionJustification",
@@ -15,14 +19,23 @@ describe("LB51 - manifiesto UI universal V1", () => {
       "economic.needsBasedContractDa33",
       "economic.budgetCoversEntireContractLife",
       "economic.maximumApprovedBudgetCents",
+      "economic.initialEstimatedValueBaseCents",
+      "economic.extensionAmountExVatCents",
+      "economic.modificationAmountExVatCents",
+      "economic.optionsAmountExVatCents",
+      "economic.otherEstimatedValueComponentsCents",
       "economic.estimatedValueCalculationMethod",
       "economic.priceDeterminationRegime",
       "economic.annualityBudgetRows",
       "economic.unitPrices",
       "execution.extensionStructure",
+      "modificationPercent",
       "execution.extensionNoticeMonths",
       "execution.plannedModificationRegime",
       "criteria.singleCriterionMotivation",
+      "criteria.formulaJustification",
+      "criteria.abnormallyLowTenderParameters",
+      "criteria.tieBreakCriteria",
     ]));
   });
 

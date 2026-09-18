@@ -72,6 +72,17 @@ describe("LB-7 adaptive procurement flow", () => {
     expect(decision.nextQuestion?.label).not.toContain("coste inicial no recurrente");
   });
 
+  it("guarda No lo sé como pendiente y avanza a preguntas independientes", () => {
+    const decision = flow.analyze({
+      needAndPurpose: "Servicio de limpieza y mantenimiento higiénico de oficinas públicas.",
+      scopeDetail: "Limpieza ordinaria, reposición de consumibles y control de calidad.",
+      technicalContinuity: "UNKNOWN",
+    });
+    expect(decision.nextQuestion?.id).toBe("serviceMeansAvailability");
+    expect(decision.warnings).toContain("No hay hechos suficientes para cerrar la decisión sobre lotes; debe recabarse información técnica adicional.");
+    expect(decision.lotProposal).toBe("PENDING");
+  });
+
   it("never asks a supply for service startup and maintenance costs", () => {
     const decision = flow.analyze({
       needAndPurpose: "Suministro de material de ferretería",

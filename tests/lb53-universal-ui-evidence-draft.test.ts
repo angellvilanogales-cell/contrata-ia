@@ -33,6 +33,12 @@ describe("LB53 - evidencia desde UI universal", () => {
     expect(() => declareUniversalUiEvidence({ fieldPath: "lots.divisionIntoLots", value: "No" }, "operator")).toThrow(/booleano/);
   });
 
+  it("admite código, denominación y asignaciones CPV por lote como evidencias separadas", () => {
+    expect(declareUniversalUiEvidence({ fieldPath: "cpvMainDescription", value: "Provisión de cursos de idiomas" }, "operator").value).toBe("Provisión de cursos de idiomas");
+    expect(declareUniversalUiEvidence({ fieldPath: "cpvAdditional", value: [{ code: "79634000-7", officialDescription: "Servicios de orientación profesional" }] }, "operator").status).toBe("SOURCE_DECLARED");
+    expect(declareUniversalUiEvidence({ fieldPath: "lots.cpvAssignments", value: [{ lotId: "LOT-1", cpvCodes: ["80580000-3"] }] }, "operator").status).toBe("SOURCE_DECLARED");
+  });
+
   it("no permite mutar paths que no formen parte del manifiesto universal", () => {
     expect(() => declareUniversalUiEvidence({ fieldPath: "legacy.foo", value: "x" }, "operator")).toThrow(/no expuesto/);
   });

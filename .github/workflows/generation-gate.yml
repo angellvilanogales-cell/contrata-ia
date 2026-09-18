@@ -1,0 +1,165 @@
+name: Contrata-IA Generation Gate
+
+on:
+  push:
+    branches:
+      - agent/lb91-universalizacion-operativa
+      - agent/lb7-qa-seguridad-v1
+  pull_request:
+    branches:
+      - agent/lb7-qa-seguridad-v1
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: generation-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generation:
+    name: Generate and audit editable procurement packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:generation
+
+  lb102-live-preuat:
+    name: Verify exact deployed SHA and run live LB102 pre-UAT gate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/lb91-universalizacion-operativa'
+    needs: generation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Wait for exact Render deployment and execute live LB102/LB103 gates
+        env:
+          BASE_URL: https://contrata-ia.onrender.com
+          EXPECTED_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          rm -f runtime-version.json adaptive.html lb103-authoritative-generation.js adaptive-preflight-unauth.json adaptive-generate-unauth.json generation.json simulation.json
+          for attempt in $(seq 1 24); do
+            echo "Runtime live attempt ${attempt}/24; expected SHA=$EXPECTED_SHA"
+            version_code=$(curl --connect-timeout 15 --max-time 45 -sS -o runtime-version.json -w '%{http_code}' "$BASE_URL/api/runtime-version" || true)
+            echo "runtime-version HTTP=$version_code"
+            if [[ "$version_code" != "200" ]]; then
+              sleep 20
+              continue
+            fi
+
+            deployed_sha=$(node -e "const fs=require('node:fs');const v=JSON.parse(fs.readFileSync('runtime-version.json','utf8'));process.stdout.write(String(v.commit||''));")
+            runtime_kind=$(node -e "const fs=require('node:fs');const v=JSON.parse(fs.readFileSync('runtime-version.json','utf8'));process.stdout.write(String(v.runtime||''));")
+            echo "deployed SHA=$deployed_sha runtime=$runtime_kind"
+            if [[ "$deployed_sha" != "$EXPECTED_SHA" || "$runtime_kind" != "LB103_AUTHORITATIVE_OVER_LB102" ]]; then
+              sleep 20
+              continue
+            fi
+
+            adaptive_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive.html -w '%{http_code}' "$BASE_URL/adaptive" || true)
+            script_code=$(curl --connect-timeout 15 --max-time 45 -sS -o lb103-authoritative-generation.js -w '%{http_code}' "$BASE_URL/lb103-authoritative-generation.js" || true)
+            preflight_unauth_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive-preflight-unauth.json -w '%{http_code}' "$BASE_URL/api/adaptive/cases/LB103-UAT-SMOKE/lb103-preflight" || true)
+            generate_unauth_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive-generate-unauth.json -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{"snapshotSha256":"0000000000000000000000000000000000000000000000000000000000000000","documentarySelectionSha256":"0000000000000000000000000000000000000000000000000000000000000000"}' "$BASE_URL/api/adaptive/cases/LB103-UAT-SMOKE/lb103-generate" || true)
+            echo "adaptive HTTP=$adaptive_code script HTTP=$script_code preflight unauth HTTP=$preflight_unauth_code generate unauth HTTP=$generate_unauth_code"
+
+            if [[ "$adaptive_code" != "200" || "$script_code" != "200" || "$preflight_unauth_code" != "401" || "$generate_unauth_code" != "401" ]]; then
+              echo "Superficie LB103 /adaptive no cumple el contrato vivo esperado."
+              cat adaptive-preflight-unauth.json || true
+              cat adaptive-generate-unauth.json || true
+              exit 1
+            fi
+
+            node <<'NODE'
+          const fs=require('node:fs');
+          const html=fs.readFileSync('adaptive.html','utf8');
+          const script=fs.readFileSync('lb103-authoritative-generation.js','utf8');
+          if(!html.includes('/lb103-authoritative-generation.js')) throw new Error('/adaptive no carga el script autoritativo LB103');
+          for(const expected of ['contrataIaAdaptiveCaseId','lb103-preflight','lb103-generate']) {
+            if(!script.includes(expected)) throw new Error(`script LB103 vivo no contiene ${expected}`);
+          }
+          for(const file of ['adaptive-preflight-unauth.json','adaptive-generate-unauth.json']) {
+            const value=JSON.parse(fs.readFileSync(file,'utf8'));
+            if(value.productionReady!==false) throw new Error(`${file}: productionReady debe permanecer false`);
+          }
+          NODE
+
+            gen_code=$(curl --connect-timeout 15 --max-time 90 -sS -o generation.json -w '%{http_code}' "$BASE_URL/api/lb102/generation-selftest" || true)
+            echo "generation HTTP=$gen_code"
+            if [[ "$gen_code" != "200" ]]; then
+              # Con el SHA exacto ya desplegado, un 503 con JSON del endpoint no es
+              # una espera de despliegue: es un blocker real de generación. Se
+              # preserva la evidencia y se falla inmediatamente para no ocultarlo
+              # detrás de 24 reintentos idénticos.
+              if [[ "$gen_code" == "503" && -s generation.json ]] && node -e "JSON.parse(require('node:fs').readFileSync('generation.json','utf8'));" >/dev/null 2>&1; then
+                echo "Runtime exacto alcanzado con blocker semántico de generación:"
+                cat generation.json
+                exit 1
+              fi
+              sleep 20
+              continue
+            fi
+
+            sim_code=$(curl --connect-timeout 15 --max-time 90 -sS -o simulation.json -w '%{http_code}' "$BASE_URL/api/lb102/pre-human-machine-simulation" || true)
+            echo "simulation HTTP=$sim_code"
+            if [[ "$sim_code" == "503" && -s simulation.json ]] && node -e "JSON.parse(require('node:fs').readFileSync('simulation.json','utf8'));" >/dev/null 2>&1; then
+              echo "Runtime exacto alcanzado con blocker semántico de simulación:"
+              cat simulation.json
+              exit 1
+            fi
+            if [[ "$sim_code" == "200" ]]; then
+              node <<'NODE'
+          const fs=require('node:fs');
+          const version=JSON.parse(fs.readFileSync('runtime-version.json','utf8'));
+          const generation=JSON.parse(fs.readFileSync('generation.json','utf8'));
+          const simulation=JSON.parse(fs.readFileSync('simulation.json','utf8'));
+          if(version.lb103Authoritative!==true) throw new Error('runtime vivo no declara LB103 autoritativo');
+          if(version.lb102SourceIngressPreserved!==true) throw new Error('runtime vivo no conserva source ingress LB102');
+          if(version.productionReady!==false) throw new Error('runtime productionReady debe permanecer false');
+          if(generation.ready!==true) throw new Error('generation.ready != true');
+          if(!Array.isArray(generation.packages)||generation.packages.length!==4) throw new Error('se esperaban 4 paquetes');
+          for(const p of generation.packages){
+            if(p.ready!==true) throw new Error(`${p.id}: paquete no listo`);
+            if(!/^[a-f0-9]{64}$/.test(p.sha256||'')) throw new Error(`${p.id}: SHA final inválido`);
+            if(Array.isArray(p.blockers)&&p.blockers.length) throw new Error(`${p.id}: blockers ${p.blockers.join(' | ')}`);
+          }
+          if(simulation.passed!==true||simulation.humanSimulationAllowed!==true) throw new Error(`simulación pre-UAT bloqueada: ${(simulation.blockers||[]).join(' | ')}`);
+          if(simulation.productionReady!==false) throw new Error('productionReady debe permanecer false');
+          console.log(JSON.stringify({version,generation,simulation},null,2));
+          NODE
+              ok=1
+              break
+            fi
+            sleep 20
+          done
+          if [[ "$ok" != "1" ]]; then
+            echo "No se alcanzó el runtime exacto y el estado vivo LB102/LB103 pre-UAT dentro de la ventana de despliegue."
+            echo "runtime-version:"; cat runtime-version.json || true
+            echo "adaptive preflight unauth:"; cat adaptive-preflight-unauth.json || true
+            echo "adaptive generate unauth:"; cat adaptive-generate-unauth.json || true
+            echo "generation:"; cat generation.json || true
+            echo "simulation:"; cat simulation.json || true
+            exit 1
+          fi
+      - name: Preserve live runtime, adaptive and LB102 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lb102-lb103-live-preuat-evidence
+          path: |
+            runtime-version.json
+            adaptive.html
+            lb103-authoritative-generation.js
+            adaptive-preflight-unauth.json
+            adaptive-generate-unauth.json
+            generation.json
+            simulation.json
+          if-no-files-found: warn
+          retention-days: 30
