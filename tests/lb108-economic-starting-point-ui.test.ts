@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { LB108_ECONOMIC_STARTING_POINT_SCRIPT } from "../src/interfaces/lb103/LB108EconomicStartingPointScript";
 
 describe("LB108 · interfaz del bloque económico", () => {
+  it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Propuesta inicial 76/18/6");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no una proporción impuesta por la LCSP");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("updateAutomaticAmounts");
+  });
   it("ofrece los dos puntos de partida antes de pedir importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Existe un límite máximo de crédito");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La necesidad aún debe definirse y valorarse");
