@@ -48,6 +48,37 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
     ]);
   });
 
+  it("respeta la familia semántica de formación en idiomas y excluye formación sectorial ajena", () => {
+    const result = createInitialProposal(
+      "Formación lingüística del personal técnico en inglés, portugués y español como lengua extranjera mediante aula virtual.",
+      [
+        cpv("80580000-3", "Provisión de cursos de idiomas"),
+        cpv("80511000-9", "Servicios de formación del personal"),
+        cpv("34962230-9", "Formación para el control del tráfico aéreo"),
+        cpv("37451730-0", "Material de formación para fútbol"),
+        cpv("37452740-0", "Material de formación para tenis"),
+      ],
+    );
+    expect(result.cpvCandidates[0]?.code).toBe("80580000-3");
+    expect(result.cpvCandidates.map(item => item.code)).not.toContain("34962230-9");
+    expect(result.cpvCandidates.map(item => item.code)).not.toContain("37451730-0");
+    expect(result.cpvCandidates.map(item => item.code)).not.toContain("37452740-0");
+  });
+
+  it("prioriza orientación profesional y excluye familias ajenas para acompañamiento de empleabilidad", () => {
+    const result = createInitialProposal(
+      "Orientación y acompañamiento grupal coaching para mejorar la empleabilidad y la movilidad laboral transfronteriza.",
+      [
+        cpv("79634000-7", "Servicios de orientación profesional"),
+        cpv("85312310-5", "Servicios de orientación"),
+        cpv("34994100-2", "Alumbrado para orientación e iluminación fluvial"),
+        cpv("90731200-2", "Servicios de gestión o control de la contaminación atmosférica transfronteriza"),
+      ],
+    );
+    expect(result.cpvCandidates[0]?.code).toBe("79634000-7");
+    expect(result.cpvCandidates.map(item => item.code)).toEqual(["79634000-7", "85312310-5"]);
+  });
+
   it("carga el catálogo completo aportado y no la antigua lista de ejemplos", () => {
     const catalog = loadProjectCpvCatalog();
     expect(catalog.length).toBe(9454);

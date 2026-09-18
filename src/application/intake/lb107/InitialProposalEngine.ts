@@ -106,6 +106,25 @@ function specificity(code: string): number {
   return Math.max(0, 6 - (digits.match(/0+$/)?.[0].length ?? 0));
 }
 
+interface CpvContextProfile {
+  matches: (text: string) => boolean;
+  accepts: (entry: CPVEntry) => boolean;
+  preferredCodes: readonly string[];
+}
+
+const CPV_CONTEXT_PROFILES: readonly CpvContextProfile[] = [
+  {
+    matches: text => ["idioma", "idiomas", "linguistica", "ingles", "portugues", "espanol como lengua", "lengua extranjera"].some(term => text.includes(term)),
+    accepts: entry => ["80580000-3", "79632000-3", "80511000-9", "80570000-0"].includes(entry.codigo),
+    preferredCodes: ["80580000-3"],
+  },
+  {
+    matches: text => ["orientacion profesional", "empleabilidad", "insercion laboral", "movilidad laboral", "acompanamiento laboral", "coaching"].some(term => text.includes(term)),
+    accepts: entry => ["79634000-7", "85312310-5", "85312300-2"].includes(entry.codigo),
+    preferredCodes: ["79634000-7"],
+  },
+];
+
 function contractType(description: string): InitialProposalResult["contractType"] {
   const text = normalize(description);
   const supplyTerms = ["adquirir", "adquisicion", "suministro", "comprar", "bienes", "productos", "material", "materiales", "equipos", "licencias", "mobiliario", "articulos"];
@@ -129,15 +148,18 @@ function cleanDescription(description: string): string {
 function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpvCandidate[] {
   const queryTokens = new Set(tokens(description));
   if (!queryTokens.size) return [];
+  const normalizedQuery = normalize(description);
+  const activeProfiles = CPV_CONTEXT_PROFILES.filter(profile => profile.matches(normalizedQuery));
   const ranked = catalog.map(entry => {
     const descriptionTokens = new Set(tokens(entry.descripcion));
     const matching = [...queryTokens].filter(token => descriptionTokens.has(token));
     const normalizedEntry = normalize(entry.descripcion);
-    const normalizedQuery = normalize(description);
     const phrase = normalizedEntry.length >= 8 && (normalizedQuery.includes(normalizedEntry) || normalizedEntry.includes(normalizedQuery));
-    const score = matching.reduce((sum, token) => sum + Math.min(18, 7 + token.length), 0) + (phrase ? 15 : 0) + Math.min(5, specificity(entry.codigo));
-    return { entry, matching, score };
-  }).filter(item => item.score > 0)
+    const acceptedByContext = activeProfiles.length === 0 || activeProfiles.some(profile => profile.accepts(entry));
+    const contextScore = activeProfiles.reduce((sum, profile) => sum + (profile.preferredCodes.includes(entry.codigo) ? 60 : profile.accepts(entry) ? 25 : 0), 0);
+    const score = matching.reduce((sum, token) => sum + Math.min(18, 7 + token.length), 0) + (phrase ? 15 : 0) + Math.min(5, specificity(entry.codigo)) + contextScore;
+    return { entry, matching, score, acceptedByContext };
+  }).filter(item => item.score > 0 && item.acceptedByContext)
     .sort((a, b) => b.score - a.score || specificity(b.entry.codigo) - specificity(a.entry.codigo) || a.entry.codigo.localeCompare(b.entry.codigo))
     .slice(0, 10);
   const max = ranked[0]?.score ?? 1;
