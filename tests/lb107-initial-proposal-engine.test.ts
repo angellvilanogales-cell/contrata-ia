@@ -36,6 +36,18 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
     expect(result.cpvCandidates[0]?.code).toBe("90919200-4");
   });
 
+  it("propone lotes completos y editables cuando identifica prestaciones diferenciadas", () => {
+    const result = createInitialProposal(
+      "Formación lingüística del personal técnico en inglés, portugués y español como lengua extranjera.\nOrientación y acompañamiento grupal para personas beneficiarias del proyecto.",
+      [cpv("80580000-3", "Provisión de cursos de idiomas")],
+    );
+    expect(result.lots.recommended).toBe(true);
+    expect(result.lots.suggestedDefinitions).toEqual([
+      expect.objectContaining({ name: expect.stringContaining("Formación lingüística"), description: expect.stringContaining("inglés") }),
+      expect.objectContaining({ name: expect.stringContaining("Orientación y acompañamiento grupal"), description: expect.stringContaining("beneficiarias") }),
+    ]);
+  });
+
   it("carga el catálogo completo aportado y no la antigua lista de ejemplos", () => {
     const catalog = loadProjectCpvCatalog();
     expect(catalog.length).toBe(9454);

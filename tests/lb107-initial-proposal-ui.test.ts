@@ -18,7 +18,9 @@ describe("LB107 · interfaz del bloque inicial", () => {
   it("decide los lotes antes del CPV y muestra código y nomenclatura seleccionables por lote", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT.indexOf("<h3>División en lotes</h3>"))
       .toBeLessThan(LB107_INITIAL_PROPOSAL_SCRIPT.indexOf("<h3>CPV sugeridos para selección humana</h3>"));
-    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Analizar lotes y sugerir CPV");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Aceptar lotes y sugerir CPV");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("p.lots.suggestedDefinitions");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("puede aceptarla sin escribir o modificarla antes de validarla");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("c.officialDescription");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain('type="checkbox" class="lb107CpvChoice"');
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Seleccione al menos un CPV para ");

@@ -45,6 +45,10 @@ export interface InitialProposalResult {
     recommended: boolean;
     confidence: "MEDIUM" | "LOW";
     reasoning: string;
+    suggestedDefinitions: readonly {
+      name: string;
+      description: string;
+    }[];
     noDivisionJustificationDraft?: string;
   };
   legalBasisByDecision: {
@@ -150,14 +154,32 @@ function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpv
   });
 }
 
+function suggestedLotDefinitions(description: string): InitialProposalResult["lots"]["suggestedDefinitions"] {
+  const parts = description.replace(/\r/g, "\n")
+    .split(/\n+|;+/)
+    .map(part => part.trim().replace(/^[-*•\d.)\s]+/, "").replace(/[:.]$/, ""))
+    .filter(part => part.length >= 12);
+  if (parts.length < 2) return [];
+  return parts.map((descriptionPart, index) => {
+    const concise = descriptionPart.split(/,|:|\bmediante\b|\bdirigid[oa]s?\b/i)[0]?.trim() || descriptionPart;
+    const title = concise.length > 90 ? `${concise.slice(0, 87).trim()}...` : concise;
+    return {
+      name: `Lote ${index + 1} · ${title.charAt(0).toUpperCase()}${title.slice(1)}`,
+      description: descriptionPart,
+    };
+  });
+}
+
 function lotsProposal(description: string): InitialProposalResult["lots"] {
   const text = normalize(description);
+  const suggestedDefinitions = suggestedLotDefinitions(description);
   const integrated = ["integral", "unidad funcional", "coordinacion unica", "interdependiente", "solucion unica"].some(term => text.includes(term));
-  const separated = ["familias", "categorias", "sedes", "especialidades", "prestaciones diferenciadas", "por zonas"].some(term => text.includes(term)) || description.includes(";");
+  const separated = ["familias", "categorias", "sedes", "especialidades", "prestaciones diferenciadas", "por zonas"].some(term => text.includes(term)) || suggestedDefinitions.length >= 2;
   if (integrated && !separated) return {
     recommended: false,
     confidence: "MEDIUM",
     reasoning: "La descripción contiene indicios de integración o coordinación técnica. Se propone provisionalmente un lote único, sujeto a que la persona confirme el motivo concreto.",
+    suggestedDefinitions: [],
     noDivisionJustificationDraft: "La ejecución independiente podría dificultar la correcta ejecución desde el punto de vista técnico por la coordinación necesaria entre las prestaciones descritas. Esta motivación debe concretarse y validarse con hechos del expediente.",
   };
   return {
@@ -166,6 +188,7 @@ function lotsProposal(description: string): InitialProposalResult["lots"] {
     reasoning: separated
       ? "La descripción contiene grupos o ámbitos diferenciados que pueden ser susceptibles de ejecución independiente. Se propone estudiar su división en lotes."
       : "Como regla inicial del artículo 99.3 LCSP se propone estudiar la división en lotes. Falta confirmar la separabilidad técnica y económica del objeto.",
+    suggestedDefinitions,
   };
 }
 
@@ -199,7 +222,7 @@ export function createInitialProposal(description: string, catalog: readonly CPV
     needDraft,
     contractType: type,
     cpvCandidates: rankCpvs(sourceDescription, catalog),
-    lots: lotsProposal(sourceDescription),
+    lots: lotsProposal(description),
     legalBasisByDecision: {
       object: [LEGAL.object99],
       contractType: [LEGAL.type12, LEGAL.supply16, LEGAL.service17],
