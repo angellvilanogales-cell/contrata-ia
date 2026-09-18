@@ -5,6 +5,10 @@ const LCSP_URL = "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902";
 export type EconomicStartingPoint = "KNOWN_CREDIT_LIMIT" | "NEED_PENDING_VALUATION";
 export type CreditScope = "INITIAL_PERIOD" | "ENTIRE_CONTRACT_LIFE";
 export type InitialEconomicContractType = "SUPPLY" | "SERVICE";
+export type ValuationMethodology = "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "QUOTES_OR_CATALOGUES" | "COST_STUDY";
+export type ValuationSupport = "TECHNICAL_SCOPE" | "HISTORICAL_CONSUMPTION" | "PRIOR_AWARD" | "MARKET_QUOTES" | "PUBLIC_CATALOGUE" | "UNIT_COSTS" | "LABOUR_COSTS" | "PRICE_INDEX" | "EXPERT_REPORT";
+
+export interface SupportingDocumentReference { id: string; fileName: string; sha256: string; size: number; mediaType: string; }
 
 export interface EconomicLegalBasis {
   id: string;
@@ -38,12 +42,15 @@ export interface KnownCreditInput {
   otherEstimatedValueComponentsCents?: number;
   successiveNeeds?: boolean;
   valuationEvidence: string;
+  valuationMethodology?: ValuationMethodology;
+  valuationSupports?: readonly ValuationSupport[];
+  supportingDocuments?: readonly SupportingDocumentReference[];
 }
 
 export interface PendingValuationInput {
   startingPoint: "NEED_PENDING_VALUATION";
   contractType: InitialEconomicContractType;
-  valuationRoute?: "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "QUOTES_OR_CATALOGUES" | "COST_STUDY";
+  valuationRoute?: ValuationMethodology;
   knownTechnicalFacts?: string;
 }
 
@@ -79,6 +86,15 @@ export interface EconomicStartingPointResult {
     otherComponentsCents: number;
     legalEstimatedValueCents: number;
     calculationMethod: string;
+  };
+  valuationPlan: {
+    proposedMethodology: ValuationMethodology;
+    selectedMethodology?: ValuationMethodology;
+    rationale: string;
+    allowedSupports: readonly ValuationSupport[];
+    selectedSupports: readonly ValuationSupport[];
+    supportingDocuments: readonly SupportingDocumentReference[];
+    evidenceSufficient: boolean;
   };
   procedure: ProcedureCandidate;
   warnings: readonly string[];
@@ -116,6 +132,25 @@ const LEGAL = {
     officialUrl: `${LCSP_URL}#da-33`,
   },
 } as const;
+
+const SUPPORTS_BY_METHOD: Record<ValuationMethodology, readonly ValuationSupport[]> = {
+  MARKET_CONSULTATION: ["TECHNICAL_SCOPE", "MARKET_QUOTES", "PUBLIC_CATALOGUE", "EXPERT_REPORT"],
+  PRIOR_CONTRACTS: ["TECHNICAL_SCOPE", "HISTORICAL_CONSUMPTION", "PRIOR_AWARD", "PRICE_INDEX"],
+  QUOTES_OR_CATALOGUES: ["TECHNICAL_SCOPE", "MARKET_QUOTES", "PUBLIC_CATALOGUE", "HISTORICAL_CONSUMPTION"],
+  COST_STUDY: ["TECHNICAL_SCOPE", "UNIT_COSTS", "LABOUR_COSTS", "PRICE_INDEX", "EXPERT_REPORT"],
+};
+
+function proposedMethodology(contractType: InitialEconomicContractType, successiveNeeds = false): { methodology: ValuationMethodology; rationale: string } {
+  if (contractType === "SUPPLY") return successiveNeeds
+    ? { methodology: "QUOTES_OR_CATALOGUES", rationale: "En un suministro sucesivo por precios unitarios conviene contrastar el catálogo de referencias con precios o tarifas de mercado y consumos históricos." }
+    : { methodology: "QUOTES_OR_CATALOGUES", rationale: "En un suministro definido, las ofertas y catálogos comparables permiten contrastar precios unitarios y condiciones homogéneas." };
+  return { methodology: "COST_STUDY", rationale: "En servicios, el estudio de costes permite justificar dedicaciones, costes laborales, medios, costes indirectos y demás componentes de la prestación." };
+}
+
+function normalizedDocuments(documents: readonly SupportingDocumentReference[] = []): SupportingDocumentReference[] {
+  return documents.map(document => ({ id: String(document.id || "").trim(), fileName: String(document.fileName || "").trim(), sha256: String(document.sha256 || "").trim().toLowerCase(), size: integer(document.size, "El tamaño del documento"), mediaType: String(document.mediaType || "application/octet-stream").trim() }))
+    .filter(document => document.id && document.fileName && /^[a-f0-9]{64}$/.test(document.sha256) && document.size > 0);
+}
 
 function integer(value: number, label: string, maximum = Number.MAX_SAFE_INTEGER): number {
   if (!Number.isInteger(value) || value < 0 || value > maximum) throw new Error(`${label} debe ser un número entero no negativo.`);
@@ -161,10 +196,12 @@ function procedureCandidate(type: InitialEconomicContractType, estimatedValueCen
 
 function pendingResult(input: PendingValuationInput): EconomicStartingPointResult {
   const route = input.valuationRoute;
+  const proposed = proposedMethodology(input.contractType);
   return {
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "VALUATION_REQUIRED",
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodology: route, rationale: proposed.rationale, allowedSupports: SUPPORTS_BY_METHOD[route ?? proposed.methodology], selectedSupports: [], supportingDocuments: [], evidenceSufficient: false },
     procedure: {
       code: "PENDING",
       label: "Procedimiento pendiente de valoración económica",
@@ -215,6 +252,16 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     throw new Error("Si el crédito cubre solo el periodo inicial y existen prórrogas, debe valorarse su importe sin IVA.");
   }
   if (!input.valuationEvidence.trim()) throw new Error("Debe indicarse la fuente o método que acredita la adecuación del importe al mercado.");
+  const proposed = proposedMethodology(input.contractType, Boolean(input.successiveNeeds));
+  const selectedMethodology = input.valuationMethodology ?? proposed.methodology;
+  if (!(selectedMethodology in SUPPORTS_BY_METHOD)) throw new Error("La metodología de valoración seleccionada no está reconocida.");
+  const allowedSupports = SUPPORTS_BY_METHOD[selectedMethodology];
+  const selectedSupports = [...new Set(input.valuationSupports ?? [])];
+  const strictEvidenceFlow = input.valuationMethodology !== undefined || input.valuationSupports !== undefined || input.supportingDocuments !== undefined;
+  if (strictEvidenceFlow && selectedSupports.length === 0) throw new Error("Debe seleccionar al menos un apoyo documental o técnico para la metodología de valoración.");
+  if (selectedSupports.some(item => !allowedSupports.includes(item))) throw new Error("Uno de los apoyos seleccionados no corresponde a la metodología de valoración elegida.");
+  const supportingDocuments = normalizedDocuments(input.supportingDocuments);
+  if (strictEvidenceFlow && supportingDocuments.length === 0) throw new Error("Debe incorporar al menos un documento que acredite la valoración antes de calcular y continuar.");
 
   const base = Math.round(contractBudgetGross * 100 / (100 + vatRate));
   const vat = contractBudgetGross - base;
@@ -260,6 +307,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "CALCULATED_FOR_HUMAN_REVIEW",
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()) },
     budget: {
       availableCreditVatIncludedCents: gross,
       baseTenderBudgetExVatCents: base,

@@ -2,6 +2,13 @@ import { describe, expect, it } from "vitest";
 import { LB108_ECONOMIC_STARTING_POINT_SCRIPT } from "../src/interfaces/lb103/LB108EconomicStartingPointScript";
 
 describe("LB108 · interfaz del bloque económico", () => {
+  it("propone metodología, despliega apoyos y carga documentos con huella", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Metodología de valoración propuesta");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("lb108Supports");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("lb108Documents");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("valuation-documents");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("SHA-256");
+  });
   it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Propuesta inicial 76/18/6");

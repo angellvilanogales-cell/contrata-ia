@@ -22,6 +22,7 @@ import { LB106_VIRGIN_PILOT_SCRIPT } from "./LB106VirginPilotScript";
 import { createInitialProposal } from "../../application/intake/lb107/InitialProposalEngine";
 import { LB107_INITIAL_PROPOSAL_SCRIPT } from "./LB107InitialProposalScript";
 import { evaluateEconomicStartingPoint, type EconomicStartingPointInput } from "../../application/intake/lb108/EconomicStartingPointEngine";
+import { storeValuationDocument } from "../../application/intake/lb108/LB108ValuationEvidenceStore";
 import { LB108_ECONOMIC_STARTING_POINT_SCRIPT } from "./LB108EconomicStartingPointScript";
 import { evaluateProcedureAndProcessing, type ProcedureAndProcessingInput } from "../../application/intake/lb109/ProcedureAndProcessingEngine";
 import { LB109_PROCEDURE_PROCESSING_SCRIPT } from "./LB109ProcedureAndProcessingScript";
@@ -198,6 +199,15 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         const body = await readJson(request);
         sendJson(response, 200, evaluateEconomicStartingPoint(body as unknown as EconomicStartingPointInput));
         return;
+      }
+      const valuationUpload = url.pathname.match(/^\/api\/lb108\/cases\/([^/]+)\/valuation-documents$/);
+      if (request.method === "PUT" && valuationUpload) {
+        security.require(security.authenticate(request), "VIEWER");
+        const chunks: Buffer[] = []; let total = 0;
+        for await (const chunk of request) { const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk); total += bytes.length; if (total > 10_000_000) throw new Error("El documento supera el máximo de 10 MB."); chunks.push(bytes); }
+        const fileName = decodeURIComponent(String(request.headers["x-file-name"] ?? "documento"));
+        const stored = storeValuationDocument(decodeURIComponent(valuationUpload[1]!), fileName, String(request.headers["content-type"] ?? "application/octet-stream"), Buffer.concat(chunks));
+        sendJson(response, 201, stored); return;
       }
       if (request.method === "POST" && url.pathname === "/api/lb109/procedure-processing") {
         security.require(security.authenticate(request), "VIEWER");

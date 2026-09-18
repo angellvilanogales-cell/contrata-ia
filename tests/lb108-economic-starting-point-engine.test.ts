@@ -165,6 +165,23 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     ]);
   });
 
+  it("propone metodología, exige apoyos y documentos y conserva su huella", () => {
+    const document = { id: "doc-1", fileName: "estudio.pdf", sha256: "a".repeat(64), size: 1234, mediaType: "application/pdf" };
+    const result = evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 1_210_000,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Estudio fechado y firmado.", valuationMethodology: "COST_STUDY",
+      valuationSupports: ["TECHNICAL_SCOPE", "LABOUR_COSTS"], supportingDocuments: [document],
+    });
+    expect(result.valuationPlan).toMatchObject({ proposedMethodology: "COST_STUDY", selectedMethodology: "COST_STUDY", evidenceSufficient: true });
+    expect(result.valuationPlan.supportingDocuments[0]?.sha256).toBe("a".repeat(64));
+    expect(() => evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 1_210_000,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Texto sin documento.", valuationMethodology: "COST_STUDY", valuationSupports: ["LABOUR_COSTS"],
+    })).toThrow(/incorporar al menos un documento/);
+  });
+
   it("propone procedimientos solo como candidatos dependientes del valor estimado", () => {
     const result = evaluateEconomicStartingPoint({
       startingPoint: "KNOWN_CREDIT_LIMIT",
