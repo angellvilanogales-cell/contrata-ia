@@ -29,7 +29,7 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
       baseTenderBudgetVatIncludedCents: 1_210_000,
       maximumApprovedBudgetCents: 1_000_000,
       budgetCoversEntireContractLife: true,
-      costBreakdown: { directCostsExVatCents: 1_000_000, indirectCostsExVatCents: 0, otherCostsExVatCents: 0 },
+      costBreakdown: { directPercent: 100, indirectPercent: 0, otherPercent: 0, directCostsExVatCents: 1_000_000, indirectCostsExVatCents: 0, otherCostsExVatCents: 0 },
       lotPblAllocations: [],
     });
     expect(result.estimatedValue).toMatchObject({
@@ -148,6 +148,21 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
       plannedModificationPercent: 0, valuationEvidence: "Estudio de costes fechado.",
       lotPblAllocations: [{ lotId: "lot-1", lot: "Lote 1", pblVatIncludedCents: 3_500_000 }],
     })).toThrow(/suma del PBL asignado a los lotes/);
+  });
+
+  it("calcula importes automáticamente desde porcentajes humanos corregibles", () => {
+    const result = evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 1_210_000,
+      contractBudgetVatIncludedCents: 1_210_000, vatRatePercent: 21, costPercentages: { direct: 85, indirect: 10, other: 5 },
+      lotPblPercentages: [{ lotId: "lot-1", lot: "Lote 1", percentage: 60 }, { lotId: "lot-2", lot: "Lote 2", percentage: 40 }],
+      creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0, plannedModificationPercent: 0,
+      valuationEvidence: "Estudio de costes fechado.",
+    });
+    expect(result.budget?.costBreakdown).toEqual({ directPercent: 85, indirectPercent: 10, otherPercent: 5, directCostsExVatCents: 850_000, indirectCostsExVatCents: 100_000, otherCostsExVatCents: 50_000 });
+    expect(result.budget?.lotPblAllocations).toEqual([
+      { lotId: "lot-1", lot: "Lote 1", percentage: 60, pblVatIncludedCents: 726_000 },
+      { lotId: "lot-2", lot: "Lote 2", percentage: 40, pblVatIncludedCents: 484_000 },
+    ]);
   });
 
   it("propone procedimientos solo como candidatos dependientes del valor estimado", () => {

@@ -25,7 +25,9 @@ export interface KnownCreditInput {
   directCostsExVatCents?: number;
   indirectCostsExVatCents?: number;
   otherCostsExVatCents?: number;
+  costPercentages?: { direct: number; indirect: number; other: number };
   lotPblAllocations?: readonly { lotId: string; lot: string; pblVatIncludedCents: number }[];
+  lotPblPercentages?: readonly { lotId: string; lot: string; percentage: number }[];
   vatRatePercent: number;
   creditScope: CreditScope;
   initialDurationMonths: number;
@@ -66,8 +68,8 @@ export interface EconomicStartingPointResult {
     baseTenderBudgetVatIncludedCents: number;
     maximumApprovedBudgetCents?: number;
     budgetCoversEntireContractLife: boolean;
-    costBreakdown: { directCostsExVatCents: number; indirectCostsExVatCents: number; otherCostsExVatCents: number };
-    lotPblAllocations: readonly { lotId: string; lot: string; pblVatIncludedCents: number }[];
+    costBreakdown: { directPercent: number; indirectPercent: number; otherPercent: number; directCostsExVatCents: number; indirectCostsExVatCents: number; otherCostsExVatCents: number };
+    lotPblAllocations: readonly { lotId: string; lot: string; percentage: number; pblVatIncludedCents: number }[];
   };
   estimatedValue?: {
     initialBaseCents: number;
@@ -117,6 +119,11 @@ const LEGAL = {
 
 function integer(value: number, label: string, maximum = Number.MAX_SAFE_INTEGER): number {
   if (!Number.isInteger(value) || value < 0 || value > maximum) throw new Error(`${label} debe ser un número entero no negativo.`);
+  return value;
+}
+
+function percentage(value: number, label: string): number {
+  if (!Number.isFinite(value) || value < 0 || value > 100) throw new Error(`${label} debe estar entre 0 y 100.`);
   return value;
 }
 
@@ -211,12 +218,28 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
 
   const base = Math.round(contractBudgetGross * 100 / (100 + vatRate));
   const vat = contractBudgetGross - base;
+  const percentages = input.costPercentages;
+  if (percentages && Math.abs(percentages.direct + percentages.indirect + percentages.other - 100) > 0.0001) throw new Error("Los porcentajes de costes directos, indirectos y otros gastos deben sumar exactamente el 100 %.");
+  const directPercent = percentages?.direct ?? 100;
+  const indirectPercent = percentages?.indirect ?? 0;
+  const otherPercent = percentages?.other ?? 0;
+  percentage(directPercent, "El porcentaje de costes directos");
+  percentage(indirectPercent, "El porcentaje de costes indirectos");
+  percentage(otherPercent, "El porcentaje de otros gastos");
   const noBreakdownProvided = input.directCostsExVatCents == null && input.indirectCostsExVatCents == null && input.otherCostsExVatCents == null;
-  const directCosts = integer(input.directCostsExVatCents ?? (noBreakdownProvided ? base : 0), "Los costes directos");
-  const indirectCosts = integer(input.indirectCostsExVatCents ?? 0, "Los costes indirectos");
-  const otherCosts = integer(input.otherCostsExVatCents ?? 0, "Los demás gastos del PBL");
+  const directCosts = percentages ? Math.round(base * directPercent / 100) : integer(input.directCostsExVatCents ?? (noBreakdownProvided ? base : 0), "Los costes directos");
+  const indirectCosts = percentages ? Math.round(base * indirectPercent / 100) : integer(input.indirectCostsExVatCents ?? 0, "Los costes indirectos");
+  const otherCosts = percentages ? base - directCosts - indirectCosts : integer(input.otherCostsExVatCents ?? 0, "Los demás gastos del PBL");
   if (directCosts + indirectCosts + otherCosts !== base) throw new Error("La suma de costes directos, costes indirectos y otros gastos debe coincidir con el PBL sin IVA.");
-  const lotPblAllocations = [...(input.lotPblAllocations ?? [])].map(item => ({ lotId: String(item.lotId || "").trim(), lot: String(item.lot || "").trim(), pblVatIncludedCents: integer(item.pblVatIncludedCents, `El PBL de ${item.lot || "cada lote"}`) }));
+  const lotPercentages = [...(input.lotPblPercentages ?? [])];
+  if (lotPercentages.length && Math.abs(lotPercentages.reduce((sum, item) => sum + item.percentage, 0) - 100) > 0.0001) throw new Error("Los porcentajes de distribución del PBL entre lotes deben sumar exactamente el 100 %.");
+  let allocated = 0;
+  const lotPblAllocations = lotPercentages.length ? lotPercentages.map((item, index) => {
+    const itemPercentage = percentage(item.percentage, `El porcentaje de ${item.lot || "cada lote"}`);
+    const amount = index === lotPercentages.length - 1 ? contractBudgetGross - allocated : Math.round(contractBudgetGross * itemPercentage / 100);
+    allocated += amount;
+    return { lotId: String(item.lotId || "").trim(), lot: String(item.lot || "").trim(), percentage: itemPercentage, pblVatIncludedCents: amount };
+  }) : [...(input.lotPblAllocations ?? [])].map(item => ({ lotId: String(item.lotId || "").trim(), lot: String(item.lot || "").trim(), percentage: 0, pblVatIncludedCents: integer(item.pblVatIncludedCents, `El PBL de ${item.lot || "cada lote"}`) }));
   if (lotPblAllocations.some(item => !item.lotId || !item.lot || item.pblVatIncludedCents === 0)) throw new Error("Cada lote debe conservar su identificación y tener asignada una parte positiva del PBL.");
   if (lotPblAllocations.length && lotPblAllocations.reduce((sum, item) => sum + item.pblVatIncludedCents, 0) !== contractBudgetGross) throw new Error("La suma del PBL asignado a los lotes debe coincidir con el PBL total del contrato, IVA incluido.");
   const modification = Math.round(base * modificationPercent / 100);
@@ -244,7 +267,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
       baseTenderBudgetVatIncludedCents: contractBudgetGross,
       ...(input.successiveNeeds ? { maximumApprovedBudgetCents: base } : {}),
       budgetCoversEntireContractLife: input.creditScope === "ENTIRE_CONTRACT_LIFE",
-      costBreakdown: { directCostsExVatCents: directCosts, indirectCostsExVatCents: indirectCosts, otherCostsExVatCents: otherCosts },
+      costBreakdown: { directPercent, indirectPercent, otherPercent, directCostsExVatCents: directCosts, indirectCostsExVatCents: indirectCosts, otherCostsExVatCents: otherCosts },
       lotPblAllocations,
     },
     estimatedValue: {
