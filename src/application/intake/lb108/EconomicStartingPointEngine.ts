@@ -294,7 +294,8 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   const scopeText = input.creditScope === "ENTIRE_CONTRACT_LIFE"
     ? "El presupuesto máximo declarado cubre toda la vigencia; las prórrogas no se suman de nuevo."
     : `El presupuesto cubre el periodo inicial y se añaden ${extension} céntimos para las prórrogas declaradas.`;
-  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}`;
+  const documentTrace = supportingDocuments.map(document => `${document.fileName} [SHA-256 ${document.sha256}]`).join("; ");
+  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodología estructurada: ${selectedMethodology}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
   const warnings = [
     "El crédito con IVA determina el límite de gasto, pero el procedimiento se analiza sobre el valor estimado sin IVA.",
     "El crédito disponible y el PBL solo coinciden cuando la persona confirma que todo ese límite corresponde al máximo contractual adecuadamente valorado.",

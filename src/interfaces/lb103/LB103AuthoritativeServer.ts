@@ -206,7 +206,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         const chunks: Buffer[] = []; let total = 0;
         for await (const chunk of request) { const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk); total += bytes.length; if (total > 10_000_000) throw new Error("El documento supera el máximo de 10 MB."); chunks.push(bytes); }
         const fileName = decodeURIComponent(String(request.headers["x-file-name"] ?? "documento"));
-        const stored = storeValuationDocument(decodeURIComponent(valuationUpload[1]!), fileName, String(request.headers["content-type"] ?? "application/octet-stream"), Buffer.concat(chunks));
+        const stored = await storeValuationDocument(decodeURIComponent(valuationUpload[1]!), fileName, String(request.headers["content-type"] ?? "application/octet-stream"), Buffer.concat(chunks));
         sendJson(response, 201, stored); return;
       }
       if (request.method === "POST" && url.pathname === "/api/lb109/procedure-processing") {

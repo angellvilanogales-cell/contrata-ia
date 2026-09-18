@@ -8,6 +8,8 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("lb108Documents");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("valuation-documents");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("SHA-256");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.valuationMethodology");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.supportingDocuments=valuationDocuments");
   });
   it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");
@@ -37,6 +39,8 @@ describe("LB108 · interfaz del bloque económico", () => {
       "durationMonths",
       "extensionMonths",
     ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidence(id,"${path}"`);
+    for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"])
+      expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidenceRaw(id,"${path}"`);
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('validateEvidence(id,"procedure"');
   });
 });

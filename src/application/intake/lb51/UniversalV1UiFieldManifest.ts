@@ -47,6 +47,10 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "economic.optionsAmountExVatCents", label: "Componente de opciones del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.otherEstimatedValueComponentsCents", label: "Otros componentes del valor estimado", control: "MONEY_CENTS", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.estimatedValueCalculationMethod", label: "Método de cálculo del valor estimado", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "economic.valuationMethodology", label: "Metodología de valoración económica", control: "SELECT", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.valuationSupports", label: "Apoyos de la valoración económica", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.valuationDocuments", label: "Documentos y huellas de la valoración económica", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.valuationEvidenceSufficient", label: "Suficiencia documental de la valoración económica", control: "BOOLEAN", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.priceDeterminationRegime", label: "Sistema de determinación del precio", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.priceRevisionRegime", label: "Revisión de precios", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.priceRevisionJustification", label: "Justificación de la revisión de precios", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
@@ -119,6 +123,8 @@ const LB22_CANONICAL_OR_DOMAIN_PATHS = new Set([
   "criteria.awardCriteria", "criteria.economicSolvency", "criteria.technicalSolvency", "criteria.judgmentCriteriaExist", "criteria.singleCriterionMotivation", "criteria.formulaJustification", "criteria.abnormallyLowTenderParameters", "criteria.tieBreakCriteria",
   "closure.finalConsentRecord",
 ]);
+
+for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"]) LB22_CANONICAL_OR_DOMAIN_PATHS.add(path);
 
 export function evaluateUniversalV1UiFieldManifest() {
   const paths = UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath);
