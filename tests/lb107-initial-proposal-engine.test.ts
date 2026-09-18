@@ -38,7 +38,7 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
 
   it("propone lotes completos y editables cuando identifica prestaciones diferenciadas", () => {
     const result = createInitialProposal(
-      "Formación lingüística del personal técnico en inglés, portugués y español como lengua extranjera.\nOrientación y acompañamiento grupal para personas beneficiarias del proyecto.",
+      "Formación lingüística del personal técnico en inglés, portugués y español como lengua extranjera. Orientación y acompañamiento grupal para personas beneficiarias del proyecto.",
       [cpv("80580000-3", "Provisión de cursos de idiomas")],
     );
     expect(result.lots.recommended).toBe(true);

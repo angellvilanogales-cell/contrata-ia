@@ -156,6 +156,7 @@ function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpv
 
 function suggestedLotDefinitions(description: string): InitialProposalResult["lots"]["suggestedDefinitions"] {
   const parts = description.replace(/\r/g, "\n")
+    .replace(/([.!?])\s+(?=[A-ZÁÉÍÓÚÑ])/g, "$1\n")
     .split(/\n+|;+/)
     .map(part => part.trim().replace(/^[-*•\d.)\s]+/, "").replace(/[:.]$/, ""))
     .filter(part => part.length >= 12);
