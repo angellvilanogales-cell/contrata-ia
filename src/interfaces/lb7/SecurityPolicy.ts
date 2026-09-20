@@ -123,6 +123,10 @@ export class SecurityPolicy {
     return `${SESSION_COOKIE}=${encodeURIComponent(internal)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
   }
 
+  public namedUserSessionCookie(id: string, password: string): string {
+    return this.sessionCookie(this.internalTokenForNamedUser(id, password));
+  }
+
   public clearSessionCookie(): string {
     return `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
   }
