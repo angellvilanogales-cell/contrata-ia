@@ -27,6 +27,15 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("el procedimiento se analiza mediante el valor estimado sin IVA");
   });
 
+  it("pregunta de forma expresa por el régimen de necesidades de la DA 33ª", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Las cantidades dependerán de las necesidades reales durante el contrato?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('name="lb108Successive" type="radio" value="NO"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('name="lb108Successive" type="radio" value="YES"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La Administración no queda obligada a consumir la totalidad del presupuesto");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("successiveNeeds:successiveNeedsValue()");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('id="lb108Successive" type="checkbox"');
+  });
+
   it("bloquea procedimiento y pliegos mientras falta la valoración", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("El aplicativo no inventará un importe ni un procedimiento");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La generación de pliegos permanece bloqueada");
