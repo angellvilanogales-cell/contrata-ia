@@ -14,6 +14,10 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('class="lb108Method" type="checkbox"');
     for (const text of ["Qué acredita", "Costes laborales o convenio", "Consumos o volúmenes históricos", "Documentos posibles:"])
       expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("var code=support[0]");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("· Obligatorio");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("supportSelectionError");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("requiere al menos uno de estos apoyos principales");
   });
   it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");
