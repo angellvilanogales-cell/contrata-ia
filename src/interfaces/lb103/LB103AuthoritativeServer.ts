@@ -2,6 +2,7 @@ import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import path from "node:path";
 import { createLB102RuntimeServerWithSourceIngress } from "../lb102/LB102SourceIngressServer";
 import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
+import { namedLoginUi } from "../lb7/NamedLoginUi";
 import { SecurityPolicy } from "../lb7/SecurityPolicy";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { HttpAdaptiveCaseMirror } from "../../infrastructure/operations/lb85/ExternalAdaptiveCaseMirror";
@@ -124,7 +125,8 @@ function statusFor(error: Error): number {
 
 function adaptiveUiWithGeneration(): string {
   const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script><script src="/lb117-execution-receipt-payment.js" defer></script><script src="/lb118-technical-specifications.js" defer></script><script src="/lb119-data-protection-security.js" defer></script><script src="/lb120-document-conclusion.js" defer></script>';
-  return ADAPTIVE_FLOW_UI.includes("</body>") ? ADAPTIVE_FLOW_UI.replace("</body>", `${tag}</body>`) : `${ADAPTIVE_FLOW_UI}${tag}`;
+  const ui = namedLoginUi(ADAPTIVE_FLOW_UI);
+  return ui.includes("</body>") ? ui.replace("</body>", `${tag}</body>`) : `${ui}${tag}`;
 }
 
 function humanUatRoleReadiness() {

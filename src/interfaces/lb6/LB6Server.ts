@@ -32,6 +32,7 @@ import { ADAPTIVE_FLOW_SCRIPT } from "../lb7/AdaptiveFlowScript";
 import { ADAPTIVE_FLOW_UI } from "../lb7/AdaptiveFlowUi";
 import { ADAPTIVE_PERSISTENCE_SCRIPT } from "../lb7/AdaptivePersistenceScript";
 import { MAIN_PILOT_UI } from "../lb7/MainPilotUi";
+import { namedLoginUi } from "../lb7/NamedLoginUi";
 import { PWA_ICON_SVG, PWA_MANIFEST, PWA_SERVICE_WORKER } from "../lb7/PwaAssets";
 import { SecurityPolicy, type ApplicationRole } from "../lb7/SecurityPolicy";
 import { SPECIALIZED_WORKFLOW_UI } from "../lb7/SpecializedWorkflowUi";
@@ -72,7 +73,6 @@ async function readJson(request: IncomingMessage): Promise<Record<string, unknow
 async function readForm(request: IncomingMessage): Promise<URLSearchParams> { const body = await readBody(request); return new URLSearchParams(body.toString("utf8")); }
 function routeParts(pathname: string): string[] { return pathname.split("/").filter(Boolean); }
 function statusForError(error: Error): number { if (/autenticación|credencial|sesión segura|usuario|contraseña/i.test(error.message)) return 401; if (/permiso insuficiente/i.test(error.message)) return 403; if (/no encontrado/i.test(error.message)) return 404; if (/demasiado grande/i.test(error.message)) return 413; return 400; }
-function namedLoginUi(html: string): string { return html.replace('<label for="token">Credencial de acceso</label><input id="token" name="token" type="password" autocomplete="off" placeholder="Credencial de acceso" required>', '<label for="userId">Usuario</label><input id="userId" name="userId" type="text" autocomplete="username" placeholder="Usuario" required><label for="password">Contraseña</label><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Contraseña" required>').replace('<button type="submit">Aplicar credencial</button>', '<button type="submit">Iniciar sesión</button>').replace('La credencial se valida en el servidor y se conserva en una sesión segura.', 'El usuario y la contraseña se validan en el servidor. La sesión se conserva mediante una cookie segura.'); }
 function requireRole(request: IncomingMessage, minimum: ApplicationRole) { const actor = security.authenticate(request); security.require(actor, minimum); return actor; }
 function eventFeatures(value: unknown): readonly EventFeature[] { if (!Array.isArray(value)) return []; return value.map(String) as EventFeature[]; }
 function eventAnswers(value: unknown): Readonly<Partial<Record<EventAnswerId, unknown>>> { if (!value || typeof value !== "object" || Array.isArray(value)) return {}; return value as Readonly<Partial<Record<EventAnswerId, unknown>>>; }
