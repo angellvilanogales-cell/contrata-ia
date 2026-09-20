@@ -201,6 +201,21 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     })).toThrow(/QUOTES_OR_CATALOGUES requiere al menos uno/);
   });
 
+  it("solo admite otra fuente cuando se identifica, justifica y acredita", () => {
+    const document = { id: "doc-other", fileName: "informe-fuente.pdf", sha256: "c".repeat(64), size: 875, mediaType: "application/pdf" };
+    const base = {
+      startingPoint: "KNOWN_CREDIT_LIMIT" as const, contractType: "SUPPLY" as const, grossCreditLimitCents: 1_210_000,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD" as const, initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Selección estructurada: Otra fuente justificada.",
+      valuationMethodologies: ["OTHER_JUSTIFIED"] as const,
+      valuationSupports: ["TECHNICAL_SCOPE", "EXPERT_REPORT"] as const, supportingDocuments: [document],
+    };
+    expect(() => evaluateEconomicStartingPoint(base)).toThrow(/describir la otra fuente/i);
+    const result = evaluateEconomicStartingPoint({ ...base, otherValuationSource: "Observatorio público sectorial, datos de 2026 comparables y ajustes explicados en el informe." });
+    expect(result.valuationPlan.selectedMethodologies).toEqual(["OTHER_JUSTIFIED"]);
+    expect(result.valuationPlan.evidenceSufficient).toBe(true);
+  });
+
   it("propone procedimientos solo como candidatos dependientes del valor estimado", () => {
     const result = evaluateEconomicStartingPoint({
       startingPoint: "KNOWN_CREDIT_LIMIT",

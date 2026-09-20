@@ -21,6 +21,13 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no una proporción impuesta por la LCSP");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("updateAutomaticAmounts");
   });
+  it("integra la fuente en la lista y reserva texto libre solo para otra fuente", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('"MARKET_CONSULTATION","OTHER_JUSTIFIED"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Otra fuente justificada");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("consolidateValuationSelector");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('hidden.id="lb108Evidence"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Identifique la otra fuente y justifique su idoneidad");
+  });
   it("ofrece los dos puntos de partida antes de pedir importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Existe un límite máximo de crédito");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La necesidad aún debe definirse y valorarse");

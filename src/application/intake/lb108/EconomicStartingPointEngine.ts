@@ -5,7 +5,7 @@ const LCSP_URL = "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902";
 export type EconomicStartingPoint = "KNOWN_CREDIT_LIMIT" | "NEED_PENDING_VALUATION";
 export type CreditScope = "INITIAL_PERIOD" | "ENTIRE_CONTRACT_LIFE";
 export type InitialEconomicContractType = "SUPPLY" | "SERVICE";
-export type ValuationMethodology = "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "QUOTES_OR_CATALOGUES" | "COST_STUDY";
+export type ValuationMethodology = "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "QUOTES_OR_CATALOGUES" | "COST_STUDY" | "OTHER_JUSTIFIED";
 export type ValuationSupport = "TECHNICAL_SCOPE" | "HISTORICAL_CONSUMPTION" | "PRIOR_AWARD" | "MARKET_QUOTES" | "PUBLIC_CATALOGUE" | "UNIT_COSTS" | "LABOUR_COSTS" | "PRICE_INDEX" | "EXPERT_REPORT";
 
 export interface SupportingDocumentReference { id: string; fileName: string; sha256: string; size: number; mediaType: string; }
@@ -45,6 +45,7 @@ export interface KnownCreditInput {
   valuationMethodologies?: readonly ValuationMethodology[];
   /** Compatibilidad con expedientes LB108 anteriores a la selección múltiple. */
   valuationMethodology?: ValuationMethodology;
+  otherValuationSource?: string;
   valuationSupports?: readonly ValuationSupport[];
   supportingDocuments?: readonly SupportingDocumentReference[];
 }
@@ -142,6 +143,7 @@ const SUPPORTS_BY_METHOD: Record<ValuationMethodology, readonly ValuationSupport
   PRIOR_CONTRACTS: ["TECHNICAL_SCOPE", "HISTORICAL_CONSUMPTION", "PRIOR_AWARD", "PRICE_INDEX"],
   QUOTES_OR_CATALOGUES: ["TECHNICAL_SCOPE", "MARKET_QUOTES", "PUBLIC_CATALOGUE", "HISTORICAL_CONSUMPTION"],
   COST_STUDY: ["TECHNICAL_SCOPE", "UNIT_COSTS", "LABOUR_COSTS", "PRICE_INDEX", "EXPERT_REPORT"],
+  OTHER_JUSTIFIED: ["TECHNICAL_SCOPE", "EXPERT_REPORT", "PRICE_INDEX", "MARKET_QUOTES", "PUBLIC_CATALOGUE", "UNIT_COSTS", "LABOUR_COSTS", "HISTORICAL_CONSUMPTION", "PRIOR_AWARD"],
 };
 
 const SUPPORT_REQUIREMENTS: Record<ValuationMethodology, { all: readonly ValuationSupport[]; any?: readonly ValuationSupport[] }> = {
@@ -149,6 +151,7 @@ const SUPPORT_REQUIREMENTS: Record<ValuationMethodology, { all: readonly Valuati
   PRIOR_CONTRACTS: { all: ["TECHNICAL_SCOPE", "PRIOR_AWARD"] },
   QUOTES_OR_CATALOGUES: { all: ["TECHNICAL_SCOPE"], any: ["MARKET_QUOTES", "PUBLIC_CATALOGUE"] },
   COST_STUDY: { all: ["TECHNICAL_SCOPE"], any: ["UNIT_COSTS", "LABOUR_COSTS"] },
+  OTHER_JUSTIFIED: { all: ["TECHNICAL_SCOPE", "EXPERT_REPORT"] },
 };
 
 function validateMethodSupport(methodology: ValuationMethodology, supports: readonly ValuationSupport[]): void {
@@ -274,6 +277,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   const selectedMethodologies = [...new Set(input.valuationMethodologies ?? (input.valuationMethodology ? [input.valuationMethodology] : [proposed.methodology]))];
   if (selectedMethodologies.length === 0) throw new Error("Debe seleccionar al menos una metodología de valoración.");
   if (selectedMethodologies.some(methodology => !(methodology in SUPPORTS_BY_METHOD))) throw new Error("Una de las metodologías de valoración seleccionadas no está reconocida.");
+  if (selectedMethodologies.includes("OTHER_JUSTIFIED") && !String(input.otherValuationSource ?? "").trim()) throw new Error("Debe describir la otra fuente de valoración y explicar por qué resulta adecuada.");
   const selectedMethodology = selectedMethodologies[0];
   const allowedSupports = [...new Set(selectedMethodologies.flatMap(methodology => SUPPORTS_BY_METHOD[methodology]))];
   const selectedSupports = [...new Set(input.valuationSupports ?? [])];
