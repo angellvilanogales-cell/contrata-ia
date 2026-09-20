@@ -8,8 +8,12 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("lb108Documents");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("valuation-documents");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("SHA-256");
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.valuationMethodology");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.valuationMethodologies");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.supportingDocuments=valuationDocuments");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Puede seleccionar una o varias");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('class="lb108Method" type="checkbox"');
+    for (const text of ["Qué acredita", "Costes laborales o convenio", "Consumos o volúmenes históricos", "Documentos posibles:"])
+      expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
   });
   it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");

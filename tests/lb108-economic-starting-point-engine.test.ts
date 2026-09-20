@@ -178,8 +178,27 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     expect(() => evaluateEconomicStartingPoint({
       startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 1_210_000,
       vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
-      plannedModificationPercent: 0, valuationEvidence: "Texto sin documento.", valuationMethodology: "COST_STUDY", valuationSupports: ["LABOUR_COSTS"],
+      plannedModificationPercent: 0, valuationEvidence: "Texto sin documento.", valuationMethodology: "COST_STUDY", valuationSupports: ["TECHNICAL_SCOPE", "LABOUR_COSTS"],
     })).toThrow(/incorporar al menos un documento/);
+  });
+
+  it("combina varias metodologías y exige los apoyos principales de cada una", () => {
+    const document = { id: "doc-multi", fileName: "contraste.pdf", sha256: "b".repeat(64), size: 987, mediaType: "application/pdf" };
+    const result = evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SUPPLY", grossCreditLimitCents: 1_210_000,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Contraste de precedente y ofertas actuales.",
+      valuationMethodologies: ["PRIOR_CONTRACTS", "QUOTES_OR_CATALOGUES"],
+      valuationSupports: ["TECHNICAL_SCOPE", "PRIOR_AWARD", "MARKET_QUOTES"], supportingDocuments: [document],
+    });
+    expect(result.valuationPlan.selectedMethodologies).toEqual(["PRIOR_CONTRACTS", "QUOTES_OR_CATALOGUES"]);
+    expect(result.estimatedValue?.calculationMethod).toContain("PRIOR_CONTRACTS, QUOTES_OR_CATALOGUES");
+    expect(() => evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SUPPLY", grossCreditLimitCents: 1_210_000,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Solo precedente.", valuationMethodologies: ["PRIOR_CONTRACTS", "QUOTES_OR_CATALOGUES"],
+      valuationSupports: ["TECHNICAL_SCOPE", "PRIOR_AWARD"], supportingDocuments: [document],
+    })).toThrow(/QUOTES_OR_CATALOGUES requiere al menos uno/);
   });
 
   it("propone procedimientos solo como candidatos dependientes del valor estimado", () => {

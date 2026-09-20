@@ -42,6 +42,8 @@ export interface KnownCreditInput {
   otherEstimatedValueComponentsCents?: number;
   successiveNeeds?: boolean;
   valuationEvidence: string;
+  valuationMethodologies?: readonly ValuationMethodology[];
+  /** Compatibilidad con expedientes LB108 anteriores a la selección múltiple. */
   valuationMethodology?: ValuationMethodology;
   valuationSupports?: readonly ValuationSupport[];
   supportingDocuments?: readonly SupportingDocumentReference[];
@@ -89,6 +91,8 @@ export interface EconomicStartingPointResult {
   };
   valuationPlan: {
     proposedMethodology: ValuationMethodology;
+    selectedMethodologies: readonly ValuationMethodology[];
+    /** Compatibilidad de lectura con expedientes LB108 anteriores. */
     selectedMethodology?: ValuationMethodology;
     rationale: string;
     allowedSupports: readonly ValuationSupport[];
@@ -139,6 +143,20 @@ const SUPPORTS_BY_METHOD: Record<ValuationMethodology, readonly ValuationSupport
   QUOTES_OR_CATALOGUES: ["TECHNICAL_SCOPE", "MARKET_QUOTES", "PUBLIC_CATALOGUE", "HISTORICAL_CONSUMPTION"],
   COST_STUDY: ["TECHNICAL_SCOPE", "UNIT_COSTS", "LABOUR_COSTS", "PRICE_INDEX", "EXPERT_REPORT"],
 };
+
+const SUPPORT_REQUIREMENTS: Record<ValuationMethodology, { all: readonly ValuationSupport[]; any?: readonly ValuationSupport[] }> = {
+  MARKET_CONSULTATION: { all: ["TECHNICAL_SCOPE", "MARKET_QUOTES"] },
+  PRIOR_CONTRACTS: { all: ["TECHNICAL_SCOPE", "PRIOR_AWARD"] },
+  QUOTES_OR_CATALOGUES: { all: ["TECHNICAL_SCOPE"], any: ["MARKET_QUOTES", "PUBLIC_CATALOGUE"] },
+  COST_STUDY: { all: ["TECHNICAL_SCOPE"], any: ["UNIT_COSTS", "LABOUR_COSTS"] },
+};
+
+function validateMethodSupport(methodology: ValuationMethodology, supports: readonly ValuationSupport[]): void {
+  const requirement = SUPPORT_REQUIREMENTS[methodology];
+  const missing = requirement.all.filter(item => !supports.includes(item));
+  if (missing.length) throw new Error(`La metodología ${methodology} requiere los apoyos: ${missing.join(", ")}.`);
+  if (requirement.any && !requirement.any.some(item => supports.includes(item))) throw new Error(`La metodología ${methodology} requiere al menos uno de estos apoyos principales: ${requirement.any.join(", ")}.`);
+}
 
 function proposedMethodology(contractType: InitialEconomicContractType, successiveNeeds = false): { methodology: ValuationMethodology; rationale: string } {
   if (contractType === "SUPPLY") return successiveNeeds
@@ -201,7 +219,7 @@ function pendingResult(input: PendingValuationInput): EconomicStartingPointResul
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "VALUATION_REQUIRED",
-    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodology: route, rationale: proposed.rationale, allowedSupports: SUPPORTS_BY_METHOD[route ?? proposed.methodology], selectedSupports: [], supportingDocuments: [], evidenceSufficient: false },
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies: route ? [route] : [], selectedMethodology: route, rationale: proposed.rationale, allowedSupports: SUPPORTS_BY_METHOD[route ?? proposed.methodology], selectedSupports: [], supportingDocuments: [], evidenceSufficient: false },
     procedure: {
       code: "PENDING",
       label: "Procedimiento pendiente de valoración económica",
@@ -253,13 +271,16 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   }
   if (!input.valuationEvidence.trim()) throw new Error("Debe indicarse la fuente o método que acredita la adecuación del importe al mercado.");
   const proposed = proposedMethodology(input.contractType, Boolean(input.successiveNeeds));
-  const selectedMethodology = input.valuationMethodology ?? proposed.methodology;
-  if (!(selectedMethodology in SUPPORTS_BY_METHOD)) throw new Error("La metodología de valoración seleccionada no está reconocida.");
-  const allowedSupports = SUPPORTS_BY_METHOD[selectedMethodology];
+  const selectedMethodologies = [...new Set(input.valuationMethodologies ?? (input.valuationMethodology ? [input.valuationMethodology] : [proposed.methodology]))];
+  if (selectedMethodologies.length === 0) throw new Error("Debe seleccionar al menos una metodología de valoración.");
+  if (selectedMethodologies.some(methodology => !(methodology in SUPPORTS_BY_METHOD))) throw new Error("Una de las metodologías de valoración seleccionadas no está reconocida.");
+  const selectedMethodology = selectedMethodologies[0];
+  const allowedSupports = [...new Set(selectedMethodologies.flatMap(methodology => SUPPORTS_BY_METHOD[methodology]))];
   const selectedSupports = [...new Set(input.valuationSupports ?? [])];
-  const strictEvidenceFlow = input.valuationMethodology !== undefined || input.valuationSupports !== undefined || input.supportingDocuments !== undefined;
+  const strictEvidenceFlow = input.valuationMethodologies !== undefined || input.valuationMethodology !== undefined || input.valuationSupports !== undefined || input.supportingDocuments !== undefined;
   if (strictEvidenceFlow && selectedSupports.length === 0) throw new Error("Debe seleccionar al menos un apoyo documental o técnico para la metodología de valoración.");
-  if (selectedSupports.some(item => !allowedSupports.includes(item))) throw new Error("Uno de los apoyos seleccionados no corresponde a la metodología de valoración elegida.");
+  if (selectedSupports.some(item => !allowedSupports.includes(item))) throw new Error("Uno de los apoyos seleccionados no corresponde a las metodologías de valoración elegidas.");
+  if (strictEvidenceFlow) selectedMethodologies.forEach(methodology => validateMethodSupport(methodology, selectedSupports));
   const supportingDocuments = normalizedDocuments(input.supportingDocuments);
   if (strictEvidenceFlow && supportingDocuments.length === 0) throw new Error("Debe incorporar al menos un documento que acredite la valoración antes de calcular y continuar.");
 
@@ -295,7 +316,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     ? "El presupuesto máximo declarado cubre toda la vigencia; las prórrogas no se suman de nuevo."
     : `El presupuesto cubre el periodo inicial y se añaden ${extension} céntimos para las prórrogas declaradas.`;
   const documentTrace = supportingDocuments.map(document => `${document.fileName} [SHA-256 ${document.sha256}]`).join("; ");
-  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodología estructurada: ${selectedMethodology}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
+  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodologías estructuradas: ${selectedMethodologies.join(", ")}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
   const warnings = [
     "El crédito con IVA determina el límite de gasto, pero el procedimiento se analiza sobre el valor estimado sin IVA.",
     "El crédito disponible y el PBL solo coinciden cuando la persona confirma que todo ese límite corresponde al máximo contractual adecuadamente valorado.",
@@ -308,7 +329,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "CALCULATED_FOR_HUMAN_REVIEW",
-    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()) },
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()) },
     budget: {
       availableCreditVatIncludedCents: gross,
       baseTenderBudgetExVatCents: base,
