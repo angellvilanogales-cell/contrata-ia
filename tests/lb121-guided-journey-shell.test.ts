@@ -31,4 +31,12 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("if(scheduled)return");
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).not.toContain("attributes:true");
   });
+
+  it("convierte las etapas en botones navegables y señala el paso actual", () => {
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('button type="button" data-step=');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('aria-current=');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('scrollIntoView');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Complete primero el paso");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("visible(STEPS[i])&&!complete(STEPS[i],a)");
+  });
 });
