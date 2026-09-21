@@ -56,6 +56,10 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("readGuidedServiceCostStudy");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.guidedServiceCostStudy");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('flow.valuationAssistance!=="ASSISTED"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Aplicar cálculo al PBL");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('guided.dataset.applied==="true"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('budget.removeAttribute("readonly")');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Puede escribir directamente el PBL");
   });
 
   it("pregunta de forma expresa por el régimen de necesidades de la DA 33ª", () => {
