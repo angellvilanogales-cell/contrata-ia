@@ -11,6 +11,30 @@ export type ValuationMethodology = "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "
 export type ValuationSupport = "TECHNICAL_SCOPE" | "HISTORICAL_CONSUMPTION" | "PRIOR_AWARD" | "MARKET_QUOTES" | "PUBLIC_CATALOGUE" | "UNIT_COSTS" | "LABOUR_COSTS" | "PRICE_INDEX" | "EXPERT_REPORT";
 
 export interface SupportingDocumentReference { id: string; fileName: string; sha256: string; size: number; mediaType: string; }
+export type GuidedServiceCostCategory = "LABOUR" | "MATERIAL" | "EQUIPMENT" | "OTHER_DIRECT";
+export interface GuidedServiceCostLine {
+  category: GuidedServiceCostCategory;
+  concept: string;
+  unit: string;
+  quantity: number;
+  unitCostExVatCents: number;
+  source: string;
+}
+export interface GuidedServiceCostStudy {
+  lines: readonly GuidedServiceCostLine[];
+  indirectRatePercent: number;
+  profitRatePercent: number;
+}
+export interface GuidedServiceCostResult {
+  lines: readonly (GuidedServiceCostLine & { totalExVatCents: number })[];
+  directCostsExVatCents: number;
+  indirectCostsExVatCents: number;
+  profitExVatCents: number;
+  totalExVatCents: number;
+  vatAmountCents: number;
+  totalVatIncludedCents: number;
+  narrative: string;
+}
 
 export interface EconomicLegalBasis {
   id: string;
@@ -53,6 +77,7 @@ export interface KnownCreditInput {
   otherValuationSource?: string;
   valuationSupports?: readonly ValuationSupport[];
   supportingDocuments?: readonly SupportingDocumentReference[];
+  guidedServiceCostStudy?: GuidedServiceCostStudy;
 }
 
 export interface PendingValuationInput {
@@ -106,6 +131,7 @@ export interface EconomicStartingPointResult {
     selectedSupports: readonly ValuationSupport[];
     supportingDocuments: readonly SupportingDocumentReference[];
     evidenceSufficient: boolean;
+    guidedServiceCostResult?: GuidedServiceCostResult;
   };
   procedure: ProcedureCandidate;
   warnings: readonly string[];
@@ -187,6 +213,34 @@ function integer(value: number, label: string, maximum = Number.MAX_SAFE_INTEGER
 function percentage(value: number, label: string): number {
   if (!Number.isFinite(value) || value < 0 || value > 100) throw new Error(`${label} debe estar entre 0 y 100.`);
   return value;
+}
+
+export function calculateGuidedServiceCost(study: GuidedServiceCostStudy, vatRatePercent: number): GuidedServiceCostResult {
+  if (!Array.isArray(study.lines) || study.lines.length === 0) throw new Error("Añada al menos un concepto al estudio de costes.");
+  const allowedCategories: readonly GuidedServiceCostCategory[] = ["LABOUR", "MATERIAL", "EQUIPMENT", "OTHER_DIRECT"];
+  const lines = study.lines.map((line, index) => {
+    const concept = String(line.concept ?? "").trim();
+    const unit = String(line.unit ?? "").trim();
+    const source = String(line.source ?? "").trim();
+    if (!allowedCategories.includes(line.category)) throw new Error(`La categoría del concepto ${index + 1} no está reconocida.`);
+    if (!concept || !unit) throw new Error(`Indique el concepto y la unidad de la línea ${index + 1}.`);
+    if (!source) throw new Error(`Indique la fuente del precio unitario de la línea ${index + 1}.`);
+    if (!Number.isFinite(line.quantity) || line.quantity <= 0) throw new Error(`La cantidad de la línea ${index + 1} debe ser superior a cero.`);
+    const unitCostExVatCents = integer(line.unitCostExVatCents, `El precio unitario de la línea ${index + 1}`);
+    if (unitCostExVatCents === 0) throw new Error(`El precio unitario de la línea ${index + 1} debe ser superior a cero.`);
+    return { ...line, concept, unit, source, unitCostExVatCents, totalExVatCents: Math.round(line.quantity * unitCostExVatCents) };
+  });
+  const indirectRatePercent = percentage(study.indirectRatePercent, "El porcentaje de costes indirectos");
+  const profitRatePercent = percentage(study.profitRatePercent, "El porcentaje de beneficio");
+  const vatRate = percentage(vatRatePercent, "El tipo de IVA");
+  const directCostsExVatCents = lines.reduce((sum, line) => sum + line.totalExVatCents, 0);
+  const indirectCostsExVatCents = Math.round(directCostsExVatCents * indirectRatePercent / 100);
+  const profitExVatCents = Math.round((directCostsExVatCents + indirectCostsExVatCents) * profitRatePercent / 100);
+  const totalExVatCents = directCostsExVatCents + indirectCostsExVatCents + profitExVatCents;
+  const vatAmountCents = Math.round(totalExVatCents * vatRate / 100);
+  const totalVatIncludedCents = totalExVatCents + vatAmountCents;
+  const narrative = `Estudio de costes formado por ${lines.length} concepto(s) trazables. Costes directos: ${directCostsExVatCents} céntimos; costes indirectos (${indirectRatePercent}% sobre los costes directos): ${indirectCostsExVatCents}; beneficio (${profitRatePercent}% sobre costes directos e indirectos): ${profitExVatCents}; total sin IVA: ${totalExVatCents}; IVA (${vatRate}%): ${vatAmountCents}; PBL con IVA: ${totalVatIncludedCents}.`;
+  return { lines, directCostsExVatCents, indirectCostsExVatCents, profitExVatCents, totalExVatCents, vatAmountCents, totalVatIncludedCents, narrative };
 }
 
 function procedureCandidate(type: InitialEconomicContractType, estimatedValueCents: number): ProcedureCandidate {
@@ -297,21 +351,25 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   if (strictEvidenceFlow) selectedMethodologies.forEach(methodology => validateMethodSupport(methodology, selectedSupports));
   const supportingDocuments = normalizedDocuments(input.supportingDocuments);
   if (strictEvidenceFlow && supportingDocuments.length === 0) throw new Error("Debe incorporar al menos un documento que acredite la valoración antes de calcular y continuar.");
+  const guidedServiceCostResult = input.guidedServiceCostStudy ? calculateGuidedServiceCost(input.guidedServiceCostStudy, input.vatRatePercent) : undefined;
+  if (guidedServiceCostResult && input.contractType !== "SERVICE") throw new Error("El estudio de costes guiado de esta fase solo está disponible para contratos de servicios.");
+  if (guidedServiceCostResult && !selectedMethodologies.includes("COST_STUDY")) throw new Error("El estudio guiado requiere seleccionar la metodología Estudio de costes.");
+  if (guidedServiceCostResult && guidedServiceCostResult.totalVatIncludedCents !== contractBudgetGross) throw new Error("El PBL indicado no coincide con el resultado del estudio de costes guiado.");
 
-  const base = Math.round(contractBudgetGross * 100 / (100 + vatRate));
-  const vat = contractBudgetGross - base;
+  const base = guidedServiceCostResult?.totalExVatCents ?? Math.round(contractBudgetGross * 100 / (100 + vatRate));
+  const vat = guidedServiceCostResult?.vatAmountCents ?? contractBudgetGross - base;
   const percentages = input.costPercentages;
   if (percentages && Math.abs(percentages.direct + percentages.indirect + percentages.other - 100) > 0.0001) throw new Error("Los porcentajes de costes directos, indirectos y otros gastos deben sumar exactamente el 100 %.");
-  const directPercent = percentages?.direct ?? 100;
-  const indirectPercent = percentages?.indirect ?? 0;
-  const otherPercent = percentages?.other ?? 0;
+  const directPercent = guidedServiceCostResult ? guidedServiceCostResult.directCostsExVatCents * 100 / base : percentages?.direct ?? 100;
+  const indirectPercent = guidedServiceCostResult ? guidedServiceCostResult.indirectCostsExVatCents * 100 / base : percentages?.indirect ?? 0;
+  const otherPercent = guidedServiceCostResult ? guidedServiceCostResult.profitExVatCents * 100 / base : percentages?.other ?? 0;
   percentage(directPercent, "El porcentaje de costes directos");
   percentage(indirectPercent, "El porcentaje de costes indirectos");
   percentage(otherPercent, "El porcentaje de otros gastos");
   const noBreakdownProvided = input.directCostsExVatCents == null && input.indirectCostsExVatCents == null && input.otherCostsExVatCents == null;
-  const directCosts = percentages ? Math.round(base * directPercent / 100) : integer(input.directCostsExVatCents ?? (noBreakdownProvided ? base : 0), "Los costes directos");
-  const indirectCosts = percentages ? Math.round(base * indirectPercent / 100) : integer(input.indirectCostsExVatCents ?? 0, "Los costes indirectos");
-  const otherCosts = percentages ? base - directCosts - indirectCosts : integer(input.otherCostsExVatCents ?? 0, "Los demás gastos del PBL");
+  const directCosts = guidedServiceCostResult ? guidedServiceCostResult.directCostsExVatCents : percentages ? Math.round(base * directPercent / 100) : integer(input.directCostsExVatCents ?? (noBreakdownProvided ? base : 0), "Los costes directos");
+  const indirectCosts = guidedServiceCostResult ? guidedServiceCostResult.indirectCostsExVatCents : percentages ? Math.round(base * indirectPercent / 100) : integer(input.indirectCostsExVatCents ?? 0, "Los costes indirectos");
+  const otherCosts = guidedServiceCostResult ? guidedServiceCostResult.profitExVatCents : percentages ? base - directCosts - indirectCosts : integer(input.otherCostsExVatCents ?? 0, "Los demás gastos del PBL");
   if (directCosts + indirectCosts + otherCosts !== base) throw new Error("La suma de costes directos, costes indirectos y otros gastos debe coincidir con el PBL sin IVA.");
   const lotPercentages = [...(input.lotPblPercentages ?? [])];
   if (lotPercentages.length && Math.abs(lotPercentages.reduce((sum, item) => sum + item.percentage, 0) - 100) > 0.0001) throw new Error("Los porcentajes de distribución del PBL entre lotes deben sumar exactamente el 100 %.");
@@ -330,7 +388,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     ? "El presupuesto máximo declarado cubre toda la vigencia; las prórrogas no se suman de nuevo."
     : `El presupuesto cubre el periodo inicial y se añaden ${extension} céntimos para las prórrogas declaradas.`;
   const documentTrace = supportingDocuments.map(document => `${document.fileName} [SHA-256 ${document.sha256}]`).join("; ");
-  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodologías estructuradas: ${selectedMethodologies.join(", ")}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
+  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. ${guidedServiceCostResult ? `${guidedServiceCostResult.narrative} ` : ""}Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodologías estructuradas: ${selectedMethodologies.join(", ")}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
   const warnings = [
     ...(budgetConstraint === "FIXED_MAXIMUM" ? [
       "El crédito con IVA determina el límite de gasto, pero el procedimiento se analiza sobre el valor estimado sin IVA.",
@@ -347,7 +405,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "CALCULATED_FOR_HUMAN_REVIEW",
-    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()) },
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()), ...(guidedServiceCostResult ? { guidedServiceCostResult } : {}) },
     budget: {
       budgetConstraint,
       ...(gross !== undefined ? { availableCreditVatIncludedCents: gross } : {}),

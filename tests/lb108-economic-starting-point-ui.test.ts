@@ -43,6 +43,21 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('delete payload.grossCreditLimitCents');
   });
 
+  it("ofrece un calculador guiado y trazable para servicios", () => {
+    for (const text of [
+      "Calculador guiado del presupuesto del servicio",
+      "Unidad de cálculo",
+      "Precio unitario sin IVA",
+      "Fuente del precio",
+      "Costes indirectos sobre los costes directos",
+      "Beneficio sobre costes directos e indirectos",
+      "PBL con IVA",
+    ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("readGuidedServiceCostStudy");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.guidedServiceCostStudy");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('flow.valuationAssistance!=="ASSISTED"');
+  });
+
   it("pregunta de forma expresa por el régimen de necesidades de la DA 33ª", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Las cantidades dependerán de las necesidades reales durante el contrato?");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('name="lb108Successive" type="radio" value="NO"');

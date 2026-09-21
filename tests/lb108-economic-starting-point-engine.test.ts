@@ -2,10 +2,49 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { evaluateEconomicStartingPoint } from "../src/application/intake/lb108/EconomicStartingPointEngine";
+import { calculateGuidedServiceCost, evaluateEconomicStartingPoint } from "../src/application/intake/lb108/EconomicStartingPointEngine";
 import { UniversalEvidenceWorkspace } from "../src/application/intake/lb52/UniversalEvidenceWorkspace";
 
 describe("LB108 · punto de partida económico y propuesta condicionada", () => {
+  it("calcula un estudio de costes trazable sin inventar precios", () => {
+    const study = calculateGuidedServiceCost({
+      lines: [
+        { category: "LABOUR", concept: "Técnico", unit: "hora", quantity: 100, unitCostExVatCents: 2_000, source: "Convenio vigente y costes sociales" },
+        { category: "MATERIAL", concept: "Consumibles", unit: "lote", quantity: 2, unitCostExVatCents: 25_000, source: "Oferta fechada" },
+      ],
+      indirectRatePercent: 10,
+      profitRatePercent: 5,
+    }, 21);
+    expect(study).toMatchObject({
+      directCostsExVatCents: 250_000,
+      indirectCostsExVatCents: 25_000,
+      profitExVatCents: 13_750,
+      totalExVatCents: 288_750,
+      vatAmountCents: 60_638,
+      totalVatIncludedCents: 349_388,
+    });
+    expect(study.narrative).toContain("2 concepto(s) trazables");
+  });
+
+  it("integra el estudio guiado en el PBL y en su justificación", () => {
+    const document = { id: "doc-cost", fileName: "costes.pdf", sha256: "d".repeat(64), size: 1000, mediaType: "application/pdf" };
+    const result = evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", budgetConstraint: "NOT_PRESET", valuationAssistance: "ASSISTED",
+      contractBudgetVatIncludedCents: 349_388, vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12,
+      extensionMonths: 0, plannedModificationPercent: 0, valuationEvidence: "Estudio de costes guiado.",
+      valuationMethodologies: ["COST_STUDY"], valuationSupports: ["TECHNICAL_SCOPE", "LABOUR_COSTS"], supportingDocuments: [document],
+      guidedServiceCostStudy: {
+        lines: [
+          { category: "LABOUR", concept: "Técnico", unit: "hora", quantity: 100, unitCostExVatCents: 2_000, source: "Convenio vigente y costes sociales" },
+          { category: "MATERIAL", concept: "Consumibles", unit: "lote", quantity: 2, unitCostExVatCents: 25_000, source: "Oferta fechada" },
+        ], indirectRatePercent: 10, profitRatePercent: 5,
+      },
+    });
+    expect(result.budget?.baseTenderBudgetExVatCents).toBe(288_750);
+    expect(result.valuationPlan.guidedServiceCostResult?.lines).toHaveLength(2);
+    expect(result.estimatedValue?.calculationMethod).toContain("costes indirectos (10%");
+  });
+
   it("separa el límite con IVA del valor estimado sin IVA", () => {
     const result = evaluateEconomicStartingPoint({
       startingPoint: "KNOWN_CREDIT_LIMIT",
