@@ -25,4 +25,10 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("EXTERNAL_BUDGET_TOOL");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no pueden cerrarse la Memoria ni el PCAP");
   });
+
+  it("no crea un ciclo de renderizado al observar sus propios cambios", () => {
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("if(grid.innerHTML!==markup)");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("if(scheduled)return");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).not.toContain("attributes:true");
+  });
 });
