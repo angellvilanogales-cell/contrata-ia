@@ -1,0 +1,24 @@
+export const LB121_GUIDED_JOURNEY_SHELL_SCRIPT = String.raw`(function(){
+var KEY="contrataIaAdaptiveAnswers",CASE_KEY="contrataIaAdaptiveCaseId";
+var STEPS=[
+ {n:1,title:"Necesidad y objeto",keys:["__lb107"],blocks:["lb107InitialBlock"]},
+ {n:2,title:"Presupuesto",keys:["__lb108"],blocks:["lb108EconomicBlock"]},
+ {n:3,title:"Adjudicación",keys:["__lb109","__lb110","__lb111","__lb112"],blocks:["lb109ProcedureBlock","lb110CapacityBlock","lb111AwardBlock","lb112GuaranteesBlock"]},
+ {n:4,title:"Condiciones",keys:["__lb113","__lb114","__lb115","__lb116"],blocks:["lb113Block","lb114Block","lb115Block","lb116Block"]},
+ {n:5,title:"Ejecución",keys:["__lb117"],blocks:["lb117Block"]},
+ {n:6,title:"Requisitos técnicos",keys:["__lb118"],blocks:["lb118Block"]},
+ {n:7,title:"Datos y seguridad",keys:["__lb119"],blocks:["lb119Block"]},
+ {n:8,title:"Documentos",keys:["__lb120"],blocks:["lb120Block","lb103GuidedPanel"]}
+];
+function answers(){try{return JSON.parse(sessionStorage.getItem(KEY)||localStorage.getItem(KEY)||"{}");}catch(e){return{};}}
+function validated(value){return !!value&&(value.status==="HUMAN_VALIDATED"||value.status==="FINAL_CONSENT_RECORDED");}
+function complete(step,a){return step.keys.every(function(key){return validated(a[key]);});}
+function visible(step){return step.blocks.some(function(id){var el=document.getElementById(id);return el&&el.textContent.trim()&&getComputedStyle(el).display!=="none";});}
+function currentIndex(a){for(var i=0;i<STEPS.length;i++)if(visible(STEPS[i]))return i;for(var j=0;j<STEPS.length;j++)if(!complete(STEPS[j],a))return j;return STEPS.length-1;}
+function style(){if(document.getElementById("lb121Style"))return;var s=document.createElement("style");s.id="lb121Style";s.textContent=".lb121-shell{position:sticky;top:0;z-index:4;background:#f4f6f7;padding:.65rem 0 .35rem}.lb121-intro{border-left:5px solid #176b45}.lb121-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.45rem}.lb121-step{border:1px solid #c8d0d5;border-radius:8px;padding:.55rem;background:#fff;font-size:.86rem}.lb121-step strong{display:block}.lb121-step.done{background:#e8f5e9;border-color:#76a98d}.lb121-step.current{background:#eaf2f8;border:2px solid #176b45}.lb121-state{font-size:.78rem;color:#626567}.lb121-step.current .lb121-state{color:#176b45;font-weight:700}#lb106VirginPilot.lb121-background{display:none}@media(max-width:760px){.lb121-shell{position:static}.lb121-steps{grid-template-columns:1fr 1fr}}";document.head.appendChild(s);}
+function mount(){style();var main=document.querySelector("main"),anchor=document.getElementById("lb107InitialBlock")||document.getElementById("lb106VirginPilot")||document.getElementById("work");if(!main||!anchor)return;var intro=document.getElementById("lb121Intro");if(!intro){intro=document.createElement("section");intro.id="lb121Intro";intro.className="card lb121-intro";intro.innerHTML='<h1>Creación guiada de los pliegos</h1><p>Responda con los datos que conoce. El sistema propondrá las decisiones jurídicas y mostrará en cada una los artículos y el texto legal aplicable para que pueda aceptarla o corregirla.</p><p class="info"><strong>Ámbito de esta versión:</strong> expediente de suministro con Memoria y PPT estructurados y PCAP cumplimentado sobre el modelo acreditado que resulte aplicable. Las decisiones nunca se aprueban automáticamente.</p>';main.insertBefore(intro,anchor);}var shell=document.getElementById("lb121Shell");if(!shell){shell=document.createElement("section");shell.id="lb121Shell";shell.className="lb121-shell";shell.setAttribute("aria-label","Progreso del expediente");shell.innerHTML='<div class="lb121-steps"></div>';intro.parentNode.insertBefore(shell,intro.nextSibling);}render();}
+function render(){var shell=document.getElementById("lb121Shell");if(!shell)return;var a=answers(),active=currentIndex(a),caseId=localStorage.getItem(CASE_KEY)||"",grid=shell.querySelector(".lb121-steps");grid.innerHTML=STEPS.map(function(step,index){var done=complete(step,a),current=index===active&&!done,state=done?"Completado":current?"Paso actual":"Pendiente";return '<div class="lb121-step '+(done?'done':current?'current':'')+'"><strong>'+step.n+'. '+step.title+'</strong><span class="lb121-state">'+state+'</span></div>';}).join("");var matrix=document.getElementById("lb106VirginPilot");if(matrix)matrix.classList.toggle("lb121-background",!!caseId);}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount);else mount();
+document.addEventListener("contrata-ia:adaptive-saved",function(){setTimeout(function(){mount();render();},50);});
+new MutationObserver(function(){mount();render();}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:["style","class"]});
+})();`;
