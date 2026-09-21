@@ -23,6 +23,7 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     });
 
     expect(result.budget).toEqual({
+      budgetConstraint: "FIXED_MAXIMUM",
       availableCreditVatIncludedCents: 1_210_000,
       baseTenderBudgetExVatCents: 1_000_000,
       vatAmountCents: 210_000,
@@ -44,6 +45,26 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     expect(result.legalBasis.some(item => item.article === "DA 33.ª")).toBe(true);
     expect(result.humanValidationRequired).toBe(true);
     expect(result.generationBlocked).toBe(true);
+  });
+
+  it("calcula el PBL sin inventar crédito cuando no existe un límite prefijado", () => {
+    const result = evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT",
+      contractType: "SERVICE",
+      budgetConstraint: "NOT_PRESET",
+      valuationAssistance: "ASSISTED",
+      contractBudgetVatIncludedCents: 1_210_000,
+      vatRatePercent: 21,
+      creditScope: "INITIAL_PERIOD",
+      initialDurationMonths: 12,
+      extensionMonths: 0,
+      plannedModificationPercent: 0,
+      valuationEvidence: "Estudio de costes fechado.",
+    });
+    expect(result.budget?.budgetConstraint).toBe("NOT_PRESET");
+    expect(result.budget?.availableCreditVatIncludedCents).toBeUndefined();
+    expect(result.budget?.baseTenderBudgetVatIncludedCents).toBe(1_210_000);
+    expect(result.warnings.join(" ")).toContain("deberá comprobarse y aprobarse");
   });
 
   it("exige valorar las prórrogas cuando el crédito cubre solo el periodo inicial", () => {

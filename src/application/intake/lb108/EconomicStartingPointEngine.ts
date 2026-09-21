@@ -3,6 +3,8 @@ export const LB108_ECONOMIC_STARTING_POINT_VERSION = "LB108-ECONOMIC-STARTING-PO
 const LCSP_URL = "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902";
 
 export type EconomicStartingPoint = "KNOWN_CREDIT_LIMIT" | "NEED_PENDING_VALUATION";
+export type BudgetConstraint = "FIXED_MAXIMUM" | "NOT_PRESET";
+export type ValuationAssistance = "ASSISTED" | "OWN_DOCUMENTATION";
 export type CreditScope = "INITIAL_PERIOD" | "ENTIRE_CONTRACT_LIFE";
 export type InitialEconomicContractType = "SUPPLY" | "SERVICE";
 export type ValuationMethodology = "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "QUOTES_OR_CATALOGUES" | "COST_STUDY" | "OTHER_JUSTIFIED";
@@ -24,7 +26,10 @@ export interface EconomicLegalBasis {
 export interface KnownCreditInput {
   startingPoint: "KNOWN_CREDIT_LIMIT";
   contractType: InitialEconomicContractType;
-  grossCreditLimitCents: number;
+  /** Los expedientes anteriores se interpretan como FIXED_MAXIMUM. */
+  budgetConstraint?: BudgetConstraint;
+  valuationAssistance?: ValuationAssistance;
+  grossCreditLimitCents?: number;
   contractBudgetVatIncludedCents?: number;
   directCostsExVatCents?: number;
   indirectCostsExVatCents?: number;
@@ -72,7 +77,8 @@ export interface EconomicStartingPointResult {
   startingPoint: EconomicStartingPoint;
   status: "CALCULATED_FOR_HUMAN_REVIEW" | "VALUATION_REQUIRED";
   budget?: {
-    availableCreditVatIncludedCents: number;
+    budgetConstraint: BudgetConstraint;
+    availableCreditVatIncludedCents?: number;
     baseTenderBudgetExVatCents: number;
     vatAmountCents: number;
     baseTenderBudgetVatIncludedCents: number;
@@ -254,11 +260,15 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   if (input.contractType !== "SUPPLY" && input.contractType !== "SERVICE") throw new Error("El bloque económico inicial solo puede continuar tras validar suministro o servicio.");
   if (input.startingPoint === "NEED_PENDING_VALUATION") return pendingResult(input);
 
-  const gross = integer(input.grossCreditLimitCents, "El límite de crédito con IVA");
-  if (gross === 0) throw new Error("El límite de crédito con IVA debe ser superior a cero.");
-  const contractBudgetGross = integer(input.contractBudgetVatIncludedCents ?? gross, "El PBL propuesto con IVA");
+  const budgetConstraint: BudgetConstraint = input.budgetConstraint ?? "FIXED_MAXIMUM";
+  if (budgetConstraint !== "FIXED_MAXIMUM" && budgetConstraint !== "NOT_PRESET") throw new Error("Debe indicar si existe un límite presupuestario prefijado.");
+  const gross = budgetConstraint === "FIXED_MAXIMUM"
+    ? integer(input.grossCreditLimitCents ?? 0, "El límite de crédito con IVA")
+    : undefined;
+  if (budgetConstraint === "FIXED_MAXIMUM" && gross === 0) throw new Error("El límite de crédito con IVA debe ser superior a cero.");
+  const contractBudgetGross = integer(input.contractBudgetVatIncludedCents ?? gross ?? 0, "El PBL propuesto con IVA");
   if (contractBudgetGross === 0) throw new Error("El PBL propuesto con IVA debe ser superior a cero.");
-  if (contractBudgetGross > gross) throw new Error("El PBL propuesto con IVA no puede superar el crédito máximo disponible.");
+  if (gross !== undefined && contractBudgetGross > gross) throw new Error("El PBL propuesto con IVA no puede superar el crédito máximo disponible.");
   const vatRate = integer(input.vatRatePercent, "El tipo de IVA", 100);
   const initialDuration = integer(input.initialDurationMonths, "La duración inicial", 1_200);
   if (initialDuration === 0) throw new Error("La duración inicial debe ser superior a cero.");
@@ -322,8 +332,12 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   const documentTrace = supportingDocuments.map(document => `${document.fileName} [SHA-256 ${document.sha256}]`).join("; ");
   const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodologías estructuradas: ${selectedMethodologies.join(", ")}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
   const warnings = [
-    "El crédito con IVA determina el límite de gasto, pero el procedimiento se analiza sobre el valor estimado sin IVA.",
-    "El crédito disponible y el PBL solo coinciden cuando la persona confirma que todo ese límite corresponde al máximo contractual adecuadamente valorado.",
+    ...(budgetConstraint === "FIXED_MAXIMUM" ? [
+      "El crédito con IVA determina el límite de gasto, pero el procedimiento se analiza sobre el valor estimado sin IVA.",
+      "El crédito disponible y el PBL solo coinciden cuando la persona confirma que todo ese límite corresponde al máximo contractual adecuadamente valorado.",
+    ] : [
+      "No se ha declarado un límite presupuestario prefijado: el crédito necesario deberá comprobarse y aprobarse después de calcular y justificar el PBL.",
+    ]),
     "La propuesta de procedimiento es provisional hasta validar criterios de adjudicación, órgano contratante y demás circunstancias legales.",
     ...(input.creditScope === "ENTIRE_CONTRACT_LIFE" && extensionMonths > 0 ? ["Las prórrogas constan temporalmente, pero no se vuelven a sumar porque la persona declara que el presupuesto máximo ya cubre toda la vigencia."] : []),
   ];
@@ -335,7 +349,8 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     status: "CALCULATED_FOR_HUMAN_REVIEW",
     valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()) },
     budget: {
-      availableCreditVatIncludedCents: gross,
+      budgetConstraint,
+      ...(gross !== undefined ? { availableCreditVatIncludedCents: gross } : {}),
       baseTenderBudgetExVatCents: base,
       vatAmountCents: vat,
       baseTenderBudgetVatIncludedCents: contractBudgetGross,

@@ -32,10 +32,15 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('hidden.id="lb108Evidence"');
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Identifique la otra fuente y justifique su idoneidad");
   });
-  it("ofrece los dos puntos de partida antes de pedir importes", () => {
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Existe un límite máximo de crédito");
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La necesidad aún debe definirse y valorarse");
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("el procedimiento se analiza mediante el valor estimado sin IVA");
+  it("separa el límite presupuestario de la ayuda para justificar el precio", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Está el contrato restringido por un límite presupuestario?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("No existe un límite prefijado");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no confirma por sí solo la existencia de crédito");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Quiere utilizar el asistente para justificar el precio?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Sí, quiero ayuda paso a paso");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("No, ya dispongo de una valoración");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('payload.budgetConstraint=flow.budgetConstraint');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('delete payload.grossCreditLimitCents');
   });
 
   it("pregunta de forma expresa por el régimen de necesidades de la DA 33ª", () => {
