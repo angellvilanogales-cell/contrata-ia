@@ -39,4 +39,12 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Complete primero el paso");
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("visible(STEPS[i])&&!complete(STEPS[i],a)");
   });
+
+  it("permite volver y fija los supuestos económicos del ejemplo", () => {
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Volver al paso anterior");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("budgetLimitVatIncludedCents:5500000");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("economicEvidenceAssumed:true");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("applyDemoEconomicDefaults");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Supuesto del ejemplo");
+  });
 });
