@@ -47,6 +47,7 @@ import { LB118_TECHNICAL_SPECIFICATIONS_SCRIPT } from "./LB118TechnicalSpecifica
 import { evaluateDataProtectionSecurity, type DataProtectionSecurityInput } from "../../application/intake/lb119/DataProtectionSecurityEngine";
 import { LB119_DATA_PROTECTION_SECURITY_SCRIPT } from "./LB119DataProtectionSecurityScript";
 import { LB120_DOCUMENT_CONCLUSION_SCRIPT } from "./LB120DocumentConclusionScript";
+import { LB121_GUIDED_JOURNEY_SHELL_SCRIPT } from "./LB121GuidedJourneyShellScript";
 import { auditLB120PriorDecisionEvidence, createLB120DocumentPreview, createLB120FinalConsent, validateLB120FinalConsent, type LB120ConsentInput } from "../../application/universal/LB120DocumentConclusion";
 import { LB116_PRICE_REVISION_SCRIPT } from "./LB116PriceRevisionScript";
 
@@ -124,7 +125,7 @@ function statusFor(error: Error): number {
 }
 
 function adaptiveUiWithGeneration(): string {
-  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script><script src="/lb117-execution-receipt-payment.js" defer></script><script src="/lb118-technical-specifications.js" defer></script><script src="/lb119-data-protection-security.js" defer></script><script src="/lb120-document-conclusion.js" defer></script>';
+  const tag = '<script src="/lb103-authoritative-generation.js" defer></script><script src="/lb106-virgin-pilot.js" defer></script><script src="/lb107-initial-proposal.js" defer></script><script src="/lb108-economic-starting-point.js" defer></script><script src="/lb109-procedure-processing.js" defer></script><script src="/lb110-capacity-solvency.js" defer></script><script src="/lb111-award-criteria.js" defer></script><script src="/lb112-guarantees.js" defer></script><script src="/lb113-special-execution.js" defer></script><script src="/lb114-subcontracting-assignment.js" defer></script><script src="/lb115-planned-modification.js" defer></script><script src="/lb116-price-revision.js" defer></script><script src="/lb117-execution-receipt-payment.js" defer></script><script src="/lb118-technical-specifications.js" defer></script><script src="/lb119-data-protection-security.js" defer></script><script src="/lb120-document-conclusion.js" defer></script><script src="/lb121-guided-journey.js" defer></script>';
   const ui = namedLoginUi(ADAPTIVE_FLOW_UI);
   return ui.includes("</body>") ? ui.replace("</body>", `${tag}</body>`) : `${ui}${tag}`;
 }
@@ -345,6 +346,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
       if (request.method === "GET" && url.pathname === "/lb118-technical-specifications.js") { sendText(response,200,LB118_TECHNICAL_SPECIFICATIONS_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb119-data-protection-security.js") { sendText(response,200,LB119_DATA_PROTECTION_SECURITY_SCRIPT,"application/javascript; charset=utf-8"); return; }
       if (request.method === "GET" && url.pathname === "/lb120-document-conclusion.js") { sendText(response,200,LB120_DOCUMENT_CONCLUSION_SCRIPT,"application/javascript; charset=utf-8"); return; }
+      if (request.method === "GET" && url.pathname === "/lb121-guided-journey.js") { sendText(response,200,LB121_GUIDED_JOURNEY_SHELL_SCRIPT,"application/javascript; charset=utf-8"); return; }
 
       const lb120PreviewCaseId = request.method === "POST" ? lb120CaseId(url.pathname, "preview") : null;
       if (lb120PreviewCaseId) {
