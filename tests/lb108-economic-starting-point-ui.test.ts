@@ -62,6 +62,23 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Puede escribir directamente el PBL");
   });
 
+  it("adapta el recorrido al conocimiento real del precio", () => {
+    for (const text of [
+      "¿Qué información tiene sobre el precio?",
+      "Conozco el precio total",
+      "Conozco precios unitarios",
+      "Solo conozco el límite disponible",
+      "No sé calcular el precio",
+      "El límite disponible no determina por sí solo el precio",
+      "Datos de la prestación ya conocidos",
+      "No dispongo de ninguna referencia",
+      "no se inventará ningún importe",
+    ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('priceKnowledge==="KNOWN_UNIT_PRICES"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('s.priceKnowledge="KNOWN_TOTAL"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('s.priceKnowledge="PENDING_SOURCE"');
+  });
+
   it("pregunta de forma expresa por el régimen de necesidades de la DA 33ª", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Las cantidades dependerán de las necesidades reales durante el contrato?");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('name="lb108Successive" type="radio" value="NO"');
