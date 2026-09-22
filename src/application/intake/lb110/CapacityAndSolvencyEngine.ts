@@ -32,7 +32,8 @@ export interface CapacityAndSolvencyResult {
   productionReady: false;
 }
 
-const basis = (id: string, article: string, paragraph: string, excerpt: string): SolvencyLegalBasis => ({ id, article, paragraph, relevantOfficialExcerpt: excerpt, officialUrl: `${LCSP}#a${article.replace(/[^0-9]/g, "")}` });
+const ARTICLE_ANCHORS: Record<string, string> = { "65": "a6-7", "74": "a7-6", "77": "a7-9", "86": "a8-8", "87": "a8-9", "89": "a8-11", "90": "a9-2", "92": "a9-4", "118": "a1-30", "159": "a1-71" };
+const basis = (id: string, article: string, paragraph: string, excerpt: string): SolvencyLegalBasis => ({ id, article, paragraph, relevantOfficialExcerpt: excerpt, officialUrl: `${LCSP}#${ARTICLE_ANCHORS[article]}` });
 const LEGAL = {
   capacity: basis("LCSP-65.1-2", "65", "1 y 2", "Solo pueden contratar quienes tengan capacidad de obrar, no estén incursos en prohibición y cuenten con la habilitación empresarial o profesional exigible."),
   solvency: basis("LCSP-74.1-2", "74", "1 y 2", "Cuando se exija solvencia, sus requisitos y documentos deben figurar en el anuncio y el pliego, vinculados al objeto y proporcionados."),
