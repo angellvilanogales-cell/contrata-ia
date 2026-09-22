@@ -32,7 +32,8 @@ export interface AwardCriteriaResult {
   productionReady: false;
 }
 
-const basis = (id:string, article:string, paragraph:string, excerpt:string):AwardLegalBasis => ({ id, article, paragraph, relevantOfficialExcerpt:excerpt, officialUrl:`${LCSP}#a${article}` });
+const ARTICLE_ANCHORS:Record<string,string>={"145":"a1-57","146":"a1-58","147":"a1-59","149":"a1-61","159":"a1-71"};
+const basis = (id:string, article:string, paragraph:string, excerpt:string):AwardLegalBasis => ({ id, article, paragraph, relevantOfficialExcerpt:excerpt, officialUrl:`${LCSP}#${ARTICLE_ANCHORS[article]}` });
 const LEGAL = {
   selection:basis("LCSP-145.1-2","145","1 y 2","La adjudicación utiliza una pluralidad de criterios basados en la mejor relación calidad-precio, o coste-eficacia previa justificación."),
   mandatory:basis("LCSP-145.3","145","3","En determinados contratos y prestaciones resulta obligatoria la aplicación de más de un criterio."),
