@@ -18,6 +18,8 @@ describe("LB109 · interfaz de procedimiento", () => {
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('80000000-4 a 80660000-8');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('al menos 51 puntos sobre 100 para calidad');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('Orientación: 20 % de juicio de valor');
+    expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('Falta responder: ');
+    expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('first.scrollIntoView');
   });
 
   it("solo persiste el procedimiento tras confirmación humana", () => {
