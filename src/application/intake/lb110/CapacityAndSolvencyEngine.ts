@@ -10,6 +10,7 @@ export interface CapacityAndSolvencyInput {
   object: string;
   specificProfessionalAuthorizationRequired: boolean;
   professionalAuthorizationDetail?: string;
+  professionalAuthorizationByLot?: readonly { lot: string; required: boolean; detail?: string }[];
   economicRequirement?: string;
   economicEvidence?: string;
   technicalRequirement?: string;
@@ -53,13 +54,17 @@ function required(value: string | undefined, message: string): string {
 
 export function evaluateCapacityAndSolvency(input: CapacityAndSolvencyInput): CapacityAndSolvencyResult {
   if (!input.object?.trim()) throw new Error("Debe existir un objeto contractual validado.");
-  const authorization = input.specificProfessionalAuthorizationRequired
+  const authorization = input.professionalAuthorizationByLot?.length
+    ? input.professionalAuthorizationByLot.map((lot) => lot.required
+      ? `${lot.lot}: se exige ${required(lot.detail, `Debe concretarse la habilitación de ${lot.lot}.`)}`
+      : `${lot.lot}: no se ha identificado habilitación específica tras comprobar la actividad.`).join(" ")
+    : input.specificProfessionalAuthorizationRequired
     ? required(input.professionalAuthorizationDetail, "Debe concretarse la habilitación empresarial o profesional exigible.")
     : "No se exige habilitación empresarial o profesional específica para esta prestación, sin perjuicio de las autorizaciones generales legalmente necesarias para ejercer la actividad.";
   const common: DocumentaryStatement[] = [
     { element: "CAPACITY", status: "APPLIES", text: "Las personas licitadoras deberán tener plena capacidad de obrar y su objeto o ámbito de actividad deberá comprender las prestaciones del contrato.", destinations: ["MEMORY", "PCAP"] },
     { element: "PROHIBITIONS", status: "APPLIES", text: "Las personas licitadoras no podrán estar incursas en prohibición de contratar con el sector público.", destinations: ["MEMORY", "PCAP"] },
-    { element: "PROFESSIONAL_AUTHORIZATION", status: input.specificProfessionalAuthorizationRequired ? "APPLIES" : "NOT_REQUIRED", text: input.specificProfessionalAuthorizationRequired ? `Se exige la siguiente habilitación empresarial o profesional: ${authorization}` : authorization, destinations: ["MEMORY", "PCAP"] },
+    { element: "PROFESSIONAL_AUTHORIZATION", status: input.specificProfessionalAuthorizationRequired ? "APPLIES" : "NOT_REQUIRED", text: input.professionalAuthorizationByLot?.length ? authorization : input.specificProfessionalAuthorizationRequired ? `Se exige la siguiente habilitación empresarial o profesional: ${authorization}` : authorization, destinations: ["MEMORY", "PCAP"] },
     { element: "CLASSIFICATION", status: "NOT_REQUIRED", text: "No se exige clasificación empresarial, por tratarse de un contrato de suministro o servicios; en su caso, la solvencia se rige por los requisitos específicos del pliego.", destinations: ["MEMORY", "PCAP"] },
   ];
   const warnings: string[] = [];
