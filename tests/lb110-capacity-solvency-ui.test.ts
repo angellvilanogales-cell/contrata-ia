@@ -17,5 +17,6 @@ describe("LB110 · interfaz", () => {
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("Necesito comprobarlo");
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("professionalAuthorizationByLot:authChoices.map");
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("select.value===\"yes\"");
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("lb110-authorization-draft");
   });
 });
