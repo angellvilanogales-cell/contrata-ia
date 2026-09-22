@@ -15,6 +15,9 @@ describe("LB109 · interfaz de procedimiento", () => {
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('answer==="unknown"');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('v.legalEstimatedValueCents<1500000');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('cpvProposal(a)');
+    expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('CPV validados en el paso 1');
+    expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('al menos un lote');
+    expect(LB109_PROCEDURE_PROCESSING_SCRIPT).not.toContain('No es un requisito que deba conocer de memoria');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('80000000-4 a 80660000-8');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('al menos 51 puntos sobre 100 para calidad');
     expect(LB109_PROCEDURE_PROCESSING_SCRIPT).toContain('Orientación: 20 % de juicio de valor');
