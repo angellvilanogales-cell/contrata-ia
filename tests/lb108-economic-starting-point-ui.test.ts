@@ -36,9 +36,9 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Está el contrato restringido por un límite presupuestario?");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("No existe un límite prefijado");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no confirma por sí solo la existencia de crédito");
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Quiere utilizar el asistente para justificar el precio?");
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Sí, quiero ayuda paso a paso");
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("No, ya dispongo de una valoración");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿En qué situación se encuentra el presupuesto?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Ya tengo el presupuesto y su justificación");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Quiero calcularlo con la herramienta de presupuesto");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('payload.budgetConstraint=flow.budgetConstraint');
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('delete payload.grossCreditLimitCents');
   });
@@ -89,7 +89,7 @@ describe("LB108 · interfaz del bloque económico", () => {
   });
 
   it("bloquea procedimiento y pliegos mientras falta la valoración", () => {
-    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("El aplicativo no inventará un importe ni un procedimiento");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("El aplicativo no inventará el PBL, el valor estimado ni el procedimiento");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La generación de pliegos permanece bloqueada");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("MARKET_CONSULTATION");
   });
