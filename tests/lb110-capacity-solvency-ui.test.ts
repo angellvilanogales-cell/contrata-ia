@@ -26,4 +26,10 @@ describe("LB110 · interfaz", () => {
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("BOE-A-2017-12902#a6-7");
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("BOE-A-2023-5365#a4-5");
   });
+  it("muestra regímenes, apartados, estados y documentos en español", () => {
+    for (const text of ["Se exigen requisitos de solvencia económica y técnica", "Capacidad para contratar", "Ausencia de prohibiciones de contratar", "Exigible", "No exigible", "Memoria justificativa", "Pliego de cláusulas administrativas particulares"])
+      expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain(text);
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("esc(label(x.element))");
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("x.destinations.map(label)");
+  });
 });
