@@ -6,6 +6,7 @@ export interface AwardCriteriaInput {
   procedure: "CONTRATO_MENOR" | "ABIERTO_SIMPLIFICADO_ABREVIADO" | "ABIERTO_SIMPLIFICADO" | "ABIERTO";
   contractType: "SUPPLY" | "SERVICE";
   intellectualService: boolean;
+  annexIvService?: boolean;
   laborIntensiveOrSpecialService: boolean;
   technicallyImprovableOrComplex: boolean;
   criteria: readonly AwardCriterionInput[];
@@ -35,6 +36,7 @@ const basis = (id:string, article:string, paragraph:string, excerpt:string):Awar
 const LEGAL = {
   selection:basis("LCSP-145.1-2","145","1 y 2","La adjudicación utiliza una pluralidad de criterios basados en la mejor relación calidad-precio, o coste-eficacia previa justificación."),
   mandatory:basis("LCSP-145.3","145","3","En determinados contratos y prestaciones resulta obligatoria la aplicación de más de un criterio."),
+  quality:basis("LCSP-145.4","145","4","En servicios del anexo IV y prestaciones de carácter intelectual, los criterios de calidad representan al menos el 51 por ciento de la puntuación."),
   link:basis("LCSP-145.5-6","145","5 y 6","Los criterios deben formularse objetivamente, garantizar competencia efectiva y estar vinculados al objeto."),
   application:basis("LCSP-146.1-3","146","1 a 3","El criterio único debe estar relacionado con costes; las fórmulas deben justificarse y las ponderaciones constar en el pliego."),
   tie:basis("LCSP-147","147","1 y 2","El pliego puede prever desempates vinculados al objeto; en su defecto se aplica el orden social legal y finalmente sorteo."),
@@ -53,18 +55,19 @@ export function evaluateAwardCriteria(input:AwardCriteriaInput):AwardCriteriaRes
     {element:"TIE_BREAK",status:"NOT_APPLICABLE",text:"No procede establecer criterios de desempate al no existir clasificación competitiva de proposiciones.",destinations:["MEMORY","PCAP"]},
   ],warnings:["La inexistencia de criterios de puntuación no elimina la justificación de necesidad, no fraccionamiento, aprobación del gasto y aptitud del contratista."],legalBasis:[LEGAL.link,LEGAL.application,LEGAL.tie,LEGAL.abnormal],humanValidationRequired:true,generationBlocked:true,productionReady:false};
   if (!Array.isArray(input.criteria)||input.criteria.length===0) throw new Error("Debe existir al menos un criterio de adjudicación.");
-  let total=0, formulaWeight=0, judgmentWeight=0, costCount=0;
+  let total=0, formulaWeight=0, judgmentWeight=0, costCount=0, qualityWeight=0;
   const normalized=input.criteria.map((raw,index)=>{
     const name=clean(raw.name,`Criterio ${index+1}: falta la denominación.`), method=clean(raw.formulaOrMethod,`Criterio ${index+1}: falta la fórmula o método de valoración.`), link=clean(raw.objectLinkReason,`Criterio ${index+1}: falta justificar su vinculación con el objeto.`);
     if(!Number.isInteger(raw.weight)||raw.weight<=0||raw.weight>100)throw new Error(`Criterio ${index+1}: la ponderación debe ser un entero entre 1 y 100.`);
     if(raw.kind!=="COST"&&raw.kind!=="QUALITY")throw new Error(`Criterio ${index+1}: clase no admitida.`);
     if(raw.evaluation!=="FORMULA"&&raw.evaluation!=="JUDGMENT")throw new Error(`Criterio ${index+1}: método no admitido.`);
-    total+=raw.weight;if(raw.evaluation==="FORMULA")formulaWeight+=raw.weight;else judgmentWeight+=raw.weight;if(raw.kind==="COST")costCount++;
+    total+=raw.weight;if(raw.evaluation==="FORMULA")formulaWeight+=raw.weight;else judgmentWeight+=raw.weight;if(raw.kind==="COST")costCount++;else qualityWeight+=raw.weight;
     return { raw:{...raw,name,formulaOrMethod:method,objectLinkReason:link}, domain:{nombre:name,ponderacion:raw.weight,evaluableMedianteFormula:raw.evaluation==="FORMULA"} };
   });
   if(total!==100)throw new Error(`Las ponderaciones deben sumar 100 puntos; actualmente suman ${total}.`);
+  if((input.annexIvService||input.intellectualService)&&qualityWeight<51)throw new Error(`Los servicios del anexo IV y las prestaciones intelectuales requieren al menos 51 puntos de calidad (art. 145.4 LCSP); actualmente hay ${qualityWeight}. La calidad también puede medirse por fórmulas.`);
   if(costCount===0)throw new Error("Debe existir al menos un criterio relacionado con el precio o los costes.");
-  const pluralityRequired=input.intellectualService||input.laborIntensiveOrSpecialService||input.technicallyImprovableOrComplex;
+  const pluralityRequired=input.annexIvService||input.intellectualService||input.laborIntensiveOrSpecialService||input.technicallyImprovableOrComplex;
   if(pluralityRequired&&normalized.length===1)throw new Error("Las características declaradas obligan a utilizar más de un criterio de adjudicación.");
   if(input.procedure==="ABIERTO_SIMPLIFICADO_ABREVIADO"&&judgmentWeight>0)throw new Error("El abierto simplificado abreviado solo admite criterios evaluables mediante fórmulas.");
   const maxJudgment=input.intellectualService?45:25;
@@ -92,5 +95,5 @@ export function evaluateAwardCriteria(input:AwardCriteriaInput):AwardCriteriaRes
     {element:"ABNORMALLY_LOW_TENDERS",status:"APPLIES",text:abnormality,destinations:["MEMORY","PCAP"]},
     {element:"TIE_BREAK",status:"APPLIES",text:tie,destinations:["MEMORY","PCAP"]},
   ];
-  return {version:LB111_AWARD_CRITERIA_VERSION,normalizedCriteria:normalized.map(x=>x.domain),formulaWeight,judgmentWeight,documentaryStatements:statements,warnings:["Las ponderaciones y fórmulas son decisiones del órgano de contratación: la LCSP delimita su contenido, pero no fija una distribución universal de puntos.",...(single?["La elección de criterio único debe quedar especialmente motivada frente a la regla general de pluralidad."]:[])],legalBasis:[LEGAL.selection,LEGAL.mandatory,LEGAL.link,LEGAL.application,LEGAL.tie,LEGAL.abnormal,...(input.procedure==="ABIERTO_SIMPLIFICADO_ABREVIADO"?[LEGAL.asa]:[])],humanValidationRequired:true,generationBlocked:true,productionReady:false};
+  return {version:LB111_AWARD_CRITERIA_VERSION,normalizedCriteria:normalized.map(x=>x.domain),formulaWeight,judgmentWeight,documentaryStatements:statements,warnings:["Las ponderaciones y fórmulas son decisiones del órgano de contratación: la LCSP delimita su contenido, pero no fija una distribución universal de puntos.",...(single?["La elección de criterio único debe quedar especialmente motivada frente a la regla general de pluralidad."]:[])],legalBasis:[LEGAL.selection,LEGAL.mandatory,...(input.annexIvService||input.intellectualService?[LEGAL.quality]:[]),LEGAL.link,LEGAL.application,LEGAL.tie,LEGAL.abnormal,...(input.procedure==="ABIERTO_SIMPLIFICADO_ABREVIADO"?[LEGAL.asa]:[])],humanValidationRequired:true,generationBlocked:true,productionReady:false};
 }
