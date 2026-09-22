@@ -19,4 +19,11 @@ describe("LB110 · interfaz", () => {
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("select.value===\"yes\"");
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("lb110-authorization-draft");
   });
+  it("propone respuesta razonada para idiomas y orientación y enlaza el artículo exacto", () => {
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain('c.indexOf("80580000")');
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain('c.indexOf("79634000")');
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("Propuesta del sistema:");
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("BOE-A-2017-12902#a6-7");
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("BOE-A-2023-5365#a4-5");
+  });
 });
