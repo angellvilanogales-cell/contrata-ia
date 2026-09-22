@@ -32,4 +32,9 @@ describe("LB110 · interfaz", () => {
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("esc(label(x.element))");
     expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("x.destinations.map(label)");
   });
+  it("permite editar cada redacción y restaurar la propuesta antes de validar", () => {
+    for (const text of ["lb110ReviewText", "Restaurar propuesta del sistema", "lb110-edit-draft", "lb110-reviewed-redactions", "humanAmendments", "Modificar requisitos y decisiones"])
+      expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain(text);
+    expect(LB110_CAPACITY_SOLVENCY_SCRIPT).toContain("x.text=s.editDraft[x.element].trim()");
+  });
 });
