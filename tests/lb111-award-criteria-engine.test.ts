@@ -21,12 +21,21 @@ describe("LB111 · criterios de adjudicación",()=>{
   });
   it("impide juicio de valor en ASA y precio único donde la pluralidad es obligatoria",()=>{
     expect(()=>evaluateAwardCriteria({...base,criteria:[{...price,evaluation:"JUDGMENT"}]})).toThrow(/solo admite criterios.*fórmulas/);
-    expect(()=>evaluateAwardCriteria({...base,intellectualService:true})).toThrow(/más de un criterio/);
+    expect(()=>evaluateAwardCriteria({...base,intellectualService:true})).toThrow(/51 puntos de calidad/);
   });
   it("valida pluralidad, parámetros propios de anormalidad y desempate específico",()=>{
     const r=evaluateAwardCriteria({...base,procedure:"ABIERTO_SIMPLIFICADO",technicallyImprovableOrComplex:true,criteria:[{...price,weight:75},{name:"Calidad técnica",weight:25,kind:"QUALITY",evaluation:"JUDGMENT",formulaOrMethod:"Valoración por subcriterios descritos",objectLinkReason:"Afecta a la calidad de ejecución"}],singleCriterionMotivation:undefined,abnormalityRegime:"CUSTOM_OBJECTIVE_PARAMETERS",abnormalityParameters:"Umbral conjunto definido matemáticamente en el PCAP.",tieBreakRegime:"SPECIFIC_OBJECT_LINKED",tieBreakCriteria:"Medida social vinculada al personal adscrito."});
     expect(r.formulaWeight).toBe(75);expect(r.judgmentWeight).toBe(25);
     expect(r.documentaryStatements.find(x=>x.element==="SINGLE_CRITERION")).toMatchObject({status:"NOT_APPLICABLE"});
+  });
+  it("impide validar un reparto inferior al 51 % de calidad para servicios del anexo IV o intelectuales",()=>{
+    const mixed=[{...price,weight:70},{name:"Calidad",weight:30,kind:"QUALITY" as const,evaluation:"JUDGMENT" as const,formulaOrMethod:"Escala técnica detallada",objectLinkReason:"Calidad de ejecución"}];
+    const values={...base,procedure:"ABIERTO_SIMPLIFICADO" as const,criteria:mixed,abnormalityRegime:"CUSTOM_OBJECTIVE_PARAMETERS" as const,abnormalityParameters:"Umbral objetivo de oferta definido en PCAP"};
+    expect(()=>evaluateAwardCriteria({...values,annexIvService:true})).toThrow(/51 puntos de calidad/);
+    expect(()=>evaluateAwardCriteria({...values,intellectualService:true})).toThrow(/51 puntos de calidad/);
+    const valid=evaluateAwardCriteria({...values,annexIvService:true,intellectualService:true,criteria:[{...price,weight:49},{...mixed[1],weight:30},{...mixed[1],name:"Calidad automática",weight:21,evaluation:"FORMULA"}]});
+    expect(valid.formulaWeight).toBe(70);
+    expect(valid.legalBasis.some(x=>x.article==="145"&&x.paragraph==="4")).toBe(true);
   });
   it("consigna expresamente la no aplicación en contrato menor",()=>{
     const r=evaluateAwardCriteria({...base,procedure:"CONTRATO_MENOR",criteria:[]});
