@@ -21,6 +21,15 @@ describe("LB110 · capacidad, habilitación y solvencia", () => {
     expect(result.documentaryStatements.find(x => x.element === "PROHIBITIONS")?.status).toBe("APPLIES");
     expect(result.documentaryStatements.find(x => x.element === "PROFESSIONAL_AUTHORIZATION")?.status).toBe("APPLIES");
   });
+  it("redacta por separado la habilitación comprobada de cada lote", () => {
+    const result = evaluateCapacityAndSolvency({ ...base, specificProfessionalAuthorizationRequired: true, professionalAuthorizationByLot: [
+      { lot: "Lote 1", required: false },
+      { lot: "Lote 2", required: true, detail: "Inscripción exigida por la norma sectorial acreditada" },
+    ] });
+    const statement = result.documentaryStatements.find(x => x.element === "PROFESSIONAL_AUTHORIZATION");
+    expect(statement?.text).toContain("Lote 1: no se ha identificado habilitación específica");
+    expect(statement?.text).toContain("Lote 2: se exige Inscripción");
+  });
 
   it("exige requisito, medio y motivación en procedimientos sin exención", () => {
     expect(() => evaluateCapacityAndSolvency({ ...base, procedure: "ABIERTO" })).toThrow(/requisito de solvencia económica/);
