@@ -10,10 +10,13 @@ const clean=(v:string,label:string)=>{const x=String(v||"").trim();if(!x)throw n
 export function evaluatePriceRevisionDecision(i:PriceRevisionDecisionInput):PriceRevisionDecisionResult{
  if(i.contractType!=="SUPPLY"&&(i.manufacturingArmamentOrPublicEquipmentSupply||i.energySupply))throw new Error("Las categorías especiales de fabricación de armamento/equipamiento y energía solo pueden declararse en contratos de suministro.");
  const base=new UniversalPriceRevisionEngine().evaluate({contractType:i.contractType,provisionalPrice:i.provisionalPrice,manufacturingArmamentOrPublicEquipmentSupply:i.manufacturingArmamentOrPublicEquipmentSupply,energySupply:i.energySupply,investmentRecoveryPeriodYears:i.investmentRecoveryPeriodYears===null?undefined:i.investmentRecoveryPeriodYears,rawMaterialsIntermediateGoodsAndEnergySharePercent:i.rawMaterialsIntermediateGoodsAndEnergySharePercent===null?undefined:i.rawMaterialsIntermediateGoodsAndEnergySharePercent});
- if(base.eligibility==="PENDING_FACTS")throw new Error("Faltan hechos para decidir la procedencia: periodo de recuperación y participación de materias primas, bienes intermedios y energía.");
- if(i.selectedRegime==="PERIODIC_PREDETERMINED"&&base.eligibility!=="ELIGIBLE_IN_PRINCIPLE")throw new Error("La revisión seleccionada no está habilitada por los hechos declarados.");
  const applying=i.selectedRegime==="PERIODIC_PREDETERMINED";
- const justification=applying?clean(i.justification,"la justificación económica y jurídica de la revisión"):clean(i.justification,"la motivación de que no procede la revisión");
+ if(applying&&base.eligibility==="PENDING_FACTS")throw new Error("Faltan hechos para decidir la procedencia: periodo de recuperación y participación de materias primas, bienes intermedios y energía.");
+ if(applying&&base.eligibility!=="ELIGIBLE_IN_PRINCIPLE")throw new Error("La revisión seleccionada no está habilitada por los hechos declarados.");
+ const defaultNoRevision=i.provisionalPrice
+  ?"No procede la revisión de precios porque el contrato utiliza precios provisionales, conforme al artículo 102.7 LCSP."
+  :"No se establece revisión periódica y predeterminada de precios porque no se han acreditado los supuestos y condiciones exigidos por los artículos 103 a 105 LCSP.";
+ const justification=applying?clean(i.justification,"la justificación económica y jurídica de la revisión"):(String(i.justification||"").trim()||defaultNoRevision);
  if(!applying&&i.officialIndices.length)throw new Error("No deben declararse índices si la revisión no procede.");
  const formula=applying?clean(i.formula,"la fórmula periódica y predeterminada"):"No procede.";
  const seen=new Set<string>();const indices=i.officialIndices.map((x,n)=>{const component=clean(x.component,`el componente ${n+1}`),officialIndex=clean(x.officialIndex,`el índice oficial ${n+1}`);if(seen.has(component.toLowerCase()))throw new Error(`Componente duplicado: ${component}.`);seen.add(component.toLowerCase());if(!Number.isFinite(x.weightPercent)||x.weightPercent<=0||x.weightPercent>100)throw new Error(`Peso inválido del componente ${component}.`);return{component,officialIndex,weightPercent:x.weightPercent};});
