@@ -17,8 +17,8 @@ describe("LB120 · interfaz de cierre", () => {
   });
 
   it("conserva un estado documental pendiente sin devolver el expediente al paso 7", () => {
-    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain('s.status=pf.snapshotReady&&!pf.generationReady?"MODEL_PENDING":"REVIEW"');
-    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain('s.decisionStatus=pf.snapshotReady?"VALIDATED":"PENDING"');
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain('s.status=pf.documentState==="MODELOS_PENDIENTES"?"MODEL_PENDING":"REVIEW"');
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("s.decisionStatus=pf.decisionState");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("s.documentStatus=");
   });
 
