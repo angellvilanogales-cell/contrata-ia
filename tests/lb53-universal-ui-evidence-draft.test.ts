@@ -21,6 +21,13 @@ describe("LB53 - evidencia desde UI universal", () => {
   });
 
   it("preserva un conflicto sin elegir automáticamente un valor", () => {
+  it("admite y valida la decisión sobre criterios sujetos a juicio de valor", () => {
+    const declared = declareUniversalUiEvidence({ fieldPath: "criteria.judgmentCriteriaExist", value: false }, "operator");
+    const validated = validateUniversalUiEvidence(declared, "reviewer");
+    expect(validated.value).toBe(false);
+    expect(validated.status).toBe("HUMAN_VALIDATED");
+  });
+
     const conflict = markUniversalUiEvidenceConflict("execution.plannedModificationRegime", ["No procede", "20 % a la baja"], [ref, { kind: "PRIMARY_DOCUMENT", sourceId: "doc:otro" }]);
     expect(conflict.status).toBe("SOURCE_CONFLICT");
     expect(conflict.value).toBeNull();
