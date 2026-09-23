@@ -47,4 +47,16 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("applyDemoEconomicDefaults");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Supuesto del ejemplo");
   });
+
+  it("aplica organización y traducción transversal a los bloques venideros", () => {
+    for (const text of [
+      "#lb114Block label",
+      "#lb119Block label",
+      "translateVisibleCodes",
+      "Memoria justificativa",
+      "Pliego de cláusulas administrativas particulares",
+      "Sin acceso a datos personales",
+      "Obligación contractual esencial",
+    ]) expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain(text);
+  });
 });
