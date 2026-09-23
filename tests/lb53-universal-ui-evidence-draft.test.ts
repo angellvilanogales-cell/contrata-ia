@@ -20,7 +20,6 @@ describe("LB53 - evidencia desde UI universal", () => {
     expect(validated.diagnostics?.join(" ")).toMatch(/reviewer/);
   });
 
-  it("preserva un conflicto sin elegir automáticamente un valor", () => {
   it("admite y valida la decisión sobre criterios sujetos a juicio de valor", () => {
     const declared = declareUniversalUiEvidence({ fieldPath: "criteria.judgmentCriteriaExist", value: false }, "operator");
     const validated = validateUniversalUiEvidence(declared, "reviewer");
@@ -28,6 +27,20 @@ describe("LB53 - evidencia desde UI universal", () => {
     expect(validated.status).toBe("HUMAN_VALIDATED");
   });
 
+  it("admite todos los valores numéricos y booleanos que confirma el bloque de garantías", () => {
+    const values: Record<string, unknown> = {
+      "guarantees.provisionalGuaranteeRequired": false,
+      "guarantees.provisionalGuaranteePercent": 2.5,
+      "guarantees.definitiveGuaranteePercent": 5,
+      "guarantees.complementaryGuaranteePercent": 1.25,
+    };
+    for (const [fieldPath, value] of Object.entries(values)) {
+      const field = declareUniversalUiEvidence({ fieldPath, value }, "operator");
+      expect(validateUniversalUiEvidence(field, "reviewer").status).toBe("HUMAN_VALIDATED");
+    }
+  });
+
+  it("preserva un conflicto sin elegir automáticamente un valor", () => {
     const conflict = markUniversalUiEvidenceConflict("execution.plannedModificationRegime", ["No procede", "20 % a la baja"], [ref, { kind: "PRIMARY_DOCUMENT", sourceId: "doc:otro" }]);
     expect(conflict.status).toBe("SOURCE_CONFLICT");
     expect(conflict.value).toBeNull();
