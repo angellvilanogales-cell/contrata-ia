@@ -1,0 +1,7 @@
+import { HttpPersistedTemplateAssetStore,type PersistedTemplateAssetDescriptor } from "../lb94/HttpPersistedTemplateAssetStore";
+import { MIXED_SUPPLY_SERVICE_TEMPLATE_MANIFEST,type MixedSupplyServiceProfile } from "./MixedSupplyServiceTemplateManifest";
+function assets(profile:MixedSupplyServiceProfile):readonly PersistedTemplateAssetDescriptor[]{return MIXED_SUPPLY_SERVICE_TEMPLATE_MANIFEST.filter(item=>item.profile===profile).map(item=>({kind:item.kind==="MEMORY"?"MEMORIA":item.kind,templateId:item.templateId,sourceId:item.templateId,sha256:item.expectedSha256,styleFingerprint:item.expectedStyleFingerprint,provenanceRole:"CONTRATA_IA_DERIVED_MIXED_SPECIALIZED_TEMPLATE" as const}));}
+export const LB99_MIXED_SUPPLY_PRINCIPAL_ASSETS=assets("SUPPLY_PRINCIPAL");
+export const LB99_MIXED_SERVICE_PRINCIPAL_ASSETS=assets("SERVICE_PRINCIPAL");
+export function createHttpPersistedMixedSupplyServiceTemplateAssetStore(endpoint:string,token:string,profile:MixedSupplyServiceProfile){return new HttpPersistedTemplateAssetStore(endpoint,token,assets(profile));}
+export function createHttpPersistedMixedSupplyServiceTemplateAssetStoreFromEnv(profile:MixedSupplyServiceProfile):HttpPersistedTemplateAssetStore|null{const endpoint=process.env.CONTRATA_IA_PERSISTENCE_URL?.trim();const token=process.env.CONTRATA_IA_PERSISTENCE_TOKEN?.trim();if(!endpoint||!token)return null;return createHttpPersistedMixedSupplyServiceTemplateAssetStore(endpoint,token,profile);}

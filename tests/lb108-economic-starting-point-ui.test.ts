@@ -1,0 +1,111 @@
+import { describe, expect, it } from "vitest";
+import { LB108_ECONOMIC_STARTING_POINT_SCRIPT } from "../src/interfaces/lb103/LB108EconomicStartingPointScript";
+
+describe("LB108 · interfaz del bloque económico", () => {
+  it("propone metodología, despliega apoyos y carga documentos con huella", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Metodología de valoración propuesta");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("lb108Supports");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("lb108Documents");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("valuation-documents");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("SHA-256");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.valuationMethodologies");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.supportingDocuments=valuationDocuments");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Puede seleccionar una o varias");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('class="lb108Method" type="checkbox"');
+    for (const text of ["Qué acredita", "Costes laborales o convenio", "Consumos o volúmenes históricos", "Documentos posibles:"])
+      expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("var code=support[0]");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("· Obligatorio");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("supportSelectionError");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("requiere al menos uno de estos apoyos principales");
+  });
+  it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Propuesta inicial 76/18/6");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no una proporción impuesta por la LCSP");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("updateAutomaticAmounts");
+  });
+  it("integra la fuente en la lista y reserva texto libre solo para otra fuente", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('"MARKET_CONSULTATION","OTHER_JUSTIFIED"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Otra fuente justificada");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("consolidateValuationSelector");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('hidden.id="lb108Evidence"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Identifique la otra fuente y justifique su idoneidad");
+  });
+  it("separa el límite presupuestario de la ayuda para justificar el precio", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Está el contrato restringido por un límite presupuestario?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("No existe un límite prefijado");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("no confirma por sí solo la existencia de crédito");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿En qué situación se encuentra el presupuesto?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Ya tengo el presupuesto y su justificación");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Quiero calcularlo con la herramienta de presupuesto");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('payload.budgetConstraint=flow.budgetConstraint');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('delete payload.grossCreditLimitCents');
+  });
+
+  it("ofrece un calculador guiado y trazable para servicios", () => {
+    for (const text of [
+      "Calculador guiado del presupuesto del servicio",
+      "Unidad de cálculo",
+      "Precio unitario sin IVA",
+      "Fuente del precio",
+      "Costes indirectos sobre los costes directos",
+      "Beneficio sobre costes directos e indirectos",
+      "PBL con IVA",
+    ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("readGuidedServiceCostStudy");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("payload.guidedServiceCostStudy");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('flow.valuationAssistance!=="ASSISTED"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Aplicar cálculo al PBL");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('guided.dataset.applied==="true"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('budget.removeAttribute("readonly")');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Puede escribir directamente el PBL");
+  });
+
+  it("adapta el recorrido al conocimiento real del precio", () => {
+    for (const text of [
+      "¿Qué información tiene sobre el precio?",
+      "Conozco el precio total",
+      "Conozco precios unitarios",
+      "Solo conozco el límite disponible",
+      "No sé calcular el precio",
+      "El límite disponible no determina por sí solo el precio",
+      "Datos de la prestación ya conocidos",
+      "No dispongo de ninguna referencia",
+      "no se inventará ningún importe",
+    ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(text);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('priceKnowledge==="KNOWN_UNIT_PRICES"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('s.priceKnowledge="KNOWN_TOTAL"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('s.priceKnowledge="PENDING_SOURCE"');
+  });
+
+  it("pregunta de forma expresa por el régimen de necesidades de la DA 33ª", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("¿Las cantidades dependerán de las necesidades reales durante el contrato?");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('name="lb108Successive" type="radio" value="NO"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('name="lb108Successive" type="radio" value="YES"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La Administración no queda obligada a consumir la totalidad del presupuesto");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("successiveNeeds:successiveNeedsValue()");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('id="lb108Successive" type="checkbox"');
+  });
+
+  it("bloquea procedimiento y pliegos mientras falta la valoración", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("El aplicativo no inventará el PBL, el valor estimado ni el procedimiento");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("La generación de pliegos permanece bloqueada");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("MARKET_CONSULTATION");
+  });
+
+  it("registra cada magnitud económica únicamente tras confirmación humana", () => {
+    for (const path of [
+      "baseTenderBudgetCents",
+      "economic.initialVatAmountCents",
+      "economic.initialPblVatIncludedCents",
+      "economic.legalEstimatedValueCents",
+      "economic.estimatedValueCalculationMethod",
+      "durationMonths",
+      "extensionMonths",
+    ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidence(id,"${path}"`);
+    for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"])
+      expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidenceRaw(id,"${path}"`);
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('validateEvidence(id,"procedure"');
+  });
+});
