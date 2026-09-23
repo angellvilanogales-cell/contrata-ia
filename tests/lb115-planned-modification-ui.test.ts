@@ -9,6 +9,9 @@ describe("LB115 · interfaz",()=>{
   it("solo ofrece la causa de la disposición adicional 33 cuando corresponde",()=>{
     for(const x of ['allowDa33=da33===true','if(allowDa33)','no se muestra porque no corresponde a este expediente']) expect(LB115_PLANNED_MODIFICATION_SCRIPT).toContain(x);
   });
+  it("recupera las magnitudes ya validadas en el bloque económico",()=>{
+    for(const x of ["a.__lb108&&a.__lb108.result","economic.budget.baseTenderBudgetExVatCents","economic.estimatedValue.legalEstimatedValueCents"]) expect(LB115_PLANNED_MODIFICATION_SCRIPT).toContain(x);
+  });
   it("persiste siete componentes, informa del progreso y registra el consentimiento",()=>{
     for(const p of ["modificationPercent","economic.modificationAmountExVatCents","execution.plannedModificationRegime","execution.plannedModificationJustification","execution.plannedModificationProcedure","execution.plannedModificationNoNewUnitPrices","execution.plannedModificationValueEstimatedTreatment"]) expect(LB115_PLANNED_MODIFICATION_SCRIPT).toContain(p);
     expect(LB115_PLANNED_MODIFICATION_SCRIPT).toContain("Guardando decisión");
