@@ -3,7 +3,6 @@ import { DocumentType } from "../src/domain/documentModel/DocumentType";
 import { TipoProcedimiento } from "../src/domain/procedimiento/TipoProcedimiento";
 import { selectUniversalDocumentSource } from "../src/domain/documentModel/UniversalDocumentSourceSelector";
 import { buildDocumentLibraryCoverageReport } from "../src/domain/documentModel/UniversalDocumentLibraryCoverageReport";
-import { getIsolationPendingEvidence } from "../src/domain/documentModel/DocumentarySourceEvidenceCatalogue";
 
 describe("LB91.41-45 - biblioteca documental multidimensional", () => {
   it("selecciona el PCAP general editable supply ASA autofinanciado", () => {
@@ -30,7 +29,7 @@ describe("LB91.41-45 - biblioteca documental multidimensional", () => {
     expect(result.blockers[0]).toMatch(/expediente/);
   });
 
-  it("bloquea el ODT de servicios con fondos europeos hasta aislar el binario original", () => {
+  it("selecciona el PCAP de trabajo verificado para servicios con fondos europeos", () => {
     const result = selectUniversalDocumentSource({
       contractType: "SERVICE",
       documentType: DocumentType.PCAP,
@@ -38,8 +37,8 @@ describe("LB91.41-45 - biblioteca documental multidimensional", () => {
       financing: "EU_FUNDS",
       technicalFamily: "GENERAL_ADMINISTRATIVE",
     });
-    expect(result.status).toBe("ISOLATION_REQUIRED");
-    expect(getIsolationPendingEvidence().some(item => item.id.includes("SERVICE-ASA-EU-FUNDS"))).toBe(true);
+    expect(result.status).toBe("GENERAL_EDITABLE_SELECTED");
+    expect(result.selected?.officialModelClaimed).toBe(false);
   });
 
   it("distingue PPT de limpieza de PPT de formación", () => {
@@ -57,6 +56,6 @@ describe("LB91.41-45 - biblioteca documental multidimensional", () => {
       { contractType: "SERVICE", documentType: DocumentType.PCAP, procedure: TipoProcedimiento.ABIERTO_SIMPLIFICADO, financing: "EU_FUNDS", technicalFamily: "GENERAL_ADMINISTRATIVE" },
       { contractType: "SERVICE", documentType: DocumentType.PPT, technicalFamily: "CLEANING" },
     ]);
-    expect(report.map(item => item.generationReady)).toEqual([true, false, false]);
+    expect(report.map(item => item.generationReady)).toEqual([true, true, false]);
   });
 });

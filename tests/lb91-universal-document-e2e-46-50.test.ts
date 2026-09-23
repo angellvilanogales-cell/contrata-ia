@@ -106,7 +106,7 @@ describe("LB91.46-50 - selección documental canónica y E2E físico", () => {
     expect(result.humanAcceptanceStillRequired).toBe(true);
   });
 
-  it("E2E servicios con fondos europeos bloquea PCAP mientras el ODT siga pendiente de aislamiento", () => {
+  it("E2E servicios con fondos europeos habilita el PCAP de trabajo acreditado", () => {
     const result = evaluateUniversalAdministrativePackagePreflight(
       state("SERVICE", TipoProcedimiento.ABIERTO_SIMPLIFICADO),
       {
@@ -119,8 +119,8 @@ describe("LB91.46-50 - selección documental canónica y E2E físico", () => {
       },
     );
     const pcap = result.documents.find(item => item.documentType === DocumentType.PCAP);
-    expect(pcap?.decision).toBe("BLOCKED");
-    expect(pcap?.selectedSourceId).toBe("SERVICE-ASA-EU-FUNDS-ODT-ISOLATION-PENDING");
+    expect(pcap?.decision).toBe("RENDER_ALLOWED");
+    expect(pcap?.selectedSourceId).toBe("contrata-ia:service:pcap:general:LB96-SERVICE-PCAP-DERIVED-ODT-V2");
     expect(result.packageReady).toBe(false);
   });
 });

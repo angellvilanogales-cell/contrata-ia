@@ -1,4 +1,4 @@
-import { HttpPersistedTemplateAssetStore, type PersistedTemplateAssetDescriptor } from "../lb94/HttpPersistedTemplateAssetStore";
+import { HttpPersistedTemplateAssetStore, LB94_SUPPLY_GENERAL_RUNTIME_ASSETS, type PersistedTemplateAssetDescriptor } from "../lb94/HttpPersistedTemplateAssetStore";
 import { SERVICE_GENERAL_TEMPLATE_MANIFEST } from "./ServiceGeneralTemplateManifest";
 
 export const LB96_SERVICE_GENERAL_RUNTIME_ASSETS: readonly PersistedTemplateAssetDescriptor[] = SERVICE_GENERAL_TEMPLATE_MANIFEST.map(item => ({
@@ -27,4 +27,15 @@ export function createHttpPersistedServiceTemplateAssetStoreFromEnv(): HttpPersi
   const token = process.env.CONTRATA_IA_PERSISTENCE_TOKEN?.trim();
   if (!endpoint || !token) return null;
   return createHttpPersistedServiceTemplateAssetStore(endpoint, token);
+}
+
+/** Inventario universal explícito: conserva identidades separadas, pero permite al servidor despachar por familia. */
+export function createHttpPersistedUniversalTemplateAssetStoreFromEnv(): HttpPersistedTemplateAssetStore | null {
+  const endpoint = process.env.CONTRATA_IA_PERSISTENCE_URL?.trim();
+  const token = process.env.CONTRATA_IA_PERSISTENCE_TOKEN?.trim();
+  if (!endpoint || !token) return null;
+  return new HttpPersistedTemplateAssetStore(endpoint, token, [
+    ...LB94_SUPPLY_GENERAL_RUNTIME_ASSETS,
+    ...LB96_SERVICE_GENERAL_RUNTIME_ASSETS,
+  ]);
 }

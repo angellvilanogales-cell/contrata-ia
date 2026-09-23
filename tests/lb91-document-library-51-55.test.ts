@@ -74,7 +74,7 @@ describe("LB91.51-55 - biblioteca productiva universal", () => {
     expect(renderer.render).toHaveBeenCalledTimes(1);
   });
 
-  it("no invoca el renderer para el PCAP europeo de servicios pendiente de aislamiento", async () => {
+  it("invoca el renderer para el PCAP europeo de servicios ya acreditado", async () => {
     const renderer = { render: vi.fn(async () => ({ outputId: "should-not-exist" })) };
     const result = await renderUniversalPhysicalDocument(
       serviceState(),
@@ -82,8 +82,8 @@ describe("LB91.51-55 - biblioteca productiva universal", () => {
       { financing: "EU_FUNDS", technicalFamily: "GENERAL_ADMINISTRATIVE" },
       renderer,
     );
-    expect(result.status).toBe("BLOCKED");
-    expect(renderer.render).not.toHaveBeenCalled();
+    expect(result.status).toBe("RENDERED");
+    expect(renderer.render).toHaveBeenCalledTimes(1);
   });
 
   it("no confunde el primer render universal con aceptación humana final", async () => {

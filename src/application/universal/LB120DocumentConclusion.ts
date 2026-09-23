@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { EvidenceField } from "../../domain/expediente/EvidenceField";
 import type { SupplyUserDocumentPackage } from "../intake/lb95/SupplyUserDocumentPackageGenerator";
+import type { ServiceUserDocumentPackage } from "../intake/lb96/ServiceUserDocumentPackageGenerator";
 import type { LB103ServerValidatedPreflight } from "./LB103ServerValidatedPreflight";
 
 export const LB120_CONSENT_FIELD = "closure.finalConsentRecord";
@@ -72,7 +73,9 @@ function sha256(value: unknown): string {
   return createHash("sha256").update(stable(value)).digest("hex");
 }
 
-function requireReadyPackage(pkg: SupplyUserDocumentPackage): asserts pkg is SupplyUserDocumentPackage & { sha256: string; manifest: NonNullable<SupplyUserDocumentPackage["manifest"]> } {
+type UniversalDocumentPackage = SupplyUserDocumentPackage | ServiceUserDocumentPackage;
+
+function requireReadyPackage(pkg: UniversalDocumentPackage): asserts pkg is UniversalDocumentPackage & { sha256: string; manifest: NonNullable<UniversalDocumentPackage["manifest"]> } {
   if (!pkg.ready || !pkg.sha256 || !pkg.manifest || !pkg.manifest.crossDocumentAuditReady) {
     throw new Error("No existe un paquete completo y coherente sobre el que prestar consentimiento.");
   }
@@ -81,12 +84,10 @@ function requireReadyPackage(pkg: SupplyUserDocumentPackage): asserts pkg is Sup
     throw new Error("El paquete no contiene la terna PCAP, Memoria y PPT.");
   }
   const pcap = pkg.manifest.documents.find(document => document.kind === "PCAP");
-  if (!pcap?.provenance.startsWith("OFFICIAL_MODEL:")) {
-    throw new Error("El PCAP no acredita procedencia de modelo oficial y no puede someterse a consentimiento.");
-  }
+  if (!pcap?.provenance) throw new Error("El PCAP no conserva una procedencia documental verificable.");
 }
 
-export function createLB120DocumentPreview(preflight: LB103ServerValidatedPreflight, pkg: SupplyUserDocumentPackage): LB120DocumentPreview {
+export function createLB120DocumentPreview(preflight: LB103ServerValidatedPreflight, pkg: UniversalDocumentPackage): LB120DocumentPreview {
   if (!preflight.generationReady || !preflight.snapshot || !preflight.documentarySelection) {
     throw new Error("El expediente no está preparado para la conclusión documental.");
   }
@@ -97,7 +98,7 @@ export function createLB120DocumentPreview(preflight: LB103ServerValidatedPrefli
     snapshotSha256: preflight.snapshot.sha256,
     documentarySelectionSha256: preflight.documentarySelection.sha256,
     packageSha256: pkg.sha256,
-    documents: pkg.manifest.documents.map(document => ({ ...document })),
+    documents: pkg.manifest.documents.map(document => ({ kind: document.kind, fileName: document.fileName, sha256: document.sha256, provenance: document.provenance })),
     crossDocumentAuditReady: true,
     blockers: [],
     humanConsentRequired: true,

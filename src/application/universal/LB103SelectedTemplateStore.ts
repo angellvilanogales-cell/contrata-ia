@@ -1,12 +1,13 @@
 import { createHash } from "node:crypto";
 import type { UniversalEditableTemplateBinaryStore } from "../intake/lb23/UniversalOdtProductionRenderer";
 import { LB94_SUPPLY_GENERAL_RUNTIME_ASSETS } from "../intake/lb94/HttpPersistedTemplateAssetStore";
+import { LB96_SERVICE_GENERAL_RUNTIME_ASSETS } from "../intake/lb96/ServicePersistedTemplateAssetStore";
 import type { LB103ProtectedDocumentarySelection } from "./LB103ServerValidatedPreflight";
 
 /** Every physical read is restricted to the source identity sealed by preflight. */
 export function selectedLB103TemplateStore(store: UniversalEditableTemplateBinaryStore, selection: LB103ProtectedDocumentarySelection): UniversalEditableTemplateBinaryStore {
   return { async get(templateId) {
-    const descriptor = LB94_SUPPLY_GENERAL_RUNTIME_ASSETS.find(asset => asset.templateId === templateId);
+    const descriptor = [...LB94_SUPPLY_GENERAL_RUNTIME_ASSETS, ...LB96_SERVICE_GENERAL_RUNTIME_ASSETS].find(asset => asset.templateId === templateId);
     const selectionId = templateId === "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" ? "JDA-SUPPLY-ASA-PCAP-GENERAL-ODT" : templateId;
     const selected = selection.documents.find(document => document.selectedSourceId === selectionId);
     if (!descriptor || !selected || selected.status !== "GENERAL_EDITABLE_SELECTED" || selected.selectedSourceSha256 !== descriptor.sha256 || selected.selectedProvenanceRole !== descriptor.provenanceRole) {

@@ -37,6 +37,23 @@ function supplyCase(): AdaptiveStoredCase {
   };
 }
 
+function serviceCase(): AdaptiveStoredCase {
+  const value = supplyCase();
+  return {
+    ...value,
+    caseId: "EXP-SERVICE-001",
+    answers: { __lb103: { contractType: "SERVICE", decisions: {}, phase: "READY_FOR_DOCUMENT_GENERATION" } } as any,
+    universalEvidence: {
+      ...value.universalEvidence,
+      contractType: validated("contractType", "SERVICE"),
+      object: validated("object", "Servicio de formación lingüística mediante aula virtual"),
+      cpvMain: validated("cpvMain", "79634000-7"),
+      procedure: validated("procedure", "ABIERTO_SIMPLIFICADO"),
+      "economic.fundingSource": validated("economic.fundingSource", "EU_FUNDS"),
+    },
+  };
+}
+
 describe("LB103 · snapshot servidor y preflight documental", () => {
   it("construye SHA determinista solo con evidencia humanamente validada", () => {
     const first = evaluateLB103ServerValidatedPreflight(supplyCase());
@@ -128,6 +145,21 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(result.documents.every(item => item.status === "BLOCKED")).toBe(true);
     expect(result.documents.every(item => item.selectedSourceId === undefined)).toBe(true);
     expect(result.productionReady).toBe(false);
+  });
+
+  it("selecciona la terna editable de servicios ASO con fondos europeos", () => {
+    const result = evaluateLB103ServerValidatedPreflight(serviceCase());
+    expect(result.snapshotReady).toBe(true);
+    expect(result.packageReady).toBe(true);
+    expect(result.generationReady).toBe(true);
+    expect(result.documentState).toBe("DOCUMENTOS_LISTOS_PARA_REVISION");
+    expect(result.documents.map(item => item.selectedSourceId)).toEqual([
+      "contrata-ia:service:memory:general:LB96-SERVICE-GENERAL-ODT-V2",
+      "contrata-ia:service:pcap:general:LB96-SERVICE-PCAP-DERIVED-ODT-V2",
+      "contrata-ia:service:ppt:general:LB96-SERVICE-GENERAL-ODT-V2",
+    ]);
+    expect(result.documents.every(item => item.selectedProvenanceRole === "CONTRATA_IA_DERIVED_GENERAL_TEMPLATE")).toBe(true);
+    expect(result.documents.every(item => item.officialModelClaimed === false)).toBe(true);
   });
 
   it("bloquea el snapshot si una decisión aplicable carece de validación trazable", () => {

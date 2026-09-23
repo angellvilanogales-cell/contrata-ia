@@ -7,6 +7,7 @@ import { SecurityPolicy } from "../lb7/SecurityPolicy";
 import { AdaptiveCaseStore } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
 import { HttpAdaptiveCaseMirror } from "../../infrastructure/operations/lb85/ExternalAdaptiveCaseMirror";
 import { createHttpPersistedTemplateAssetStoreFromEnv } from "../../application/intake/lb94/HttpPersistedTemplateAssetStore";
+import { createHttpPersistedUniversalTemplateAssetStoreFromEnv } from "../../application/intake/lb96/ServicePersistedTemplateAssetStore";
 import { generateLB103AuthoritativeSupplyPackage } from "../../application/universal/LB103AuthoritativeSupplyGeneration";
 import { evaluateLB103ServerValidatedPreflight } from "../../application/universal/LB103ServerValidatedPreflight";
 import { LB103_AUTHORITATIVE_GENERATION_SCRIPT } from "./LB103AuthoritativeGenerationScript";
@@ -354,7 +355,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         const body = await readJson(request);
         const caseValue=caseStore.get(lb120PreviewCaseId); const priorBlockers=auditLB120PriorDecisionEvidence(caseValue.universalEvidence??{});
         if(priorBlockers.length){sendJson(response,409,{error:"D20 exige el cierre validado de D01 a D19.",blockers:priorBlockers,productionReady:false});return;}
-        const templateStore = createHttpPersistedTemplateAssetStoreFromEnv();
+        const templateStore = createHttpPersistedUniversalTemplateAssetStoreFromEnv();
         if (!templateStore) { sendJson(response,503,{error:"La vista previa exige la persistencia remota acreditada de plantillas.",productionReady:false}); return; }
         const result = await generateLB103AuthoritativeSupplyPackage({caseValue,presentedSeals:{snapshotSha256:typeof body.snapshotSha256==="string"?body.snapshotSha256:"",documentarySelectionSha256:typeof body.documentarySelectionSha256==="string"?body.documentarySelectionSha256:""},templateStore});
         if (!result.ready || !result.package) { sendJson(response,409,{error:"La vista previa D20 ha sido bloqueada.",blockers:result.blockers,productionReady:false}); return; }
@@ -367,7 +368,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         const body = await readJson(request) as unknown as LB120ConsentInput;
         const caseValue=caseStore.get(lb120ConsentCaseId); const priorBlockers=auditLB120PriorDecisionEvidence(caseValue.universalEvidence??{});
         if(priorBlockers.length){sendJson(response,409,{error:"D20 exige el cierre validado de D01 a D19.",blockers:priorBlockers,productionReady:false});return;}
-        const templateStore = createHttpPersistedTemplateAssetStoreFromEnv();
+        const templateStore = createHttpPersistedUniversalTemplateAssetStoreFromEnv();
         if (!templateStore) { sendJson(response,503,{error:"El consentimiento exige la persistencia remota acreditada de plantillas.",productionReady:false}); return; }
         const result = await generateLB103AuthoritativeSupplyPackage({caseValue,presentedSeals:{snapshotSha256:body.snapshotSha256??"",documentarySelectionSha256:body.documentarySelectionSha256??""},templateStore});
         if (!result.ready || !result.package) { sendJson(response,409,{error:"El consentimiento D20 ha sido bloqueado.",blockers:result.blockers,productionReady:false}); return; }
@@ -390,7 +391,7 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         const body = await readJson(request);
         const snapshotSha256 = typeof body.snapshotSha256 === "string" ? body.snapshotSha256 : "";
         const documentarySelectionSha256 = typeof body.documentarySelectionSha256 === "string" ? body.documentarySelectionSha256 : "";
-        const templateStore = createHttpPersistedTemplateAssetStoreFromEnv();
+        const templateStore = createHttpPersistedUniversalTemplateAssetStoreFromEnv();
         if (!templateStore) {
           sendJson(response, 503, {
             error: "La generación universal exige la persistencia remota acreditada de plantillas.",

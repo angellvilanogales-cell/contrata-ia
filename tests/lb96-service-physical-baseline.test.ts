@@ -11,13 +11,12 @@ describe("LB96 Service physical baseline", () => {
     expect(result.regressionCases).toContain("REG-SERVICE-007");
   });
 
-  it("mantiene bloqueada la generación física hasta aislar y promover un binario editable Service", () => {
+  it("declara lista la terna física tras aislar y promover los binarios editables Service", () => {
     const result = evaluateServicePhysicalBaseline();
-    expect(result.pcap.editableBinaryIsolated).toBe(false);
-    expect(result.pcap.generalTemplatePromoted).toBe(false);
-    expect(result.physicalPackageReady).toBe(false);
-    expect(result.blockers.join(" ")).toContain("binario editable Service aislado");
-    expect(result.blockers.join(" ")).toContain("plantilla general");
+    expect(result.pcap.editableBinaryIsolated).toBe(true);
+    expect(result.pcap.generalTemplatePromoted).toBe(true);
+    expect(result.physicalPackageReady).toBe(true);
+    expect(result.blockers).toEqual([]);
     expect(result.humanValidationRequired).toBe(true);
   });
 });

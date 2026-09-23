@@ -15,7 +15,8 @@ describe("LB91.36-40 - explotación conservadora de fuentes documentales", () =>
     expect(ids).toContain("CARL-2024-PPT-SERVICE-CLEANING");
     expect(ids).toContain("SAE-HUELVA-PPT-SERVICE-CLEANING");
     expect(ids).toContain("FPE-5G-2024-PPT-SERVICE-TRAINING");
-    expect(sources.every(item => item.generalizable === false)).toBe(true);
+    expect(sources.filter(item => item.role !== "GENERAL_MODEL").every(item => item.generalizable === false)).toBe(true);
+    expect(sources.some(item => item.role === "GENERAL_MODEL" && item.generalizable)).toBe(true);
   });
 
   it("incorpora el PCAP real de servicios por abierto simplificado ordinario como perfil lógico, no físico", () => {

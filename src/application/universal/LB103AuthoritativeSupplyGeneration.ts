@@ -5,6 +5,7 @@ import {
   type SupplyUserDocumentPackage,
 } from "../intake/lb95/SupplyUserDocumentPackageGenerator";
 import type { AdaptiveStoredCase } from "../../infrastructure/operations/lb7/AdaptiveCaseStore";
+import { generateServiceUserDocumentPackage, type ServiceUserDocumentPackage } from "../intake/lb96/ServiceUserDocumentPackageGenerator";
 import { selectedLB103TemplateStore } from "./LB103SelectedTemplateStore";
 import {
   evaluateLB103ServerValidatedPreflight,
@@ -19,7 +20,7 @@ export interface LB103PresentedGenerationSeals {
 export interface LB103AuthoritativeSupplyGenerationResult {
   ready: boolean;
   preflight: LB103ServerValidatedPreflight;
-  package: SupplyUserDocumentPackage | null;
+  package: SupplyUserDocumentPackage | ServiceUserDocumentPackage | null;
   blockers: readonly string[];
   humanAcceptanceStillRequired: true;
   productionReady: false;
@@ -103,13 +104,10 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
     blockers.push("La selección documental presentada por /adaptive diverge de la selección reconstruida por el servidor.");
   }
 
-  if (preflight.snapshot && preflight.snapshot.contractType !== "SUPPLY") {
-    blockers.push("El generador Supply no puede utilizarse para otra familia contractual.");
-  }
-  if (preflight.snapshot && preflight.snapshot.procedure !== "ABIERTO_SIMPLIFICADO_ABREVIADO") {
+  if (preflight.snapshot?.contractType === "SUPPLY" && preflight.snapshot.procedure !== "ABIERTO_SIMPLIFICADO_ABREVIADO") {
     blockers.push("La terna Supply acreditada exige procedimiento abierto simplificado abreviado.");
   }
-  if (preflight.snapshot && preflight.snapshot.financing !== "AUTOFINANCED") {
+  if (preflight.snapshot?.contractType === "SUPPLY" && preflight.snapshot.financing !== "AUTOFINANCED") {
     blockers.push("La terna Supply acreditada exige financiación autofinanciada.");
   }
 
@@ -129,15 +127,17 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
     fields: documentaryEvidence(caseValue.universalEvidence ?? {}),
     updatedAt: documentaryUpdatedAt(caseValue.universalEvidence ?? {}, caseValue.updatedAt),
   };
-  const generator = input.generator ?? generateSupplyUserDocumentPackage;
-  const pkg = await generator({ record, templateStore: selectedLB103TemplateStore(input.templateStore, preflight.documentarySelection!), authoritativeSeals: {...input.presentedSeals} });
+  const protectedStore = selectedLB103TemplateStore(input.templateStore, preflight.documentarySelection!);
+  const pkg = preflight.snapshot!.contractType === "SERVICE"
+    ? await generateServiceUserDocumentPackage({ record, templateStore: protectedStore })
+    : await (input.generator ?? generateSupplyUserDocumentPackage)({ record, templateStore: protectedStore, authoritativeSeals: {...input.presentedSeals} });
 
   if (!pkg.ready || !pkg.bytes || !pkg.manifest) {
     return {
       ready: false,
       preflight,
       package: pkg,
-      blockers: pkg.blockers.length ? pkg.blockers : ["El generador atómico Supply no produjo un paquete utilizable."],
+      blockers: pkg.blockers.length ? pkg.blockers : ["El generador documental no produjo un paquete utilizable."],
       humanAcceptanceStillRequired: true,
       productionReady: false,
     };
