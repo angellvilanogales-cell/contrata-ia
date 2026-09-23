@@ -49,6 +49,24 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Recuperando el paso");
   });
 
+  it("separa adjudicación de condiciones contractuales y hace visible la subnumeración", () => {
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain(
+      '{n:3,title:"Adjudicación",keys:["__lb109","__lb110","__lb111"]',
+    );
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain(
+      '{n:4,title:"Condiciones contractuales",keys:["__lb112","__lb113","__lb114","__lb115","__lb116"]',
+    );
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Apartados ");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("step.n+'.1 a '");
+  });
+
+  it("distingue el paso documental de los siete pasos de decisiones", () => {
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Decisiones completas · modelos pendientes");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Preparación documental");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("MODEL_PENDING");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Modelo compatible verificado");
+  });
+
   it("permite volver y fija los supuestos económicos del ejemplo", () => {
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Volver al paso anterior");
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("budgetLimitVatIncludedCents:5500000");
