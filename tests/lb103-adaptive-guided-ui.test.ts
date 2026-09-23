@@ -54,16 +54,24 @@ describe("LB103 · integración guiada en /adaptive", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("selección del modelo documental permanecerá bloqueada");
   });
 
-  it("ejecuta el preflight en servidor y presenta SHA, modelos y bloqueos", () => {
+  it("ejecuta la comprobación en servidor y la presenta en lenguaje comprensible", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("/lb103-preflight");
-    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Construir snapshot y comprobar modelos");
-    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Snapshot canónico validado");
-    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("SHA-256");
-    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Selección documental");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Preparar documentos y comprobar modelos");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Resumen del expediente comprobado");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Huella de integridad");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Documentos que se prepararán");
   });
 
   it("no confunde revisión final con producción institucional", () => {
     expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("READY_FOR_DOCUMENT_GENERATION");
-    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("todavía no implica generación ni producción institucional");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("Decisiones completas. Pendiente de comprobación y revisión documental final.");
+  });
+
+  it("traduce los códigos internos y recupera los importes del bloque económico", () => {
+    for (const text of ["Sí", "Abierto simplificado", "Fondos europeos", "Resumen del expediente"]) {
+      expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain(text);
+    }
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("economic.budget.baseTenderBudgetExVatCents");
+    expect(ADAPTIVE_PERSISTENCE_SCRIPT).toContain("economic.estimatedValue.legalEstimatedValueCents");
   });
 });
