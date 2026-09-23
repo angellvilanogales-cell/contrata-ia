@@ -41,6 +41,13 @@ describe("LB51 - manifiesto UI universal V1", () => {
       "guarantees.provisionalGuaranteePercent",
       "guarantees.definitiveGuaranteePercent",
       "guarantees.complementaryGuaranteePercent",
+      "execution.subcontractingRegime",
+      "execution.subcontractingCriticalTasks",
+      "execution.subcontractingPriorOfferDisclosure",
+      "execution.subcontractingCommunicationRegime",
+      "execution.subcontractingPaymentControlRegime",
+      "execution.assignmentRegime",
+      "execution.assignmentRequirements",
     ]));
   });
 
