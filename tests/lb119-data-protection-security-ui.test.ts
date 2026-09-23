@@ -2,6 +2,7 @@ import {describe,expect,it} from "vitest";
 import {LB119_DATA_PROTECTION_SECURITY_SCRIPT} from "../src/interfaces/lb103/LB119DataProtectionSecurityScript";
 import {UNIVERSAL_V1_UI_FIELD_MANIFEST} from "../src/application/intake/lb51/UniversalV1UiFieldManifest";
 describe("LB119 · interfaz guiada",()=>{
+  it("entrega al navegador un script JavaScript válido",()=>{expect(()=>new Function(LB119_DATA_PROTECTION_SECURITY_SCRIPT)).not.toThrow()});
   it("reduce la decisión principal y propone el escenario desde los hechos",()=>{for(const x of ["Propuesta del sistema","¿Qué ocurrirá durante la prestación?","Herramientas y sistemas","Revisar o modificar los detalles propuestos","aula virtual"])expect(LB119_DATA_PROTECTION_SECURITY_SCRIPT).toContain(x);for(const old of ["Datos especiales o penales","Servidores o servicios asociados","Sistemas sustentan el servicio público"])expect(LB119_DATA_PROTECTION_SECURITY_SCRIPT).not.toContain(old)});
   it("muestra preguntas dependientes solo cuando proceden",()=>{for(const x of ['processor=val("lb119Scenario")==="PROCESSOR"','style.display=processor?"":"none"','style.display=processor&&platform?"":"none"','style.display=processor&&systems?"":"none"'])expect(LB119_DATA_PROTECTION_SECURITY_SCRIPT).toContain(x)});
   it("mantiene oculta la revisión final prematura",()=>{expect(LB119_DATA_PROTECTION_SECURITY_SCRIPT).toContain("hideGuided()");expect(LB119_DATA_PROTECTION_SECURITY_SCRIPT).toContain('x.style.display="none"')});
