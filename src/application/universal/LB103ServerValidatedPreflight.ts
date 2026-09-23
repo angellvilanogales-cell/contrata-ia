@@ -60,6 +60,8 @@ export interface LB103ProtectedDocumentarySelection {
 }
 
 export interface LB103ServerValidatedPreflight {
+  decisionState: "DECISIONES_PENDIENTES" | "DECISIONES_VALIDADAS";
+  documentState: "MODELOS_PENDIENTES" | "MODELOS_VERIFICADOS" | "DOCUMENTOS_LISTOS_PARA_REVISION";
   snapshotReady: boolean;
   snapshot?: LB103ServerValidatedSnapshot;
   documentarySelection?: LB103ProtectedDocumentarySelection;
@@ -220,16 +222,29 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
   blockers.push(...documentBlockers);
 
   const completion = snapshot?.contractType === "SUPPLY" ? evaluateLB103DocumentCompletion({caseId: caseValue.caseId, fields: evidence, updatedAt: caseValue.updatedAt}) : undefined;
+  const snapshotReady = Boolean(snapshot);
+  const packageReady = snapshotReady && documents.every(item => item.status === "GENERAL_EDITABLE_SELECTED");
+  // LB103DocumentCompletion comprueba campos físicos propios del vertical Supply.
+  // Un servicio no debe quedar bloqueado por la ausencia de ese control ajeno:
+  // su disponibilidad se decide por snapshot + terna documental acreditada.
+  const verticalCompletionReady = snapshot?.contractType === "SUPPLY" ? completion?.ready === true : snapshot?.contractType === "SERVICE";
+  const generationReady = packageReady && verticalCompletionReady;
   return {
-    snapshotReady: Boolean(snapshot),
+    decisionState: snapshotReady ? "DECISIONES_VALIDADAS" : "DECISIONES_PENDIENTES",
+    documentState: generationReady
+      ? "DOCUMENTOS_LISTOS_PARA_REVISION"
+      : packageReady
+        ? "MODELOS_VERIFICADOS"
+        : "MODELOS_PENDIENTES",
+    snapshotReady,
     snapshot,
     documentarySelection,
-    packageReady: Boolean(snapshot) && documents.every(item => item.status === "GENERAL_EDITABLE_SELECTED"),
+    packageReady,
     documents,
     blockers,
     humanAcceptanceStillRequired: true,
     productionReady: false,
     completion,
-    generationReady: Boolean(snapshot) && documents.every(item => item.status === "GENERAL_EDITABLE_SELECTED") && completion?.ready === true,
+    generationReady,
   };
 }
