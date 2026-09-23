@@ -80,6 +80,8 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "execution.receiptAndAcceptanceRegime", label: "Recepción o conformidad de la prestación", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "execution.invoiceSubmissionRegime", label: "Presentación de factura electrónica", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "execution.paymentRegime", label: "Régimen de pago vinculado a la conformidad", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "technical.technicalPurpose", label: "Finalidad técnica de la prestación", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "technical.technicalRequirements", label: "Prescripciones técnicas mínimas", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "technical.verificationMethods", label: "Métodos de comprobación de requisitos técnicos", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "technical.accessibilityRegime", label: "Accesibilidad universal y diseño para todas las personas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "technical.environmentalTechnicalRegime", label: "Prescripciones técnicas ambientales", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
