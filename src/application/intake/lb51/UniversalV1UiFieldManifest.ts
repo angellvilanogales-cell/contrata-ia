@@ -91,6 +91,7 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "security.ensRegime", label: "Aplicación y conformidad ENS", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "security.incidentContinuityRegime", label: "Incidentes y continuidad", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "criteria.awardCriteria", label: "Criterios de adjudicación", control: "TABLE", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
+  { fieldPath: "criteria.judgmentCriteriaExist", label: "Existencia de criterios sujetos a juicio de valor", control: "BOOLEAN", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "criteria.singleCriterionMotivation", label: "Motivación del criterio único", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "criteria.formulaJustification", label: "Justificación de fórmulas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "criteria.abnormallyLowTenderParameters", label: "Parámetros de ofertas anormalmente bajas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
