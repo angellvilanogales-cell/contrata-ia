@@ -42,6 +42,7 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     const first = evaluateLB103ServerValidatedPreflight(supplyCase());
     const second = evaluateLB103ServerValidatedPreflight(supplyCase());
     expect(first.snapshotReady).toBe(true);
+    expect(first.decisionState).toBe("DECISIONES_VALIDADAS");
     expect(first.snapshot?.sha256).toMatch(/^[a-f0-9]{64}$/);
     expect(first.snapshot?.sha256).toBe(second.snapshot?.sha256);
     expect(first.snapshot?.contractType).toBe("SUPPLY");
@@ -103,6 +104,7 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(result.documents.some(item => item.selectedSourceId?.startsWith("FERRETERIA-"))).toBe(false);
     expect(result.documentarySelection?.documents).toEqual(result.documents);
     expect(result.packageReady).toBe(true);
+    expect(result.documentState).toBe("MODELOS_VERIFICADOS");
     expect(result.blockers).toEqual([]);
     expect(result.humanAcceptanceStillRequired).toBe(true);
     expect(result.productionReady).toBe(false);
@@ -121,6 +123,8 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     const result = evaluateLB103ServerValidatedPreflight(wrongScope);
     expect(result.snapshotReady).toBe(true);
     expect(result.packageReady).toBe(false);
+    expect(result.decisionState).toBe("DECISIONES_VALIDADAS");
+    expect(result.documentState).toBe("MODELOS_PENDIENTES");
     expect(result.documents.every(item => item.status === "BLOCKED")).toBe(true);
     expect(result.documents.every(item => item.selectedSourceId === undefined)).toBe(true);
     expect(result.productionReady).toBe(false);
@@ -143,6 +147,8 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     };
     const result = evaluateLB103ServerValidatedPreflight(value);
     expect(result.snapshotReady).toBe(false);
+    expect(result.decisionState).toBe("DECISIONES_PENDIENTES");
+    expect(result.documentState).toBe("MODELOS_PENDIENTES");
     expect(result.documentarySelection).toBeUndefined();
     expect(result.packageReady).toBe(false);
     expect(result.blockers.join(" ")).toContain("baseTenderBudgetCents");
