@@ -1,4 +1,4 @@
-export type UniversalUiControlKind = "TEXT" | "TEXTAREA" | "BOOLEAN" | "MONEY_CENTS" | "INTEGER" | "SELECT" | "TABLE";
+export type UniversalUiControlKind = "TEXT" | "TEXTAREA" | "BOOLEAN" | "MONEY_CENTS" | "INTEGER" | "DECIMAL" | "SELECT" | "TABLE";
 
 export interface UniversalV1UiFieldDefinition {
   fieldPath: string;
@@ -96,8 +96,12 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "criteria.formulaJustification", label: "Justificación de fórmulas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "criteria.abnormallyLowTenderParameters", label: "Parámetros de ofertas anormalmente bajas", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "criteria.tieBreakCriteria", label: "Criterios de desempate", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.provisionalGuaranteeRequired", label: "Exigencia de garantía provisional", control: "BOOLEAN", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.provisionalGuaranteePercent", label: "Porcentaje de garantía provisional", control: "DECIMAL", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "guarantees.provisionalGuaranteeJustification", label: "Motivación de garantía provisional", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.definitiveGuaranteePercent", label: "Porcentaje de garantía definitiva", control: "DECIMAL", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "guarantees.definitiveGuaranteeRegime", label: "Régimen y base de garantía definitiva", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "guarantees.complementaryGuaranteePercent", label: "Porcentaje de garantía complementaria", control: "DECIMAL", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "guarantees.complementaryGuaranteeJustification", label: "Motivación de garantía complementaria", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "guarantees.warrantyPeriodMonths", label: "Plazo de garantía contractual en meses", control: "INTEGER", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "guarantees.warrantyPeriodRegime", label: "Régimen del plazo de garantía", control: "TEXTAREA", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
