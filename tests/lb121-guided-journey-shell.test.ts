@@ -44,7 +44,8 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('{n:8,title:"Documentos",keys:["__lb120"],blocks:["lb120Block"]}');
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('if(legacy&&a.__lb107)legacy.style.display="none"');
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("numberBlockHeadings()");
-    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('wanted="Paso "+step.n+" · "+clean');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('step.blocks.length>1?step.n+"."+(index+1)');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('replace(/^Paso\\s+\\d+(?:\\.\\d+)?');
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Recuperando el paso");
   });
 
