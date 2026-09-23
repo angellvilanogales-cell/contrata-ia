@@ -26,6 +26,9 @@ function assertControlValue(control: UniversalUiControlKind, value: unknown): vo
   if ((control === "MONEY_CENTS" || control === "INTEGER") && (!Number.isInteger(value) || Number(value) < 0)) {
     throw new Error("El campo universal requiere un número entero no negativo.");
   }
+  if (control === "DECIMAL" && (typeof value !== "number" || !Number.isFinite(value) || value < 0)) {
+    throw new Error("El campo universal requiere un número no negativo.");
+  }
   if (control === "TABLE" && !Array.isArray(value)) throw new Error("El campo universal requiere una colección estructurada.");
 }
 
