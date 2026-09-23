@@ -37,7 +37,15 @@ describe("LB121 · diálogo inicial simplificado", () => {
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('aria-current=');
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('scrollIntoView');
     expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Complete primero el paso");
-    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("visible(STEPS[i])&&!complete(STEPS[i],a)");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("if(!complete(STEPS[i],a))return i");
+  });
+
+  it("impide saltar a documentos, oculta el resumen antiguo y numera todos los módulos", () => {
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('{n:8,title:"Documentos",keys:["__lb120"],blocks:["lb120Block"]}');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('if(legacy&&a.__lb107)legacy.style.display="none"');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("numberBlockHeadings()");
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain('wanted="Paso "+step.n+" · "+clean');
+    expect(LB121_GUIDED_JOURNEY_SHELL_SCRIPT).toContain("Recuperando el paso");
   });
 
   it("permite volver y fija los supuestos económicos del ejemplo", () => {
