@@ -40,6 +40,22 @@ describe("LB53 - evidencia desde UI universal", () => {
     }
   });
 
+  it("admite y valida las siete decisiones del bloque de subcontratación y cesión", () => {
+    const paths = [
+      "execution.subcontractingRegime",
+      "execution.subcontractingCriticalTasks",
+      "execution.subcontractingPriorOfferDisclosure",
+      "execution.subcontractingCommunicationRegime",
+      "execution.subcontractingPaymentControlRegime",
+      "execution.assignmentRegime",
+      "execution.assignmentRequirements",
+    ];
+    for (const fieldPath of paths) {
+      const field = declareUniversalUiEvidence({ fieldPath, value: `Texto validado: ${fieldPath}` }, "operator");
+      expect(validateUniversalUiEvidence(field, "reviewer").status).toBe("HUMAN_VALIDATED");
+    }
+  });
+
   it("preserva un conflicto sin elegir automáticamente un valor", () => {
     const conflict = markUniversalUiEvidenceConflict("execution.plannedModificationRegime", ["No procede", "20 % a la baja"], [ref, { kind: "PRIMARY_DOCUMENT", sourceId: "doc:otro" }]);
     expect(conflict.status).toBe("SOURCE_CONFLICT");
