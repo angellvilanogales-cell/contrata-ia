@@ -53,4 +53,13 @@ describe("LB107 · interfaz del bloque inicial", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("no forzará una coincidencia por palabras genéricas");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("CELEX:32002R2195");
   });
+
+  it("reanálisis no destructivo conserva la propuesta hasta recibir la nueva", () => {
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Edición segura");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Cancelar y conservar la propuesta anterior");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("var nextProposal=await json");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("No se ha sustituido la propuesta anterior");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).not.toContain("s.proposal=null");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("<h2>Describa qué se necesita</h2>");
+  });
 });
