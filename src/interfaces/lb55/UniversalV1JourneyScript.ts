@@ -7,8 +7,20 @@ export const UNIVERSAL_V1_JOURNEY_SCRIPT = String.raw`(function(){
 let definitions=[];
 let currentRecord={fields:{}};
 const supplySupplement=${SUPPLY_FIELDS_JSON};
+const optionLabels={
+  'technical.supplyVariant':{
+    CATALOGUE_NEEDS:'Suministro mediante pedidos sucesivos según necesidades y precios unitarios',
+    ICT_LICENSE_OR_SOFTWARE:'Licencias, software o soluciones informáticas',
+    DIGITAL_EQUIPMENT:'Equipos y dispositivos digitales',
+    SUPPLY_WITH_SERVICE_COMPONENT:'Suministro con una prestación complementaria de servicio o plataforma',
+    MEDICAL_FRAMEWORK:'Suministro sanitario mediante acuerdo marco',
+    FURNITURE_INSTALLATION:'Mobiliario con montaje o instalación',
+    ORDINARY_GLOBAL_PRICE:'Suministro ordinario con cantidades determinadas y precio global'
+  }
+};
 const byId=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c));
+const optionLabel=(fieldPath,value)=>optionLabels[fieldPath]?.[value]||value;
 function showStatus(message,kind='muted'){const el=byId('status');if(!el)return;el.className=kind;el.textContent=message;}
 function token(){return String(byId('token')?.value||'').trim();}
 function headers(){const t=token();return {'content-type':'application/json',...(t?{authorization:'Bearer '+t}:{})};}
@@ -23,7 +35,7 @@ async function api(url,options={}){
 function editor(def,field){
   const value=field?.value??'';
   if(def.control==='BOOLEAN')return '<select data-value><option value="">Seleccione…</option><option value="true" '+(value===true?'selected':'')+'>Sí</option><option value="false" '+(value===false?'selected':'')+'>No</option></select>';
-  if(def.control==='SELECT'&&Array.isArray(def.options))return '<select data-value><option value="">Seleccione…</option>'+def.options.map(option=>'<option value="'+esc(option)+'" '+(String(value)===String(option)?'selected':'')+'>'+esc(option)+'</option>').join('')+'</select>';
+  if(def.control==='SELECT'&&Array.isArray(def.options))return '<select data-value><option value="">Seleccione…</option>'+def.options.map(option=>'<option value="'+esc(option)+'" '+(String(value)===String(option)?'selected':'')+'>'+esc(optionLabel(def.fieldPath,option))+'</option>').join('')+'</select>';
   if(def.control==='SELECT'&&def.fieldPath==='contractType')return '<select data-value><option value="">Seleccione…</option>'+['SUPPLY','SERVICE','WORKS','CONCESSION','MIXED','OTHER'].map(option=>'<option value="'+option+'" '+(String(value)===option?'selected':'')+'>'+option+'</option>').join('')+'</select>';
   if(def.control==='TEXTAREA'||def.control==='TABLE')return '<textarea data-value>'+esc(typeof value==='string'?value:JSON.stringify(value,null,2))+'</textarea>';
   return '<input data-value value="'+esc(value)+'">';

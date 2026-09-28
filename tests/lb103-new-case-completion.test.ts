@@ -96,4 +96,11 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("ui:lb103:need-and-means-review");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('fieldPath:"need"');
   });
+
+  it("presenta en español las subfamilias de suministro sin alterar sus valores internos",()=>{
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('"ORDINARY_GLOBAL_PRICE":"Suministro ordinario con cantidades determinadas y precio global"');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('"CATALOGUE_NEEDS":"Suministro mediante pedidos sucesivos según necesidades y precios unitarios"');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain(`value="'+esc(o)+'"`);
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('optionLabel(f.fieldPath,o)');
+  });
 });
