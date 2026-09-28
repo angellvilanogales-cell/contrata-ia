@@ -22,6 +22,16 @@ describe("LB120 · interfaz de cierre", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("s.documentStatus=");
   });
 
+  it("permite recuperar y validar la fuente de financiación omitida sin rehacer el expediente", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("economic.fundingSource");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisión pendiente · fuente de financiación");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Presupuesto propio de la Administración, sin fondos europeos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Financiado total o parcialmente con fondos europeos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120ValidateFunding");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("missing-decision-recovery");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
+  });
+
   it("exige vista previa, seis confirmaciones y validación del registro", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-preview");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-consent");
