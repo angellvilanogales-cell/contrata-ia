@@ -67,5 +67,7 @@ describe("LB107 · interfaz del bloque inicial", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("propuesta editable que requiere validación humana");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("d.noLots&&d.noLots.trim()?d.noLots");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("debe comprobarse, modificarse si procede y validarse expresamente");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("compatibleNoDivisionDraft");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("if(!p.lots.noDivisionJustificationDraft)");
   });
 });
