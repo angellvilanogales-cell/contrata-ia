@@ -103,4 +103,15 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain(`value="'+esc(o)+'"`);
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('optionLabel(f.fieldPath,o)');
   });
+
+  it("convierte las decisiones residuales del Anexo I en una revisión guiada y propuesta",()=>{
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Revisión guiada del Anexo I");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Paso "+"'+(index+1)+'"+" de ");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("proposedResidualDecisions");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Objeto, unidades y lotes");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Cesión, suspensión y datos personales");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("residualDependencies");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("setupResidualWizard");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('save.style.display=step===groups.length-1');
+  });
 });
