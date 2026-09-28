@@ -46,6 +46,8 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
       expect.objectContaining({ name: expect.stringContaining("Formación lingüística"), description: expect.stringContaining("inglés") }),
       expect.objectContaining({ name: expect.stringContaining("Orientación y acompañamiento grupal"), description: expect.stringContaining("beneficiarias") }),
     ]);
+    expect(result.lots.noDivisionJustificationDraft).toContain("unidad funcional");
+    expect(result.lots.noDivisionJustificationDraft).toContain("validar");
   });
 
   it("respeta la familia semántica de formación en idiomas y excluye formación sectorial ajena", () => {

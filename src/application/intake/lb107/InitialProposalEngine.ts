@@ -244,6 +244,7 @@ function lotsProposal(description: string): InitialProposalResult["lots"] {
       ? "La descripción contiene grupos o ámbitos diferenciados que pueden ser susceptibles de ejecución independiente. Se propone estudiar su división en lotes."
       : "Como regla inicial del artículo 99.3 LCSP se propone estudiar la división en lotes. Falta confirmar la separabilidad técnica y económica del objeto.",
     suggestedDefinitions,
+    noDivisionJustificationDraft: "La no división en lotes se propone provisionalmente porque las prestaciones descritas conforman una unidad funcional orientada a un resultado común y su ejecución separada podría dificultar la coordinación y la correcta ejecución del contrato. La unidad promotora debe comprobar, concretar y validar estas circunstancias antes de incorporar la motivación al expediente.",
   };
 }
 

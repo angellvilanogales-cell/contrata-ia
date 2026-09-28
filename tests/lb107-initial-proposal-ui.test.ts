@@ -62,4 +62,10 @@ describe("LB107 · interfaz del bloque inicial", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).not.toContain("s.proposal=null");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("<h2>Describa qué se necesita</h2>");
   });
+
+  it("autocompleta una motivación editable al elegir lote único", () => {
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("propuesta editable que requiere validación humana");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("d.noLots&&d.noLots.trim()?d.noLots");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("debe comprobarse, modificarse si procede y validarse expresamente");
+  });
 });
