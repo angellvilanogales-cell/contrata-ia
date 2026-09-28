@@ -70,4 +70,17 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(()=>context.testEuros("1.234,567")).toThrow();
     expect(()=>context.testEuros("")).toThrow();
   });
+
+  it("abre la recuperación documental aunque la combinación de modelos siga pendiente",()=>{
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).not.toContain("!result.packageReady){panel.innerHTML=\"\"");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Completar datos para los documentos");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("proposedValue");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("economic.priceDeterminationRegime");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("technical.supplyVariant");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("technical.executionLocations");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("execution.extensionStructure");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("economic.annualityBudgetRows");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("No se cambiará el procedimiento ni la financiación");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("ui:lb103:document-recovery");
+  });
 });

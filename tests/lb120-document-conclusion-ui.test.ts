@@ -8,7 +8,7 @@ describe("LB120 · interfaz de cierre", () => {
 
   it("separa las decisiones validadas de la disponibilidad de modelos", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("preflightMessage");
-    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisiones del expediente completas y validadas");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisiones principales validadas");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Estado de los documentos");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Modelo pendiente de verificar");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("La falta de un modelo no modifica el estado de los pasos 1 a 7");
@@ -30,6 +30,14 @@ describe("LB120 · interfaz de cierre", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120ValidateFunding");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("missing-decision-recovery");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
+  });
+
+  it("abre el asistente documental cuando el snapshot existe pero quedan decisiones físicas", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("recoveryPending");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisiones principales validadas");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Quedan datos documentales por completar");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Completar datos para los documentos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain('gate(state.status==="HUMAN_VALIDATED"||recoveryPending(state.preflight))');
   });
 
   it("exige vista previa, seis confirmaciones y validación del registro", () => {
