@@ -91,6 +91,11 @@ function basis(
 
 const STOP_WORDS = new Set([
   "para", "como", "con", "sin", "del", "las", "los", "una", "uno", "unos", "unas", "por", "que", "sus", "este", "esta", "estos", "estas", "desde", "hasta", "sobre", "entre", "mediante", "necesita", "necesitamos", "contratar", "contratacion", "administracion",
+  // Son palabras habituales del objeto contractual, pero no identifican por sí
+  // solas una familia CPV. Su coincidencia producía falsos positivos graves.
+  "suministro", "suministros", "material", "materiales", "articulo", "articulos",
+  "producto", "productos", "soporte", "soportes", "elemento", "elementos",
+  "destinado", "destinada", "destinados", "destinadas", "objeto", "contrato",
 ]);
 
 function normalize(value: string): string {
@@ -123,6 +128,11 @@ const CPV_CONTEXT_PROFILES: readonly CpvContextProfile[] = [
     accepts: entry => ["79634000-7", "85312310-5", "85312300-2"].includes(entry.codigo),
     preferredCodes: ["79634000-7"],
   },
+  {
+    matches: text => ["material divulgativo", "material publicitario", "soportes publicitarios", "merchandising", "imagen corporativa", "articulos promocionales", "productos promocionales"].some(term => text.includes(term)),
+    accepts: entry => ["22462000-6", "39294100-0"].includes(entry.codigo),
+    preferredCodes: ["22462000-6"],
+  },
 ];
 
 const CPV_SELECTION_GUIDANCE: Readonly<Record<string, string>> = {
@@ -133,7 +143,18 @@ const CPV_SELECTION_GUIDANCE: Readonly<Record<string, string>> = {
   "79634000-7": "Código específico para orientación profesional; encaja directamente con actuaciones de empleabilidad, acompañamiento laboral o movilidad profesional.",
   "85312310-5": "Código general de servicios de orientación; puede complementar al código profesional cuando el acompañamiento excede el ámbito estrictamente laboral.",
   "85312300-2": "Código general de orientación y asesoramiento; debe elegirse solo si el lote incluye también asesoramiento individual o grupal diferenciado.",
+  "22462000-6": "Código específico para material de publicidad; es el candidato principal cuando se adquieren piezas divulgativas o soportes publicitarios como bienes.",
+  "39294100-0": "Código para productos de información y promoción; puede complementar al principal cuando el lote incluye artículos de merchandising o promocionales diferenciados.",
 };
+
+function isCompatibleCpvFamily(type: InitialContractType, code: string): boolean {
+  const division = Number(code.slice(0, 2));
+  if (!Number.isFinite(division)) return false;
+  // Como regla de seguridad para la propuesta inicial, un suministro no debe
+  // recibir familias de obras o servicios y un servicio no debe recibir bienes.
+  // La persona puede revisar después prestaciones mixtas o accesorias.
+  return type === "SUPPLY" ? division < 45 || division === 48 : division >= 50;
+}
 
 function contractType(description: string): InitialProposalResult["contractType"] {
   const text = normalize(description);
@@ -155,7 +176,7 @@ function cleanDescription(description: string): string {
   return clean.charAt(0).toLowerCase() + clean.slice(1).replace(/[.]$/, "");
 }
 
-function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpvCandidate[] {
+function rankCpvs(description: string, type: InitialContractType, catalog: readonly CPVEntry[]): InitialCpvCandidate[] {
   const queryTokens = new Set(tokens(description));
   if (!queryTokens.size) return [];
   const normalizedQuery = normalize(description);
@@ -164,12 +185,13 @@ function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpv
     const descriptionTokens = new Set(tokens(entry.descripcion));
     const matching = [...queryTokens].filter(token => descriptionTokens.has(token));
     const normalizedEntry = normalize(entry.descripcion);
-    const phrase = normalizedEntry.length >= 8 && (normalizedQuery.includes(normalizedEntry) || normalizedEntry.includes(normalizedQuery));
+    const phrase = descriptionTokens.size >= 2 && normalizedEntry.length >= 8 && (normalizedQuery.includes(normalizedEntry) || normalizedEntry.includes(normalizedQuery));
     const acceptedByContext = activeProfiles.length === 0 || activeProfiles.some(profile => profile.accepts(entry));
+    const compatibleFamily = isCompatibleCpvFamily(type, entry.codigo);
     const contextScore = activeProfiles.reduce((sum, profile) => sum + (profile.preferredCodes.includes(entry.codigo) ? 60 : profile.accepts(entry) ? 25 : 0), 0);
     const score = matching.reduce((sum, token) => sum + Math.min(18, 7 + token.length), 0) + (phrase ? 15 : 0) + Math.min(5, specificity(entry.codigo)) + contextScore;
-    return { entry, matching, score, acceptedByContext };
-  }).filter(item => item.score > 0 && item.acceptedByContext)
+    return { entry, matching, score, acceptedByContext, compatibleFamily, phrase };
+  }).filter(item => item.score >= 14 && item.acceptedByContext && item.compatibleFamily && (activeProfiles.length > 0 || item.matching.length >= 2 || item.phrase || item.matching.some(token => token.length >= 7)))
     .sort((a, b) => b.score - a.score || specificity(b.entry.codigo) - specificity(a.entry.codigo) || a.entry.codigo.localeCompare(b.entry.codigo))
     .slice(0, 10);
   const max = ranked[0]?.score ?? 1;
@@ -179,7 +201,7 @@ function rankCpvs(description: string, catalog: readonly CPVEntry[]): InitialCpv
       code: item.entry.codigo,
       officialDescription: item.entry.descripcion,
       score: relative,
-      confidence: relative >= 80 && item.matching.length >= 2 ? "HIGH" : relative >= 55 ? "MEDIUM" : "LOW",
+      confidence: item.score >= 35 && relative >= 80 ? "HIGH" : item.score >= 14 && relative >= 55 ? "MEDIUM" : "LOW",
       suggestedRole: index === 0 ? "PRIMARY" : "COMPLEMENTARY",
       explanation: `${CPV_SELECTION_GUIDANCE[item.entry.codigo] ?? `Coincide con estos términos del lote: ${item.matching.join(", ") || "coincidencia de expresión"}.`} ${index === 0 ? "Se propone como principal por ser la opción más específica encontrada." : "Se propone como posible complementario; no debe marcarse si no añade una prestación real distinta."}`,
     } satisfies InitialCpvCandidate;
@@ -254,7 +276,7 @@ export function createInitialProposal(description: string, catalog: readonly CPV
     scopeDraft,
     needDraft,
     contractType: type,
-    cpvCandidates: rankCpvs(sourceDescription, catalog),
+    cpvCandidates: rankCpvs(sourceDescription, type.recommended, catalog),
     lots: lotsProposal(description),
     legalBasisByDecision: {
       object: [LEGAL.object99],

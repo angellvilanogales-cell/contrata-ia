@@ -82,6 +82,36 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
     expect(result.cpvCandidates.map(item => item.code)).toEqual(["79634000-7", "85312310-5"]);
   });
 
+  it("clasifica el material publicitario por su familia y no por palabras genéricas", () => {
+    const result = createInitialProposal(
+      "Suministro de material divulgativo, soportes publicitarios y artículos de merchandising destinados a reforzar la imagen corporativa del consorcio EURES-T AA.",
+      [
+        cpv("22462000-6", "Material de publicidad"),
+        cpv("39294100-0", "Productos de información y promoción"),
+        cpv("44212313-6", "Soportes"),
+        cpv("39225000-5", "Encendedores, artículos de material combustible, de pirotecnia, cerillas y combustibles líquidos o de gas licuado"),
+        cpv("37400000-2", "Artículos y material deportivo"),
+        cpv("45216114-6", "Edificios destinados al Parlamento y a reuniones públicas"),
+        cpv("79341000-6", "Servicios de publicidad"),
+      ],
+    );
+    expect(result.contractType.recommended).toBe("SUPPLY");
+    expect(result.cpvCandidates.map(item => item.code)).toEqual(["22462000-6", "39294100-0"]);
+    expect(result.cpvCandidates[0]?.explanation).toContain("material de publicidad");
+  });
+
+  it("no propone una familia contractual incompatible aunque comparta vocabulario", () => {
+    const result = createInitialProposal(
+      "Suministro de equipos de limpieza industrial para edificios públicos.",
+      [
+        cpv("42995000-7", "Máquinas de limpieza diversas"),
+        cpv("90911200-8", "Servicios de limpieza de edificios"),
+      ],
+    );
+    expect(result.contractType.recommended).toBe("SUPPLY");
+    expect(result.cpvCandidates.map(item => item.code)).not.toContain("90911200-8");
+  });
+
   it("carga el catálogo completo aportado y no la antigua lista de ejemplos", () => {
     const catalog = loadProjectCpvCatalog();
     expect(catalog.length).toBe(9454);
