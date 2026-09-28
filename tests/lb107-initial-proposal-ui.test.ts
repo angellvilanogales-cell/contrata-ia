@@ -47,4 +47,10 @@ describe("LB107 · interfaz del bloque inicial", () => {
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("s.selectedCpvs=selected");
     expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("s.mainCpvKey=mainKey");
   });
+
+  it("no fuerza códigos débiles y ofrece contraste con el vocabulario oficial", () => {
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("Sin propuesta CPV fiable");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("no forzará una coincidencia por palabras genéricas");
+    expect(LB107_INITIAL_PROPOSAL_SCRIPT).toContain("CELEX:32002R2195");
+  });
 });
