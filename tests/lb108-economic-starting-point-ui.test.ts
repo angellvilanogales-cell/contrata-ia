@@ -18,6 +18,12 @@ describe("LB108 · interfaz del bloque económico", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("· Obligatorio");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("supportSelectionError");
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("requiere al menos uno de estos apoyos principales");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Obtención y trazabilidad de las evidencias");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('id="lb108AcquisitionMode"');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Búsqueda pública asistida");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Plataforma de Contratación del Sector Público");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Comparabilidad y ajustes aplicados");
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("Validar cifras y evidencias y pasar al análisis del procedimiento");
   });
   it("propone el reparto 76/18/6 como referencia corregible y calcula los importes", () => {
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain("direct:76,indirect:18,other:6");
@@ -104,7 +110,7 @@ describe("LB108 · interfaz del bloque económico", () => {
       "durationMonths",
       "extensionMonths",
     ]) expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidence(id,"${path}"`);
-    for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"])
+    for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationEvidenceAcquisitionMode", "economic.valuationPublicReferences", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"])
       expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidenceRaw(id,"${path}"`);
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('validateEvidence(id,"procedure"');
   });

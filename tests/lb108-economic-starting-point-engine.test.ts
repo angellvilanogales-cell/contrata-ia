@@ -276,6 +276,40 @@ describe("LB108 · punto de partida económico y propuesta condicionada", () => 
     expect(result.valuationPlan.evidenceSufficient).toBe(true);
   });
 
+  it("acepta referencias públicas completas y rechaza una mera URL sin comparabilidad", () => {
+    const base = {
+      startingPoint: "KNOWN_CREDIT_LIMIT" as const, contractType: "SUPPLY" as const,
+      grossCreditLimitCents: 1_210_000, vatRatePercent: 21, creditScope: "INITIAL_PERIOD" as const,
+      initialDurationMonths: 12, extensionMonths: 0, plannedModificationPercent: 0,
+      valuationEvidence: "Catálogo público contrastado.", valuationMethodologies: ["QUOTES_OR_CATALOGUES"] as const,
+      valuationSupports: ["TECHNICAL_SCOPE", "PUBLIC_CATALOGUE"] as const,
+      evidenceAcquisitionMode: "PUBLIC_REFERENCES" as const,
+    };
+    expect(() => evaluateEconomicStartingPoint({ ...base, publicReferences: [{
+      title: "Tarifa pública", issuer: "Central de compras", url: "https://example.test/tarifa",
+      referenceDate: "2026-09-01", scopeAndPrice: "Precio unitario de 100 euros", comparabilityAndAdjustments: "",
+    }] })).toThrow(/comparabilidad\/ajustes/);
+    const result = evaluateEconomicStartingPoint({ ...base, publicReferences: [{
+      title: "Tarifa pública", issuer: "Central de compras", url: "https://example.test/tarifa",
+      referenceDate: "2026-09-01", scopeAndPrice: "Precio unitario de 100 euros",
+      comparabilityAndAdjustments: "Misma unidad y condiciones; sin ajustes.",
+    }] });
+    expect(result.valuationPlan).toMatchObject({ acquisitionMode: "PUBLIC_REFERENCES", evidenceSufficient: true });
+    expect(result.valuationPlan.publicReferences).toHaveLength(1);
+    expect(result.estimatedValue?.calculationMethod).toContain("Tarifa pública");
+  });
+
+  it("exige ambas clases de evidencia cuando se elige la modalidad mixta", () => {
+    expect(() => evaluateEconomicStartingPoint({
+      startingPoint: "KNOWN_CREDIT_LIMIT", contractType: "SERVICE", grossCreditLimitCents: 1_210_000,
+      vatRatePercent: 21, creditScope: "INITIAL_PERIOD", initialDurationMonths: 12, extensionMonths: 0,
+      plannedModificationPercent: 0, valuationEvidence: "Estudio de costes y contraste público.",
+      valuationMethodologies: ["COST_STUDY"], valuationSupports: ["TECHNICAL_SCOPE", "LABOUR_COSTS"],
+      evidenceAcquisitionMode: "MIXED", publicReferences: [{ title: "Convenio", issuer: "BOE", url: "https://www.boe.es/",
+        referenceDate: "2026-09-01", scopeAndPrice: "Tablas salariales", comparabilityAndAdjustments: "Categorías aplicables." }],
+    })).toThrow(/modalidad mixta/);
+  });
+
   it("propone procedimientos solo como candidatos dependientes del valor estimado", () => {
     const result = evaluateEconomicStartingPoint({
       startingPoint: "KNOWN_CREDIT_LIMIT",

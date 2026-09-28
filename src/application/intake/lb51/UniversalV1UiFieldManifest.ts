@@ -54,6 +54,8 @@ export const UNIVERSAL_V1_UI_FIELD_MANIFEST: readonly UniversalV1UiFieldDefiniti
   { fieldPath: "economic.estimatedValueCalculationMethod", label: "Método de cálculo del valor estimado", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
   { fieldPath: "economic.valuationMethodology", label: "Metodologías de valoración económica", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.valuationSupports", label: "Apoyos de la valoración económica", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.valuationEvidenceAcquisitionMode", label: "Modo de obtención de las evidencias económicas", control: "SELECT", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
+  { fieldPath: "economic.valuationPublicReferences", label: "Referencias públicas de la valoración económica", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.valuationDocuments", label: "Documentos y huellas de la valoración económica", control: "TABLE", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.valuationEvidenceSufficient", label: "Suficiencia documental de la valoración económica", control: "BOOLEAN", requiredForValidatedSupplyAsa: false, humanValidationRequired: true },
   { fieldPath: "economic.priceDeterminationRegime", label: "Sistema de determinación del precio", control: "TEXTAREA", requiredForValidatedSupplyAsa: true, humanValidationRequired: true },
@@ -140,7 +142,7 @@ const LB22_CANONICAL_OR_DOMAIN_PATHS = new Set([
   "closure.finalConsentRecord",
 ]);
 
-for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"]) LB22_CANONICAL_OR_DOMAIN_PATHS.add(path);
+for (const path of ["economic.valuationMethodology", "economic.valuationSupports", "economic.valuationEvidenceAcquisitionMode", "economic.valuationPublicReferences", "economic.valuationDocuments", "economic.valuationEvidenceSufficient"]) LB22_CANONICAL_OR_DOMAIN_PATHS.add(path);
 
 export function evaluateUniversalV1UiFieldManifest() {
   const paths = UNIVERSAL_V1_UI_FIELD_MANIFEST.map(item => item.fieldPath);

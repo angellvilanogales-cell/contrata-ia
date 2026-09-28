@@ -9,6 +9,7 @@ export type CreditScope = "INITIAL_PERIOD" | "ENTIRE_CONTRACT_LIFE";
 export type InitialEconomicContractType = "SUPPLY" | "SERVICE";
 export type ValuationMethodology = "MARKET_CONSULTATION" | "PRIOR_CONTRACTS" | "QUOTES_OR_CATALOGUES" | "COST_STUDY" | "OTHER_JUSTIFIED";
 export type ValuationSupport = "TECHNICAL_SCOPE" | "HISTORICAL_CONSUMPTION" | "PRIOR_AWARD" | "MARKET_QUOTES" | "PUBLIC_CATALOGUE" | "UNIT_COSTS" | "LABOUR_COSTS" | "PRICE_INDEX" | "EXPERT_REPORT";
+export type EvidenceAcquisitionMode = "PUBLIC_REFERENCES" | "DOCUMENT_UPLOAD" | "MIXED";
 
 export interface SupportingDocumentReference { id: string; fileName: string; sha256: string; size: number; mediaType: string; }
 export type GuidedServiceCostCategory = "LABOUR" | "MATERIAL" | "EQUIPMENT" | "OTHER_DIRECT";
@@ -34,6 +35,14 @@ export interface GuidedServiceCostResult {
   vatAmountCents: number;
   totalVatIncludedCents: number;
   narrative: string;
+}
+export interface PublicValuationReference {
+  title: string;
+  issuer: string;
+  url: string;
+  referenceDate: string;
+  scopeAndPrice: string;
+  comparabilityAndAdjustments: string;
 }
 
 export interface EconomicLegalBasis {
@@ -78,6 +87,8 @@ export interface KnownCreditInput {
   valuationSupports?: readonly ValuationSupport[];
   supportingDocuments?: readonly SupportingDocumentReference[];
   guidedServiceCostStudy?: GuidedServiceCostStudy;
+  evidenceAcquisitionMode?: EvidenceAcquisitionMode;
+  publicReferences?: readonly PublicValuationReference[];
 }
 
 export interface PendingValuationInput {
@@ -130,6 +141,8 @@ export interface EconomicStartingPointResult {
     allowedSupports: readonly ValuationSupport[];
     selectedSupports: readonly ValuationSupport[];
     supportingDocuments: readonly SupportingDocumentReference[];
+    acquisitionMode?: EvidenceAcquisitionMode;
+    publicReferences: readonly PublicValuationReference[];
     evidenceSufficient: boolean;
     guidedServiceCostResult?: GuidedServiceCostResult;
   };
@@ -203,6 +216,15 @@ function proposedMethodology(contractType: InitialEconomicContractType, successi
 function normalizedDocuments(documents: readonly SupportingDocumentReference[] = []): SupportingDocumentReference[] {
   return documents.map(document => ({ id: String(document.id || "").trim(), fileName: String(document.fileName || "").trim(), sha256: String(document.sha256 || "").trim().toLowerCase(), size: integer(document.size, "El tamaño del documento"), mediaType: String(document.mediaType || "application/octet-stream").trim() }))
     .filter(document => document.id && document.fileName && /^[a-f0-9]{64}$/.test(document.sha256) && document.size > 0);
+}
+
+function normalizedPublicReferences(references: readonly PublicValuationReference[] = []): PublicValuationReference[] {
+  return references.map(reference => ({
+    title: String(reference.title ?? "").trim(), issuer: String(reference.issuer ?? "").trim(),
+    url: String(reference.url ?? "").trim(), referenceDate: String(reference.referenceDate ?? "").trim(),
+    scopeAndPrice: String(reference.scopeAndPrice ?? "").trim(),
+    comparabilityAndAdjustments: String(reference.comparabilityAndAdjustments ?? "").trim(),
+  })).filter(reference => reference.title || reference.url || reference.scopeAndPrice);
 }
 
 function integer(value: number, label: string, maximum = Number.MAX_SAFE_INTEGER): number {
@@ -282,7 +304,7 @@ function pendingResult(input: PendingValuationInput): EconomicStartingPointResul
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "VALUATION_REQUIRED",
-    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies: route ? [route] : [], selectedMethodology: route, rationale: proposed.rationale, allowedSupports: SUPPORTS_BY_METHOD[route ?? proposed.methodology], selectedSupports: [], supportingDocuments: [], evidenceSufficient: false },
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies: route ? [route] : [], selectedMethodology: route, rationale: proposed.rationale, allowedSupports: SUPPORTS_BY_METHOD[route ?? proposed.methodology], selectedSupports: [], supportingDocuments: [], publicReferences: [], evidenceSufficient: false },
     procedure: {
       code: "PENDING",
       label: "Procedimiento pendiente de valoración económica",
@@ -345,16 +367,25 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
   const selectedMethodology = selectedMethodologies[0];
   const allowedSupports = [...new Set(selectedMethodologies.flatMap(methodology => SUPPORTS_BY_METHOD[methodology]))];
   const selectedSupports = [...new Set(input.valuationSupports ?? [])];
-  const strictEvidenceFlow = input.valuationMethodologies !== undefined || input.valuationMethodology !== undefined || input.valuationSupports !== undefined || input.supportingDocuments !== undefined;
+  const strictEvidenceFlow = input.valuationMethodologies !== undefined || input.valuationMethodology !== undefined || input.valuationSupports !== undefined || input.supportingDocuments !== undefined || input.evidenceAcquisitionMode !== undefined || input.publicReferences !== undefined;
   if (strictEvidenceFlow && selectedSupports.length === 0) throw new Error("Debe seleccionar al menos un apoyo documental o técnico para la metodología de valoración.");
   if (selectedSupports.some(item => !allowedSupports.includes(item))) throw new Error("Uno de los apoyos seleccionados no corresponde a las metodologías de valoración elegidas.");
   if (strictEvidenceFlow) selectedMethodologies.forEach(methodology => validateMethodSupport(methodology, selectedSupports));
   const supportingDocuments = normalizedDocuments(input.supportingDocuments);
-  if (strictEvidenceFlow && supportingDocuments.length === 0) throw new Error("Debe incorporar al menos un documento que acredite la valoración antes de calcular y continuar.");
   const guidedServiceCostResult = input.guidedServiceCostStudy ? calculateGuidedServiceCost(input.guidedServiceCostStudy, input.vatRatePercent) : undefined;
   if (guidedServiceCostResult && input.contractType !== "SERVICE") throw new Error("El estudio de costes guiado de esta fase solo está disponible para contratos de servicios.");
   if (guidedServiceCostResult && !selectedMethodologies.includes("COST_STUDY")) throw new Error("El estudio guiado requiere seleccionar la metodología Estudio de costes.");
   if (guidedServiceCostResult && guidedServiceCostResult.totalVatIncludedCents !== contractBudgetGross) throw new Error("El PBL indicado no coincide con el resultado del estudio de costes guiado.");
+  const publicReferences = normalizedPublicReferences(input.publicReferences);
+  const acquisitionMode = input.evidenceAcquisitionMode ?? (supportingDocuments.length && publicReferences.length ? "MIXED" : publicReferences.length ? "PUBLIC_REFERENCES" : strictEvidenceFlow ? "DOCUMENT_UPLOAD" : undefined);
+  if (acquisitionMode === "DOCUMENT_UPLOAD" && supportingDocuments.length === 0) throw new Error("Debe incorporar al menos un documento que acredite la valoración antes de calcular y continuar.");
+  if (acquisitionMode === "PUBLIC_REFERENCES" && publicReferences.length === 0) throw new Error("Debe registrar al menos una referencia pública trazable antes de calcular y continuar.");
+  if (acquisitionMode === "MIXED" && (!publicReferences.length || !supportingDocuments.length)) throw new Error("La modalidad mixta exige al menos una referencia pública y un documento incorporado.");
+  for (const reference of publicReferences) {
+    if (!reference.title || !reference.issuer || !reference.referenceDate || !reference.scopeAndPrice || !reference.comparabilityAndAdjustments) throw new Error("Cada referencia pública debe indicar título, organismo o entidad, fecha, alcance/precio y comparabilidad/ajustes.");
+    try { const parsed = new URL(reference.url); if (parsed.protocol !== "https:" && parsed.protocol !== "http:") throw new Error(); }
+    catch { throw new Error("Cada referencia pública debe incluir una URL http o https válida."); }
+  }
 
   const base = guidedServiceCostResult?.totalExVatCents ?? Math.round(contractBudgetGross * 100 / (100 + vatRate));
   const vat = guidedServiceCostResult?.vatAmountCents ?? contractBudgetGross - base;
@@ -388,7 +419,8 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     ? "El presupuesto máximo declarado cubre toda la vigencia; las prórrogas no se suman de nuevo."
     : `El presupuesto cubre el periodo inicial y se añaden ${extension} céntimos para las prórrogas declaradas.`;
   const documentTrace = supportingDocuments.map(document => `${document.fileName} [SHA-256 ${document.sha256}]`).join("; ");
-  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. ${guidedServiceCostResult ? `${guidedServiceCostResult.narrative} ` : ""}Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodologías estructuradas: ${selectedMethodologies.join(", ")}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
+  const publicTrace = publicReferences.map(reference => `${reference.title} (${reference.issuer}, ${reference.referenceDate}) ${reference.url}`).join("; ");
+  const calculationMethod = `${scopeText} Base sin IVA: ${base} céntimos; prórrogas: ${extension}; modificaciones previstas: ${modification}; opciones: ${options}; otros conceptos: ${other}. ${guidedServiceCostResult ? `${guidedServiceCostResult.narrative} ` : ""}Fuente o método de valoración declarado: ${input.valuationEvidence.trim()}. Metodologías estructuradas: ${selectedMethodologies.join(", ")}. Apoyos: ${selectedSupports.join(", ") || "declaración narrativa previa"}.${acquisitionMode ? ` Obtención de evidencias: ${acquisitionMode}.` : ""}${publicTrace ? ` Referencias públicas: ${publicTrace}.` : ""}${documentTrace ? ` Documentos acreditativos: ${documentTrace}.` : ""}`;
   const warnings = [
     ...(budgetConstraint === "FIXED_MAXIMUM" ? [
       "El crédito con IVA determina el límite de gasto, pero el procedimiento se analiza sobre el valor estimado sin IVA.",
@@ -405,7 +437,7 @@ export function evaluateEconomicStartingPoint(input: EconomicStartingPointInput)
     version: LB108_ECONOMIC_STARTING_POINT_VERSION,
     startingPoint: input.startingPoint,
     status: "CALCULATED_FOR_HUMAN_REVIEW",
-    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && supportingDocuments.length > 0 : Boolean(input.valuationEvidence.trim()), ...(guidedServiceCostResult ? { guidedServiceCostResult } : {}) },
+    valuationPlan: { proposedMethodology: proposed.methodology, selectedMethodologies, selectedMethodology, rationale: proposed.rationale, allowedSupports, selectedSupports, supportingDocuments, acquisitionMode, publicReferences, evidenceSufficient: strictEvidenceFlow ? selectedSupports.length > 0 && (supportingDocuments.length > 0 || publicReferences.length > 0) : Boolean(input.valuationEvidence.trim()), ...(guidedServiceCostResult ? { guidedServiceCostResult } : {}) },
     budget: {
       budgetConstraint,
       ...(gross !== undefined ? { availableCreditVatIncludedCents: gross } : {}),

@@ -27,7 +27,7 @@ function fillRequired(workspace: UniversalEvidenceWorkspace, caseId: string): vo
     ["economic.annualityBudgetRows", [{ year: 2026, amountCents: 159606, budgetApplication: "G/32L/22000/00", vatIncluded: true }]],
     ["durationMonths", 24], ["extensionMonths", 24], ["execution.extensionStructure", "Dos prórrogas de 12 meses"], ["execution.extensionNoticeMonths", 2],
     ["execution.plannedModificationRegime", "-20 % estabilidad / +20 % DA33"], ["criteria.awardCriteria", [{ nombre: "Precio", ponderacion: 100, evaluableMedianteFormula: true }]],
-    ["criteria.singleCriterionMotivation", "Naturaleza estandarizada"], ["execution.specialExecutionConditions", ["Gestión de residuos"]],
+    ["criteria.singleCriterionMotivation", "Naturaleza estandarizada"], ["criteria.judgmentCriteriaExist", false], ["execution.specialExecutionConditions", ["Gestión de residuos"]],
     ["economic.unitPrices", [{ concept: "ABRAZADERA", unit: "UD", unitPriceCents: 130 }]],
   ] as const;
   for (const [field, value] of definitions) { workspace.declare(caseId, field, value, "operator"); workspace.validate(caseId, field, "reviewer"); }
