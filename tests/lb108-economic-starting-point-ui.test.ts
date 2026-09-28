@@ -114,4 +114,10 @@ describe("LB108 · interfaz del bloque económico", () => {
       expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain(`validateEvidenceRaw(id,"${path}"`);
     expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).not.toContain('validateEvidence(id,"procedure"');
   });
+
+  it("normaliza la trazabilidad de expedientes anteriores sin enviar valores nulos", () => {
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('plan.acquisitionMode||(references.length&&documents.length?"MIXED":references.length?"PUBLIC_REFERENCES":"DOCUMENT_UPLOAD")');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('Array.isArray(plan.supportingDocuments)?plan.supportingDocuments:[]');
+    expect(LB108_ECONOMIC_STARTING_POINT_SCRIPT).toContain('Array.isArray(plan.selectedSupports)?plan.selectedSupports:[]');
+  });
 });
