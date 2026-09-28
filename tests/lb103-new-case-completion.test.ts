@@ -83,4 +83,17 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("No se cambiará el procedimiento ni la financiación");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("ui:lb103:document-recovery");
   });
+
+  it("propone la necesidad, exige comprobar los recursos disponibles y separa el órgano competente",()=>{
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("proposedNeedText");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Texto propuesto y editable");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Comprobación previa obligatoria");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("existencias disponibles, reutilización o redistribución de materiales");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("medios personales y técnicos propios");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Puede atenderse parcialmente; debo revisar o reducir el objeto");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Todavía no se ha comprobado");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Esta decisión es distinta de la necesidad");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("ui:lb103:need-and-means-review");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('fieldPath:"need"');
+  });
 });
