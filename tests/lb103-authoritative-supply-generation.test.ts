@@ -143,7 +143,7 @@ describe("LB103 · generación Supply autoritativa sellada", () => {
     expect(result.blockers.join(" ")).toContain("selección documental presentada por /adaptive diverge");
   });
 
-  it("rechaza la generación si el estado guiado ya no es READY_FOR_DOCUMENT_GENERATION", async () => {
+  it("tolera una fase local obsoleta cuando la evidencia autoritativa está completa", async () => {
     const caseValue = supplyCase("GUIDED_DECISIONS");
     const preflight = evaluateLB103ServerValidatedPreflight(caseValue);
     let calls = 0;
@@ -160,9 +160,9 @@ describe("LB103 · generación Supply autoritativa sellada", () => {
       },
     });
 
-    expect(calls).toBe(0);
-    expect(result.ready).toBe(false);
-    expect(result.blockers.join(" ")).toContain("READY_FOR_DOCUMENT_GENERATION");
+    expect(calls).toBe(1);
+    expect(result.ready).toBe(true);
+    expect(result.blockers).toEqual([]);
   });
 
   it("rechaza una terna fuera del ámbito Supply ASA autofinanciado", async () => {

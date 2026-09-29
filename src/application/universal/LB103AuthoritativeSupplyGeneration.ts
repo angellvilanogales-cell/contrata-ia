@@ -32,14 +32,6 @@ type SupplyPackageGenerator = (input: {
   authoritativeSeals?: LB103PresentedGenerationSeals;
 }) => Promise<SupplyUserDocumentPackage>;
 
-function guidedPhase(caseValue: AdaptiveStoredCase): string | undefined {
-  const answers = caseValue.answers as unknown as Record<string, unknown>;
-  const state = answers.__lb103;
-  if (!state || typeof state !== "object" || Array.isArray(state)) return undefined;
-  const phase = (state as Record<string, unknown>).phase;
-  return typeof phase === "string" ? phase : undefined;
-}
-
 function isSha256(value: string): boolean {
   return /^[a-f0-9]{64}$/.test(value);
 }
@@ -76,9 +68,10 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
   const preflight = evaluateLB103ServerValidatedPreflight(caseValue);
   const blockers: string[] = [];
 
-  if (guidedPhase(input.caseValue) !== "READY_FOR_DOCUMENT_GENERATION") {
-    blockers.push("El expediente guiado no está en READY_FOR_DOCUMENT_GENERATION.");
-  }
+  // La fase LB103 del navegador es solo una ayuda de navegación y puede
+  // quedar obsoleta tras completar decisiones desde la recuperación
+  // documental. La autorización se deriva de la evidencia persistida y
+  // validada que reconstruye este preflight en el servidor.
   if (!preflight.snapshotReady || !preflight.snapshot) {
     blockers.push("El servidor no puede reconstruir un snapshot canónico validado.");
   }
