@@ -118,8 +118,8 @@ export async function renderSupplyAsaGeneralPcap(input: { record: UniversalEvide
       ...JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET,
       templateId: "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17",
       sourceId: "jda:cccp:pcap:supply:asa:eu-funds:2025-12-17:odt",
-      contentHash: "sha256:54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",
-      styleFingerprint: "sha256:8e4bd158b0868e06d20e12982830797335746d1c5c4a76a210fc8b0c19f4156f",
+      contentHash: "sha256:0b6ec38663e874ef54e2182951cee48cf18a6d5945e0405930b513c4d52969f7",
+      styleFingerprint: "sha256:8a85db38c2f7a067003527b5e8b7da3987b8b6038dab9dcc450206445032b5f0",
     } : JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET;
     const renderer = new UniversalOdtProductionRenderer(input.templateStore, JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION);
     const rendered = await renderer.render({ asset, values });
