@@ -141,7 +141,7 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
       "contrata-ia:supply:ppt:general:LB105-SUPPLY-CANONICAL-ODT-V1",
     ]);
     expect(result.documents[1]).toMatchObject({
-      selectedSourceSha256: "54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",
+      selectedSourceSha256: "0b6ec38663e874ef54e2182951cee48cf18a6d5945e0405930b513c4d52969f7",
       selectedProvenanceRole: "OFFICIAL_MODEL",
       officialModelClaimed: true,
     });
