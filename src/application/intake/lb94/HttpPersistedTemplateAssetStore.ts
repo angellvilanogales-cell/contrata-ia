@@ -22,7 +22,7 @@ export interface PersistedTemplateAssetDescriptor {
 
 export const LB94_SUPPLY_GENERAL_RUNTIME_ASSETS: readonly PersistedTemplateAssetDescriptor[] = [
   {kind:"PCAP",templateId:"JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17",sourceId:"jda:cccp:pcap:supply:asa:autofinanced:2025-12-17:odt",sha256:"45e1e6b16ec41d77206d3ef385c70f87c9120bb0ccce4e43d9a24d245812cadc",styleFingerprint:"sha256:9eb23463f4d56abd03531cb909206ef47d749054bf284087bd45867b39e6ceee",provenanceRole:"OFFICIAL_MODEL"},
-  {kind:"PCAP",templateId:"JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17",sourceId:"jda:cccp:pcap:supply:asa:eu-funds:2025-12-17:odt",sha256:"54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",styleFingerprint:"sha256:8e4bd158b0868e06d20e12982830797335746d1c5c4a76a210fc8b0c19f4156f",provenanceRole:"OFFICIAL_MODEL"},
+  {kind:"PCAP",templateId:"JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17",sourceId:"jda:cccp:pcap:supply:asa:eu-funds:2025-12-17:odt",sha256:"0b6ec38663e874ef54e2182951cee48cf18a6d5945e0405930b513c4d52969f7",styleFingerprint:"sha256:8a85db38c2f7a067003527b5e8b7da3987b8b6038dab9dcc450206445032b5f0",provenanceRole:"OFFICIAL_MODEL"},
   ...SUPPLY_GENERAL_DERIVED_ASSET_MANIFEST.map(item=>({kind:item.kind,templateId:item.templateId,sourceId:item.templateId,sha256:item.sha256,styleFingerprint:item.styleFingerprint,provenanceRole:item.provenanceRole})),
 ] as const;
 export const LB94_SUPPLY_LEGACY_DERIVED_ASSETS: readonly PersistedTemplateAssetDescriptor[] = [
