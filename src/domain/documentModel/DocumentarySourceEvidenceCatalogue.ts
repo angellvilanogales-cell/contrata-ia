@@ -76,13 +76,14 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     editableBinaryVerified: true,
     generalizable: true,
     sourceTitle: "Modelo PCAP suministro abierto simplificado abreviado - presentación electrónica - fondos europeos",
-    sha256: "54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",
+    sha256: "0b6ec38663e874ef54e2182951cee48cf18a6d5945e0405930b513c4d52969f7",
     provenanceRole: "OFFICIAL_MODEL",
     officialModelClaimed: true,
     humanValidationRequired: true,
     observations: [
       "Modelo oficial específico para expedientes financiados con fondos europeos; activo físico verificado.",
       "Identidad física runtime: JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17.",
+      "Binario oficial revalidado el 29/09/2026 contra la URL publicada por la Junta: ODT de suministro, procedimiento abierto simplificado abreviado y fondos europeos.",
     ],
   },
   {
