@@ -115,8 +115,8 @@ function conditionalPaths(record: UniversalEvidenceRecord): Readonly<Record<Excl
 
   const procedureValue = String(field(record, "procedure")?.value ?? "");
   const funding = String(field(record, "economic.fundingSource")?.value ?? "");
-  const supplyAsaAutofinanced = procedureValue === "ABIERTO_SIMPLIFICADO_ABREVIADO" && ["AUTOFINANCED", "AUTOFINANCIADA"].includes(funding);
-  if (supplyAsaAutofinanced) {
+  const supplyAsaWithOfficialModel = procedureValue === "ABIERTO_SIMPLIFICADO_ABREVIADO" && ["AUTOFINANCED", "AUTOFINANCIADA", "EU_FUNDS"].includes(funding);
+  if (supplyAsaWithOfficialModel) {
     identification.push("administrative.reservedContractDa4");
     economics.push(
       "economic.initialVatAmountCents",

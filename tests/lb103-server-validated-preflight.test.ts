@@ -127,7 +127,27 @@ describe("LB103 · snapshot servidor y preflight documental", () => {
     expect(result.productionReady).toBe(false);
   });
 
-  it("bloquea la terna si procedimiento o financiación salen del ámbito acreditado", () => {
+  it("mantiene Memoria y PPT y selecciona el PCAP oficial europeo en Supply ASA con fondos europeos", () => {
+    const value = supplyCase();
+    value.universalEvidence = {
+      ...value.universalEvidence,
+      "economic.fundingSource": validated("economic.fundingSource", "EU_FUNDS"),
+    };
+    const result = evaluateLB103ServerValidatedPreflight(value);
+    expect(result.packageReady).toBe(true);
+    expect(result.documents.map(item => item.selectedSourceId)).toEqual([
+      "contrata-ia:supply:memory:general:LB105-SUPPLY-CANONICAL-ODT-V1",
+      "JDA-SUPPLY-ASA-EU-FUNDS-PCAP-GENERAL-ODT",
+      "contrata-ia:supply:ppt:general:LB105-SUPPLY-CANONICAL-ODT-V1",
+    ]);
+    expect(result.documents[1]).toMatchObject({
+      selectedSourceSha256: "54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",
+      selectedProvenanceRole: "OFFICIAL_MODEL",
+      officialModelClaimed: true,
+    });
+  });
+
+  it("bloquea la terna si el procedimiento sale del ámbito acreditado", () => {
     const original = supplyCase();
     const wrongScope: AdaptiveStoredCase = {
       ...original,

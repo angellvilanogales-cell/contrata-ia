@@ -8,7 +8,10 @@ import type { LB103ProtectedDocumentarySelection } from "./LB103ServerValidatedP
 export function selectedLB103TemplateStore(store: UniversalEditableTemplateBinaryStore, selection: LB103ProtectedDocumentarySelection): UniversalEditableTemplateBinaryStore {
   return { async get(templateId) {
     const descriptor = [...LB94_SUPPLY_GENERAL_RUNTIME_ASSETS, ...LB96_SERVICE_GENERAL_RUNTIME_ASSETS].find(asset => asset.templateId === templateId);
-    const selectionId = templateId === "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" ? "JDA-SUPPLY-ASA-PCAP-GENERAL-ODT" : templateId;
+    const selectionId = ({
+      "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17": "JDA-SUPPLY-ASA-PCAP-GENERAL-ODT",
+      "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17": "JDA-SUPPLY-ASA-EU-FUNDS-PCAP-GENERAL-ODT",
+    } as Record<string, string>)[templateId] ?? templateId;
     const selected = selection.documents.find(document => document.selectedSourceId === selectionId);
     if (!descriptor || !selected || selected.status !== "GENERAL_EDITABLE_SELECTED" || selected.selectedSourceSha256 !== descriptor.sha256 || selected.selectedProvenanceRole !== descriptor.provenanceRole) {
       throw new Error("El generador solicitó una plantilla ajena a la selección documental sellada.");

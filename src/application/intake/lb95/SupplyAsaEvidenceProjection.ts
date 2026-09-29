@@ -93,7 +93,7 @@ export function projectSupplyAsaEvidence(record: UniversalEvidenceRecord): Unive
   const procedure = must<string>(record, "procedure");
   if (procedure.value !== "ABIERTO_SIMPLIFICADO_ABREVIADO") throw new Error("El proyector PCAP ASA solo admite el procedimiento abierto simplificado abreviado.");
   const funding = must<string>(record, "economic.fundingSource");
-  if (!["AUTOFINANCED", "AUTOFINANCIADA"].includes(String(funding.value))) throw new Error("El proyector PCAP ASA acreditado exige financiación autofinanciada.");
+  if (!["AUTOFINANCED", "AUTOFINANCIADA", "EU_FUNDS"].includes(String(funding.value))) throw new Error("El proyector PCAP ASA exige una financiación compatible con un modelo oficial acreditado.");
 
   const object = must<string>(record, "object");
   const cpv = must<string>(record, "cpvMain");

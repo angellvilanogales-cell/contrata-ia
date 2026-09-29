@@ -47,14 +47,15 @@ describe("LB91.36-40 - explotación conservadora de fuentes documentales", () =>
     expect(ppt.generalizable).toBe(true);
   });
 
-  it("considera generalizables y editables los tres modelos supply actualmente acreditados", () => {
+  it("considera generalizables y editables los cuatro modelos supply actualmente acreditados", () => {
     const general = getGeneralizableEditableEvidence().filter(item => item.contractType === "SUPPLY");
-    expect(general).toHaveLength(3);
+    expect(general).toHaveLength(4);
     expect(general.map(item => item.documentType)).toEqual(expect.arrayContaining([
       DocumentType.PCAP,
       DocumentType.MEMORY,
       DocumentType.PPT,
     ]));
     expect(general.map(item => item.id)).toContain("JDA-SUPPLY-ASA-PCAP-GENERAL-ODT");
+    expect(general.map(item => item.id)).toContain("JDA-SUPPLY-ASA-EU-FUNDS-PCAP-GENERAL-ODT");
   });
 });

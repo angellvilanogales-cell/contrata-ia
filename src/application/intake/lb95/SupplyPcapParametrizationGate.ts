@@ -4,14 +4,15 @@ import type { SupplyUserJourney } from "./SupplyUserJourneyCoordinator";
 
 export interface SupplyPcapParametrizationGate {
   ready: boolean;
-  templateId: "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17";
+  templateId: "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" | "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17";
   blockers: readonly string[];
   requiredFieldPaths: readonly string[];
   humanValidationRequired: true;
   officialScopeRespected: boolean;
 }
 
-const TEMPLATE_ID = "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" as const;
+const AUTOFINANCED_TEMPLATE_ID = "JDA-PCAP-SUPPLY-ASA-AUTOFINANCED-2025-12-17" as const;
+const EU_FUNDS_TEMPLATE_ID = "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17" as const;
 
 function value(record: UniversalEvidenceRecord, path: string): unknown {
   return record.fields[path]?.value;
@@ -42,7 +43,7 @@ export function evaluateSupplyPcapParametrizationGate(
   if (value(record, "contractType") !== "SUPPLY") blockers.push("El modelo PCAP seleccionado solo corresponde a contratos de suministro.");
   if (value(record, "procedure") !== "ABIERTO_SIMPLIFICADO_ABREVIADO") blockers.push("El modelo oficial acreditado corresponde exclusivamente al abierto simplificado abreviado.");
   const funding = String(value(record, "economic.fundingSource") ?? "");
-  if (!(["AUTOFINANCED", "AUTOFINANCIADA"] as string[]).includes(funding)) blockers.push("El modelo oficial acreditado exige perfil de financiación autofinanciada.");
+  if (!(["AUTOFINANCED", "AUTOFINANCIADA", "EU_FUNDS"] as string[]).includes(funding)) blockers.push("No existe un modelo oficial acreditado para el perfil de financiación seleccionado.");
   if (!journey.readyForFinalReview) blockers.push("El expediente todavía no ha completado todos los datos aplicables.");
   const finalReview = journey.stages.find(stage => stage.id === "FINAL_REVIEW");
   if (finalReview?.status !== "COMPLETE") blockers.push("La revisión y validación humana final no está completada.");
@@ -51,7 +52,7 @@ export function evaluateSupplyPcapParametrizationGate(
   const scopeBlockers = blockers.filter(item => item.includes("modelo oficial acreditado") || item.includes("solo corresponde"));
   return {
     ready: blockers.length === 0,
-    templateId: TEMPLATE_ID,
+    templateId: funding === "EU_FUNDS" ? EU_FUNDS_TEMPLATE_ID : AUTOFINANCED_TEMPLATE_ID,
     blockers: [...new Set(blockers)],
     requiredFieldPaths,
     humanValidationRequired: true,

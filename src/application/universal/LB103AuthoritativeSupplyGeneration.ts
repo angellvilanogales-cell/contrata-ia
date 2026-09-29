@@ -107,8 +107,8 @@ export async function generateLB103AuthoritativeSupplyPackage(input: {
   if (preflight.snapshot?.contractType === "SUPPLY" && preflight.snapshot.procedure !== "ABIERTO_SIMPLIFICADO_ABREVIADO") {
     blockers.push("La terna Supply acreditada exige procedimiento abierto simplificado abreviado.");
   }
-  if (preflight.snapshot?.contractType === "SUPPLY" && preflight.snapshot.financing !== "AUTOFINANCED") {
-    blockers.push("La terna Supply acreditada exige financiación autofinanciada.");
+  if (preflight.snapshot?.contractType === "SUPPLY" && !["AUTOFINANCED", "EU_FUNDS"].includes(preflight.snapshot.financing)) {
+    blockers.push("La terna Supply exige una financiación con modelo PCAP oficial acreditado.");
   }
 
   if (blockers.length > 0) {

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type { UniversalSupplyAsaPlannedModificationDecision } from "../../../domain/expediente/UniversalExpedienteDomains";
 import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace";
 import { UniversalOdtProductionRenderer, type UniversalEditableTemplateBinaryStore, type UniversalOdtRendererConfiguration, type UniversalTemplateValueFormatter } from "../lb23/UniversalOdtProductionRenderer";
-import { JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET, JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE, JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION, FERRETERIA_PLANNED_MODIFICATION_PROFILE_ID } from "../lb34/JuntaSupplyAsaModificationSection";
+import { JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET, JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE, JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION, JDA_SUPPLY_ASA_LB34_PHYSICAL_BINDINGS, FERRETERIA_PLANNED_MODIFICATION_PROFILE_ID } from "../lb34/JuntaSupplyAsaModificationSection";
 import { auditJdaSupplyAsaRenderedOdt } from "../lb35/JuntaSupplyAsaAnexoIResidualAudit";
 import { completeSupplyAsaAnnexIResidualFields } from "./SupplyAsaAnnexIResidualCompletion";
 
@@ -81,7 +81,10 @@ const otherLimits: UniversalTemplateValueFormatter = (value, fieldKey) => {
 };
 
 export const JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION: UniversalOdtRendererConfiguration = {
-  bindingsByTemplateId: JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION.bindingsByTemplateId,
+  bindingsByTemplateId: {
+    ...JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION.bindingsByTemplateId,
+    "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17": JDA_SUPPLY_ASA_LB34_PHYSICAL_BINDINGS,
+  },
   formattersBySlotId: {
     ...JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION.formattersBySlotId,
     "pcap.anexoI.14.estabilidad.porcentaje": stabilityPercent,
@@ -110,8 +113,16 @@ export async function renderSupplyAsaGeneralPcap(input: { record: UniversalEvide
   const blockers: string[] = [];
   try {
     const values = JDA_SUPPLY_ASA_LB34_MAPPING_PROFILE.slots.map(slot => ({ slotId: slot.slotId, value: validated(input.record, slot.fieldKey), sourceFieldKey: slot.fieldKey }));
+    const funding = String(validated(input.record, "economic.fundingSource"));
+    const asset = funding === "EU_FUNDS" ? {
+      ...JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET,
+      templateId: "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17",
+      sourceId: "jda:cccp:pcap:supply:asa:eu-funds:2025-12-17:odt",
+      contentHash: "sha256:54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",
+      styleFingerprint: "sha256:8e4bd158b0868e06d20e12982830797335746d1c5c4a76a210fc8b0c19f4156f",
+    } : JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET;
     const renderer = new UniversalOdtProductionRenderer(input.templateStore, JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION);
-    const rendered = await renderer.render({ asset: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET, values });
+    const rendered = await renderer.render({ asset, values });
     const completed = completeSupplyAsaAnnexIResidualFields(rendered.bytes, validated(input.record, "administrative.pcapAnnexIResidualDecisions"));
     const residual = auditJdaSupplyAsaRenderedOdt(completed.bytes);
     if (!residual.ready) throw new Error(`Auditoría residual PCAP: ${residual.blockers.join(" ")}`);
@@ -123,7 +134,7 @@ export async function renderSupplyAsaGeneralPcap(input: { record: UniversalEvide
         fileName: `PCAP_${input.record.caseId.replaceAll("/", "-")}.odt`,
         bytes,
         sha256: createHash("sha256").update(bytes).digest("hex"),
-        templateId: JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET.templateId,
+        templateId: asset.templateId,
         renderedStyleFingerprint: rendered.renderedStyleFingerprint,
       },
       blockers: [],

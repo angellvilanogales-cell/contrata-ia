@@ -65,6 +65,27 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     ],
   },
   {
+    id: "JDA-SUPPLY-ASA-EU-FUNDS-PCAP-GENERAL-ODT",
+    contractType: "SUPPLY",
+    documentType: DocumentType.PCAP,
+    format: "ODT",
+    role: "GENERAL_MODEL",
+    applicableProcedures: [TipoProcedimiento.ABIERTO_SIMPLIFICADO_ABREVIADO],
+    financing: "EU_FUNDS",
+    technicalFamily: "GENERAL_ADMINISTRATIVE",
+    editableBinaryVerified: true,
+    generalizable: true,
+    sourceTitle: "Modelo PCAP suministro abierto simplificado abreviado - presentación electrónica - fondos europeos",
+    sha256: "54f4d1dc804259bb1cc23c7e659ce0226470f58a26e37c776817afdf8ed75a75",
+    provenanceRole: "OFFICIAL_MODEL",
+    officialModelClaimed: true,
+    humanValidationRequired: true,
+    observations: [
+      "Modelo oficial específico para expedientes financiados con fondos europeos; activo físico verificado.",
+      "Identidad física runtime: JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17.",
+    ],
+  },
+  {
     id: "contrata-ia:supply:memory:general:LB105-SUPPLY-CANONICAL-ODT-V1",
     contractType: "SUPPLY",
     documentType: DocumentType.MEMORY,
@@ -82,7 +103,7 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     humanValidationRequired: true,
     observations: [
       "Plantilla general derivada por Contrata-IA y persistida como activo físico verificado; no es modelo oficial de la Junta de Andalucía.",
-      "Se habilita conservadoramente en este preflight para el alcance Supply ASA autofinanciado acreditado por LB105.",
+      "La Memoria se selecciona por tipología contractual y procedimiento; la financiación se proyecta desde la evidencia del expediente.",
     ],
   },
   {
@@ -104,6 +125,7 @@ export const DOCUMENTARY_SOURCE_EVIDENCE: readonly DocumentarySourceEvidence[] =
     observations: [
       "Plantilla general derivada por Contrata-IA y persistida como activo físico verificado; no es modelo oficial de la Junta de Andalucía.",
       "Núcleo técnico común Supply; los overlays de subfamilia siguen sujetos a las reglas de aplicabilidad del expediente.",
+      "El PPT no cambia de modelo por la fuente de financiación; las obligaciones aplicables se proyectan desde la evidencia validada.",
     ],
   },
   {

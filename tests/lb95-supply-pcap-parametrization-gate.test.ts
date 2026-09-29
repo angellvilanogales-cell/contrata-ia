@@ -51,10 +51,11 @@ describe("LB95 Supply PCAP parametrization gate", () => {
     expect(result.blockers.join(" ")).toContain("exclusivamente al abierto simplificado abreviado");
   });
 
-  it("impide usarlo con financiación distinta o revisión incompleta", () => {
+  it("selecciona el modelo oficial de fondos europeos y mantiene la revisión humana", () => {
     const result = evaluateSupplyPcapParametrizationGate(record(completePcapValues({ "economic.fundingSource": "EU_FUNDS" })), journey("IN_PROGRESS"), true);
     expect(result.ready).toBe(false);
-    expect(result.blockers.join(" ")).toContain("autofinanciada");
+    expect(result.templateId).toBe("JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17");
+    expect(result.blockers.join(" ")).not.toContain("financiación");
     expect(result.blockers.join(" ")).toContain("validación humana");
   });
 

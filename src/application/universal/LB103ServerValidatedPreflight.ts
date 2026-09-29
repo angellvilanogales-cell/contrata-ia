@@ -185,7 +185,9 @@ export function evaluateLB103ServerValidatedPreflight(caseValue: AdaptiveStoredC
           contractType: snapshot!.contractType as UniversalTargetContractType,
           documentType,
           procedure: snapshot!.procedure,
-          financing: snapshot!.financing,
+          // La financiación determina el PCAP oficial. Memoria y PPT son
+          // documentos sustantivos del contrato y conservan su modelo general.
+          financing: documentType === DocumentType.PCAP ? snapshot!.financing : undefined,
           technicalFamily: documentType === DocumentType.PCAP ? "GENERAL_ADMINISTRATIVE" : undefined,
         });
         const ready = selection.status === "GENERAL_EDITABLE_SELECTED";
