@@ -47,4 +47,13 @@ describe("LB120 · interfaz de cierre", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("closure.finalConsentRecord");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("universal-evidence");
   });
+
+  it("permite descargar y comprender la copia previa antes de aceptar", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-review-package");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Descargar PCAP, Memoria y PPT para revisión");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Datos técnicos de trazabilidad");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Modelo oficial de la Junta de Andalucía");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Aceptación general de la persona responsable");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).not.toContain("Conclusión y motivación de la persona responsable");
+  });
 });
