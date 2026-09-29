@@ -1,6 +1,7 @@
 import {createHash} from "node:crypto";
 import {afterEach,describe,expect,it,vi} from "vitest";
 import {JdaOfficialPcapRemoteFallbackStore} from "../src/application/intake/lb102/JdaOfficialPcapRemoteFallbackStore";
+import {resolveJdaOfficialPcapModel} from "../src/application/intake/lb102/JdaOfficialPcapModelManifest2025";
 import {readOdtZip,writeOdtZip,type OdtZipEntry} from "../src/application/intake/lb23/OdtPackageCodec";
 import {computeOdtStyleFingerprint,type UniversalEditableTemplateBinaryStore} from "../src/application/intake/lb23/UniversalOdtProductionRenderer";
 import type {PersistedTemplateAssetDescriptor} from "../src/application/intake/lb94/HttpPersistedTemplateAssetStore";
@@ -25,6 +26,10 @@ afterEach(()=>vi.unstubAllGlobals());
 describe("LB103 — recuperación cerrada del PCAP oficial ASA fondos europeos",()=>{
  it("fija la URL oficial completa del modelo seleccionado",()=>{
   expect(JDA_SUPPLY_ASA_EU_FUNDS_PCAP_SOURCE_URL).toBe("https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/02/2025_12_17_pcap_suministro_abierto_simplificado_abreviado_ffee.odt");
+  expect(resolveJdaOfficialPcapModel({family:"SUPPLY",procedure:"ASA",financing:"EU_FUNDS"})).toMatchObject({
+   sha256:"0b6ec38663e874ef54e2182951cee48cf18a6d5945e0405930b513c4d52969f7",
+   styleFingerprint:"sha256:8a85db38c2f7a067003527b5e8b7da3987b8b6038dab9dcc450206445032b5f0",
+  });
  });
  it("usa el ODT oficial cuando falta en persistencia y coinciden ambas huellas",async()=>{
   const bytes=fixture();vi.stubGlobal("fetch",vi.fn(async()=>new Response(bytes,{status:200})));
