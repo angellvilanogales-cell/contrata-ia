@@ -80,10 +80,59 @@ const otherLimits: UniversalTemplateValueFormatter = (value, fieldKey) => {
   return lines.map((line, index) => `<text:p text:style-name="${index === 0 ? "P176" : "P177"}"><text:span text:style-name="${index === 0 ? "T875" : "T896"}">-<text:tab/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1377">${xmlEscape(line)}</text:span></text:span></text:p>`).join("");
 };
 
+const EU_FUNDS_TEMPLATE_ID = "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17";
+const EU_STABILITY_ORIGINAL = '<text:p text:style-name="P62">-<text:tab/>Porcentaje máximo del precio del contrato al que pueda afectar: <text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1822">_</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1827">______</text:span></text:span> %</text:p>';
+const EU_DA33_CAUSE_ORIGINAL = '<text:p text:style-name="P48"><text:span text:style-name="T1995"><text:sequence text:ref-name="refmodif2" text:name="modif" text:formula="ooow:modif+1" style:num-format="1">3</text:sequence></text:span><text:span text:style-name="T1995">. </text:span><text:span text:style-name="T1996">_______</text:span><text:span text:style-name="T1997">(Indicar causa de modificación).</text:span></text:p>';
+const EU_DA33_LIMITS_ORIGINAL = '<text:p text:style-name="P202"><text:span text:style-name="T1159">-<text:tab/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1828">_________</text:span></text:span></text:p><text:p text:style-name="P203"><text:span text:style-name="T1183">-<text:tab/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1828">_________</text:span></text:span></text:p>';
+const EU_OTHER_CAUSE_ORIGINAL = '<text:p text:style-name="P266"><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1907"><text:sequence text:ref-name="refmodif3" text:name="modif" text:formula="ooow:modif+1" style:num-format="1">4</text:sequence></text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1907">. </text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1913">_______ (Indicar causa de modificación).</text:span></text:span></text:p>';
+const EU_OTHER_LIMITS_ORIGINAL = '<text:p text:style-name="P202"><text:span text:style-name="T1159">-<text:tab/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1828">_________</text:span></text:span></text:p><text:p text:style-name="P203"><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1915">-<text:tab/></text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1314">_________</text:span></text:span></text:p>';
+
+const euBindings: readonly import("../lb23/UniversalOdtProductionRenderer").UniversalOdtPhysicalSlotBinding[] = JDA_SUPPLY_ASA_LB34_PHYSICAL_BINDINGS.map(binding => {
+  const base = { ...binding, anchorMode: "STYLE_NAME_AGNOSTIC" as const };
+  if (binding.slotId === "pcap.anexoI.8.condicionesEspeciales") return { ...base, anchorContextBefore: "las condiciones especiales de ejecución de entre las que enumera" };
+  if (binding.slotId === "pcap.anexoI.1C.da33") return { ...base, anchorContextBefore: "importe máximo de las nuevas necesidades." };
+  if (binding.slotId === "pcap.anexoI.2C.sistemaPrecio") return { ...base, anchorContextBefore: "El precio del contrato podrá formularse" };
+  const exact = {
+    "pcap.anexoI.14.estabilidad.porcentaje": EU_STABILITY_ORIGINAL,
+    "pcap.anexoI.14.da33.causa": EU_DA33_CAUSE_ORIGINAL,
+    "pcap.anexoI.14.da33.limites": EU_DA33_LIMITS_ORIGINAL,
+    "pcap.anexoI.14.otras.causa": EU_OTHER_CAUSE_ORIGINAL,
+    "pcap.anexoI.14.otras.limites": EU_OTHER_LIMITS_ORIGINAL,
+  }[binding.slotId];
+  return exact ? { ...binding, xmlToken: exact, anchorMode: "EXACT" as const } : base;
+});
+
+const euStabilityPercent: UniversalTemplateValueFormatter = (value, fieldKey) => {
+  const d = decision(value, fieldKey);
+  return EU_STABILITY_ORIGINAL.replace('<text:span text:style-name="T1822">_</text:span>', `<text:span text:style-name="T1822">${d.budgetStability.maximumPercent}</text:span>`).replace('<text:span text:style-name="T1827">______</text:span>', '<text:span text:style-name="T1827"></text:span>');
+};
+const euDa33Cause: UniversalTemplateValueFormatter = (value, fieldKey) => {
+  const d = decision(value, fieldKey);
+  const text = d.needsDa33.applicable ? "Mayores necesidades reales respecto de las estimadas inicialmente, en contrato de suministro en función de las necesidades conforme a la disposición adicional 33.ª LCSP." : "No procede modificación por mayores necesidades conforme a la disposición adicional 33.ª LCSP.";
+  return `<text:p text:style-name="P48"><text:span text:style-name="T1995"><text:sequence text:ref-name="refmodif2" text:name="modif" text:formula="ooow:modif+1" style:num-format="1">3</text:sequence></text:span><text:span text:style-name="T1995">. </text:span><text:span text:style-name="T1996">${xmlEscape(text)}</text:span><text:span text:style-name="T1997"></text:span></text:p>`;
+};
+const euDa33Limits: UniversalTemplateValueFormatter = (value, fieldKey) => {
+  const d = decision(value, fieldKey);
+  const lines = d.needsDa33.applicable ? [...d.needsDa33.limits, `Porcentaje máximo de incremento: ${d.needsDa33.maximumPercent} %.`] : ["No procede."];
+  return lines.map((line, index) => `<text:p text:style-name="${index === 0 ? "P202" : "P203"}"><text:span text:style-name="${index === 0 ? "T1159" : "T1183"}">-<text:tab/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1828">${xmlEscape(line)}</text:span></text:span></text:p>`).join("");
+};
+const euOtherCause: UniversalTemplateValueFormatter = (value, fieldKey) => {
+  const d = decision(value, fieldKey);
+  const text = d.other.applicable ? d.other.description : "Otras causas de modificación previstas: No procede.";
+  return `<text:p text:style-name="P266"><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1907"><text:sequence text:ref-name="refmodif3" text:name="modif" text:formula="ooow:modif+1" style:num-format="1">4</text:sequence></text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1907">. </text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1913">${xmlEscape(text)}</text:span></text:span></text:p>`;
+};
+const euOtherLimits: UniversalTemplateValueFormatter = (value, fieldKey) => {
+  const d = decision(value, fieldKey);
+  const lines = d.other.applicable ? [...d.other.limits, `Porcentaje máximo: ${d.other.maximumPercent} %.`] : ["No procede."];
+  return lines.map((line, index) => index === 0
+    ? `<text:p text:style-name="P202"><text:span text:style-name="T1159">-<text:tab/></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1828">${xmlEscape(line)}</text:span></text:span></text:p>`
+    : `<text:p text:style-name="P203"><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1915">-<text:tab/></text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1314">${xmlEscape(line)}</text:span></text:span></text:p>`).join("");
+};
+
 export const JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION: UniversalOdtRendererConfiguration = {
   bindingsByTemplateId: {
     ...JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION.bindingsByTemplateId,
-    "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17": JDA_SUPPLY_ASA_LB34_PHYSICAL_BINDINGS,
+    [EU_FUNDS_TEMPLATE_ID]: euBindings,
   },
   formattersBySlotId: {
     ...JDA_SUPPLY_ASA_LB34_RENDERER_CONFIGURATION.formattersBySlotId,
@@ -92,6 +141,15 @@ export const JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION: UniversalOdtRendererCon
     "pcap.anexoI.14.da33.limites": da33Limits,
     "pcap.anexoI.14.otras.causa": otherCause,
     "pcap.anexoI.14.otras.limites": otherLimits,
+  },
+  formattersByTemplateId: {
+    [EU_FUNDS_TEMPLATE_ID]: {
+      "pcap.anexoI.14.estabilidad.porcentaje": euStabilityPercent,
+      "pcap.anexoI.14.da33.causa": euDa33Cause,
+      "pcap.anexoI.14.da33.limites": euDa33Limits,
+      "pcap.anexoI.14.otras.causa": euOtherCause,
+      "pcap.anexoI.14.otras.limites": euOtherLimits,
+    },
   },
 };
 
@@ -116,7 +174,7 @@ export async function renderSupplyAsaGeneralPcap(input: { record: UniversalEvide
     const funding = String(validated(input.record, "economic.fundingSource"));
     const asset = funding === "EU_FUNDS" ? {
       ...JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET,
-      templateId: "JDA-PCAP-SUPPLY-ASA-EU_FUNDS-2025-12-17",
+      templateId: EU_FUNDS_TEMPLATE_ID,
       sourceId: "jda:cccp:pcap:supply:asa:eu-funds:2025-12-17:odt",
       contentHash: "sha256:0b6ec38663e874ef54e2182951cee48cf18a6d5945e0405930b513c4d52969f7",
       styleFingerprint: "sha256:8a85db38c2f7a067003527b5e8b7da3987b8b6038dab9dcc450206445032b5f0",
