@@ -49,7 +49,9 @@ function decision(value: unknown, fieldKey: string): UniversalSupplyAsaPlannedMo
     needsDa33: { applicable: boolean(da33.applicable, "needsDa33.applicable"), maximumPercent: percent(da33.maximumPercent, "needsDa33.maximumPercent"), limits: limits(da33.limits ?? [], "needsDa33.limits") },
     other: { applicable: boolean(other.applicable, "other.applicable"), description: typeof other.description === "string" ? other.description.trim() : "", maximumPercent: percent(other.maximumPercent, "other.maximumPercent"), limits: limits(other.limits ?? [], "other.limits") },
   };
-  if (!result.budgetStability.applicable) throw new Error(`${fieldKey}: el modelo oficial ASA acreditado materializa la causa de estabilidad presupuestaria y exige decisión aplicable.`);
+  for (const [name, item] of Object.entries({ budgetStability: result.budgetStability, needsDa33: result.needsDa33, other: result.other })) {
+    if (!item.applicable && item.maximumPercent !== 0) throw new Error(`${fieldKey}: ${name}.maximumPercent debe ser 0 cuando la causa no sea aplicable.`);
+  }
   if (result.needsDa33.applicable && result.needsDa33.limits.length === 0) throw new Error(`${fieldKey}: DA 33.ª aplicable exige límites expresos.`);
   if (result.other.applicable && (!result.other.description || result.other.limits.length === 0)) throw new Error(`${fieldKey}: otra modificación aplicable exige descripción y límites.`);
   return result;
@@ -57,7 +59,7 @@ function decision(value: unknown, fieldKey: string): UniversalSupplyAsaPlannedMo
 
 const stabilityPercent: UniversalTemplateValueFormatter = (value, fieldKey) => {
   const d = decision(value, fieldKey);
-  return `<text:p text:style-name="P55">-<text:tab/>Porcentaje máximo del precio del contrato al que pueda afectar: <text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1371">${d.budgetStability.maximumPercent}</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1376"></text:span></text:span> %</text:p>`;
+  return `<text:p text:style-name="P55">-<text:tab/>Porcentaje máximo del precio del contrato al que pueda afectar: <text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1371">${d.budgetStability.applicable ? d.budgetStability.maximumPercent : 0}</text:span></text:span><text:span text:style-name="Fuente_20_de_20_párrafo_20_predeter."><text:span text:style-name="T1376"></text:span></text:span> %</text:p>`;
 };
 const da33Cause: UniversalTemplateValueFormatter = (value, fieldKey) => {
   const d = decision(value, fieldKey);
@@ -104,7 +106,7 @@ const euBindings: readonly import("../lb23/UniversalOdtProductionRenderer").Univ
 
 const euStabilityPercent: UniversalTemplateValueFormatter = (value, fieldKey) => {
   const d = decision(value, fieldKey);
-  return EU_STABILITY_ORIGINAL.replace('<text:span text:style-name="T1822">_</text:span>', `<text:span text:style-name="T1822">${d.budgetStability.maximumPercent}</text:span>`).replace('<text:span text:style-name="T1827">______</text:span>', '<text:span text:style-name="T1827"></text:span>');
+  return EU_STABILITY_ORIGINAL.replace('<text:span text:style-name="T1822">_</text:span>', `<text:span text:style-name="T1822">${d.budgetStability.applicable ? d.budgetStability.maximumPercent : 0}</text:span>`).replace('<text:span text:style-name="T1827">______</text:span>', '<text:span text:style-name="T1827"></text:span>');
 };
 const euDa33Cause: UniversalTemplateValueFormatter = (value, fieldKey) => {
   const d = decision(value, fieldKey);
