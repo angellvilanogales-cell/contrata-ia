@@ -112,7 +112,7 @@ function routeCaseId(pathname: string, action: "lb103-preflight" | "lb103-genera
   return decodeURIComponent(match[1]);
 }
 
-function lb120CaseId(pathname: string, action: "preview" | "consent"): string | null {
+function lb120CaseId(pathname: string, action: "preview" | "review-package" | "consent"): string | null {
   const match = new RegExp(`^/api/adaptive/cases/([^/]+)/lb120-${action}$`).exec(pathname);
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
@@ -360,6 +360,19 @@ export function createLB103AuthoritativeServer(caseStore: AdaptiveCaseStore = ad
         const result = await generateLB103AuthoritativeSupplyPackage({caseValue,presentedSeals:{snapshotSha256:typeof body.snapshotSha256==="string"?body.snapshotSha256:"",documentarySelectionSha256:typeof body.documentarySelectionSha256==="string"?body.documentarySelectionSha256:""},templateStore});
         if (!result.ready || !result.package) { sendJson(response,409,{error:"La vista previa D20 ha sido bloqueada.",blockers:result.blockers,productionReady:false}); return; }
         sendJson(response,200,createLB120DocumentPreview(result.preflight,result.package)); return;
+      }
+
+      const lb120ReviewPackageCaseId = request.method === "POST" ? lb120CaseId(url.pathname, "review-package") : null;
+      if (lb120ReviewPackageCaseId) {
+        const actor = security.authenticate(request); security.require(actor, "OPERATOR");
+        const body = await readJson(request);
+        const caseValue=caseStore.get(lb120ReviewPackageCaseId); const priorBlockers=auditLB120PriorDecisionEvidence(caseValue.universalEvidence??{});
+        if(priorBlockers.length){sendJson(response,409,{error:"La revisión documental D20 exige el cierre validado de D01 a D19.",blockers:priorBlockers,productionReady:false});return;}
+        const templateStore = createHttpPersistedUniversalTemplateAssetStoreFromEnv();
+        if (!templateStore) { sendJson(response,503,{error:"La copia de revisión exige la persistencia remota acreditada de plantillas.",productionReady:false}); return; }
+        const result = await generateLB103AuthoritativeSupplyPackage({caseValue,presentedSeals:{snapshotSha256:typeof body.snapshotSha256==="string"?body.snapshotSha256:"",documentarySelectionSha256:typeof body.documentarySelectionSha256==="string"?body.documentarySelectionSha256:""},templateStore});
+        if (!result.ready || !result.package?.bytes || !result.package.fileName) { sendJson(response,409,{error:"La copia de revisión D20 ha sido bloqueada.",blockers:result.blockers,productionReady:false}); return; }
+        sendZip(response,result.package.bytes,`BORRADOR_REVISION_${result.package.fileName}`); return;
       }
 
       const lb120ConsentCaseId = request.method === "POST" ? lb120CaseId(url.pathname, "consent") : null;
