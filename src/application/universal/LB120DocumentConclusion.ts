@@ -114,7 +114,7 @@ export function createLB120FinalConsent(preview: LB120DocumentPreview, input: LB
   const confirmations = [input.factsAndDecisionsConfirmed, input.legalGroundsConfirmed, input.crossDocumentConsistencyConfirmed, input.officialPcapIntegrityConfirmed, input.memoryAndPptStructureConfirmed, input.noCriticalBlockersConfirmed];
   if (!confirmations.every(Boolean)) throw new Error("Deben confirmarse expresamente todos los extremos de coherencia y control documental.");
   const finalStatement = input.finalStatement.trim();
-  if (finalStatement.length < 20) throw new Error("La conclusión final debe contener una motivación expresa de al menos 20 caracteres.");
+  if (finalStatement.length < 20) throw new Error("La aceptación general debe contener una declaración expresa de al menos 20 caracteres.");
   const documentSha256 = Object.fromEntries(preview.documents.map(document => [document.kind, document.sha256])) as Record<"PCAP" | "MEMORIA" | "PPT", string>;
   const payload = { ...input, finalStatement, schemaVersion: "LB120-FINAL-CONSENT-1" as const, caseId: preview.caseId, documentSha256, reviewerId: reviewerId.trim(), consentedAt, humanValidated: true as const, productionReady: false as const };
   return { ...payload, consentSha256: sha256(payload) };
