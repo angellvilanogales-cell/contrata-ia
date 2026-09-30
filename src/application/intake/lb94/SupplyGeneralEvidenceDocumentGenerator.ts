@@ -74,6 +74,60 @@ function stringifyControlled(value: unknown): string {
   throw new Error("Valor documental no serializable de forma controlada.");
 }
 
+const DOCUMENT_LABELS: Readonly<Record<string, string>> = {
+  ABIERTO: "Abierto",
+  ABIERTO_SIMPLIFICADO: "Abierto simplificado",
+  ABIERTO_SIMPLIFICADO_ORDINARIO: "Abierto simplificado ordinario",
+  ABIERTO_SIMPLIFICADO_ABREVIADO: "Abierto simplificado abreviado",
+  AUTOFINANCED: "Fondos propios",
+  AUTOFINANCIADA: "Fondos propios",
+  EU_FUNDS: "Fondos europeos",
+  OTHER: "Otra fuente de financiación",
+  ORDINARY_GLOBAL_PRICE: "Suministro ordinario con cantidades determinadas y precio global",
+  CATALOGUE_NEEDS: "Suministro por necesidades sucesivas y precios unitarios",
+  QUOTES_OR_CATALOGUES: "Ofertas, tarifas o catálogos contrastables",
+  COST_STUDY: "Estudio de costes",
+  PRIOR_CONTRACTS: "Contratos anteriores comparables",
+  MARKET_CONSULTATION: "Consulta preliminar de mercado",
+};
+
+function documentLabel(value: string): string {
+  return DOCUMENT_LABELS[value] ?? value.replaceAll("_", " ").toLocaleLowerCase("es-ES");
+}
+
+function optionalValue(record: UniversalEvidenceRecord, path: string): unknown {
+  if (!record.fields[path]) return null;
+  return value(record, path);
+}
+
+function cpvSummary(record: UniversalEvidenceRecord): string {
+  const principal = text(record, "cpvMain");
+  const description = optionalValue(record, "cpvMainDescription");
+  const additional = optionalValue(record, "cpvAdditional");
+  const assignments = optionalValue(record, "lots.cpvAssignments");
+  return [
+    `Principal: ${principal}${typeof description === "string" && description.trim() ? ` — ${description.trim()}` : ""}.`,
+    additional && (!Array.isArray(additional) || additional.length > 0) ? `Complementarios: ${stringifyControlled(additional)}.` : "",
+    assignments && (!Array.isArray(assignments) || assignments.length > 0) ? `Asignación por lotes: ${stringifyControlled(assignments)}.` : "",
+  ].filter(Boolean).join(" ");
+}
+
+function technicalSpecifications(record: UniversalEvidenceRecord): string {
+  const rows: readonly [string, string][] = [
+    ["technical.technicalPurpose", "Finalidad técnica"],
+    ["technical.technicalRequirements", "Requisitos mínimos"],
+    ["technical.verificationMethods", "Comprobación de los requisitos"],
+    ["technical.accessibilityRegime", "Accesibilidad universal"],
+    ["technical.environmentalTechnicalRegime", "Requisitos ambientales"],
+    ["technical.equivalenceRegime", "Referencias técnicas y equivalencias"],
+    ["technical.specialRequirements", "Prescripciones especiales"],
+  ];
+  return rows.map(([path, label]) => {
+    const current = optionalValue(record, path);
+    return `${label}: ${current === null ? "No procede." : stringifyControlled(current)}`;
+  }).join("\n");
+}
+
 function lotsRegime(record: UniversalEvidenceRecord): string {
   const divided = boolean(record, "lots.divisionIntoLots");
   if (!divided) return `No se divide el contrato en lotes. Motivación validada: ${text(record, "lots.noDivisionJustification")}`;
@@ -104,7 +158,7 @@ function durationSummary(record: UniversalEvidenceRecord): string {
 function procedureSummary(record: UniversalEvidenceRecord): string {
   const procedure = text(record, "procedure");
   const funding = text(record, "economic.fundingSource");
-  return `Procedimiento validado: ${procedure}. Financiación declarada: ${funding}.`;
+  return `Procedimiento validado: ${documentLabel(procedure)}. Financiación declarada: ${documentLabel(funding)}.`;
 }
 
 function awardCriteriaSummary(record: UniversalEvidenceRecord): string {
@@ -134,7 +188,7 @@ function modificationSummary(record: UniversalEvidenceRecord): string {
 
 function supplyVariantRequirements(record: UniversalEvidenceRecord): string {
   const variant = text(record, "technical.supplyVariant");
-  const parts: string[] = [`Subfamilia técnica declarada: ${variant}.`];
+  const parts: string[] = [`Modalidad del suministro: ${documentLabel(variant)}.`];
   for (const [path, label] of [
     ["technical.hasSuccessiveOrders", "Pedidos o entregas sucesivas"],
     ["technical.hasServicePlatformComponent", "Componente de servicio o plataforma"],
@@ -165,7 +219,7 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
       values: [
         { slotId: "need", value: text(input.record, "need") },
         { slotId: "object", value: text(input.record, "object") },
-        { slotId: "cpvMain", value: text(input.record, "cpvMain") },
+        { slotId: "cpvMain", value: cpvSummary(input.record) },
         { slotId: "lotsRegime", value: lotsRegime(input.record) },
         { slotId: "economicSummary", value: economicSummary(input.record) },
         { slotId: "durationSummary", value: durationSummary(input.record) },
@@ -192,7 +246,7 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
         { slotId: "contractManagement", value: `Órgano de contratación: ${text(input.record, "administrative.contractingAuthority")}` },
         { slotId: "durationSummary", value: durationSummary(input.record) },
         { slotId: "executionLocations", value: stringArray(input.record, "technical.executionLocations") },
-        { slotId: "technicalRequirements", value: text(input.record, "technical.technicalRequirements") },
+        { slotId: "technicalRequirements", value: technicalSpecifications(input.record) },
         { slotId: "supplyVariantRequirements", value: supplyVariantRequirements(input.record) },
         { slotId: "receiptAndAcceptanceRegime", value: text(input.record, "execution.receiptAndAcceptanceRegime") },
         { slotId: "specialExecutionConditions", value: value(input.record, "execution.specialExecutionConditions") },
