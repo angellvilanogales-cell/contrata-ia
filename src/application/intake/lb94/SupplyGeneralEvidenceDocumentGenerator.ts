@@ -95,6 +95,13 @@ function documentLabel(value: string): string {
   return DOCUMENT_LABELS[value] ?? value.replaceAll("_", " ").toLocaleLowerCase("es-ES");
 }
 
+function documentaryText(value: string): string {
+  return Object.entries(DOCUMENT_LABELS).reduce(
+    (current, [code, label]) => current.replaceAll(code, label),
+    value,
+  );
+}
+
 function optionalValue(record: UniversalEvidenceRecord, path: string): unknown {
   if (!record.fields[path]) return null;
   return value(record, path);
@@ -144,7 +151,7 @@ function economicSummary(record: UniversalEvidenceRecord): string {
   const price = text(record, "economic.priceDeterminationRegime");
   const calculation = text(record, "economic.estimatedValueCalculationMethod");
   const revision = text(record, "economic.priceRevisionRegime");
-  return `Presupuesto base sin IVA: ${euro(base)}. IVA: ${euro(vat)}. Presupuesto con IVA: ${euro(total)}. Valor estimado: ${euro(estimated)}. Sistema de determinación del precio: ${price} Método de cálculo del valor estimado: ${calculation} Revisión de precios: ${revision}`;
+  return `Presupuesto base sin IVA: ${euro(base)}. IVA: ${euro(vat)}. Presupuesto con IVA: ${euro(total)}. Valor estimado: ${euro(estimated)}. Sistema de determinación del precio: ${documentaryText(price)} Método de cálculo del valor estimado: ${documentaryText(calculation)} Revisión de precios: ${documentaryText(revision)}`;
 }
 
 function durationSummary(record: UniversalEvidenceRecord): string {

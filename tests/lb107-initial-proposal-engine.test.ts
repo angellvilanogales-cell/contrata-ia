@@ -47,7 +47,8 @@ describe("LB107 · bloque inicial propuesto y validado por una persona", () => {
       expect.objectContaining({ name: expect.stringContaining("Orientación y acompañamiento grupal"), description: expect.stringContaining("beneficiarias") }),
     ]);
     expect(result.lots.noDivisionJustificationDraft).toContain("unidad funcional");
-    expect(result.lots.noDivisionJustificationDraft).toContain("validar");
+    expect(result.lots.noDivisionJustificationDraft).toContain("no procede la división en lotes");
+    expect(result.lots.noDivisionJustificationDraft).not.toContain("provisionalmente");
   });
 
   it("respeta la familia semántica de formación en idiomas y excluye formación sectorial ajena", () => {

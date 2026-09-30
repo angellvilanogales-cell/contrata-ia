@@ -233,7 +233,7 @@ function lotsProposal(description: string): InitialProposalResult["lots"] {
   if (integrated && !separated) return {
     recommended: false,
     confidence: "MEDIUM",
-    reasoning: "La descripción contiene indicios de integración o coordinación técnica. Se propone provisionalmente un lote único, sujeto a que la persona confirme el motivo concreto.",
+    reasoning: "La descripción contiene indicios de integración o coordinación técnica que permiten proponer un lote único para validación humana.",
     suggestedDefinitions: [],
     noDivisionJustificationDraft: "La ejecución independiente podría dificultar la correcta ejecución desde el punto de vista técnico por la coordinación necesaria entre las prestaciones descritas. Esta motivación debe concretarse y validarse con hechos del expediente.",
   };
@@ -244,7 +244,7 @@ function lotsProposal(description: string): InitialProposalResult["lots"] {
       ? "La descripción contiene grupos o ámbitos diferenciados que pueden ser susceptibles de ejecución independiente. Se propone estudiar su división en lotes."
       : "Como regla inicial del artículo 99.3 LCSP se propone estudiar la división en lotes. Falta confirmar la separabilidad técnica y económica del objeto.",
     suggestedDefinitions,
-    noDivisionJustificationDraft: "La no división en lotes se propone provisionalmente porque las prestaciones descritas conforman una unidad funcional orientada a un resultado común y su ejecución separada podría dificultar la coordinación y la correcta ejecución del contrato. La unidad promotora debe comprobar, concretar y validar estas circunstancias antes de incorporar la motivación al expediente.",
+    noDivisionJustificationDraft: "Las prestaciones descritas conforman una unidad funcional orientada a un resultado común. Su ejecución separada dificultaría la coordinación técnica, la correcta ejecución del suministro y la atribución unitaria de responsabilidades, por lo que no procede la división en lotes.",
   };
 }
 
