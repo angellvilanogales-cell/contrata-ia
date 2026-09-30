@@ -32,6 +32,16 @@ describe("LB120 · interfaz de cierre", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
   });
 
+  it("permite corregir directamente en D20 los textos provisionales ya validados", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Corregir textos que impiden generar los documentos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120ApplyCorrections");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lots.noDivisionJustification");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("economic.estimatedValueCalculationMethod");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("criteria.singleCriterionMotivation");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-direct-corrections");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
+  });
+
   it("abre el asistente documental cuando el snapshot existe pero quedan decisiones físicas", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("recoveryPending");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisiones principales validadas");
