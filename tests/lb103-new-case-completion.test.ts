@@ -19,6 +19,9 @@ describe("LB103 nuevo expediente y selección física", () => {
     const decisions=NEW_SUPPLY_VALUES["administrative.pcapAnnexIResidualDecisions"];
     expect(()=>assertSupplyAsaAnnexIResidualDecisions(decisions)).not.toThrow();
     expect(()=>assertSupplyAsaAnnexIResidualDecisions({...decisions as object,insuranceRequired:"Pendiente"})).toThrow(/Sí o No/);
+    expect(()=>assertSupplyAsaAnnexIResidualDecisions({...decisions as object,totalUnits:"Según la relación de unidades validada en la documentación técnica."})).toThrow(/genérica/);
+    expect(()=>assertSupplyAsaAnnexIResidualDecisions({...decisions as object,totalUnits:"Unidades definidas"})).toThrow(/cifra o una relación cuantificada/);
+    expect(()=>assertSupplyAsaAnnexIResidualDecisions({...decisions as object,contractingAuthority:"El órgano de contratación competente"})).toThrow(/genérica/);
     const missing={...decisions as Record<string,string>};delete missing.warrantyTerm;
     expect(()=>assertSupplyAsaAnnexIResidualDecisions(missing)).toThrow(/Plazo de garantía/);
   });
@@ -113,5 +116,7 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("residualDependencies");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("setupResidualWizard");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('save.style.display=step===groups.length-1');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('economic.initialPblVatIncludedCents');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).not.toContain('totalUnits:"Según la relación de unidades');
   });
 });

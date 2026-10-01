@@ -61,7 +61,10 @@ export function assertSupplyAsaAnnexIResidualDecisions(value:unknown): asserts v
   if(!value||typeof value!=="object"||Array.isArray(value))throw new Error("La cumplimentación residual del Anexo I debe ser una estructura de decisiones.");
   const row=value as Record<string,unknown>;const expected=new Set(SUPPLY_ASA_ANNEX_I_RESIDUAL_DECISIONS.map(item=>item.id));
   const unexpected=Object.keys(row).filter(key=>!expected.has(key));if(unexpected.length)throw new Error(`Decisiones residuales no reconocidas: ${unexpected.join(", ")}.`);
-  for(const definition of SUPPLY_ASA_ANNEX_I_RESIDUAL_DECISIONS){const current=row[definition.id];if(typeof current!=="string"||!current.trim())throw new Error(`${definition.label}: falta decisión.`);if(/_{3,}|Sí\s*\/\s*No/i.test(current))throw new Error(`${definition.label}: contiene un valor sin resolver.`);if(definition.control==="YES_NO"&&!/^(?:Sí|Si|No)$/i.test(current.trim()))throw new Error(`${definition.label}: seleccione Sí o No.`);}
+  const generic=/(?:según la relación de unidades|documentación técnica|órgano de contratación competente|plazo validado en el expediente|los indicados por el órgano de contratación|las previstas en el PCAP|penalidades proporcionales por incumplimiento)/i;
+  for(const definition of SUPPLY_ASA_ANNEX_I_RESIDUAL_DECISIONS){const current=row[definition.id];if(typeof current!=="string"||!current.trim())throw new Error(`${definition.label}: falta decisión.`);if(/_{3,}|Sí\s*\/\s*No/i.test(current))throw new Error(`${definition.label}: contiene un valor sin resolver.`);if(generic.test(current))throw new Error(`${definition.label}: la propuesta es genérica y debe concretarse para este expediente.`);if(definition.control==="YES_NO"&&!/^(?:Sí|Si|No)$/i.test(current.trim()))throw new Error(`${definition.label}: seleccione Sí o No.`);}
+  if(!/\d/.test(String(row.totalUnits)))throw new Error("Número total de unidades: indique una cifra o una relación cuantificada concreta.");
+  if(!/\d/.test(String(row.totalAmount)))throw new Error("Importe total asociado a las unidades: indique el importe concreto con IVA.");
 }
 
 interface ParagraphSpan{xml:string;start:number;end:number;}

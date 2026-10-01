@@ -27,6 +27,13 @@ describe("LB105 normalización física Supply", () => {
       if (kind === "MEMORY") {
         const content = Buffer.from(readOdtZip(bytes).find(item => item.name === "content.xml")!.bytes).toString("utf8");
         expect(content).toContain('text:style-name="CI_LB105_Heading1_Continuation">12. Garantías');
+        expect(content).toContain("{{capacityAndSolvencySummary}}");
+        expect(content).toContain("{{managementExecutionPaymentSummary}}");
+        expect(content).not.toContain("se regirán por el PCAP");
+      } else {
+        const content = Buffer.from(readOdtZip(bytes).find(item => item.name === "content.xml")!.bytes).toString("utf8");
+        expect(content).toContain("{{supplyDefinition}}");
+        expect(content).toContain("{{technicalDocumentationSummary}}");
       }
     });
   }

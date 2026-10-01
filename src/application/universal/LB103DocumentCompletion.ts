@@ -4,6 +4,7 @@ import { supplyAsaPcapRequiredFieldPaths } from "../intake/lb95/SupplyAsaGeneral
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../intake/lb51/UniversalV1UiFieldManifest";
 import { SUPPLY_VERTICAL_FIELD_MANIFEST } from "../intake/lb93/SupplyVerticalFieldManifest";
 import { SUPPLY_ASA_PCAP_FIELD_MANIFEST } from "../intake/lb95/SupplyAsaPcapFieldManifest";
+import { assertSupplyAsaAnnexIResidualDecisions } from "../intake/lb95/SupplyAsaAnnexIResidualCompletion";
 import {
   auditLb106DecisionMatrix,
   lb106DecisionCardForField,
@@ -33,7 +34,11 @@ export function evaluateLB103DocumentCompletion(record: UniversalEvidenceRecord)
   const fields = paths.map(fieldPath => {
     const definition = LB103_DOCUMENT_FIELDS.find(item => item.fieldPath === fieldPath);
     const field = record.fields[fieldPath];
-    const ready = field?.status === "HUMAN_VALIDATED" && field.humanValidated === true &&
+    let semanticReady = true;
+    if (fieldPath === "administrative.pcapAnnexIResidualDecisions" && field?.value !== undefined) {
+      try { assertSupplyAsaAnnexIResidualDecisions(field.value); } catch { semanticReady = false; }
+    }
+    const ready = semanticReady && field?.status === "HUMAN_VALIDATED" && field.humanValidated === true &&
       Boolean(field.humanValidation?.by && field.humanValidation.at) && field.value !== undefined && field.value !== null &&
       (typeof field.value !== "string" || Boolean(field.value.trim())) && (!Array.isArray(field.value) || field.value.length > 0);
     return { fieldPath, label: definition?.label ?? fieldPath, control: definition?.control ?? "TEXTAREA",

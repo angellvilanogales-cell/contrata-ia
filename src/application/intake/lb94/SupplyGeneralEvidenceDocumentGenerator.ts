@@ -107,6 +107,16 @@ function optionalValue(record: UniversalEvidenceRecord, path: string): unknown {
   return value(record, path);
 }
 
+function optionalText(record: UniversalEvidenceRecord, path: string, fallback: string): string {
+  const current = optionalValue(record, path);
+  return typeof current === "string" && current.trim() ? documentaryText(current.trim()) : fallback;
+}
+
+function residualDecisions(record: UniversalEvidenceRecord): Record<string, unknown> {
+  const current = optionalValue(record, "administrative.pcapAnnexIResidualDecisions");
+  return current && typeof current === "object" && !Array.isArray(current) ? current as Record<string, unknown> : {};
+}
+
 function cpvSummary(record: UniversalEvidenceRecord): string {
   const principal = text(record, "cpvMain");
   const description = optionalValue(record, "cpvMainDescription");
@@ -171,7 +181,95 @@ function procedureSummary(record: UniversalEvidenceRecord): string {
 function awardCriteriaSummary(record: UniversalEvidenceRecord): string {
   const criteria = value(record, "criteria.awardCriteria");
   const motivation = Array.isArray(criteria) && criteria.length === 1 ? ` Motivación asociada: ${text(record, "criteria.singleCriterionMotivation")}` : "";
-  return `Criterios de adjudicación validados: ${stringifyControlled(criteria)}.${motivation}`;
+  if (!Array.isArray(criteria) || !criteria.length) throw new Error("Los criterios de adjudicación deben contener al menos una decisión validada.");
+  const formatted = criteria.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return `${index + 1}. ${stringifyControlled(item)}`;
+    const row = item as Record<string, unknown>;
+    const name = String(row.nombre ?? row.name ?? `Criterio ${index + 1}`);
+    const weight = Number(row.ponderacion ?? row.weight);
+    const automatic = row.evaluableMedianteFormula ?? row.evaluation === "FORMULA";
+    return `${index + 1}. ${name}: ${Number.isFinite(weight) ? `${weight} puntos` : "ponderación definida"}; ${automatic ? "valoración automática mediante fórmula" : "valoración técnica conforme al método definido"}.`;
+  }).join(" ");
+  return `Criterios de adjudicación: ${formatted}${motivation}`;
+}
+
+function backgroundAndCompetence(record: UniversalEvidenceRecord): string {
+  const authority = text(record, "administrative.contractingAuthority");
+  return `La contratación se promueve para atender la necesidad descrita en esta Memoria. El órgano de contratación es ${authority}, al que corresponde aprobar el expediente y los pliegos dentro de las competencias que tenga atribuidas.`;
+}
+
+function estimatedValueSummary(record: UniversalEvidenceRecord): string {
+  return `El valor estimado del contrato asciende a ${euro(number(record, "economic.legalEstimatedValueCents"))}, IVA excluido. Se ha calculado mediante el siguiente método validado: ${documentaryText(text(record, "economic.estimatedValueCalculationMethod"))}`;
+}
+
+function procedureJustification(record: UniversalEvidenceRecord): string {
+  const procedure = documentLabel(text(record, "procedure"));
+  const processing = optionalText(record, "processing.processingType", "tramitación ordinaria");
+  return `Se emplea el procedimiento ${procedure} por resultar compatible con la naturaleza y cuantía del contrato y con las decisiones jurídicas validadas en el expediente. La tramitación será ${processing.toLocaleLowerCase("es-ES")}.`;
+}
+
+function capacityAndSolvencySummary(record: UniversalEvidenceRecord): string {
+  const economic = optionalText(record, "criteria.economicSolvency", "No se exige acreditar solvencia económica por el régimen del procedimiento seleccionado.");
+  const technical = optionalText(record, "criteria.technicalSolvency", "No se exige acreditar solvencia técnica por el régimen del procedimiento seleccionado.");
+  const residual = residualDecisions(record);
+  const authorization = String(residual.professionalAuthorization ?? "No").toLocaleLowerCase("es-ES").startsWith("s")
+    ? `Se exige habilitación profesional: ${String(residual.professionalAuthorizationDetail ?? "debe concretarse")}.`
+    : "No se exige una habilitación empresarial o profesional específica distinta de la capacidad general para contratar.";
+  return `${authorization} Solvencia económica: ${economic} Solvencia técnica o profesional: ${technical}`;
+}
+
+function guaranteesSummary(record: UniversalEvidenceRecord): string {
+  const provisional = optionalValue(record, "guarantees.provisionalGuaranteeRequired") === true
+    ? `Se exige garantía provisional: ${optionalText(record, "guarantees.provisionalGuaranteeJustification", "según la decisión motivada del expediente")}.`
+    : "No se exige garantía provisional.";
+  const definitive = optionalText(record, "guarantees.definitiveGuaranteeRegime", "No se exige garantía definitiva por el régimen del procedimiento seleccionado.");
+  const warranty = optionalText(record, "guarantees.warrantyPeriodRegime", String(residualDecisions(record).warrantyTerm ?? "No se establece un plazo adicional distinto del legalmente aplicable."));
+  return `${provisional} Garantía definitiva: ${definitive} Plazo de garantía: ${warranty}`;
+}
+
+function subcontractingAndAssignmentSummary(record: UniversalEvidenceRecord): string {
+  return `Subcontratación: ${optionalText(record, "execution.subcontractingRegime", "Se admite en los términos y con los límites establecidos en la LCSP.")} Cesión: ${optionalText(record, "execution.assignmentRegime", "Se admite cuando se cumplan los requisitos legales y los establecidos en el PCAP.")}`;
+}
+
+function managementExecutionPaymentSummary(record: UniversalEvidenceRecord): string {
+  const manager = optionalText(record, "administrative.contractManager", "la unidad que designe el órgano de contratación");
+  const functions = optionalText(record, "execution.contractManagerFunctions", "supervisar la ejecución y dictar las instrucciones necesarias para asegurar el cumplimiento de la prestación");
+  const receipt = text(record, "execution.receiptAndAcceptanceRegime");
+  const invoice = optionalText(record, "execution.invoiceSubmissionRegime", "La factura se presentará electrónicamente en el punto general aplicable.");
+  const payment = optionalText(record, "execution.paymentRegime", "El pago se efectuará tras la recepción conforme y la aprobación de la factura.");
+  return `Responsable del contrato: ${manager}; ejercerá las siguientes funciones: ${functions} Recepción y conformidad: ${receipt} Facturación: ${invoice} Pago: ${payment}`;
+}
+
+function dataProtectionAndSecuritySummary(record: UniversalEvidenceRecord): string {
+  return `Escenario de protección de datos: ${optionalText(record, "dataProtection.processingScenario", "la ejecución no requiere tratamiento de datos personales por cuenta del responsable")} Régimen aplicable: ${optionalText(record, "dataProtection.personalDataRegime", "deber de confidencialidad y cumplimiento de la normativa aplicable")} Seguridad de la información: ${optionalText(record, "security.informationSecurityRegime", "medidas proporcionadas a la información efectivamente tratada")}`;
+}
+
+function supplyDefinition(record: UniversalEvidenceRecord): string {
+  const residual = residualDecisions(record);
+  const units = String(residual.totalUnits ?? "").trim();
+  const specification = String(residual.objectSpecification ?? "").trim();
+  if (!units || /según la relación|documentación técnica/i.test(units)) throw new Error("El PPT exige el número o relación concreta de unidades del suministro; no basta una remisión genérica.");
+  if (!specification || specification === text(record, "object")) throw new Error("El PPT exige especificaciones materiales adicionales al mero objeto del contrato.");
+  return `Definición material del suministro: ${specification} Número o relación total de unidades: ${units}.`;
+}
+
+function technicalWarrantySummary(record: UniversalEvidenceRecord): string {
+  const warranty = optionalText(record, "guarantees.warrantyPeriodRegime", String(residualDecisions(record).warrantyTerm ?? "").trim());
+  if (!warranty) throw new Error("El PPT exige concretar el plazo y alcance de la garantía técnica.");
+  return `Garantía técnica: ${warranty}`;
+}
+
+function pptDataProtectionSummary(record: UniversalEvidenceRecord): string {
+  return `Protección de datos y confidencialidad durante la ejecución: ${optionalText(record, "dataProtection.personalDataRegime", "no se prevé tratamiento de datos personales por cuenta del responsable; se mantendrá la confidencialidad de la información a la que se acceda")}. Seguridad de la información: ${optionalText(record, "security.informationSecurityRegime", "se aplicarán medidas proporcionadas a la información efectivamente tratada")}.`;
+}
+
+function environmentalSummary(record: UniversalEvidenceRecord): string {
+  return `Obligaciones ambientales vinculadas al suministro: ${optionalText(record, "technical.environmentalRequirements", "cumplimiento de la normativa ambiental aplicable, reducción de embalajes innecesarios y correcta gestión de los residuos generados en la entrega")}.`;
+}
+
+function technicalDocumentationSummary(record: UniversalEvidenceRecord): string {
+  const documents = optionalText(record, "technical.requiredDocumentation", "fichas técnicas, instrucciones y documentación de conformidad que resulte aplicable a los bienes suministrados");
+  return `Documentación que deberá acompañar al suministro: ${documents}. La documentación deberá permitir comprobar las características ofertadas y la conformidad de las unidades entregadas.`;
 }
 
 function executionSummary(record: UniversalEvidenceRecord): string {
@@ -225,15 +323,24 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
       caseId: input.record.caseId,
       values: [
         { slotId: "need", value: text(input.record, "need") },
+        { slotId: "backgroundAndCompetence", value: backgroundAndCompetence(input.record) },
         { slotId: "object", value: text(input.record, "object") },
         { slotId: "cpvMain", value: cpvSummary(input.record) },
         { slotId: "lotsRegime", value: lotsRegime(input.record) },
         { slotId: "economicSummary", value: economicSummary(input.record) },
+        { slotId: "estimatedValueSummary", value: estimatedValueSummary(input.record) },
         { slotId: "durationSummary", value: durationSummary(input.record) },
         { slotId: "procedureSummary", value: procedureSummary(input.record) },
+        { slotId: "procedureJustification", value: procedureJustification(input.record) },
+        { slotId: "capacityAndSolvencySummary", value: capacityAndSolvencySummary(input.record) },
         { slotId: "awardCriteriaSummary", value: awardCriteriaSummary(input.record) },
+        { slotId: "guaranteesSummary", value: guaranteesSummary(input.record) },
         { slotId: "executionSummary", value: executionSummary(input.record) },
+        { slotId: "subcontractingAndAssignmentSummary", value: subcontractingAndAssignmentSummary(input.record) },
         { slotId: "modificationSummary", value: modificationSummary(input.record) },
+        { slotId: "priceRevisionSummary", value: documentaryText(text(input.record, "economic.priceRevisionRegime")) },
+        { slotId: "managementExecutionPaymentSummary", value: managementExecutionPaymentSummary(input.record) },
+        { slotId: "dataProtectionAndSecuritySummary", value: dataProtectionAndSecuritySummary(input.record) },
       ],
     });
     assertCanonicalOdtStructure({ bytes: document.bytes, document: "MEMORY", family: "SUPPLY" });
@@ -254,9 +361,14 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
         { slotId: "durationSummary", value: durationSummary(input.record) },
         { slotId: "executionLocations", value: stringArray(input.record, "technical.executionLocations") },
         { slotId: "technicalRequirements", value: technicalSpecifications(input.record) },
+        { slotId: "supplyDefinition", value: supplyDefinition(input.record) },
         { slotId: "supplyVariantRequirements", value: supplyVariantRequirements(input.record) },
         { slotId: "receiptAndAcceptanceRegime", value: text(input.record, "execution.receiptAndAcceptanceRegime") },
         { slotId: "specialExecutionConditions", value: value(input.record, "execution.specialExecutionConditions") },
+        { slotId: "technicalWarrantySummary", value: technicalWarrantySummary(input.record) },
+        { slotId: "pptDataProtectionSummary", value: pptDataProtectionSummary(input.record) },
+        { slotId: "environmentalSummary", value: environmentalSummary(input.record) },
+        { slotId: "technicalDocumentationSummary", value: technicalDocumentationSummary(input.record) },
       ],
     });
     assertCanonicalOdtStructure({ bytes: document.bytes, document: "PPT", family: "SUPPLY" });
