@@ -129,11 +129,16 @@ export function normalizeSupplyGeneralOdtLb105(bytes: Uint8Array, kind: SupplyGe
   if (!contentEntry || !stylesEntry) throw new Error("El ODT Supply no contiene content.xml y styles.xml.");
   let content = Buffer.from(contentEntry.bytes).toString("utf8");
   let styles = Buffer.from(stylesEntry.bytes).toString("utf8");
-  const logoPath = institutionalLogo(entries, styles);
+  const alreadyNormalized = content.includes(SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION);
+  const normalizedLogo = alreadyNormalized ? /draw:name="CI_LB105_Cover_Junta_Andalucia"[\s\S]*?xlink:href="([^"]+)"/.exec(content)?.[1] : undefined;
+  const logoPath = normalizedLogo && entries.some(item => item.name === normalizedLogo && item.bytes.length > 0)
+    ? normalizedLogo
+    : institutionalLogo(entries, styles);
   content = content.replace(/<office:text\b[\s\S]*?<\/office:text>/, body(kind, logoPath));
-  if (!content.includes(SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION)) {
+  if (!alreadyNormalized) {
     content = content.replace(/<office:body\b/, `<!-- ${SUPPLY_CANONICAL_ODT_NORMALIZATION_VERSION} --><office:body`);
   }
+  if (alreadyNormalized) return writeOdtZip(replaceEntry(entries, "content.xml", content));
   styles = styles.replace(/<office:styles\b[^>]*>/, match => `${match}${styleDefinitions()}`);
   const repeatedMasterPage = styles.includes('style:name="MP0"') ? "MP0" : styles.includes('style:name="Standard"') ? "Standard" : undefined;
   if (repeatedMasterPage) {

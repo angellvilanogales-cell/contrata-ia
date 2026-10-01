@@ -42,6 +42,17 @@ describe("LB105 normalización física Supply", () => {
     expect(Buffer.from(normalizeSupplyGeneralOdtLb105(fixture(), "MEMORY"))).toEqual(Buffer.from(normalizeSupplyGeneralOdtLb105(fixture(), "MEMORY")));
   });
 
+  it("actualiza el cuerpo de una plantilla ya normalizada sin duplicar ni alterar sus estilos", () => {
+    const first = normalizeSupplyGeneralOdtLb105(fixture(), "MEMORY");
+    const firstStyles = readOdtZip(first).find(item => item.name === "styles.xml")!.bytes;
+    const refreshed = normalizeSupplyGeneralOdtLb105(first, "MEMORY");
+    const refreshedEntries = readOdtZip(refreshed);
+    expect(Buffer.from(refreshedEntries.find(item => item.name === "styles.xml")!.bytes)).toEqual(Buffer.from(firstStyles));
+    const content = Buffer.from(refreshedEntries.find(item => item.name === "content.xml")!.bytes).toString("utf8");
+    expect(content.match(/LB105-SUPPLY-CANONICAL-ODT-V1/g)).toHaveLength(1);
+    expect(content).toContain("{{capacityAndSolvencySummary}}");
+  });
+
   it("conserva autocerrado el layout autocerrado del ODT persistido", () => {
     const bytes = normalizeSupplyGeneralOdtLb105(fixture(true), "MEMORY");
     expect(auditCanonicalOdtVisualProfile(bytes).ready).toBe(true);
