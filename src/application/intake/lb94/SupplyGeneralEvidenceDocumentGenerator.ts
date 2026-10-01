@@ -5,6 +5,7 @@ import { loadPersistedSupplyGeneralTemplate } from "./PersistedSupplyGeneralTemp
 import { renderSupplyGeneralEditableTemplate, type SupplyGeneralRenderedDocument } from "./SupplyGeneralEditableTemplateRenderer";
 import { assertCanonicalOdtStructure } from "../lb104/CanonicalOdtStructureAudit";
 import { assertCanonicalOdtVisualProfile } from "../lb105/CanonicalOdtVisualAudit";
+import { normalizeSupplyGeneralOdtLb105 } from "../lb105/SupplyCanonicalOdtNormalization";
 
 export interface SupplyGeneralEvidenceDocuments {
   ready: boolean;
@@ -317,7 +318,8 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
   const documents: SupplyGeneralRenderedDocument[] = [];
   try {
     if (text(input.record, "contractType") !== "SUPPLY") throw new Error("LB94 solo genera estas plantillas para contratos de suministro.");
-    const memory = await loadPersistedSupplyGeneralTemplate(input.templateStore, "MEMORY");
+    const persistedMemory = await loadPersistedSupplyGeneralTemplate(input.templateStore, "MEMORY");
+    const memory = { ...persistedMemory, bytes: normalizeSupplyGeneralOdtLb105(persistedMemory.bytes, "MEMORY") };
     const document = renderSupplyGeneralEditableTemplate({
       template: memory,
       caseId: input.record.caseId,
@@ -351,7 +353,8 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
   }
 
   try {
-    const ppt = await loadPersistedSupplyGeneralTemplate(input.templateStore, "PPT");
+    const persistedPpt = await loadPersistedSupplyGeneralTemplate(input.templateStore, "PPT");
+    const ppt = { ...persistedPpt, bytes: normalizeSupplyGeneralOdtLb105(persistedPpt.bytes, "PPT") };
     const document = renderSupplyGeneralEditableTemplate({
       template: ppt,
       caseId: input.record.caseId,
