@@ -118,5 +118,10 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('save.style.display=step===groups.length-1');
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('economic.initialPblVatIncludedCents');
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).not.toContain('totalUnits:"Según la relación de unidades');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("residualHelp");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Indique la suma total de unidades");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("complete este campo antes de validar el Anexo I");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("__lb103ShowResidual");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('decisions[row.id]="No procede"');
   });
 });
