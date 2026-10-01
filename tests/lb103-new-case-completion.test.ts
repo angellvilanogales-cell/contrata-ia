@@ -128,5 +128,7 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("No hay campos nuevos en este paso");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Validar el resumen del Anexo I y continuar");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("validateStep");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Generación documental pendiente");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('closure.status!=="HUMAN_VALIDATED"');
   });
 });

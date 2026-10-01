@@ -39,6 +39,9 @@ describe("LB120 · interfaz de cierre", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("economic.estimatedValueCalculationMethod");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("criteria.singleCriterionMotivation");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-direct-corrections");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("prescripción genérica insuficiente");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("technical.technicalRequirements");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Requisitos técnicos mínimos del suministro");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
   });
 

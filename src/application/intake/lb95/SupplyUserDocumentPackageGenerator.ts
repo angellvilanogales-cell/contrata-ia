@@ -7,7 +7,7 @@ import { assertAtomicDocumentPackage } from "../lb102/AtomicDocumentPackageGate"
 import { renderSupplyAsaGeneralPcap, type SupplyAsaGeneralPcapResult } from "./SupplyAsaGeneralPcapRenderer";
 import { zipStoredFiles } from "./StoredZipPackage";
 import type { LB103PresentedGenerationSeals } from "../../universal/LB103AuthoritativeSupplyGeneration";
-import { extractContractingAuthorityAnexoIText } from "../lb35/JuntaSupplyAsaAnexoIResidualAudit";
+import { auditJdaSupplyAsaRenderedOdt } from "../lb35/JuntaSupplyAsaAnexoIResidualAudit";
 
 export type SupplyAsaPackageProfile="SUPPLY_ASA_AUTOFINANCED_LB95"|"SUPPLY_ASA_EU_FUNDS_LB95";
 export interface SupplyUserDocumentPackage {ready:boolean;fileName:string|null;mediaType:"application/zip";bytes:Uint8Array|null;sha256:string|null;manifest:null|{caseId:string;profile:SupplyAsaPackageProfile;generatedAt:string;documents:readonly {kind:"PCAP"|"MEMORIA"|"PPT";fileName:string;sha256:string;provenance:string}[];crossDocumentAuditReady:boolean;blockers:readonly string[];humanAcceptanceRequired:true};blockers:readonly string[];}
@@ -28,7 +28,7 @@ function crossAudit(record:UniversalEvidenceRecord,pcap:Uint8Array,memory:Uint8A
  for(const marker of memoryGeneric)if(texts.MEMORIA.toLocaleLowerCase("es-ES").includes(marker.toLocaleLowerCase("es-ES")))blockers.push(`MEMORIA: contiene una remisión o expresión interna que debe sustituirse por la justificación material: «${marker}».`);
  const pptGeneric=["Ejecutar "+object+", conforme al alcance","conforme al expediente validado","formarán parte de las obligaciones de ejecución"];
  for(const marker of pptGeneric)if(marker&&texts.PPT.toLocaleLowerCase("es-ES").includes(marker.toLocaleLowerCase("es-ES")))blockers.push(`PPT: contiene una prescripción genérica insuficiente: «${marker}».`);
- try{const content=readOdtZip(pcap).find(item=>item.name==="content.xml");if(!content)throw new Error("falta content.xml");const annex=extractContractingAuthorityAnexoIText(Buffer.from(content.bytes).toString("utf8"));if(/_{3,}|Sí\s*\/\s*No/i.test(annex))blockers.push("PCAP: el Anexo I conserva campos del órgano de contratación sin cumplimentar.");for(const marker of ["El órgano de contratación competente","El plazo validado en el expediente","Según la relación de unidades","Los indicados por el órgano de contratación","Las previstas en el PCAP","Penalidades proporcionales por incumplimiento"])if(annex.toLocaleLowerCase("es-ES").includes(marker.toLocaleLowerCase("es-ES")))blockers.push(`PCAP: el Anexo I conserva una respuesta genérica no apta para el expediente: «${marker}».`);}catch(error){blockers.push(`PCAP: no ha podido auditarse materialmente el Anexo I (${error instanceof Error?error.message:String(error)}).`);}
+ try{const residual=auditJdaSupplyAsaRenderedOdt(pcap);for(const finding of residual.blockers)blockers.push(`PCAP: ${finding}`);}catch(error){blockers.push(`PCAP: no ha podido auditarse materialmente el Anexo I (${error instanceof Error?error.message:String(error)}).`);}
  const base=euro(record.fields.baseTenderBudgetCents?.value),total=euro(record.fields["economic.initialPblVatIncludedCents"]?.value);if(base&&total&&base!==total&&new RegExp(base.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+".{0,40}IVA incluido","i").test(texts.PCAP))blockers.push(`PCAP: el importe ${base} corresponde al PBL sin IVA y no puede identificarse como IVA incluido.`);
  return [...new Set(blockers)];
 }
