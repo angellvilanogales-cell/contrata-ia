@@ -2,7 +2,7 @@ import type { CanonicalContractType } from "../../../domain/expediente/Canonical
 import type { CriterioAdjudicacion } from "../../../domain/expediente/CriterioAdjudicacion";
 import type { EvidenceField } from "../../../domain/expediente/EvidenceField";
 import { isPromotableEvidenceField } from "../../../domain/expediente/EvidenceField";
-import type { UniversalAnnualityBudgetRow, UniversalUnitPrice } from "../../../domain/expediente/UniversalExpedienteDomains";
+import type { UniversalAnnualityBudgetRow, UniversalSupplyAsaPlannedModificationDecision, UniversalUnitPrice } from "../../../domain/expediente/UniversalExpedienteDomains";
 import type { UniversalExpedienteV13 } from "../../../domain/expediente/UniversalExpedienteV13";
 import { UNIVERSAL_V1_UI_FIELD_MANIFEST } from "../lb51/UniversalV1UiFieldManifest";
 
@@ -65,7 +65,7 @@ export function applyUniversalEvidenceOverlay(
 
       case "execution.extensionStructure": current = { ...current, execution: { ...current.execution, extensionStructure: typed<string>(field) } }; break;
       case "execution.extensionNoticeMonths": current = { ...current, execution: { ...current.execution, extensionNoticeMonths: typed<number>(field) } }; break;
-      case "execution.plannedModificationRegime": current = { ...current, execution: { ...current.execution, plannedModificationRegime: typed<string>(field) } }; break;
+      case "execution.plannedModificationRegime": current = { ...current, execution: { ...current.execution, plannedModificationRegime: typed<string | UniversalSupplyAsaPlannedModificationDecision>(field) } }; break;
       case "execution.specialExecutionConditions": current = { ...current, execution: { ...current.execution, specialExecutionConditions: typed<readonly string[]>(field) } }; break;
       case "criteria.awardCriteria": current = { ...current, criteria: { ...current.criteria, awardCriteria: typed<readonly CriterioAdjudicacion[]>(field) } }; break;
       case "criteria.singleCriterionMotivation": current = { ...current, criteria: { ...current.criteria, singleCriterionMotivation: typed<string>(field) } }; break;

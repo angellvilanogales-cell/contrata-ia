@@ -24,6 +24,16 @@ export interface UniversalOdtPhysicalSlotBinding {
    */
   valueToken?: string;
   /**
+   * Algunos modelos oficiales comparten exactamente la misma estructura y
+   * textos, pero LibreOffice renumera los nombres internos de estilo. En ese
+   * caso se permite ignorar exclusivamente el valor de text:style-name al
+   * localizar el fragmento; el fragmento observado debe seguir siendo único.
+   */
+  anchorMode?: "EXACT" | "STYLE_NAME_AGNOSTIC";
+  /** Texto estable que debe aparecer inmediatamente antes del anclaje. */
+  anchorContextBefore?: string;
+  anchorContextWindow?: number;
+  /**
    * TEXT es el modo por defecto y escapa XML. RAW_XML solo se admite con un
    * formatter explícito y sirve para sustituir un fragmento ODF completo por
    * otro fragmento estructural controlado. Nunca serializa entrada de usuario
@@ -39,6 +49,7 @@ export type UniversalTemplateValueFormatter = (value: unknown, sourceFieldKey: s
 export interface UniversalOdtRendererConfiguration {
   bindingsByTemplateId: Readonly<Record<string, readonly UniversalOdtPhysicalSlotBinding[]>>;
   formattersBySlotId?: Readonly<Record<string, UniversalTemplateValueFormatter>>;
+  formattersByTemplateId?: Readonly<Record<string, Readonly<Record<string, UniversalTemplateValueFormatter>>>>;
 }
 
 function sha256(bytes: Uint8Array | string): string {
@@ -108,19 +119,37 @@ function replacePart(entries: readonly OdtZipEntry[], part: string, nextText: st
   return entries.map(entry => entry.name === part ? { ...entry, bytes: Buffer.from(nextText, "utf8") } : entry);
 }
 
-function validateBinding(binding: UniversalOdtPhysicalSlotBinding, partText: string): void {
+function regexpEscape(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function observedAnchor(binding: UniversalOdtPhysicalSlotBinding, partText: string): string {
   if (!binding.xmlToken.length || !binding.sourceSection.trim() || !binding.sourceLabel.trim()) {
     throw new Error(`Binding físico incompleto para ${binding.slotId}.`);
   }
-  const occurrences = countOccurrences(partText, binding.xmlToken);
-  if (occurrences !== 1) {
+  let matches: readonly {token:string;index:number}[];
+  if (binding.anchorMode === "STYLE_NAME_AGNOSTIC") {
+    const pieces = binding.xmlToken.split(/ text:style-name="[^"]*"/).map(regexpEscape);
+    const pattern = new RegExp(pieces.join(' text:style-name="[^"]*"'), "g");
+    matches = [...partText.matchAll(pattern)].map(match => ({token:match[0],index:match.index??-1}));
+  } else {
+    matches = [...partText.matchAll(new RegExp(regexpEscape(binding.xmlToken), "g"))].map(match => ({token:match[0],index:match.index??-1}));
+  }
+  if (binding.anchorContextBefore) {
+    const window = binding.anchorContextWindow ?? 2_000;
+    matches = matches.filter(match => partText.slice(Math.max(0,match.index-window),match.index).includes(binding.anchorContextBefore!));
+  }
+  if (matches.length !== 1) {
+    const occurrences = matches.length;
     throw new Error(`El anclaje físico de ${binding.slotId} aparece ${occurrences} veces en ${binding.part}; se exige coincidencia exacta y única.`);
   }
-  const valueToken = binding.valueToken ?? binding.xmlToken;
-  const valueOccurrences = countOccurrences(binding.xmlToken, valueToken);
+  const anchor = matches[0]!.token;
+  const valueToken = binding.valueToken ?? anchor;
+  const valueOccurrences = countOccurrences(anchor, valueToken);
   if (!valueToken.length || valueOccurrences !== 1) {
     throw new Error(`El valueToken de ${binding.slotId} debe aparecer exactamente una vez dentro de su anclaje físico.`);
   }
+  return anchor;
 }
 
 /**
@@ -171,8 +200,10 @@ export class UniversalOdtProductionRenderer implements UniversalEditableTemplate
       if (seenBindings.has(binding.slotId)) throw new Error(`Binding físico duplicado: ${binding.slotId}.`);
       seenBindings.add(binding.slotId);
       const partText = Buffer.from(getEntry(entries, binding.part).bytes).toString("utf8");
-      validateBinding(binding, partText);
-      if (binding.escapeMode === "RAW_XML" && !this.configuration.formattersBySlotId?.[binding.slotId]) {
+      observedAnchor(binding, partText);
+      const formatter = this.configuration.formattersByTemplateId?.[request.asset.templateId]?.[binding.slotId]
+        ?? this.configuration.formattersBySlotId?.[binding.slotId];
+      if (binding.escapeMode === "RAW_XML" && !formatter) {
         throw new Error(`El binding RAW_XML ${binding.slotId} exige un formateador explícito.`);
       }
     }
@@ -181,7 +212,7 @@ export class UniversalOdtProductionRenderer implements UniversalEditableTemplate
     for (const value of request.values) {
       const binding = bindings.find(item => item.slotId === value.slotId);
       if (!binding) throw new Error(`No existe binding físico para el slot ${value.slotId}.`);
-      const explicitFormatter = this.configuration.formattersBySlotId?.[value.slotId];
+      const explicitFormatter = this.configuration.formattersByTemplateId?.[request.asset.templateId]?.[value.slotId] ?? this.configuration.formattersBySlotId?.[value.slotId];
       if (binding.escapeMode === "RAW_XML" && !explicitFormatter) {
         throw new Error(`El binding RAW_XML ${binding.slotId} no puede usar serialización automática.`);
       }
@@ -190,10 +221,10 @@ export class UniversalOdtProductionRenderer implements UniversalEditableTemplate
       const renderedValue = binding.escapeMode === "RAW_XML" ? formattedValue : xmlEscape(formattedValue);
       const entry = getEntry(entries, binding.part);
       const partText = Buffer.from(entry.bytes).toString("utf8");
-      validateBinding(binding, partText);
-      const valueToken = binding.valueToken ?? binding.xmlToken;
-      const anchoredReplacement = binding.xmlToken.replace(valueToken, renderedValue);
-      entries = replacePart(entries, binding.part, partText.replace(binding.xmlToken, anchoredReplacement));
+      const anchor = observedAnchor(binding, partText);
+      const valueToken = binding.valueToken ?? anchor;
+      const anchoredReplacement = anchor.replace(valueToken, renderedValue);
+      entries = replacePart(entries, binding.part, partText.replace(anchor, anchoredReplacement));
       appliedSlots.push(value.slotId);
     }
 

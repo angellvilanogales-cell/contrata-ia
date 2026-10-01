@@ -1,0 +1,72 @@
+import { describe, expect, it } from "vitest";
+import { LB120_DOCUMENT_CONCLUSION_SCRIPT } from "../src/interfaces/lb103/LB120DocumentConclusionScript";
+
+describe("LB120 · interfaz de cierre", () => {
+  it("entrega un script válido al navegador", () => {
+    expect(() => new Function(LB120_DOCUMENT_CONCLUSION_SCRIPT)).not.toThrow();
+  });
+
+  it("separa las decisiones validadas de la disponibilidad de modelos", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("preflightMessage");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisiones principales validadas");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Estado de los documentos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Modelo pendiente de verificar");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("La falta de un modelo no modifica el estado de los pasos 1 a 7");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("No se sustituirá el modelo oficial");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).not.toContain("Complete y valide todas las decisiones antes del cierre");
+  });
+
+  it("conserva un estado documental pendiente sin devolver el expediente al paso 7", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain('s.status=pf.documentState==="MODELOS_PENDIENTES"?"MODEL_PENDING":"REVIEW"');
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("s.decisionStatus=pf.decisionState");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("s.documentStatus=");
+  });
+
+  it("permite recuperar y validar la fuente de financiación omitida sin rehacer el expediente", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("economic.fundingSource");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisión pendiente · fuente de financiación");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Presupuesto propio de la Administración, sin fondos europeos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Financiado total o parcialmente con fondos europeos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120ValidateFunding");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("missing-decision-recovery");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
+  });
+
+  it("permite corregir directamente en D20 los textos provisionales ya validados", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Corregir textos que impiden generar los documentos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120ApplyCorrections");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lots.noDivisionJustification");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("economic.estimatedValueCalculationMethod");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("criteria.singleCriterionMotivation");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-direct-corrections");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("prescripción genérica insuficiente");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("technical.technicalRequirements");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Requisitos técnicos mínimos del suministro");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
+  });
+
+  it("abre el asistente documental cuando el snapshot existe pero quedan decisiones físicas", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("recoveryPending");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Decisiones principales validadas");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Quedan datos documentales por completar");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Completar datos para los documentos");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain('gate(state.status==="HUMAN_VALIDATED"||recoveryPending(state.preflight))');
+  });
+
+  it("exige vista previa, seis confirmaciones y validación del registro", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-preview");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-consent");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("officialPcapIntegrityConfirmed");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("closure.finalConsentRecord");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("universal-evidence");
+  });
+
+  it("permite descargar y comprender la copia previa antes de aceptar", () => {
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("lb120-review-package");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Descargar PCAP, Memoria y PPT para revisión");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Datos técnicos de trazabilidad");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Modelo oficial de la Junta de Andalucía");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Aceptación general de la persona responsable");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).not.toContain("Conclusión y motivación de la persona responsable");
+  });
+});

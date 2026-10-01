@@ -9,6 +9,7 @@
  * ============================================================
  */
 
+import * as fs from "fs";
 import * as path from "path";
 
 import { KnowledgeLoader } from "../domain/conocimiento/KnowledgeLoader";
@@ -135,21 +136,17 @@ export class KnowledgeBootstrap {
      */
     private cargarCPV(): void {
 
-        const catalogo = this.loader.cargarJSON<CPVEntry[]>(
-
-            path.join(
-
-                process.cwd(),
-
-                "knowledge",
-
-                "cpv",
-
-                "cpv.json"
-
-            )
-
-        );
+        const cpvRoot = path.join(process.cwd(), "knowledge", "cpv");
+        const partsRoot = path.join(cpvRoot, "parts");
+        const files = [
+            path.join(cpvRoot, "cpv.json"),
+            ...(fs.existsSync(partsRoot)
+                ? fs.readdirSync(partsRoot).filter(name => /^cpv-\d+\.json$/.test(name)).sort().map(name => path.join(partsRoot, name))
+                : []),
+        ];
+        const catalogo = [...new Map(
+            files.flatMap(file => this.loader.cargarJSON<CPVEntry[]>(file)).map(entry => [entry.codigo, entry])
+        ).values()];
 
         this.cpvRepository.cargar(
 
