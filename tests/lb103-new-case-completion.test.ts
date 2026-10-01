@@ -108,7 +108,7 @@ describe("LB103 nuevo expediente y selección física", () => {
   });
 
   it("convierte las decisiones residuales del Anexo I en una revisión guiada y propuesta",()=>{
-    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Revisión guiada del Anexo I");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Cumplimentación guiada del Anexo I");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Paso "+"'+(index+1)+'"+" de ");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("proposedResidualDecisions");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Objeto, unidades y lotes");
@@ -123,5 +123,10 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("complete este campo antes de validar el Anexo I");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("__lb103ShowResidual");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('decisions[row.id]="No procede"');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Resumen final");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Guardar este paso y continuar");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("No hay campos nuevos en este paso");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Validar el resumen del Anexo I y continuar");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("validateStep");
   });
 });
