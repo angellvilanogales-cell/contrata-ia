@@ -5,7 +5,8 @@ describe("LB-7 supply catalogue branch", () => {
   it("offers an Excel-compatible template and supply catalogue import", () => {
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Descargar plantilla para Excel");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Importar relación cumplimentada");
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Referencia;Denominación;Descripción técnica mínima;Unidad;Cantidad estimada;Precio unitario estimado sin IVA;Lote;CPV");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Referencia;Denominación breve;Descripción técnica mínima;Unidad de medida;Cantidad;Precio unitario sin IVA;Tipo de IVA (%)");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Fuente del precio;Fecha de la fuente;Observaciones");
   });
 
   it("checks basic catalogue coherence and keeps automatic categories advisory", () => {
@@ -17,11 +18,31 @@ describe("LB-7 supply catalogue branch", () => {
   });
 
   it("accepts ODS without reading its binary ZIP bytes as CSV text", () => {
-    expect(SUPPLY_CATALOGUE_SCRIPT).toContain(".csv,.ods");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain(".xlsx,.csv,.ods");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("odsContentXml");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("DecompressionStream");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Precio unitario");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Formato leído");
+  });
+
+  it("accepts native XLSX and reads the first worksheet by column names", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("parseXlsx");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("xl/worksheets/sheet1.xml");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("xl/sharedStrings.xml");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain('fromMatrix(matrix,"XLSX")');
+  });
+
+  it("separates contractual catalogue data from price evidence", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("Dos clases de información separadas");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("nunca se copiarán dentro de las celdas del Anexo I");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("function columnMap");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("la denominación es demasiado extensa");
+  });
+
+  it("records the imported file identity for D20 traceability", () => {
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("sourceFileName");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("sourceSha256");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain('crypto.subtle.digest("SHA-256"');
   });
 
   it("groups articles and subtotals by lot", () => {

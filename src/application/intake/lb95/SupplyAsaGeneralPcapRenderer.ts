@@ -183,7 +183,11 @@ export async function renderSupplyAsaGeneralPcap(input: { record: UniversalEvide
     } : JDA_SUPPLY_ASA_LB34_EDITABLE_ASSET;
     const renderer = new UniversalOdtProductionRenderer(input.templateStore, JDA_SUPPLY_ASA_LB95_RENDERER_CONFIGURATION);
     const rendered = await renderer.render({ asset, values });
-    const completed = completeSupplyAsaAnnexIResidualFields(rendered.bytes, validated(input.record, "administrative.pcapAnnexIResidualDecisions"));
+    const locations=validated(input.record,"technical.executionLocations");
+    if(!Array.isArray(locations)||!locations.length||typeof locations[0]!=="string"||!locations[0].trim())throw new Error("technical.executionLocations: falta una localidad o lugar concreto para el encabezado del Anexo I.");
+    const completed = completeSupplyAsaAnnexIResidualFields(rendered.bytes, validated(input.record, "administrative.pcapAnnexIResidualDecisions"),{
+      title:String(validated(input.record,"object")),caseId:input.record.caseId,locality:locations[0].trim(),
+    });
     const residual = auditJdaSupplyAsaRenderedOdt(completed.bytes);
     if (!residual.ready) throw new Error(`Auditoría residual PCAP: ${residual.blockers.join(" ")}`);
     const bytes = completed.bytes;

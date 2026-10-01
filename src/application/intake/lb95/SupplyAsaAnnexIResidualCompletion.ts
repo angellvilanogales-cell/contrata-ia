@@ -75,8 +75,27 @@ function annexStart(content:string,roman:string){const matches=topLevelParagraph
 function materialize(xml:string,current:string,value:string){const escaped=xmlEscape(value.trim());if(/Sí\s*\/\s*No/i.test(current)){const direct=xml.replace(/Sí\s*\/\s*No/i,escaped);if(direct!==xml)return direct;const open=xml.indexOf(">");return `${xml.slice(0,open+1)}${xmlEscape(current.replace(/Sí\s*\/\s*No/i,value.trim()))}</text:p>`;}const blank=xml.match(/_{3,}/)?.[0];if(blank)return xml.replace(blank,escaped);const close=xml.lastIndexOf("</text:p>");if(close<0)throw new Error("Párrafo ODF sin cierre.");return `${xml.slice(0,close)} ${escaped}${xml.slice(close)}`;}
 function replaceContent(entries:readonly OdtZipEntry[],content:string){return entries.map(item=>item.name==="content.xml"?{...item,bytes:Buffer.from(content,"utf8")}:item);}
 
-export function completeSupplyAsaAnnexIResidualFields(bytes:Uint8Array,value:unknown){
+export interface SupplyAsaAnnexIIdentity { title:string; caseId:string; locality:string; }
+
+function completeAuthorityHeader(content:string,identity:SupplyAsaAnnexIIdentity){
+  const start=annexStart(content,"I"),end=annexStart(content,"II");let section=content.slice(start,end);
+  const replacements:{pattern:RegExp;value:string;label:string}[]=[
+    {pattern:/^TÍTULO DEL CONTRATO\s*:\s*_{3,}/i,value:identity.title,label:"Título del contrato"},
+    {pattern:/^EXPEDIENTE\s*:\s*_{3,}/i,value:identity.caseId,label:"Expediente"},
+    {pattern:/^LOCALIDAD\s*:\s*_{3,}/i,value:identity.locality,label:"Localidad"},
+  ];
+  for(const replacement of replacements){
+    if(!replacement.value.trim())throw new Error(`${replacement.label}: falta un valor concreto para cumplimentar el encabezado del Anexo I.`);
+    const paragraph=topLevelParagraphs(section).find(item=>replacement.pattern.test(visible(item.xml).trim()));
+    if(!paragraph)throw new Error(`${replacement.label}: no se localiza el campo del órgano de contratación en el encabezado del Anexo I.`);
+    const next=materialize(paragraph.xml,visible(paragraph.xml).trim(),replacement.value);
+    section=section.slice(0,paragraph.start)+next+section.slice(paragraph.end);
+  }
+  return content.slice(0,start)+section+content.slice(end);
+}
+
+export function completeSupplyAsaAnnexIResidualFields(bytes:Uint8Array,value:unknown,identity:SupplyAsaAnnexIIdentity){
   assertSupplyAsaAnnexIResidualDecisions(value);let entries=readOdtZip(bytes);const style=computeOdtStyleFingerprint(entries);const contentEntry=entries.find(item=>item.name==="content.xml");if(!contentEntry)throw new Error("ODT inválido: falta content.xml.");let content=Buffer.from(contentEntry.bytes).toString("utf8");let cursor=annexStart(content,"I");
   for(const definition of SUPPLY_ASA_ANNEX_I_RESIDUAL_DECISIONS){const end=annexStart(content,"II");const section=content.slice(cursor,end);const found=topLevelParagraphs(section).find(item=>definition.pattern.test(visible(item.xml).trim())&&/(?:Sí\s*\/\s*No|_{3,}|:\s*$)/i.test(visible(item.xml).trim()));if(!found)throw new Error(`No se localiza de forma ordenada el campo residual ${definition.id}.`);const start=cursor+found.start;const next=materialize(found.xml,visible(found.xml).trim(),value[definition.id]!);content=content.slice(0,start)+next+content.slice(start+found.xml.length);cursor=start+next.length;}
-  entries=replaceContent(entries,content);if(computeOdtStyleFingerprint(entries)!==style)throw new Error("La cumplimentación residual alteró la huella de estilos.");const completed=writeOdtZip(entries);const audit=auditJdaSupplyAsaRenderedOdt(completed);return{bytes:completed,sha256:createHash("sha256").update(completed).digest("hex"),auditReady:audit.ready,blockers:audit.blockers};
+  content=completeAuthorityHeader(content,identity);entries=replaceContent(entries,content);if(computeOdtStyleFingerprint(entries)!==style)throw new Error("La cumplimentación residual alteró la huella de estilos.");const completed=writeOdtZip(entries);const audit=auditJdaSupplyAsaRenderedOdt(completed);return{bytes:completed,sha256:createHash("sha256").update(completed).digest("hex"),auditReady:audit.ready,blockers:audit.blockers};
 }
