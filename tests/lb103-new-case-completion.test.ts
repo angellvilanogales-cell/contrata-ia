@@ -120,6 +120,14 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).not.toContain('totalUnits:"Según la relación de unidades');
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("residualHelp");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Indique la suma total de unidades");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("residualCompactControls");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('inputmode="'+"'+esc(compact)+'"+'"');
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("residualTextRows");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("article129BodiesProposal");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Agencia Estatal de Administración Tributaria y Agencia Tributaria de Andalucía");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Instituto Andaluz de Prevención de Riesgos Laborales");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Instituto Andaluz de la Mujer");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("inserción sociolaboral y obligaciones de contratación de personas con discapacidad");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("complete este campo antes de validar el Anexo I");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("__lb103ShowResidual");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain('decisions[row.id]="No procede"');
