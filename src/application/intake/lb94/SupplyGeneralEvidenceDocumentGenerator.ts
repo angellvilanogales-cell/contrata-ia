@@ -97,10 +97,11 @@ function documentLabel(value: string): string {
 }
 
 function documentaryText(value: string): string {
-  return Object.entries(DOCUMENT_LABELS).reduce(
+  const labelled = Object.entries(DOCUMENT_LABELS).reduce(
     (current, [code, label]) => current.replaceAll(code, label),
     value,
   );
+  return labelled.replace(/\bServicio\s+erues\b/giu, "Servicio EURES");
 }
 
 function optionalValue(record: UniversalEvidenceRecord, path: string): unknown {
@@ -206,7 +207,7 @@ function estimatedValueSummary(record: UniversalEvidenceRecord): string {
 function procedureJustification(record: UniversalEvidenceRecord): string {
   const procedure = documentLabel(text(record, "procedure"));
   const processing = optionalText(record, "processing.processingType", "tramitación ordinaria");
-  return `Se emplea el procedimiento ${procedure} por resultar compatible con la naturaleza y cuantía del contrato y con las decisiones jurídicas validadas en el expediente. La tramitación será ${processing.toLocaleLowerCase("es-ES")}.`;
+  return `Se emplea el procedimiento ${procedure} por resultar adecuado a la naturaleza y cuantía del contrato y permitir la concurrencia en los términos establecidos en la LCSP. La tramitación será ${processing.toLocaleLowerCase("es-ES")}.`;
 }
 
 function capacityAndSolvencySummary(record: UniversalEvidenceRecord): string {
