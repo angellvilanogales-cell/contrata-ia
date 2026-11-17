@@ -2,7 +2,7 @@ import type { EvidenceField } from "../../../domain/expediente/EvidenceField";
 import type { UniversalEvidenceRecord } from "../lb52/UniversalEvidenceWorkspace";
 import type { UniversalEditableTemplateBinaryStore } from "../lb23/UniversalOdtProductionRenderer";
 import { loadPersistedSupplyGeneralTemplate } from "./PersistedSupplyGeneralTemplateRuntime";
-import { renderSupplyGeneralEditableTemplate, type SupplyGeneralRenderedDocument } from "./SupplyGeneralEditableTemplateRenderer";
+import { renderSupplyGeneralEditableTemplate, type SupplyGeneralRenderedDocument, type SupplyGeneralTableValue } from "./SupplyGeneralEditableTemplateRenderer";
 import { assertCanonicalOdtStructure } from "../lb104/CanonicalOdtStructureAudit";
 import { assertCanonicalOdtVisualProfile } from "../lb105/CanonicalOdtVisualAudit";
 import { normalizeSupplyGeneralOdtLb105 } from "../lb105/SupplyCanonicalOdtNormalization";
@@ -96,12 +96,23 @@ function documentLabel(value: string): string {
   return DOCUMENT_LABELS[value] ?? value.replaceAll("_", " ").toLocaleLowerCase("es-ES");
 }
 
-function documentaryText(value: string): string {
-  return Object.entries(DOCUMENT_LABELS).reduce(
+export function normalizeSupplyDocumentaryText(value: string): string {
+  const labelled = Object.entries(DOCUMENT_LABELS).reduce(
     (current, [code, label]) => current.replaceAll(code, label),
     value,
   );
+  return labelled
+    .replace(/\bServicio\s+erues\b/giu, "Servicio EURES")
+    .replace(/\bestudio de marcado\b/giu, "estudio de mercado")
+    .replace(/\bSuministro de servicios de producción y suministro\b/giu, "Producción y suministro")
+    .replace(/\.{2,}/g, ".")
+    .replace(
+      /El abono se tramitará dentro de los treinta días siguientes a la aprobación del documento de conformidad, sin convertir este plazo legal en una fecha de pago inventada\./giu,
+      "De conformidad con el artículo 198.4 LCSP, el abono se tramitará dentro de los treinta días siguientes a la aprobación del documento que acredite la conformidad con la prestación.",
+    );
 }
+
+const documentaryText = normalizeSupplyDocumentaryText;
 
 function optionalValue(record: UniversalEvidenceRecord, path: string): unknown {
   if (!record.fields[path]) return null;
@@ -124,7 +135,7 @@ function cpvSummary(record: UniversalEvidenceRecord): string {
   const additional = optionalValue(record, "cpvAdditional");
   const assignments = optionalValue(record, "lots.cpvAssignments");
   return [
-    `Principal: ${principal}${typeof description === "string" && description.trim() ? ` — ${description.trim()}` : ""}.`,
+    `${principal}${typeof description === "string" && description.trim() ? ` — ${description.trim()}` : ""}.`,
     additional && (!Array.isArray(additional) || additional.length > 0) ? `Complementarios: ${stringifyControlled(additional)}.` : "",
     assignments && (!Array.isArray(assignments) || assignments.length > 0) ? `Asignación por lotes: ${stringifyControlled(assignments)}.` : "",
   ].filter(Boolean).join(" ");
@@ -170,7 +181,8 @@ function durationSummary(record: UniversalEvidenceRecord): string {
   const extensions = number(record, "extensionMonths");
   const structure = text(record, "execution.extensionStructure");
   const notice = number(record, "execution.extensionNoticeMonths");
-  return `Duración inicial validada: ${initial} meses. Prórrogas máximas: ${extensions} meses. Estructura: ${structure} Preaviso declarado: ${notice} meses.`;
+  const months = (value: number) => `${value} ${value === 1 ? "mes" : "meses"}`;
+  return `Duración inicial validada: ${months(initial)}. Prórrogas máximas: ${months(extensions)}. Estructura: ${structure} Preaviso declarado: ${months(notice)}.`;
 }
 
 function procedureSummary(record: UniversalEvidenceRecord): string {
@@ -183,6 +195,12 @@ function awardCriteriaSummary(record: UniversalEvidenceRecord): string {
   const criteria = value(record, "criteria.awardCriteria");
   const motivation = Array.isArray(criteria) && criteria.length === 1 ? ` Motivación asociada: ${text(record, "criteria.singleCriterionMotivation")}` : "";
   if (!Array.isArray(criteria) || !criteria.length) throw new Error("Los criterios de adjudicación deben contener al menos una decisión validada.");
+  if (criteria.length === 1) {
+    const rows = supplyCatalogue(record);
+    if (rows.length > 1 && rows.some(row => !row.technicalDescription || row.quantity === null || row.unitPriceCents === null)) {
+      throw new Error("El criterio único no puede justificarse como precio único mientras el catálogo multiproducto no tenga cantidades, precios y prescripciones técnicas completas.");
+    }
+  }
   const formatted = criteria.map((item, index) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return `${index + 1}. ${stringifyControlled(item)}`;
     const row = item as Record<string, unknown>;
@@ -206,7 +224,7 @@ function estimatedValueSummary(record: UniversalEvidenceRecord): string {
 function procedureJustification(record: UniversalEvidenceRecord): string {
   const procedure = documentLabel(text(record, "procedure"));
   const processing = optionalText(record, "processing.processingType", "tramitación ordinaria");
-  return `Se emplea el procedimiento ${procedure} por resultar compatible con la naturaleza y cuantía del contrato y con las decisiones jurídicas validadas en el expediente. La tramitación será ${processing.toLocaleLowerCase("es-ES")}.`;
+  return `Se emplea el procedimiento ${procedure} por resultar adecuado a la naturaleza y cuantía del contrato y permitir la concurrencia en los términos establecidos en la LCSP. La tramitación será ${processing.toLocaleLowerCase("es-ES")}.`;
 }
 
 function capacityAndSolvencySummary(record: UniversalEvidenceRecord): string {
@@ -245,13 +263,108 @@ function dataProtectionAndSecuritySummary(record: UniversalEvidenceRecord): stri
   return `Escenario de protección de datos: ${optionalText(record, "dataProtection.processingScenario", "la ejecución no requiere tratamiento de datos personales por cuenta del responsable")} Régimen aplicable: ${optionalText(record, "dataProtection.personalDataRegime", "deber de confidencialidad y cumplimiento de la normativa aplicable")} Seguridad de la información: ${optionalText(record, "security.informationSecurityRegime", "medidas proporcionadas a la información efectivamente tratada")}`;
 }
 
+interface SupplyCatalogueRow {
+  reference: string;
+  description: string;
+  technicalDescription: string;
+  unit: string;
+  quantity: number | null;
+  unitPriceCents: number | null;
+  lot: string;
+  material: string;
+  dimensions: string;
+  personalization: string;
+  packaging: string;
+  delivery: string;
+  verification: string;
+}
+
+function firstString(row: Record<string, unknown>, ...keys: string[]): string {
+  for (const key of keys) {
+    const current = row[key];
+    if (typeof current === "string" && current.trim()) return documentaryText(current.trim());
+  }
+  return "";
+}
+
+function finiteNumber(row: Record<string, unknown>, ...keys: string[]): number | null {
+  for (const key of keys) {
+    const current = row[key];
+    if (typeof current === "number" && Number.isFinite(current)) return current;
+    if (typeof current === "string" && current.trim()) {
+      const parsed = Number(current.trim().replaceAll(".", "").replace(",", "."));
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+}
+
+function supplyCatalogue(record: UniversalEvidenceRecord): readonly SupplyCatalogueRow[] {
+  const source = optionalValue(record, "economic.unitPrices");
+  if (!Array.isArray(source) || !source.length) throw new Error("El suministro exige una relación estructurada de artículos y precios unitarios validada.");
+  const rows = source.map((value, index): SupplyCatalogueRow => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`La fila ${index + 1} del catálogo no es una estructura válida.`);
+    const row = value as Record<string, unknown>;
+    const description = firstString(row, "description", "denominacion", "concept");
+    if (!description) throw new Error(`La fila ${index + 1} del catálogo no contiene denominación.`);
+    return {
+      reference: firstString(row, "reference", "referencia") || `ART-${String(index + 1).padStart(3, "0")}`,
+      description,
+      technicalDescription: firstString(row, "technicalDescription", "descripcion", "specification"),
+      unit: firstString(row, "unit", "unidad") || "unidad",
+      quantity: finiteNumber(row, "quantity", "cantidad"),
+      unitPriceCents: finiteNumber(row, "unitPriceCents"),
+      lot: firstString(row, "lot", "lote") || "Lote único",
+      material: firstString(row, "material"),
+      dimensions: firstString(row, "dimensions", "dimensiones"),
+      personalization: firstString(row, "personalization", "personalizacion"),
+      packaging: firstString(row, "packaging", "embalaje"),
+      delivery: [firstString(row, "deliveryPlace", "lugarEntrega"), firstString(row, "deliveryDeadline", "plazoEntrega")].filter(Boolean).join(" · "),
+      verification: firstString(row, "verification", "verificationMethod", "observaciones"),
+    };
+  });
+  if (rows.length > 1) {
+    const incomplete = rows.findIndex(row => row.quantity === null || !row.technicalDescription);
+    if (incomplete >= 0) throw new Error(`La fila ${incomplete + 1} del catálogo debe indicar cantidad y descripción técnica mínima antes de generar.`);
+  }
+  return rows;
+}
+
+function catalogueEconomicTable(record: UniversalEvidenceRecord): SupplyGeneralTableValue {
+  const rows = supplyCatalogue(record);
+  return {
+    kind: "ODT_TABLE",
+    name: "CI_Catalogo_Economico",
+    headers: ["Referencia", "Artículo", "Cantidad", "Precio unitario sin IVA", "Importe sin IVA", "Lote"],
+    rows: rows.map(row => {
+      const total = row.quantity !== null && row.unitPriceCents !== null ? row.quantity * row.unitPriceCents : null;
+      return [row.reference, row.description, row.quantity === null ? "—" : `${row.quantity} ${row.unit}`, row.unitPriceCents === null ? "—" : euro(row.unitPriceCents), total === null ? "—" : euro(total), row.lot];
+    }),
+  };
+}
+
+function catalogueTechnicalTable(record: UniversalEvidenceRecord): SupplyGeneralTableValue {
+  const rows = supplyCatalogue(record);
+  return {
+    kind: "ODT_TABLE",
+    name: "CI_Catalogo_Tecnico",
+    headers: ["Ref. y artículo", "Cantidad", "Prescripciones técnicas mínimas", "Personalización, entrega y comprobación"],
+    rows: rows.map(row => [
+      `${row.reference} · ${row.description}`,
+      row.quantity === null ? `— (${row.unit})` : `${row.quantity} ${row.unit}`,
+      [row.technicalDescription, row.material && `Material: ${row.material}`, row.dimensions && `Dimensiones/capacidad: ${row.dimensions}`, row.packaging && `Embalaje: ${row.packaging}`].filter(Boolean).join(". "),
+      [row.personalization && `Personalización: ${row.personalization}`, row.delivery && `Entrega: ${row.delivery}`, row.verification && `Comprobación: ${row.verification}`].filter(Boolean).join(". ") || "Conformidad con las prescripciones y recepción material.",
+    ]),
+  };
+}
+
 function supplyDefinition(record: UniversalEvidenceRecord): string {
   const residual = residualDecisions(record);
   const units = String(residual.totalUnits ?? "").trim();
   const specification = String(residual.objectSpecification ?? "").trim();
   if (!units || /según la relación|documentación técnica/i.test(units)) throw new Error("El PPT exige el número o relación concreta de unidades del suministro; no basta una remisión genérica.");
   if (!specification || specification === text(record, "object")) throw new Error("El PPT exige especificaciones materiales adicionales al mero objeto del contrato.");
-  return `Definición material del suministro: ${specification} Número o relación total de unidades: ${units}.`;
+  return `Definición material del suministro: ${documentaryText(specification)} Número total de unidades: ${units}. La relación completa y las especificaciones de cada artículo figuran en la tabla siguiente.`;
 }
 
 function technicalWarrantySummary(record: UniversalEvidenceRecord): string {
@@ -330,6 +443,7 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
         { slotId: "cpvMain", value: cpvSummary(input.record) },
         { slotId: "lotsRegime", value: lotsRegime(input.record) },
         { slotId: "economicSummary", value: economicSummary(input.record) },
+        { slotId: "catalogueEconomicTable", value: catalogueEconomicTable(input.record) },
         { slotId: "estimatedValueSummary", value: estimatedValueSummary(input.record) },
         { slotId: "durationSummary", value: durationSummary(input.record) },
         { slotId: "procedureSummary", value: procedureSummary(input.record) },
@@ -365,6 +479,7 @@ export async function generateSupplyGeneralEvidenceDocuments(input: {
         { slotId: "executionLocations", value: stringArray(input.record, "technical.executionLocations") },
         { slotId: "technicalRequirements", value: technicalSpecifications(input.record) },
         { slotId: "supplyDefinition", value: supplyDefinition(input.record) },
+        { slotId: "catalogueTechnicalTable", value: catalogueTechnicalTable(input.record) },
         { slotId: "supplyVariantRequirements", value: supplyVariantRequirements(input.record) },
         { slotId: "receiptAndAcceptanceRegime", value: text(input.record, "execution.receiptAndAcceptanceRegime") },
         { slotId: "specialExecutionConditions", value: value(input.record, "execution.specialExecutionConditions") },

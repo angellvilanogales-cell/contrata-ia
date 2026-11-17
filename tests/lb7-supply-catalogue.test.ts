@@ -43,6 +43,9 @@ describe("LB-7 supply catalogue branch", () => {
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("sourceFileName");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain("sourceSha256");
     expect(SUPPLY_CATALOGUE_SCRIPT).toContain('crypto.subtle.digest("SHA-256"');
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("persistCatalogueEvidence");
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain('fieldPath:"economic.unitPrices"');
+    expect(SUPPLY_CATALOGUE_SCRIPT).toContain("requiere revisión y validación humana");
   });
 
   it("groups articles and subtotals by lot", () => {

@@ -42,6 +42,10 @@ describe("LB120 · interfaz de cierre", () => {
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("prescripción genérica insuficiente");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("technical.technicalRequirements");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Requisitos técnicos mínimos del suministro");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("OBJETO: reproduce una lista");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("Objeto sintético del contrato");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("fabricado en UE");
+    expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("technical.accessibilityRegime");
     expect(LB120_DOCUMENT_CONCLUSION_SCRIPT).toContain("await recheck()");
   });
 

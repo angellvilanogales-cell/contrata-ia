@@ -127,7 +127,8 @@ export function auditJdaSupplyAsaAnexoIText(anexoIText: string): AnexoIResidualA
   const findings: AnexoIResidualFinding[] = [];
 
   for (const line of lines) {
-    if (!isAuthorityField(line) || !isUnresolved(line)) continue;
+    const globallyUnresolvedChoice = /Sí\s*\/\s*No/i.test(line);
+    if (!(globallyUnresolvedChoice || (isAuthorityField(line) && isUnresolved(line)))) continue;
     findings.push({
       id: `anexo-i-residual-${findings.length + 1}`,
       severity: "BLOCKING",
