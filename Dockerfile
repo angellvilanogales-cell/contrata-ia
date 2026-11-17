@@ -17,6 +17,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY scripts/start-pilot.mjs ./scripts/start-pilot.mjs
+COPY knowledge ./knowledge
 RUN mkdir -p /data/contrata-ia && chown -R node:node /app /data/contrata-ia
 USER node
 EXPOSE 3000

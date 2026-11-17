@@ -91,6 +91,48 @@ describe("LB23 - renderer ODT de producción", () => {
     expect(content).not.toContain("[[OBJECT]]");
   });
 
+  it("admite renumeración de estilos solo con anclaje estructural único y contexto estable", async () => {
+    const entries = fixtureEntries().map(entry => entry.name === "content.xml" ? {
+      ...entry,
+      bytes: Buffer.from('<?xml version="1.0"?><office:document-content xmlns:office="urn:o" xmlns:text="urn:t"><office:automatic-styles/><office:body><office:text><text:p>Otro apartado</text:p><text:p text:style-name="P90"><text:span text:style-name="T90">_______</text:span></text:p><text:p>Importe máximo de las nuevas necesidades.</text:p><text:p text:style-name="P91"><text:span text:style-name="T91">_______</text:span></text:p></office:text></office:body></office:document-content>'),
+    } : entry);
+    const sourceBytes = writeOdtZip(entries);
+    const base = fixtureAsset(sourceBytes);
+    const asset = { ...base, templateId: "test-style-renumbered", slotIds: ["da33"] };
+    const renderer = new UniversalOdtProductionRenderer(
+      createInMemoryEditableTemplateBinaryStore([{ templateId: asset.templateId, sourceId: asset.sourceId, bytes: sourceBytes }]),
+      {
+        bindingsByTemplateId: { [asset.templateId]: [{
+          slotId: "da33", part: "content.xml", sourceSection: "1.C", sourceLabel: "DA 33.ª",
+          xmlToken: '<text:p text:style-name="P1"><text:span text:style-name="T1">_______</text:span></text:p>',
+          valueToken: "_______", anchorMode: "STYLE_NAME_AGNOSTIC",
+          anchorContextBefore: "Importe máximo de las nuevas necesidades.",
+        }] },
+      },
+    );
+    const rendered = await renderer.render({ asset, values: [{ slotId: "da33", value: "Sí", sourceFieldKey: "economic.da33" }] });
+    const content = Buffer.from(readOdtZip(rendered.bytes).find(entry => entry.name === "content.xml")?.bytes ?? []).toString("utf8");
+    expect(content).toContain('<text:p text:style-name="P91"><text:span text:style-name="T91">Sí</text:span></text:p>');
+    expect(content).toContain('<text:p text:style-name="P90"><text:span text:style-name="T90">_______</text:span></text:p>');
+  });
+
+  it("permite formateadores RAW_XML específicos por modelo", async () => {
+    const entries = fixtureEntries().map(entry => entry.name === "content.xml" ? { ...entry, bytes: Buffer.from('<office:document-content xmlns:office="urn:o" xmlns:text="urn:t"><office:automatic-styles/><office:body><office:text><text:p>[[RAW]]</text:p></office:text></office:body></office:document-content>') } : entry);
+    const sourceBytes = writeOdtZip(entries);
+    const base = fixtureAsset(sourceBytes);
+    const asset = { ...base, templateId: "test-template-formatter", slotIds: ["raw"] };
+    const renderer = new UniversalOdtProductionRenderer(
+      createInMemoryEditableTemplateBinaryStore([{ templateId: asset.templateId, sourceId: asset.sourceId, bytes: sourceBytes }]),
+      {
+        bindingsByTemplateId: { [asset.templateId]: [{ slotId: "raw", part: "content.xml", sourceSection: "14", sourceLabel: "Causa", xmlToken: "<text:p>[[RAW]]</text:p>", escapeMode: "RAW_XML" }] },
+        formattersByTemplateId: { [asset.templateId]: { raw: value => `<text:p>${String(value)}</text:p>` } },
+      },
+    );
+    const rendered = await renderer.render({ asset, values: [{ slotId: "raw", value: "Texto europeo", sourceFieldKey: "modification" }] });
+    const content = Buffer.from(readOdtZip(rendered.bytes).find(entry => entry.name === "content.xml")?.bytes ?? []).toString("utf8");
+    expect(content).toContain("<text:p>Texto europeo</text:p>");
+  });
+
   it("rechaza hash de contenido no verificable o distinto", async () => {
     const sourceBytes = writeOdtZip(fixtureEntries());
     const asset = { ...fixtureAsset(sourceBytes), contentHash: "sha256:" + "0".repeat(64) };

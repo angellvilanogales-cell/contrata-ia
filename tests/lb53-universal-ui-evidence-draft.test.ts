@@ -20,6 +20,42 @@ describe("LB53 - evidencia desde UI universal", () => {
     expect(validated.diagnostics?.join(" ")).toMatch(/reviewer/);
   });
 
+  it("admite y valida la decisión sobre criterios sujetos a juicio de valor", () => {
+    const declared = declareUniversalUiEvidence({ fieldPath: "criteria.judgmentCriteriaExist", value: false }, "operator");
+    const validated = validateUniversalUiEvidence(declared, "reviewer");
+    expect(validated.value).toBe(false);
+    expect(validated.status).toBe("HUMAN_VALIDATED");
+  });
+
+  it("admite todos los valores numéricos y booleanos que confirma el bloque de garantías", () => {
+    const values: Record<string, unknown> = {
+      "guarantees.provisionalGuaranteeRequired": false,
+      "guarantees.provisionalGuaranteePercent": 2.5,
+      "guarantees.definitiveGuaranteePercent": 5,
+      "guarantees.complementaryGuaranteePercent": 1.25,
+    };
+    for (const [fieldPath, value] of Object.entries(values)) {
+      const field = declareUniversalUiEvidence({ fieldPath, value }, "operator");
+      expect(validateUniversalUiEvidence(field, "reviewer").status).toBe("HUMAN_VALIDATED");
+    }
+  });
+
+  it("admite y valida las siete decisiones del bloque de subcontratación y cesión", () => {
+    const paths = [
+      "execution.subcontractingRegime",
+      "execution.subcontractingCriticalTasks",
+      "execution.subcontractingPriorOfferDisclosure",
+      "execution.subcontractingCommunicationRegime",
+      "execution.subcontractingPaymentControlRegime",
+      "execution.assignmentRegime",
+      "execution.assignmentRequirements",
+    ];
+    for (const fieldPath of paths) {
+      const field = declareUniversalUiEvidence({ fieldPath, value: `Texto validado: ${fieldPath}` }, "operator");
+      expect(validateUniversalUiEvidence(field, "reviewer").status).toBe("HUMAN_VALIDATED");
+    }
+  });
+
   it("preserva un conflicto sin elegir automáticamente un valor", () => {
     const conflict = markUniversalUiEvidenceConflict("execution.plannedModificationRegime", ["No procede", "20 % a la baja"], [ref, { kind: "PRIMARY_DOCUMENT", sourceId: "doc:otro" }]);
     expect(conflict.status).toBe("SOURCE_CONFLICT");
@@ -31,6 +67,12 @@ describe("LB53 - evidencia desde UI universal", () => {
   it("rechaza tipos de valor incompatibles con el control UI", () => {
     expect(() => declareUniversalUiEvidence({ fieldPath: "economic.initialVatAmountCents", value: "2216,01" }, "operator")).toThrow(/número entero/);
     expect(() => declareUniversalUiEvidence({ fieldPath: "lots.divisionIntoLots", value: "No" }, "operator")).toThrow(/booleano/);
+  });
+
+  it("admite código, denominación y asignaciones CPV por lote como evidencias separadas", () => {
+    expect(declareUniversalUiEvidence({ fieldPath: "cpvMainDescription", value: "Provisión de cursos de idiomas" }, "operator").value).toBe("Provisión de cursos de idiomas");
+    expect(declareUniversalUiEvidence({ fieldPath: "cpvAdditional", value: [{ code: "79634000-7", officialDescription: "Servicios de orientación profesional" }] }, "operator").status).toBe("SOURCE_DECLARED");
+    expect(declareUniversalUiEvidence({ fieldPath: "lots.cpvAssignments", value: [{ lotId: "LOT-1", cpvCodes: ["80580000-3"] }] }, "operator").status).toBe("SOURCE_DECLARED");
   });
 
   it("no permite mutar paths que no formen parte del manifiesto universal", () => {

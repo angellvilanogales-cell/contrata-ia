@@ -30,6 +30,10 @@ export interface EvidenceField<T> {
   legalBasis?: readonly string[];
   humanValidationRequired: boolean;
   humanValidated: boolean;
+  humanValidation?: {
+    by: string;
+    at: string;
+  };
   conflict?: {
     statements: readonly string[];
     treatment: "DO_NOT_AUTO_RESOLVE";

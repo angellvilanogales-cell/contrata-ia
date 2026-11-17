@@ -1,0 +1,1 @@
+Temporary transport marker for Panda V4 binary ingest. Binary ODTs are not committed here; their source identities remain protected by SHA in LB102PersistedPilotTemplateStores.ts.

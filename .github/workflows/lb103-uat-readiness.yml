@@ -1,0 +1,91 @@
+name: Contrata-IA LB103 UAT Readiness
+
+on:
+  push:
+    branches:
+      - agent/lb91-universalizacion-operativa
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lb103-uat-readiness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live-uat-readiness:
+    name: Verify live UAT readiness without replacing human acceptance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Wait for exact Render SHA and verify UAT prerequisites
+        env:
+          BASE_URL: https://contrata-ia.onrender.com
+          EXPECTED_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f runtime-version.json lb102-preflight.json adaptive.html pilot-acceptance.html
+          ready=0
+          for attempt in $(seq 1 24); do
+            version_code=$(curl --connect-timeout 15 --max-time 45 -sS -o runtime-version.json -w '%{http_code}' "$BASE_URL/api/runtime-version" || true)
+            if [[ "$version_code" != "200" ]]; then sleep 20; continue; fi
+            deployed_sha=$(node -e "const fs=require('node:fs');const v=JSON.parse(fs.readFileSync('runtime-version.json','utf8'));process.stdout.write(String(v.commit||''));")
+            runtime_kind=$(node -e "const fs=require('node:fs');const v=JSON.parse(fs.readFileSync('runtime-version.json','utf8'));process.stdout.write(String(v.runtime||''));")
+            echo "attempt=$attempt deployed=$deployed_sha runtime=$runtime_kind expected=$EXPECTED_SHA"
+            if [[ "$deployed_sha" != "$EXPECTED_SHA" || "$runtime_kind" != "LB103_AUTHORITATIVE_OVER_LB102" ]]; then sleep 20; continue; fi
+
+            adaptive_code=$(curl --connect-timeout 15 --max-time 45 -sS -o adaptive.html -w '%{http_code}' "$BASE_URL/adaptive" || true)
+            acceptance_code=$(curl --connect-timeout 15 --max-time 45 -sS -o pilot-acceptance.html -w '%{http_code}' "$BASE_URL/pilot-acceptance" || true)
+            preflight_code=$(curl --connect-timeout 15 --max-time 180 -sS -o lb102-preflight.json -w '%{http_code}' "$BASE_URL/api/lb102/preflight" || true)
+            echo "adaptive=$adaptive_code pilot-acceptance=$acceptance_code lb102-preflight=$preflight_code"
+            if [[ "$adaptive_code" != "200" || "$acceptance_code" != "200" || "$preflight_code" != "200" ]]; then
+              sleep 20
+              continue
+            fi
+
+            node <<'NODE'
+          const fs=require('node:fs');
+          const version=JSON.parse(fs.readFileSync('runtime-version.json','utf8'));
+          const preflight=JSON.parse(fs.readFileSync('lb102-preflight.json','utf8'));
+          const adaptive=fs.readFileSync('adaptive.html','utf8');
+          const acceptance=fs.readFileSync('pilot-acceptance.html','utf8');
+          if(version.productionReady!==false) throw new Error('runtime productionReady debe permanecer false');
+          if(version.humanAcceptanceRequired!==true) throw new Error('runtime debe exigir aceptación humana');
+          const human=version.humanUatRoleReadiness||{};
+          if(human.ready!==true) throw new Error(`Capacidad humana UAT insuficiente: reviewers=${human.reviewerCapableUsers??0}, admins=${human.adminCapableUsers??0}, usuarios con contraseña=${human.passwordEnabledNamedUsers??0}`);
+          if(human.twoDistinctReviewersReady!==true) throw new Error('Se requieren dos identidades nominativas distintas con rol REVIEWER o ADMIN y contraseña habilitada.');
+          if(human.finalAdminDecisionReady!==true) throw new Error('Se requiere al menos una identidad nominativa ADMIN con contraseña habilitada.');
+          if(preflight.technicalPrePilotReady!==true) throw new Error(`LB102 technicalPrePilotReady != true: ${(preflight.blockers||[]).join(' | ')}`);
+          if(preflight.lb101?.pilotSecurityReady!==true) throw new Error(`LB101 security no lista: ${(preflight.lb101?.blockers||[]).join(' | ')}`);
+          if(preflight.preHumanMachineSimulation?.passed!==true) throw new Error('simulación prehumana no superada');
+          if(preflight.preHumanMachineSimulation?.humanSimulationAllowed!==true) throw new Error('simulación humana no autorizada');
+          if(preflight.productionReady!==false) throw new Error('LB102 preflight productionReady debe permanecer false');
+          if(preflight.humanAcceptanceRequired!==true) throw new Error('LB102 preflight debe exigir aceptación humana');
+          if(!adaptive.includes('/adaptive/login')) throw new Error('/adaptive no expone el login seguro esperado');
+          if(!adaptive.includes('lb103-authoritative-generation.js')) throw new Error('/adaptive no carga LB103 autoritativo');
+          if(!acceptance.includes('acept') && !acceptance.toLowerCase().includes('piloto')) throw new Error('interfaz de aceptación humana no reconocible');
+          console.log(JSON.stringify({commit:version.commit,humanUatRoleReadiness:human,technicalPrePilotReady:preflight.technicalPrePilotReady,pilotSecurityReady:preflight.lb101.pilotSecurityReady,simulationPassed:preflight.preHumanMachineSimulation.passed,humanSimulationAllowed:preflight.preHumanMachineSimulation.humanSimulationAllowed,humanAcceptanceRequired:preflight.humanAcceptanceRequired,productionReady:preflight.productionReady},null,2));
+          NODE
+            ready=1
+            break
+          done
+          if [[ "$ready" != "1" ]]; then
+            echo "No se alcanzó preparación UAT viva para el SHA exacto."
+            cat runtime-version.json || true
+            cat lb102-preflight.json || true
+            exit 1
+          fi
+      - name: Preserve UAT readiness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lb103-live-uat-readiness-evidence
+          path: |
+            runtime-version.json
+            lb102-preflight.json
+            adaptive.html
+            pilot-acceptance.html
+          if-no-files-found: warn
+          retention-days: 30

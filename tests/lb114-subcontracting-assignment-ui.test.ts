@@ -1,0 +1,17 @@
+import {describe,expect,it} from "vitest";
+import {LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT} from "../src/interfaces/lb103/LB114SubcontractingAssignmentScript";
+
+describe("LB114 · interfaz",()=>{
+  it("organiza las decisiones y elimina el formato técnico",()=>{
+    for(const x of ['prior.status!=="HUMAN_VALIDATED"','1. Características del contrato','2. Información en la oferta','3. Tareas críticas de ejecución directa','4. Datos para analizar la cesión','Añadir tarea crítica','Esto es exactamente lo que se guardará','Artículo 214: cesión','Artículo 215: subcontratación']) expect(LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT).toContain(x);
+    expect(LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT).not.toContain("tarea | justificación");
+  });
+  it("oculta la pregunta de suministro en contratos de servicios",()=>{
+    for(const x of ['type!=="SUPPLY"','installLabel.style.display="none"',"Dato resuelto por el sistema","este expediente es un contrato de servicios",'supplyIncludesInstallationOrServices:type==="SUPPLY"']) expect(LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT).toContain(x);
+  });
+  it("persiste los siete componentes con validación humana y progreso",()=>{
+    for(const p of ["execution.subcontractingRegime","execution.subcontractingCriticalTasks","execution.subcontractingPriorOfferDisclosure","execution.subcontractingCommunicationRegime","execution.subcontractingPaymentControlRegime","execution.assignmentRegime","execution.assignmentRequirements"]) expect(LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT).toContain(p);
+    expect(LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT).toContain("Guardando decisión");
+    expect(LB114_SUBCONTRACTING_ASSIGNMENT_SCRIPT).toContain("lb114-human-validation");
+  });
+});

@@ -23,6 +23,24 @@ export interface UniversalUnitPrice {
   unitPriceCents: number;
 }
 
+export interface UniversalSupplyAsaPlannedModificationDecision {
+  budgetStability: {
+    applicable: boolean;
+    maximumPercent: number;
+  };
+  needsDa33: {
+    applicable: boolean;
+    maximumPercent: number;
+    limits: readonly string[];
+  };
+  other: {
+    applicable: boolean;
+    description: string;
+    maximumPercent: number;
+    limits: readonly string[];
+  };
+}
+
 /**
  * Componentes económicos explícitos del valor estimado. No son sinónimos de PBL,
  * presupuesto máximo ni duración temporal; se conservan separados para evitar
@@ -113,7 +131,7 @@ export interface UniversalExecutionEvidence {
   receiptAndAcceptanceRegime: EvidenceField<string>;
   extensionStructure?: EvidenceField<string>;
   extensionNoticeMonths?: EvidenceField<number>;
-  plannedModificationRegime?: EvidenceField<string>;
+  plannedModificationRegime?: EvidenceField<string | UniversalSupplyAsaPlannedModificationDecision>;
 }
 
 export interface UniversalCriteriaEvidence {

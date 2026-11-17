@@ -58,18 +58,19 @@ describe("Bloque 12.5 - selector canónico de modelo documental", () => {
     expect(result.canGenerateFullDocument).toBe(true);
   });
 
-  it("no reutiliza el PCAP abierto de servicios para un procedimiento simplificado", () => {
+  it("selecciona un perfil distinto y específico para servicios por abierto simplificado ordinario", () => {
     const result = selectCanonicalDocumentProfile(
       state("SERVICE", TipoProcedimiento.ABIERTO_SIMPLIFICADO),
       DocumentType.PCAP,
       createStandardContractDocumentProfiles(),
     );
 
-    expect(result.status).toBe("BLOCKED_BY_PROCEDURE");
-    expect(result.canGenerateFullDocument).toBe(false);
+    expect(result.status).toBe("SELECTED");
+    expect(result.profile?.id).toBe("SERVICE-PCAP-SIMPLIFIED-ORDINARY-CARL-2024");
+    expect(result.canGenerateFullDocument).toBe(true);
   });
 
-  it("bloquea el PCAP completo de suministros mientras solo exista el Anexo I", () => {
+  it("bloquea el PCAP completo de suministros cuando no existe perfil para el procedimiento abierto solicitado", () => {
     const result = selectCanonicalDocumentProfile(
       state("SUPPLY", TipoProcedimiento.ABIERTO),
       DocumentType.PCAP,
