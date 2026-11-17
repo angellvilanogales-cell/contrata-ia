@@ -29,10 +29,12 @@ describe("LB105 normalización física Supply", () => {
         expect(content).toContain('text:style-name="CI_LB105_Heading1_Continuation">12. Garantías');
         expect(content).toContain("{{capacityAndSolvencySummary}}");
         expect(content).toContain("{{managementExecutionPaymentSummary}}");
+        expect(content).toContain("{{catalogueEconomicTable}}");
         expect(content).not.toContain("se regirán por el PCAP");
       } else {
         const content = Buffer.from(readOdtZip(bytes).find(item => item.name === "content.xml")!.bytes).toString("utf8");
         expect(content).toContain("{{supplyDefinition}}");
+        expect(content).toContain("{{catalogueTechnicalTable}}");
         expect(content).toContain("{{technicalDocumentationSummary}}");
       }
     });

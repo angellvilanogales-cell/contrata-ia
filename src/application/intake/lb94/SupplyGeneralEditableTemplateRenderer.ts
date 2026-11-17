@@ -8,6 +8,13 @@ export interface SupplyGeneralTemplateValue {
   value: unknown;
 }
 
+export interface SupplyGeneralTableValue {
+  kind: "ODT_TABLE";
+  name: string;
+  headers: readonly string[];
+  rows: readonly (readonly string[])[];
+}
+
 export interface SupplyGeneralRenderedDocument {
   kind: SupplyGeneralTemplateKind;
   templateId: string;
@@ -28,6 +35,21 @@ function xmlEscape(value: string): string { return value.replace(/&/g, "&amp;").
 function entry(entries: readonly OdtZipEntry[], name: string): OdtZipEntry { const found = entries.find(item => item.name === name); if (!found) throw new Error(`ODT inválido: falta ${name}.`); return found; }
 function replace(entries: readonly OdtZipEntry[], name: string, text: string): OdtZipEntry[] { return entries.map(item => item.name === name ? { ...item, bytes: Buffer.from(text, "utf8") } : item); }
 function count(text: string, token: string): number { if (!token) return 0; let total = 0; let cursor = 0; while ((cursor = text.indexOf(token, cursor)) >= 0) { total += 1; cursor += token.length; } return total; }
+
+function isTableValue(value: unknown): value is SupplyGeneralTableValue {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const table = value as Partial<SupplyGeneralTableValue>;
+  return table.kind === "ODT_TABLE" && typeof table.name === "string" && Array.isArray(table.headers) && Array.isArray(table.rows);
+}
+
+function tableXml(value: SupplyGeneralTableValue, slotId: string): string {
+  if (!value.headers.length || value.headers.length > 8) throw new Error(`La tabla ${slotId} debe tener entre una y ocho columnas.`);
+  if (!value.rows.length) throw new Error(`La tabla ${slotId} no contiene filas.`);
+  if (value.rows.some(row => row.length !== value.headers.length)) throw new Error(`La tabla ${slotId} contiene filas con un número de columnas incoherente.`);
+  const cell = (text: string, header = false) => `<table:table-cell office:value-type="string"><text:p${header ? ' text:style-name="CI_LB105_Heading2"' : ' text:style-name="CI_LB105_Body"'}>${xmlEscape(text)}</text:p></table:table-cell>`;
+  const row = (values: readonly string[], header = false) => `<table:table-row>${values.map(item => cell(item, header)).join("")}</table:table-row>`;
+  return `<table:table table:name="${xmlEscape(value.name)}"><table:table-header-rows>${row(value.headers, true)}</table:table-header-rows><table:table-rows>${value.rows.map(item => row(item)).join("")}</table:table-rows></table:table>`;
+}
 
 function formatDefault(value: unknown, slotId: string): string {
   if (value === null || value === undefined) return "";
@@ -67,9 +89,16 @@ export function renderSupplyGeneralEditableTemplate(input: {
     if (!bySlot.has(slotId)) throw new Error(`Falta valor documental para el slot obligatorio ${slotId}.`);
     const token = `{{${slotId}}}`;
     if (count(content, token) !== 1) throw new Error(`El slot ${slotId} no tiene anclaje físico único.`);
-    const formatter = input.formatters?.[slotId];
-    const formatted = formatter ? formatter(bySlot.get(slotId)) : formatDefault(bySlot.get(slotId), slotId);
-    content = content.replace(token, xmlEscape(formatted));
+    const rawValue = bySlot.get(slotId);
+    if (isTableValue(rawValue)) {
+      const paragraphPattern = new RegExp(`<text:p\\b[^>]*>\\s*${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*</text:p>`);
+      if (!paragraphPattern.test(content)) throw new Error(`El slot tabular ${slotId} debe ocupar un párrafo físico independiente.`);
+      content = content.replace(paragraphPattern, tableXml(rawValue, slotId));
+    } else {
+      const formatter = input.formatters?.[slotId];
+      const formatted = formatter ? formatter(rawValue) : formatDefault(rawValue, slotId);
+      content = content.replace(token, xmlEscape(formatted));
+    }
     applied.push(slotId);
   }
 

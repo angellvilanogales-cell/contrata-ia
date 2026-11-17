@@ -65,6 +65,9 @@ export function assertSupplyAsaAnnexIResidualDecisions(value:unknown): asserts v
   for(const definition of SUPPLY_ASA_ANNEX_I_RESIDUAL_DECISIONS){const current=row[definition.id];if(typeof current!=="string"||!current.trim())throw new Error(`${definition.label}: falta decisión.`);if(/_{3,}|Sí\s*\/\s*No/i.test(current))throw new Error(`${definition.label}: contiene un valor sin resolver.`);if(generic.test(current))throw new Error(`${definition.label}: la propuesta es genérica y debe concretarse para este expediente.`);if(definition.control==="YES_NO"&&!/^(?:Sí|Si|No)$/i.test(current.trim()))throw new Error(`${definition.label}: seleccione Sí o No.`);}
   if(!/\d/.test(String(row.totalUnits)))throw new Error("Número total de unidades: indique una cifra o una relación cuantificada concreta.");
   if(!/\d/.test(String(row.totalAmount)))throw new Error("Importe total asociado a las unidades: indique el importe concreto con IVA.");
+  if(String(row.objectSpecification).length>500)throw new Error("Especificaciones adicionales del objeto: utilice una síntesis de hasta 500 caracteres y traslade el catálogo detallado a la tabla del PPT.");
+  if(String(row.totalUnits).length>120)throw new Error("Número total de unidades: indique el total numérico; el desglose por artículo debe figurar en la tabla del PPT.");
+  for(const key of ["lotsDescription","lot1","lot2"]){if(String(row[key]).length>600)throw new Error("La descripción de los lotes debe ser sintética; la relación de artículos debe figurar en la tabla estructurada.");}
 }
 
 interface ParagraphSpan{xml:string;start:number;end:number;}

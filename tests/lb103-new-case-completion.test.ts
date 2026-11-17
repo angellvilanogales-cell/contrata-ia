@@ -83,6 +83,10 @@ describe("LB103 nuevo expediente y selección física", () => {
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("technical.executionLocations");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("execution.extensionStructure");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("economic.annualityBudgetRows");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Prescripción técnica mínima");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("Relación estructurada de ");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("data-original");
+    expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("decodeURIComponent(row.dataset.original");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("No se cambiará el procedimiento ni la financiación");
     expect(LB103_AUTHORITATIVE_GENERATION_SCRIPT).toContain("ui:lb103:document-recovery");
   });
