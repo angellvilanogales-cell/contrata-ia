@@ -96,13 +96,20 @@ function documentLabel(value: string): string {
   return DOCUMENT_LABELS[value] ?? value.replaceAll("_", " ").toLocaleLowerCase("es-ES");
 }
 
-function documentaryText(value: string): string {
+export function normalizeSupplyDocumentaryText(value: string): string {
   const labelled = Object.entries(DOCUMENT_LABELS).reduce(
     (current, [code, label]) => current.replaceAll(code, label),
     value,
   );
-  return labelled.replace(/\bServicio\s+erues\b/giu, "Servicio EURES");
+  return labelled
+    .replace(/\bServicio\s+erues\b/giu, "Servicio EURES")
+    .replace(
+      /El abono se tramitará dentro de los treinta días siguientes a la aprobación del documento de conformidad, sin convertir este plazo legal en una fecha de pago inventada\./giu,
+      "De conformidad con el artículo 198.4 LCSP, el abono se tramitará dentro de los treinta días siguientes a la aprobación del documento que acredite la conformidad con la prestación.",
+    );
 }
+
+const documentaryText = normalizeSupplyDocumentaryText;
 
 function optionalValue(record: UniversalEvidenceRecord, path: string): unknown {
   if (!record.fields[path]) return null;
